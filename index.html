@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MotifJS — coming soon</title>
+<meta name="description" content="MotifJS is a UI framework for JavaScript and TypeScript: components written as classes, functions or options objects, fine-grained reactivity without a virtual DOM, routing and dependency injection. Not public yet.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f3efe6'/%3E%3Cpath d='M9 9l14 14M23 9L9 23' stroke='%23b3441e' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root {
+  --paper: #f3efe6;
+  --ink: #1c1a16;
+  --ink-soft: #57524a;
+  --rule: #d8d1c2;
+  --accent: #b3441e;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Charter, "Bitstream Charter", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --edge: clamp(16px, 9vw, 152px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #171512;
+    --ink: #ece6da;
+    --ink-soft: #a9a193;
+    --rule: #3a352d;
+    --accent: #e0805b;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.55;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+.hem {
+  display: block;
+  width: min(330px, 100%);
+  height: auto;
+  margin: 0 0 clamp(32px, 6vh, 56px);
+}
+.hem path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+header, main, .journey { padding: 0 var(--edge); }
+header { padding-top: clamp(40px, 10vh, 104px); }
+h1 {
+  margin: 0 0 0 -0.04em;
+  font-weight: 400;
+  font-size: clamp(4rem, 13vw, 9.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+}
+main {
+  margin-top: clamp(28px, 5vh, 48px);
+  display: grid;
+  grid-template-columns: minmax(0, 34rem) minmax(0, 17rem);
+  column-gap: clamp(40px, 6vw, 96px);
+  row-gap: 24px;
+  align-items: start;
+}
+.lead {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.1vw, 1.5rem);
+  line-height: 1.4;
+  max-width: 30em;
+}
+.aside {
+  padding-top: 0.35em;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.aside p { margin: 0 0 0.75em; }
+.aside p:last-child { margin-bottom: 0; }
+.aside strong {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+}
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.22em;
+}
+a:hover { text-decoration-thickness: 3px; }
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.journey {
+  margin-top: clamp(96px, 18vh, 176px);
+  padding-bottom: clamp(48px, 10vh, 96px);
+}
+.journey h2 {
+  margin: 0 0 clamp(32px, 5vh, 48px) -0.02em;
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 40rem;
+}
+.steps li {
+  position: relative;
+  padding: 0 0 clamp(36px, 6vh, 56px) 40px;
+}
+.steps li:last-child { padding-bottom: 0; }
+.steps li::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: -12px;
+  left: 5px;
+  border-left: 1px solid var(--rule);
+}
+.steps li:last-child::before { display: none; }
+.steps li:nth-last-child(2)::before { border-left-style: dashed; }
+.steps li::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-soft);
+  background: var(--paper);
+}
+.steps .now::after {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.steps .next::after {
+  border-style: dashed;
+  border-color: var(--accent);
+}
+.steps h3 {
+  margin: 0;
+  font-weight: 400;
+  font-size: 1.625rem;
+  line-height: 1.15;
+}
+.steps .now h3 { color: var(--accent); }
+.steps p { margin: 12px 0 0; max-width: 36em; }
+.more {
+  margin-top: 1.25em;
+  font-size: 1.0625rem;
+}
+@media (max-width: 760px) {
+  main { grid-template-columns: minmax(0, 1fr); }
+  .aside { padding-top: 0; }
+}
+@media (max-width: 480px) {
+  body { font-size: 17px; }
+  header { padding-top: 40px; }
+  .steps li { padding-left: 32px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <svg class="hem" viewBox="0 0 264 24" width="330" height="30" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="stitch" width="64" height="24" patternUnits="userSpaceOnUse">
+        <path d="M2 2l4 4M6 2l-4 4M10 10l4 4M14 10l-4 4M18 18l4 4M22 18l-4 4M26 10l4 4M30 10l-4 4M34 2l4 4M38 2l-4 4M42 10l4 4M46 10l-4 4M50 18l4 4M54 18l-4 4M58 10l4 4M62 10l-4 4"/>
+      </pattern>
+    </defs>
+    <rect width="264" height="24" fill="url(#stitch)"/>
+  </svg>
+  <h1>MotifJS</h1>
+</header>
+<main>
+  <p class="lead">A UI framework for JavaScript and TypeScript: components written as classes, functions or options objects, fine-grained reactivity without a virtual DOM, routing and dependency injection.</p>
+  <div class="aside">
+    <p><strong>Not public yet.</strong> The first release is being prepared.</p> 
+    <p class="more"><a href="https://github.com/motifjsdev">github.com/motifjsdev</a></p>
+  </div>
+</main>
+<section class="journey" aria-labelledby="journey-title">
+  <h2 id="journey-title">Journey</h2>
+  <ol class="steps">
+      <li>
+        <h3>Fighting the framework</h3>
+        <p>We were building metadata-driven systems, and the frameworks we used kept getting in our way. We spent more time configuring them and bending them to fit than on the apps we actually wanted to build.</p>
+      </li>
+      <li>
+        <h3>A framework of our own</h3>
+        <p>So in 2018 we decided to write our own. A small one, just for our internal systems. We called it movico (mo-vi-co, from model, view and controller). It never went to npm, we only passed it around locally.</p>
+      </li>
+      <li>
+        <h3>A new name</h3>
+        <p>In 2022 movico became movijs and we put it on npm. We used it in our own systems for years and always wanted to release it under MIT, but honestly there was never enough time for docs or for turning it into a real public project. The last version, 1.4.1, came out in December 2024 and that was it.</p>
+      </li>
+      <li>
+        <h3>It grew</h3>
+        <p>It started simple and kept growing. Using it was easy and honestly fun, we reached for it every day. The code behind it was another story though. It got messy, things were all over the place and it became hard to maintain. So we started cleaning it up.</p>
+      </li>
+      <li class="now">
+        <h3>Opening it up</h3>
+        <p>While cleaning up we kept thinking: if we like it this much, maybe other developers will too. So we decided to open it up under a new name, MotifJS, and now we work on it full time. That means docs, examples, cleaner code, and figuring out what goes in the core and what should be a separate package. It is taking a while, and we are still on it.</p>
+      </li>
+      <li class="next">
+        <h3>Open to everyone</h3>
+        <p>We hope to release it soon, so you can spend your time on your own project instead of fighting a framework.</p>
+      </li>
+  </ol>
+</section>
+</body>
+</html>
