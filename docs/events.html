@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="DOM events and modifiers, motif.on/off/trigger component events, lifecycle events, the application event bus and service events with Emitter; with and without JSX.">
+    <title>Events — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/events">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/events">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/events">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/events">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/events">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Events">
+    <meta property="og:description" content="DOM events and modifiers, motif.on/off/trigger component events, lifecycle events, the application event bus and service events with Emitter; with and without JSX.">
+    <script type="application/json" id="doc-data">{"slug":"events","locale":"en","title":"Events","description":"DOM events and modifiers, motif.on/off/trigger component events, lifecycle events, the application event bus and service events with Emitter; with and without JSX.","category":{"id":"2","title":"Core concepts"},"html":"\u003Cp\u003EMotifJS has three layers of events:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Cstrong\u003EDOM events\u003C/strong\u003E — attached to an element with props such as \u003Ccode\u003Eonclick\u003C/code\u003E and \u003Ccode\u003Eoninput\u003C/code\u003E, and without JSX with \u003Ccode\u003Emotif.on\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EComponent events\u003C/strong\u003E — communication between components with \u003Ccode\u003Ecomponent.motif.on/trigger/off\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EApplication events\u003C/strong\u003E — application-wide broadcasts with \u003Ccode\u003Econtext.on/fire\u003C/code\u003E.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EThe examples are slices of the notes application in the starter template: the notes list (\u003Ccode\u003ENotesLayout\u003C/code\u003E) and the editor (\u003Ccode\u003ENotePage\u003C/code\u003E). \u003Ccode\u003ENote\u003C/code\u003E and \u003Ccode\u003ENotesService\u003C/code\u003E are the ones in the \u003Ccode\u003Esrc/services/notes.ts\u003C/code\u003E file on the \u003Ca href=\u0022/docs/components\u0022\u003EComponents\u003C/a\u003E page.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Ethis.state\u003C/code\u003E is the component\u0027s own state; \u003Ccode\u003Ethis.remove\u003C/code\u003E and \u003Ccode\u003Ethis.close\u003C/code\u003E are methods of the component.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Estate\u003C/code\u003E is the local state the component sets up with \u003Ccode\u003Ereactive\u003C/code\u003E; \u003Ccode\u003Eremove\u003C/code\u003E and \u003Ccode\u003Eclose\u003C/code\u003E are local functions inside the component function.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022dom-events\u0022\u003EDOM events\u003C/h2\u003E\n\u003Cp\u003EIn JSX, \u003Ccode\u003Eon...\u003C/code\u003E props are attached to DOM events, and event names are written in lower case. Without JSX the same binding is a \u003Ccode\u003Emotif.on(name, handler)\u003C/code\u003E call:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Pin\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (this.state.query = (e.target as HTMLInputElement).value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Archive\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Pin\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (state.query = (e.target as HTMLInputElement).value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Archive\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Pin\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (this.state.query = (e.target as HTMLInputElement).value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link: ComponentBase) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Archive\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Pin\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (state.query = (e.target as HTMLInputElement).value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link: ComponentBase) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Archive\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Pin\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (this.state.query = e.target.value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Archive\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Pin\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (state.query = e.target.value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Archive\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Pin\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (this.state.query = e.target.value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender, e) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Archive\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Pin\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (state.query = e.target.value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender, e) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Archive\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EOn a plain tag every DOM event is attached this way (\u003Ccode\u003Eonpointerdown\u003C/code\u003E, \u003Ccode\u003Eonmouseenter\u003C/code\u003E and \u003Ccode\u003Eonanimationend\u003C/code\u003E included); a camelCase spelling such as \u003Ccode\u003EonClick\u003C/code\u003E attaches the same event.\u003C/p\u003E\n\u003Cp\u003EOn a component tag, a prop carrying a DOM event name (\u003Ccode\u003Eonchange\u003C/code\u003E/\u003Ccode\u003EonChange\u003C/code\u003E, \u003Ccode\u003EonCopy\u003C/code\u003E, \u003Ccode\u003EonResize\u003C/code\u003E, \u003Ccode\u003EonSelect\u003C/code\u003E, \u003Ccode\u003EonReset\u003C/code\u003E, \u003Ccode\u003EonContextMenu\u003C/code\u003E …) is attached to the component\u0027s element as a DOM listener and does not reach the component\u0027s props; for the camelCase spelling the compiler prints an \u003Ccode\u003EMJX002\u003C/code\u003E warning. For a callback prop, pick a name that does not clash with a DOM event (\u003Ccode\u003EonValueChange\u003C/code\u003E, \u003Ccode\u003EonConfirm\u003C/code\u003E). In a component without an element (a fragment) there is no element for such a listener to be attached to (see \u003Ca href=\u0022/docs/components#root-element\u0022\u003ERoot element\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022handler-signatures\u0022\u003EHandler signatures\u003C/h3\u003E\n\u003Cp\u003EA handler is written in one of two forms, and MotifJS calls the right one based on the number of parameters. The rule is the same for \u003Ccode\u003Emotif.on\u003C/code\u003E: a one-parameter handler receives the event, not the sender:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;text\u0026quot; onkeydown={(e) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create()} /\u0026gt;          {/* event only */}\n\u0026lt;li onclick={(sender, e) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;)}\u0026gt;…\u0026lt;/li\u0026gt;                       {/* sender \u002B event */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst field = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.motif.on(\u0026quot;keydown\u0026quot;, (_sender: ComponentBase, e: KeyboardEvent) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create());\n});\nconst row = motifComponent(\u0026quot;li\u0026quot;, (li: ComponentBase) =\u0026gt; {\n  li.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;text\u0026quot; onkeydown={(e) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create()} /\u0026gt;          {/* event only */}\n\u0026lt;li onclick={(sender, e) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;)}\u0026gt;…\u0026lt;/li\u0026gt;                       {/* sender \u002B event */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst field = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.motif.on(\u0026quot;keydown\u0026quot;, (_sender, e) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create());\n});\nconst row = motifComponent(\u0026quot;li\u0026quot;, (li) =\u0026gt; {\n  li.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Esender\u003C/code\u003E — the \u003Ccode\u003EComponentBase\u003C/code\u003E instance that triggered the event; you can reach members such as \u003Ccode\u003Esender.element\u003C/code\u003E, \u003Ccode\u003Esender.context\u003C/code\u003E and \u003Ccode\u003Esender.motif\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EIf the handler returns \u003Ccode\u003E{ cancel: true }\u003C/code\u003E, MotifJS calls \u003Ccode\u003EpreventDefault()\u003C/code\u003E and \u003Ccode\u003EstopPropagation()\u003C/code\u003E. Other return values, \u003Ccode\u003Efalse\u003C/code\u003E included, are ignored, which is why the short body of \u003Ccode\u003Eonkeydown\u003C/code\u003E above does not cancel other keys. These methods are called only if they exist on the event object; when a plain data object is passed with \u003Ccode\u003Emotif.trigger(\u0026quot;name\u0026quot;, { … })\u003C/code\u003E, neither is called and no error occurs. The \u003Ccode\u003E:prevent\u003C/code\u003E / \u003Ccode\u003E:stop\u003C/code\u003E modifiers follow the same rule.\u003C/li\u003E\n\u003Cli\u003EThe number of parameters is the function\u0027s \u003Ccode\u003Elength\u003C/code\u003E: if the declared parameter count is ≤ 1, \u003Ccode\u003Efn(event)\u003C/code\u003E is called, and if it is 2 or more, \u003Ccode\u003Efn(sender, event)\u003C/code\u003E. A parameter with a default value or a rest parameter, and anything after it, is not counted; so \u003Ccode\u003E(...a) =\u0026gt; …\u003C/code\u003E counts as 0 and receives only \u003Ccode\u003Eevent\u003C/code\u003E, and \u003Ccode\u003E(s = null, e) =\u0026gt; …\u003C/code\u003E counts as 0 too.\u003C/li\u003E\n\u003Cli\u003EIn TypeScript both forms, on a plain tag and on a component tag, are typed from the element\u0027s event: with \u003Ccode\u003Eonkeydown={(e) =\u0026gt; e.key}\u003C/code\u003E, \u003Ccode\u003Ee\u003C/code\u003E is a \u003Ccode\u003EKeyboardEvent\u003C/code\u003E, and in the \u003Ccode\u003E(s, e) =\u0026gt; …\u003C/code\u003E form \u003Ccode\u003Ee\u003C/code\u003E gets the same type. Since the meaning of the first parameter depends on the number of parameters, the event and the component are typed together (\u003Ccode\u003EKeyboardEvent \u0026amp; ComponentBase\u003C/code\u003E); use the event\u0027s members inside \u003Ccode\u003E(e) =\u0026gt; …\u003C/code\u003E and the component\u0027s members inside \u003Ccode\u003E(s, e) =\u0026gt; …\u003C/code\u003E. The type of \u003Ccode\u003Emotif.on\u003C/code\u003E is the \u003Ccode\u003E(sender, e)\u003C/code\u003E signature; if you are going to use the event, write two parameters.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022handler-errors\u0022\u003EHandler errors\u003C/h3\u003E\n\u003Cp\u003EIf a handler throws, or the promise returned by an \u003Ccode\u003Easync\u003C/code\u003E handler is rejected, the error is reported to \u003Ccode\u003EerrorHandler\u003C/code\u003E as a \u003Ccode\u003EMotifError\u003C/code\u003E with the code \u003Ccode\u003EMJX123\u003C/code\u003E (\u003Ccode\u003EThe \u0027\u0026lt;event\u0026gt;\u0027 event handler threw.\u003C/code\u003E), with the original error in the \u003Ccode\u003Ecause\u003C/code\u003E field. The report is written to the console in production mode too (\u003Ccode\u003Eapp.useLogging(false)\u003C/code\u003E turns it off) and reaches the \u003Ccode\u003EerrorHandler.addListener(fn)\u003C/code\u003E listeners. The other listeners of the same event keep running.\u003C/p\u003E\n\u003Ch3 id=\u0022context-events\u0022\u003EThe \u003Ccode\u003Eon:name\u003C/code\u003E / \u003Ccode\u003Eon-name\u003C/code\u003E / \u003Ccode\u003Eon_name\u003C/code\u003E spelling\u003C/h3\u003E\n\u003Cp\u003EThis spelling attaches the handler as it is to the tag\u0027s component: \u003Ccode\u003E\u0026lt;X on:saved={fn}/\u0026gt;\u003C/code\u003E means \u003Ccode\u003Esender.motif.on(\u0026quot;saved\u0026quot;, fn)\u003C/code\u003E. The event name is everything left after the prefix (\u003Ccode\u003Eon:\u003C/code\u003E, \u003Ccode\u003Eon-\u003C/code\u003E, \u003Ccode\u003Eon_\u003C/code\u003E) is dropped: \u003Ccode\u003Eon-my-event\u003C/code\u003E → \u003Ccode\u003Emy-event\u003C/code\u003E, \u003Ccode\u003Eon_my_event\u003C/code\u003E → \u003Ccode\u003Emy_event\u003C/code\u003E. It is used both for DOM events and for custom events triggered with \u003Ccode\u003Emotif.trigger\u003C/code\u003E, and the parameter count rule above applies just the same:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target: Note) =\u0026gt; this.remove(target)} /\u0026gt;   {/* one parameter: the data given to trigger */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* two parameters: sender \u002B event */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={this.close}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* the method reference is passed as is */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target: Note) =\u0026gt; remove(target)} /\u0026gt;   {/* one parameter: the data given to trigger */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* two parameters: sender \u002B event */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={close}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* the function reference is passed as is */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm: ComponentBase, target: Note) =\u0026gt; this.remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, this.close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm: ComponentBase, target: Note) =\u0026gt; remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target) =\u0026gt; this.remove(target)} /\u0026gt;   {/* one parameter: the data given to trigger */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* two parameters: sender \u002B event */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={this.close}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* the method reference is passed as is */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target) =\u0026gt; remove(target)} /\u0026gt;   {/* one parameter: the data given to trigger */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* two parameters: sender \u002B event */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={close}\u0026gt;Close\u0026lt;/button\u0026gt;   {/* the function reference is passed as is */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm, target) =\u0026gt; this.remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, this.close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm, target) =\u0026gt; remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Close\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EWhen the \u0026quot;Delete\u0026quot; button is pressed, the delete confirmation \u003Ccode\u003EDeleteConfirm\u003C/code\u003E calls \u003Ccode\u003Emotif.trigger(\u0026quot;confirm\u0026quot;, note)\u003C/code\u003E on its own component (\u003Ccode\u003Ethis.motif.trigger\u003C/code\u003E in a class and in Options, the \u003Ccode\u003Emotif.trigger\u003C/code\u003E of the root it returns in a function component), and the first handler receives the note. Without JSX the listener is set up in the \u003Ccode\u003EinitializeComponent\u003C/code\u003E key, the same for class, function and Options components. Since the event name is free, the parameters of \u003Ccode\u003Eon:\u003C/code\u003E/\u003Ccode\u003Eon-\u003C/code\u003E/\u003Ccode\u003Eon_\u003C/code\u003E props are typed \u003Ccode\u003Eany\u003C/code\u003E; you give the data its own type in the parameter (\u003Ccode\u003E(target: Note) =\u0026gt; …\u003C/code\u003E). The type of \u003Ccode\u003Emotif.on\u003C/code\u003E is \u003Ccode\u003E(sender, e)\u003C/code\u003E, so without JSX the data is the second parameter.\u003C/p\u003E\n\u003Ch2 id=\u0022modifiers\u0022\u003EEvent modifiers\u003C/h2\u003E\n\u003Cp\u003EModifiers added to the event name with a colon adjust the behaviour. They are defined in the \u003Ccode\u003Ecomponent.motif.on\u003C/code\u003E API and in the type system:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EModifier\u003C/th\u003E\n\u003Cth\u003EEffect\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:once\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERuns once, then removes itself.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:passive\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Epassive: true\u003C/code\u003E for \u003Ccode\u003EaddEventListener\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:capture\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EListens in the capture phase.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:prevent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EpreventDefault()\u003C/code\u003E after the handler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:stop\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EstopPropagation()\u003C/code\u003E after the handler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:self\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERuns only if the event target is the element itself.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:trusted\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERuns only for \u003Ccode\u003EisTrusted\u003C/code\u003E events.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EIn JSX an attribute name can take only one \u003Ccode\u003E:\u003C/code\u003E, so on a tag you write one modifier per attribute; with \u003Ccode\u003Emotif.on\u003C/code\u003E they chain. A prop with a modifier gets the same type as the one without; inside \u003Ccode\u003Eonkeydown:once={(e) =\u0026gt; e.key}\u003C/code\u003E, \u003Ccode\u003Ee\u003C/code\u003E is a \u003Ccode\u003EKeyboardEvent\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;form onsubmit:prevent={() =\u0026gt; notes.create()}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;button type=\u0026quot;button\u0026quot; onclick:once={() =\u0026gt; notes.create()}\u0026gt;Create the first note\u0026lt;/button\u0026gt;\n\u0026lt;div class=\u0026quot;list\u0026quot; onscroll:passive={() =\u0026gt; rememberScroll()}\u0026gt;…\u0026lt;/div\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst form = motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; notes.create());\n});\nconst first = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click:once\u0026quot;, () =\u0026gt; notes.create());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Create the first note\u0026quot;)));\n});\nconst list = motifComponent(\u0026quot;div\u0026quot;, (list: ComponentBase) =\u0026gt; {\n  list.class.add(\u0026quot;list\u0026quot;);\n  list.motif.on(\u0026quot;scroll:passive\u0026quot;, () =\u0026gt; rememberScroll());\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;form onsubmit:prevent={() =\u0026gt; notes.create()}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;button type=\u0026quot;button\u0026quot; onclick:once={() =\u0026gt; notes.create()}\u0026gt;Create the first note\u0026lt;/button\u0026gt;\n\u0026lt;div class=\u0026quot;list\u0026quot; onscroll:passive={() =\u0026gt; rememberScroll()}\u0026gt;…\u0026lt;/div\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst form = motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; notes.create());\n});\nconst first = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click:once\u0026quot;, () =\u0026gt; notes.create());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Create the first note\u0026quot;)));\n});\nconst list = motifComponent(\u0026quot;div\u0026quot;, (list) =\u0026gt; {\n  list.class.add(\u0026quot;list\u0026quot;);\n  list.motif.on(\u0026quot;scroll:passive\u0026quot;, () =\u0026gt; rememberScroll());\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022component-events\u0022\u003EThe component event API: \u003Ccode\u003Emotif.on\u003C/code\u003E / \u003Ccode\u003Emotif.off\u003C/code\u003E / \u003Ccode\u003Emotif.trigger\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EProgrammatic event handling on every component lives in the \u003Ccode\u003Emotif\u003C/code\u003E namespace. In the example, when the row is clicked the component triggers its own \u003Ccode\u003Esaved\u003C/code\u003E event; that event\u0027s handler is registered internally only:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Econst onSaved = (sender: ComponentBase, saved: Note) =\u0026gt; notes.touch(saved);\n\nthis.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.motif.trigger(\u0026quot;saved\u0026quot;, note));\nthis.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nthis.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Econst onSaved = (sender: ComponentBase, saved: Note) =\u0026gt; notes.touch(saved);\n\nrow.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; row.motif.trigger(\u0026quot;saved\u0026quot;, note));\nrow.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nrow.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Econst onSaved = (sender, saved) =\u0026gt; notes.touch(saved);\n\nthis.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.motif.trigger(\u0026quot;saved\u0026quot;, note));\nthis.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nthis.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Econst onSaved = (sender, saved) =\u0026gt; notes.touch(saved);\n\nrow.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; row.motif.trigger(\u0026quot;saved\u0026quot;, note));\nrow.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nrow.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn a function component these calls are made on the component itself (\u003Ccode\u003Erow\u003C/code\u003E in the example): in JSX, the component that reaches the root\u0027s \u003Ccode\u003EonConfig\u003C/code\u003E hook or \u003Ccode\u003Eref\u003C/code\u003E, and without JSX, the component received by the function of the \u003Ccode\u003EmotifComponent\u003C/code\u003E call that builds the root.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EListeners added with \u003Ccode\u003Emotif.on\u003C/code\u003E are \u003Cstrong\u003Ecleaned up automatically\u003C/strong\u003E when the component is disposed.\u003C/li\u003E\n\u003Cli\u003EThe third argument of \u003Ccode\u003Emotif.on\u003C/code\u003E is \u003Ccode\u003EdomEvent\u003C/code\u003E (\u003Ccode\u003Etrue\u003C/code\u003E by default). If you pass \u003Ccode\u003Efalse\u003C/code\u003E, no \u003Ccode\u003EaddEventListener\u003C/code\u003E is done on the DOM; it is kept only as an internal (custom) event and is triggered with \u003Ccode\u003Emotif.trigger\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EOn a component without an element (a fragment), a DOM listener listens on the component\u0027s \u003Cstrong\u003Econtent\u003C/strong\u003E: each of its top-level element children, nested fragments included. A child added later is covered and a child that leaves is released; \u003Ccode\u003E:self\u003C/code\u003E means the target is one of these elements; \u003Ccode\u003E:once\u003C/code\u003E and \u003Ccode\u003Emotif.off\u003C/code\u003E act on all of them at once.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.trigger(\u0026quot;name\u0026quot;, data)\u003C/code\u003E calls only the handlers registered under \u003Cstrong\u003Eexactly that name\u003C/strong\u003E (without modifiers, case-insensitive); a handler registered with \u003Ccode\u003E\u0026quot;click:once\u0026quot;\u003C/code\u003E is not called by \u003Ccode\u003Etrigger(\u0026quot;click\u0026quot;)\u003C/code\u003E. Handlers receive \u003Ccode\u003Edata\u003C/code\u003E as the event object; no event is sent to the DOM. A \u003Ccode\u003E:once\u003C/code\u003E handler is used up by whichever path reaches it first: \u003Ccode\u003Etrigger(\u0026quot;click:once\u0026quot;, data)\u003C/code\u003E runs it once and removes it, just like a DOM click; after that, \u003Ccode\u003Emotif.options.hasEvent(\u0026quot;click:once\u0026quot;)\u003C/code\u003E returns \u003Ccode\u003Efalse\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EFor DOM events, \u003Ccode\u003Emotif.off(name, fn)\u003C/code\u003E removes \u003Cstrong\u003Eone\u003C/strong\u003E registration of the same handler; if the same handler was added several times, call it once for each. The event name is given with the spelling used at registration (modifiers included).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.addHandler(name, fn)\u003C/code\u003E is the same as \u003Ccode\u003Emotif.on(name, fn)\u003C/code\u003E (no return value). \u003Ccode\u003Emotif.toggle()\u003C/code\u003E hides the component if it is visible and shows it otherwise.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022x-mounted\u0022\u003E\u003Ccode\u003Ex:mounted\u003C/code\u003E — the moment of attaching to the DOM\u003C/h3\u003E\n\u003Cp\u003EA hook that runs when the element is actually added to the DOM; for work such as giving focus to the title field:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; this.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Etitle.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; title.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; this.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Etitle.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; title.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the function component, \u003Ccode\u003Etitle\u003C/code\u003E is the component of the title field: obtained with \u003Ccode\u003Eref\u003C/code\u003E in JSX, and the variable built with \u003Ccode\u003EmotifComponent\u003C/code\u003E without JSX.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EEach subscription runs \u003Cstrong\u003Eonce\u003C/strong\u003E, in the task after the element is attached to \u003Ccode\u003Edocument\u003C/code\u003E; if the element is already in \u003Ccode\u003Edocument\u003C/code\u003E, in the task after the subscription. When the component is detached and placed again (moving, \u003Ccode\u003Emotif.hide\u003C/code\u003E/\u003Ccode\u003Emotif.show\u003C/code\u003E, keepAlive), \u003Ccode\u003Ex:mounted\u003C/code\u003E does not fire again; use \u003Ccode\u003Ex:activated\u003C/code\u003E for that moment (\u003Ca href=\u0022/docs/lifecycle\u0022\u003ELifecycle\u003C/a\u003E). \u003Ccode\u003Emotif.off(\u0026quot;x:mounted\u0026quot;, handler)\u003C/code\u003E cancels a subscription that has not run yet. An error thrown by the handler is reported as \u003Ccode\u003EMJX122\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022lifecycle-events\u0022\u003ELifecycle events\u003C/h2\u003E\n\u003Cp\u003EYou can also listen to component lifecycle events with \u003Ccode\u003Emotif.on\u003C/code\u003E. The \u003Ccode\u003Ex:\u003C/code\u003E prefix attaches these events not to the DOM but to the component\u0027s own emitter; the handler is called with the \u003Ccode\u003E(sender, e)\u003C/code\u003E signature (\u003Ccode\u003Ee\u003C/code\u003E: \u003Ccode\u003E{ cancel }\u003C/code\u003E), and a one-parameter handler receives only \u003Ccode\u003Ee\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nthis.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Erow.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nrow.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nthis.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Erow.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nrow.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ERecognized names: \u003Ccode\u003Ex:initializing\u003C/code\u003E, \u003Ccode\u003Ex:initialized\u003C/code\u003E, \u003Ccode\u003Ex:config\u003C/code\u003E, \u003Ccode\u003Ex:configured\u003C/code\u003E, \u003Ccode\u003Ex:building\u003C/code\u003E, \u003Ccode\u003Ex:built\u003C/code\u003E, \u003Ccode\u003Ex:mounted\u003C/code\u003E, \u003Ccode\u003Ex:visibilityChanged\u003C/code\u003E, \u003Ccode\u003Ex:activated\u003C/code\u003E, \u003Ccode\u003Ex:deactivated\u003C/code\u003E, \u003Ccode\u003Ex:disposing\u003C/code\u003E, \u003Ccode\u003Ex:disposed\u003C/code\u003E. The subscription is cleaned up together with the component, and it can also be removed by hand with \u003Ccode\u003Emotif.off\u003C/code\u003E. If the same handler subscribed several times, \u003Ccode\u003Emotif.off\u003C/code\u003E removes all of them. \u003Ccode\u003Ex:initializing\u003C/code\u003E and \u003Ccode\u003Ex:initialized\u003C/code\u003E end in the component\u0027s constructor; if you subscribe to a built component later, the handler runs once at the moment of subscribing.\u003C/p\u003E\n\u003Cp\u003EIf one of these listeners throws, the error is reported to \u003Ccode\u003EerrorHandler\u003C/code\u003E with the code \u003Ccode\u003EMJX122\u003C/code\u003E (e.g. \u003Ccode\u003EThe component x:built hook threw.\u003C/code\u003E), as if the hook had been written as a class method or a prop; the component keeps being built.\u003C/p\u003E\n\u003Cblockquote\u003E\n\u003Cp\u003EA note on timing: on plain \u003Ccode\u003Enew Component(\u0026quot;div\u0026quot;, …)\u003C/code\u003E instances \u003Ccode\u003Ex:config\u003C/code\u003E fires in the constructor, so subscribing after the constructor returns is too late. In subclasses (\u003Ccode\u003Eclass X extends Component\u003C/code\u003E) \u003Ccode\u003EonConfig\u003C/code\u003E runs at the start of \u003Ccode\u003Ebuild()\u003C/code\u003E, so subscribing after the constructor is enough. Details: \u003Ca href=\u0022/docs/lifecycle\u0022\u003ELifecycle\u003C/a\u003E.\u003C/p\u003E\n\u003C/blockquote\u003E\n\u003Ch2 id=\u0022app-events\u0022\u003EApplication events — \u003Ccode\u003Econtext.on\u003C/code\u003E / \u003Ccode\u003Econtext.fire\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003ETo communicate between components (without a parent-child relationship), use the application event bus. A component\u0027s \u003Ccode\u003Econtext\u003C/code\u003E is the running \u003Ccode\u003EApplication\u003C/code\u003E (\u003Ccode\u003Ethis.context\u003C/code\u003E in a class and in Options, the \u003Ccode\u003Econtext\u003C/code\u003E of the \u003Ca href=\u0022/docs/components#function-root\u0022\u003Eroot component\u003C/a\u003E in a function component); when the listening component is disposed, the subscription goes away on its own. \u003Ccode\u003EArchiveCounter\u003C/code\u003E counts archived notes: in the class it is \u003Ccode\u003Ethis.context.on\u003C/code\u003E inside \u003Ccode\u003EonConfig\u003C/code\u003E, in the function an \u003Ccode\u003EonConfig\u003C/code\u003E prop written on the root, and in Options \u003Ccode\u003EonConfigured\u003C/code\u003E; without JSX all of them are the same \u003Ccode\u003Econtext.on\u003C/code\u003E call:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  override onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  override view() {\n    return \u0026lt;span class=\u0026quot;archived\u0026quot;\u0026gt;{() =\u0026gt; \u0060${this.state.count} archived\u0060}\u0026lt;/span\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return (\n    \u0026lt;span class=\u0026quot;archived\u0026quot; onConfig={(counter) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B)}\u0026gt;\n      {() =\u0026gt; \u0060${state.count} archived\u0060}\n    \u0026lt;/span\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; \u0060${this.data.count} archived\u0060}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  override onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${this.state.count} archived\u0060);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return motifComponent(\u0026quot;span\u0026quot;, {\n    onConfig: (counter: ComponentBase) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B),\n    initializeComponent: (span: ComponentBase) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${state.count} archived\u0060);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; \u0060${this.data.count} archived\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  view() {\n    return \u0026lt;span class=\u0026quot;archived\u0026quot;\u0026gt;{() =\u0026gt; \u0060${this.state.count} archived\u0060}\u0026lt;/span\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.jsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return (\n    \u0026lt;span class=\u0026quot;archived\u0026quot; onConfig={(counter) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B)}\u0026gt;\n      {() =\u0026gt; \u0060${state.count} archived\u0060}\n    \u0026lt;/span\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; \u0060${this.data.count} archived\u0060}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${this.state.count} archived\u0060);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return motifComponent(\u0026quot;span\u0026quot;, {\n    onConfig: (counter) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B),\n    initializeComponent: (span) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${state.count} archived\u0060);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; \u0060${this.data.count} archived\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe publisher broadcasts through the \u003Ccode\u003Econtext\u003C/code\u003E of the component sending the event; the second argument of \u003Ccode\u003Efire\u003C/code\u003E goes to the listeners as data:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={(sender, e) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); }}\u0026gt;Archive\u0026lt;/button\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst archive = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); });\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Archive\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={(sender, e) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); }}\u0026gt;Archive\u0026lt;/button\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst archive = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); });\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Archive\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe \u003Ccode\u003EApplication\u003C/code\u003E event API:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMethod\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.on(event, handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EListens; returns a function for unsubscribing. The handler\u0027s parameter is the data given to \u003Ccode\u003Efire\u003C/code\u003E (\u003Ccode\u003E(note?: Note) =\u0026gt; …\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.fire(event, args?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETriggers the event.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.off(event, handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERemoves the listener.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.onRouterChanged(handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA hook that runs on every navigation (startup and 404 included); returns a function for unsubscribing.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.onLifecycle(handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETab/application visibility and connectivity changes; see \u003Ca href=\u0022/docs/lifecycle#app-lifecycle\u0022\u003EApplication lifecycle\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EAn event name can be a string or a \u003Ccode\u003ESymbol\u003C/code\u003E; \u003Ccode\u003Efire\u003C/code\u003E calls the listeners synchronously, in the order they were added.\u003C/p\u003E\n\u003Cp\u003EAn error thrown by an application event listener is reported with the code \u003Ccode\u003EMJX123\u003C/code\u003E (\u003Ccode\u003EThe \u0027\u0026lt;event\u0026gt;\u0027 event handler threw.\u003C/code\u003E), and the event\u0027s other listeners run. The same goes for \u003Ccode\u003EonRouterChanged\u003C/code\u003E handlers (\u003Ccode\u003EThe \u0027motifjs-router-navigated\u0027 event handler threw.\u003C/code\u003E); the navigation still completes.\u003C/p\u003E\n\u003Cp\u003EA component\u0027s \u003Ccode\u003Econtext\u003C/code\u003E is a view of the application tied to the component: the \u003Ccode\u003Eon\u003C/code\u003E and \u003Ccode\u003EonRouterChanged\u003C/code\u003E subscriptions opened through it are removed on their own when the component is disposed (\u003Ccode\u003EonLifecycle\u003C/code\u003E is not covered by this). Subscriptions opened through \u003Ccode\u003EApplication.main\u003C/code\u003E, an \u003Ccode\u003Eapp\u003C/code\u003E instance you hold, or \u003Ccode\u003EuseApplication().application\u003C/code\u003E are not tied to any component; call the returned function yourself, or register it on a component with \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E (\u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EMemory Management and Disposal\u003C/a\u003E):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Econst unsubscribe = app.on\u0026lt;Note\u0026gt;(\u0026quot;noteArchived\u0026quot;, (note) =\u0026gt; {\n  if (note) document.title = \u0060${note.title} archived\u0060;\n});\n\nunsubscribe();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Econst unsubscribe = app.on(\u0026quot;noteArchived\u0026quot;, (note) =\u0026gt; {\n  if (note) document.title = \u0060${note.title} archived\u0060;\n});\n\nunsubscribe();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022emitter\u0022\u003EService events — \u003Ccode\u003EEmitter\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EApplication events work by name and are open to the whole application. For a service to broadcast its own event together with its type, use \u003Ccode\u003EEmitter\u0026lt;T\u0026gt;\u003C/code\u003E; it is a small emitter that carries a single type and is independent of components. The service in the example announces the deleted note:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\u003Ccode\u003Eimport { Emitter, Injectable, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface Note {\n  id: number;\n  title: string;\n  body: string;\n  pinned: boolean;\n  archived: boolean;\n  createdAt: number;\n  updatedAt: number;\n}\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  readonly state = reactive({ items: [] as Note[] });\n  private readonly removed = new Emitter\u0026lt;Note\u0026gt;();\n  readonly onRemoved = this.removed.event;\n\n  remove(id: number): boolean {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    const [note] = this.state.items.splice(index, 1);\n    this.removed.fire(note);\n    return true;\n  }\n\n  dispose() {\n    this.removed.dispose();\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/notes.js\u0022\u003E\u003Ccode\u003Eimport { Emitter, Injectable, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  state = reactive({ items: [] });\n  removed = new Emitter();\n  onRemoved = this.removed.event;\n\n  remove(id) {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    const [note] = this.state.items.splice(index, 1);\n    this.removed.fire(note);\n    return true;\n  }\n\n  dispose() {\n    this.removed.dispose();\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EA component ties the subscription to its own lifetime with \u003Ccode\u003Emotif.register\u003C/code\u003E; when the component is disposed, the subscription goes away:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Ethis.motif.register(this.notes.onRemoved((note) =\u0026gt; (this.state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Elist.motif.register(notes.onRemoved((note) =\u0026gt; (state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Ethis.motif.register(this.notes.onRemoved((note) =\u0026gt; (this.state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Elist.motif.register(notes.onRemoved((note) =\u0026gt; (state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the function component, \u003Ccode\u003Elist\u003C/code\u003E is the component that carries the subscription: in JSX, the component that reaches the root\u0027s \u003Ccode\u003EonConfig\u003C/code\u003E hook or \u003Ccode\u003Eref\u003C/code\u003E, and without JSX, the component received by the function of the \u003Ccode\u003EmotifComponent\u003C/code\u003E call that builds the root.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eevent(listener, thisArgs?, disposables?)\u003C/code\u003E subscribes and returns an \u003Ccode\u003EIDisposable\u003C/code\u003E; if \u003Ccode\u003Edisposables\u003C/code\u003E is a \u003Ccode\u003EDisposableStore\u003C/code\u003E or an \u003Ccode\u003EIDisposable[]\u003C/code\u003E, the subscription is added there too (\u003Ccode\u003Enotes.onRemoved(fn, undefined, store)\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Efire(value)\u003C/code\u003E calls the listeners synchronously, in the order they were added. A listener added during dispatch does not receive that dispatch; a removed listener is never called again.\u003C/li\u003E\n\u003Cli\u003EAn error thrown by a listener does not stop the others; it goes down the unexpected error path (see \u003Ca href=\u0022/docs/error-handling#unexpected-errors\u0022\u003EUnexpected errors\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Edispose()\u003C/code\u003E invalidates every subscription; later \u003Ccode\u003Eevent(...)\u003C/code\u003E calls return an empty \u003Ccode\u003EIDisposable\u003C/code\u003E. The provider calls the service\u0027s \u003Ccode\u003Edispose()\u003C/code\u003E method; for a singleton that is the moment of \u003Ccode\u003Eapp.dispose()\u003C/code\u003E (see \u003Ca href=\u0022/docs/service-disposal\u0022\u003EDisposing Services\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn about form input and two-way binding, go on to \u003Ca href=\u0022/docs/forms\u0022\u003EForms and Two-Way Binding\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"dom-events","text":"DOM events","level":2},{"id":"handler-signatures","text":"Handler signatures","level":3},{"id":"handler-errors","text":"Handler errors","level":3},{"id":"context-events","text":"The on:name / on-name / on_name spelling","level":3},{"id":"modifiers","text":"Event modifiers","level":2},{"id":"component-events","text":"The component event API: motif.on / motif.off / motif.trigger","level":2},{"id":"x-mounted","text":"x:mounted — the moment of attaching to the DOM","level":3},{"id":"lifecycle-events","text":"Lifecycle events","level":2},{"id":"app-events","text":"Application events — context.on / context.fire","level":2},{"id":"emitter","text":"Service events — Emitter\u003CT\u003E","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"conditionals-and-lists","title":"Conditional Rendering and Lists"},"next":{"slug":"forms","title":"Forms and Two-Way Binding"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Core concepts</p>
+        <h1>Events</h1>
+        <p>DOM events and modifiers, motif.on/off/trigger component events, lifecycle events, the application event bus and service events with Emitter; with and without JSX.</p>
+<p>MotifJS has three layers of events:</p>
+<ol>
+<li><strong>DOM events</strong> — attached to an element with props such as <code>onclick</code> and <code>oninput</code>, and without JSX with <code>motif.on</code>.</li>
+<li><strong>Component events</strong> — communication between components with <code>component.motif.on/trigger/off</code>.</li>
+<li><strong>Application events</strong> — application-wide broadcasts with <code>context.on/fire</code>.</li>
+</ol>
+<p>The examples are slices of the notes application in the starter template: the notes list (<code>NotesLayout</code>) and the editor (<code>NotePage</code>). <code>Note</code> and <code>NotesService</code> are the ones in the <code>src/services/notes.ts</code> file on the <a href="/docs/components">Components</a> page.</p>
+<div class="doc-variant" data-variant="class,options">
+<p><code>this.state</code> is the component's own state; <code>this.remove</code> and <code>this.close</code> are methods of the component.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p><code>state</code> is the local state the component sets up with <code>reactive</code>; <code>remove</code> and <code>close</code> are local functions inside the component function.</p>
+</div>
+<h2 id="dom-events">DOM events</h2>
+<p>In JSX, <code>on...</code> props are attached to DOM events, and event names are written in lower case. Without JSX the same binding is a <code>motif.on(name, handler)</code> call:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Pin&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (this.state.query = (e.target as HTMLInputElement).value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Archive&lt;/a&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Pin&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (state.query = (e.target as HTMLInputElement).value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Archive&lt;/a&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Pin&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (this.state.query = (e.target as HTMLInputElement).value));
+});
+const form = motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender: ComponentBase, e: Event) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link: ComponentBase) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Archive&quot;)));
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Pin&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (state.query = (e.target as HTMLInputElement).value));
+});
+const form = motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender: ComponentBase, e: Event) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link: ComponentBase) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Archive&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Pin&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (this.state.query = e.target.value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Archive&lt;/a&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Pin&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (state.query = e.target.value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Archive&lt;/a&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Pin&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender, e) =&gt; (this.state.query = e.target.value));
+});
+const form = motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender, e) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Archive&quot;)));
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Pin&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender, e) =&gt; (state.query = e.target.value));
+});
+const form = motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender, e) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Archive&quot;)));
+});</code></pre>
+</div>
+<p>On a plain tag every DOM event is attached this way (<code>onpointerdown</code>, <code>onmouseenter</code> and <code>onanimationend</code> included); a camelCase spelling such as <code>onClick</code> attaches the same event.</p>
+<p>On a component tag, a prop carrying a DOM event name (<code>onchange</code>/<code>onChange</code>, <code>onCopy</code>, <code>onResize</code>, <code>onSelect</code>, <code>onReset</code>, <code>onContextMenu</code> …) is attached to the component's element as a DOM listener and does not reach the component's props; for the camelCase spelling the compiler prints an <code>MJX002</code> warning. For a callback prop, pick a name that does not clash with a DOM event (<code>onValueChange</code>, <code>onConfirm</code>). In a component without an element (a fragment) there is no element for such a listener to be attached to (see <a href="/docs/components#root-element">Root element</a>).</p>
+<h3 id="handler-signatures">Handler signatures</h3>
+<p>A handler is written in one of two forms, and MotifJS calls the right one based on the number of parameters. The rule is the same for <code>motif.on</code>: a one-parameter handler receives the event, not the sender:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;input type=&quot;text&quot; onkeydown={(e) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create()} /&gt;          {/* event only */}
+&lt;li onclick={(sender, e) =&gt; sender.class.add(&quot;selected&quot;)}&gt;…&lt;/li&gt;                       {/* sender + event */}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/NotesLayout.ts"><code>const field = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.motif.on(&quot;keydown&quot;, (_sender: ComponentBase, e: KeyboardEvent) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create());
+});
+const row = motifComponent(&quot;li&quot;, (li: ComponentBase) =&gt; {
+  li.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.class.add(&quot;selected&quot;));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;input type=&quot;text&quot; onkeydown={(e) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create()} /&gt;          {/* event only */}
+&lt;li onclick={(sender, e) =&gt; sender.class.add(&quot;selected&quot;)}&gt;…&lt;/li&gt;                       {/* sender + event */}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/NotesLayout.js"><code>const field = motifComponent(&quot;input&quot;, (input) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.motif.on(&quot;keydown&quot;, (_sender, e) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create());
+});
+const row = motifComponent(&quot;li&quot;, (li) =&gt; {
+  li.motif.on(&quot;click&quot;, (sender, _e) =&gt; sender.class.add(&quot;selected&quot;));
+});</code></pre>
+</div>
+<ul>
+<li><code>sender</code> — the <code>ComponentBase</code> instance that triggered the event; you can reach members such as <code>sender.element</code>, <code>sender.context</code> and <code>sender.motif</code>.</li>
+<li>If the handler returns <code>{ cancel: true }</code>, MotifJS calls <code>preventDefault()</code> and <code>stopPropagation()</code>. Other return values, <code>false</code> included, are ignored, which is why the short body of <code>onkeydown</code> above does not cancel other keys. These methods are called only if they exist on the event object; when a plain data object is passed with <code>motif.trigger(&quot;name&quot;, { … })</code>, neither is called and no error occurs. The <code>:prevent</code> / <code>:stop</code> modifiers follow the same rule.</li>
+<li>The number of parameters is the function's <code>length</code>: if the declared parameter count is ≤ 1, <code>fn(event)</code> is called, and if it is 2 or more, <code>fn(sender, event)</code>. A parameter with a default value or a rest parameter, and anything after it, is not counted; so <code>(...a) =&gt; …</code> counts as 0 and receives only <code>event</code>, and <code>(s = null, e) =&gt; …</code> counts as 0 too.</li>
+<li>In TypeScript both forms, on a plain tag and on a component tag, are typed from the element's event: with <code>onkeydown={(e) =&gt; e.key}</code>, <code>e</code> is a <code>KeyboardEvent</code>, and in the <code>(s, e) =&gt; …</code> form <code>e</code> gets the same type. Since the meaning of the first parameter depends on the number of parameters, the event and the component are typed together (<code>KeyboardEvent &amp; ComponentBase</code>); use the event's members inside <code>(e) =&gt; …</code> and the component's members inside <code>(s, e) =&gt; …</code>. The type of <code>motif.on</code> is the <code>(sender, e)</code> signature; if you are going to use the event, write two parameters.</li>
+</ul>
+<h3 id="handler-errors">Handler errors</h3>
+<p>If a handler throws, or the promise returned by an <code>async</code> handler is rejected, the error is reported to <code>errorHandler</code> as a <code>MotifError</code> with the code <code>MJX123</code> (<code>The '&lt;event&gt;' event handler threw.</code>), with the original error in the <code>cause</code> field. The report is written to the console in production mode too (<code>app.useLogging(false)</code> turns it off) and reaches the <code>errorHandler.addListener(fn)</code> listeners. The other listeners of the same event keep running.</p>
+<h3 id="context-events">The <code>on:name</code> / <code>on-name</code> / <code>on_name</code> spelling</h3>
+<p>This spelling attaches the handler as it is to the tag's component: <code>&lt;X on:saved={fn}/&gt;</code> means <code>sender.motif.on(&quot;saved&quot;, fn)</code>. The event name is everything left after the prefix (<code>on:</code>, <code>on-</code>, <code>on_</code>) is dropped: <code>on-my-event</code> → <code>my-event</code>, <code>on_my_event</code> → <code>my_event</code>. It is used both for DOM events and for custom events triggered with <code>motif.trigger</code>, and the parameter count rule above applies just the same:</p>
+<div class="doc-code" data-file="src/pages/NotePage.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target: Note) =&gt; this.remove(target)} /&gt;   {/* one parameter: the data given to trigger */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Close&lt;/button&gt;   {/* two parameters: sender + event */}
+&lt;button type=&quot;button&quot; on_click={this.close}&gt;Close&lt;/button&gt;   {/* the method reference is passed as is */}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target: Note) =&gt; remove(target)} /&gt;   {/* one parameter: the data given to trigger */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Close&lt;/button&gt;   {/* two parameters: sender + event */}
+&lt;button type=&quot;button&quot; on_click={close}&gt;Close&lt;/button&gt;   {/* the function reference is passed as is */}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/pages/NotePage.ts"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm: ComponentBase, target: Note) =&gt; this.remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Close&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, this.close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Close&quot;)));
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/NotePage.ts"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm: ComponentBase, target: Note) =&gt; remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Close&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Close&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target) =&gt; this.remove(target)} /&gt;   {/* one parameter: the data given to trigger */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Close&lt;/button&gt;   {/* two parameters: sender + event */}
+&lt;button type=&quot;button&quot; on_click={this.close}&gt;Close&lt;/button&gt;   {/* the method reference is passed as is */}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target) =&gt; remove(target)} /&gt;   {/* one parameter: the data given to trigger */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Close&lt;/button&gt;   {/* two parameters: sender + event */}
+&lt;button type=&quot;button&quot; on_click={close}&gt;Close&lt;/button&gt;   {/* the function reference is passed as is */}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/pages/NotePage.js"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm, target) =&gt; this.remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender, _e) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Close&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, this.close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Close&quot;)));
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/NotePage.js"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm, target) =&gt; remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender, _e) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Close&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Close&quot;)));
+});</code></pre>
+</div>
+<p>When the &quot;Delete&quot; button is pressed, the delete confirmation <code>DeleteConfirm</code> calls <code>motif.trigger(&quot;confirm&quot;, note)</code> on its own component (<code>this.motif.trigger</code> in a class and in Options, the <code>motif.trigger</code> of the root it returns in a function component), and the first handler receives the note. Without JSX the listener is set up in the <code>initializeComponent</code> key, the same for class, function and Options components. Since the event name is free, the parameters of <code>on:</code>/<code>on-</code>/<code>on_</code> props are typed <code>any</code>; you give the data its own type in the parameter (<code>(target: Note) =&gt; …</code>). The type of <code>motif.on</code> is <code>(sender, e)</code>, so without JSX the data is the second parameter.</p>
+<h2 id="modifiers">Event modifiers</h2>
+<p>Modifiers added to the event name with a colon adjust the behaviour. They are defined in the <code>component.motif.on</code> API and in the type system:</p>
+<table>
+<thead>
+<tr>
+<th>Modifier</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:once</code></td>
+<td>Runs once, then removes itself.</td>
+</tr>
+<tr>
+<td><code>:passive</code></td>
+<td><code>passive: true</code> for <code>addEventListener</code>.</td>
+</tr>
+<tr>
+<td><code>:capture</code></td>
+<td>Listens in the capture phase.</td>
+</tr>
+<tr>
+<td><code>:prevent</code></td>
+<td><code>preventDefault()</code> after the handler.</td>
+</tr>
+<tr>
+<td><code>:stop</code></td>
+<td><code>stopPropagation()</code> after the handler.</td>
+</tr>
+<tr>
+<td><code>:self</code></td>
+<td>Runs only if the event target is the element itself.</td>
+</tr>
+<tr>
+<td><code>:trusted</code></td>
+<td>Runs only for <code>isTrusted</code> events.</td>
+</tr>
+</tbody>
+</table>
+<p>In JSX an attribute name can take only one <code>:</code>, so on a tag you write one modifier per attribute; with <code>motif.on</code> they chain. A prop with a modifier gets the same type as the one without; inside <code>onkeydown:once={(e) =&gt; e.key}</code>, <code>e</code> is a <code>KeyboardEvent</code>:</p>
+<div class="doc-code" data-file="src/pages/NotePage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;form onsubmit:prevent={() =&gt; notes.create()}&gt;…&lt;/form&gt;
+&lt;button type=&quot;button&quot; onclick:once={() =&gt; notes.create()}&gt;Create the first note&lt;/button&gt;
+&lt;div class=&quot;list&quot; onscroll:passive={() =&gt; rememberScroll()}&gt;…&lt;/div&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NotePage.ts"><code>const form = motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.motif.on(&quot;submit:prevent&quot;, () =&gt; notes.create());
+});
+const first = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click:once&quot;, () =&gt; notes.create());
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Create the first note&quot;)));
+});
+const list = motifComponent(&quot;div&quot;, (list: ComponentBase) =&gt; {
+  list.class.add(&quot;list&quot;);
+  list.motif.on(&quot;scroll:passive&quot;, () =&gt; rememberScroll());
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;form onsubmit:prevent={() =&gt; notes.create()}&gt;…&lt;/form&gt;
+&lt;button type=&quot;button&quot; onclick:once={() =&gt; notes.create()}&gt;Create the first note&lt;/button&gt;
+&lt;div class=&quot;list&quot; onscroll:passive={() =&gt; rememberScroll()}&gt;…&lt;/div&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NotePage.js"><code>const form = motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.motif.on(&quot;submit:prevent&quot;, () =&gt; notes.create());
+});
+const first = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click:once&quot;, () =&gt; notes.create());
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Create the first note&quot;)));
+});
+const list = motifComponent(&quot;div&quot;, (list) =&gt; {
+  list.class.add(&quot;list&quot;);
+  list.motif.on(&quot;scroll:passive&quot;, () =&gt; rememberScroll());
+});</code></pre>
+</div>
+<h2 id="component-events">The component event API: <code>motif.on</code> / <code>motif.off</code> / <code>motif.trigger</code></h2>
+<p>Programmatic event handling on every component lives in the <code>motif</code> namespace. In the example, when the row is clicked the component triggers its own <code>saved</code> event; that event's handler is registered internally only:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NoteRow.ts"><code>const onSaved = (sender: ComponentBase, saved: Note) =&gt; notes.touch(saved);
+
+this.motif.on(&quot;click&quot;, () =&gt; this.motif.trigger(&quot;saved&quot;, note));
+this.motif.on(&quot;saved&quot;, onSaved, false);
+this.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NoteRow.ts"><code>const onSaved = (sender: ComponentBase, saved: Note) =&gt; notes.touch(saved);
+
+row.motif.on(&quot;click&quot;, () =&gt; row.motif.trigger(&quot;saved&quot;, note));
+row.motif.on(&quot;saved&quot;, onSaved, false);
+row.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NoteRow.js"><code>const onSaved = (sender, saved) =&gt; notes.touch(saved);
+
+this.motif.on(&quot;click&quot;, () =&gt; this.motif.trigger(&quot;saved&quot;, note));
+this.motif.on(&quot;saved&quot;, onSaved, false);
+this.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NoteRow.js"><code>const onSaved = (sender, saved) =&gt; notes.touch(saved);
+
+row.motif.on(&quot;click&quot;, () =&gt; row.motif.trigger(&quot;saved&quot;, note));
+row.motif.on(&quot;saved&quot;, onSaved, false);
+row.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In a function component these calls are made on the component itself (<code>row</code> in the example): in JSX, the component that reaches the root's <code>onConfig</code> hook or <code>ref</code>, and without JSX, the component received by the function of the <code>motifComponent</code> call that builds the root.</p>
+</div>
+<ul>
+<li>Listeners added with <code>motif.on</code> are <strong>cleaned up automatically</strong> when the component is disposed.</li>
+<li>The third argument of <code>motif.on</code> is <code>domEvent</code> (<code>true</code> by default). If you pass <code>false</code>, no <code>addEventListener</code> is done on the DOM; it is kept only as an internal (custom) event and is triggered with <code>motif.trigger</code>.</li>
+<li>On a component without an element (a fragment), a DOM listener listens on the component's <strong>content</strong>: each of its top-level element children, nested fragments included. A child added later is covered and a child that leaves is released; <code>:self</code> means the target is one of these elements; <code>:once</code> and <code>motif.off</code> act on all of them at once.</li>
+<li><code>motif.trigger(&quot;name&quot;, data)</code> calls only the handlers registered under <strong>exactly that name</strong> (without modifiers, case-insensitive); a handler registered with <code>&quot;click:once&quot;</code> is not called by <code>trigger(&quot;click&quot;)</code>. Handlers receive <code>data</code> as the event object; no event is sent to the DOM. A <code>:once</code> handler is used up by whichever path reaches it first: <code>trigger(&quot;click:once&quot;, data)</code> runs it once and removes it, just like a DOM click; after that, <code>motif.options.hasEvent(&quot;click:once&quot;)</code> returns <code>false</code>.</li>
+<li>For DOM events, <code>motif.off(name, fn)</code> removes <strong>one</strong> registration of the same handler; if the same handler was added several times, call it once for each. The event name is given with the spelling used at registration (modifiers included).</li>
+<li><code>motif.addHandler(name, fn)</code> is the same as <code>motif.on(name, fn)</code> (no return value). <code>motif.toggle()</code> hides the component if it is visible and shows it otherwise.</li>
+</ul>
+<h3 id="x-mounted"><code>x:mounted</code> — the moment of attaching to the DOM</h3>
+<p>A hook that runs when the element is actually added to the DOM; for work such as giving focus to the title field:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NoteFields.ts"><code>this.motif.on(&quot;x:mounted&quot;, () =&gt; this.element.focus());</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NoteFields.ts"><code>title.motif.on(&quot;x:mounted&quot;, () =&gt; title.element.focus());</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NoteFields.js"><code>this.motif.on(&quot;x:mounted&quot;, () =&gt; this.element.focus());</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NoteFields.js"><code>title.motif.on(&quot;x:mounted&quot;, () =&gt; title.element.focus());</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the function component, <code>title</code> is the component of the title field: obtained with <code>ref</code> in JSX, and the variable built with <code>motifComponent</code> without JSX.</p>
+</div>
+<p>Each subscription runs <strong>once</strong>, in the task after the element is attached to <code>document</code>; if the element is already in <code>document</code>, in the task after the subscription. When the component is detached and placed again (moving, <code>motif.hide</code>/<code>motif.show</code>, keepAlive), <code>x:mounted</code> does not fire again; use <code>x:activated</code> for that moment (<a href="/docs/lifecycle">Lifecycle</a>). <code>motif.off(&quot;x:mounted&quot;, handler)</code> cancels a subscription that has not run yet. An error thrown by the handler is reported as <code>MJX122</code>.</p>
+<h2 id="lifecycle-events">Lifecycle events</h2>
+<p>You can also listen to component lifecycle events with <code>motif.on</code>. The <code>x:</code> prefix attaches these events not to the DOM but to the component's own emitter; the handler is called with the <code>(sender, e)</code> signature (<code>e</code>: <code>{ cancel }</code>), and a one-parameter handler receives only <code>e</code>:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NoteRow.ts"><code>this.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+this.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NoteRow.ts"><code>row.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+row.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NoteRow.js"><code>this.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+this.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NoteRow.js"><code>row.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+row.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+</div>
+<p>Recognized names: <code>x:initializing</code>, <code>x:initialized</code>, <code>x:config</code>, <code>x:configured</code>, <code>x:building</code>, <code>x:built</code>, <code>x:mounted</code>, <code>x:visibilityChanged</code>, <code>x:activated</code>, <code>x:deactivated</code>, <code>x:disposing</code>, <code>x:disposed</code>. The subscription is cleaned up together with the component, and it can also be removed by hand with <code>motif.off</code>. If the same handler subscribed several times, <code>motif.off</code> removes all of them. <code>x:initializing</code> and <code>x:initialized</code> end in the component's constructor; if you subscribe to a built component later, the handler runs once at the moment of subscribing.</p>
+<p>If one of these listeners throws, the error is reported to <code>errorHandler</code> with the code <code>MJX122</code> (e.g. <code>The component x:built hook threw.</code>), as if the hook had been written as a class method or a prop; the component keeps being built.</p>
+<blockquote>
+<p>A note on timing: on plain <code>new Component(&quot;div&quot;, …)</code> instances <code>x:config</code> fires in the constructor, so subscribing after the constructor returns is too late. In subclasses (<code>class X extends Component</code>) <code>onConfig</code> runs at the start of <code>build()</code>, so subscribing after the constructor is enough. Details: <a href="/docs/lifecycle">Lifecycle</a>.</p>
+</blockquote>
+<h2 id="app-events">Application events — <code>context.on</code> / <code>context.fire</code></h2>
+<p>To communicate between components (without a parent-child relationship), use the application event bus. A component's <code>context</code> is the running <code>Application</code> (<code>this.context</code> in a class and in Options, the <code>context</code> of the <a href="/docs/components#function-root">root component</a> in a function component); when the listening component is disposed, the subscription goes away on its own. <code>ArchiveCounter</code> counts archived notes: in the class it is <code>this.context.on</code> inside <code>onConfig</code>, in the function an <code>onConfig</code> prop written on the root, and in Options <code>onConfigured</code>; without JSX all of them are the same <code>context.on</code> call:</p>
+<div class="doc-code" data-file="src/parts/ArchiveCounter.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/ArchiveCounter.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  override onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  override view() {
+    return &lt;span class=&quot;archived&quot;&gt;{() =&gt; `${this.state.count} archived`}&lt;/span&gt;;
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/ArchiveCounter.tsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return (
+    &lt;span class=&quot;archived&quot; onConfig={(counter) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++)}&gt;
+      {() =&gt; `${state.count} archived`}
+    &lt;/span&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/ArchiveCounter.tsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; `${this.data.count} archived`}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/ArchiveCounter.ts"><code>import { Component, ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  override onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  override view() {
+    return motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${this.state.count} archived`);
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/ArchiveCounter.ts"><code>import { ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return motifComponent(&quot;span&quot;, {
+    onConfig: (counter: ComponentBase) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++),
+    initializeComponent: (span: ComponentBase) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${state.count} archived`);
+    },
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/ArchiveCounter.ts"><code>import { ComponentBase, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; `${this.data.count} archived`));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/ArchiveCounter.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  view() {
+    return &lt;span class=&quot;archived&quot;&gt;{() =&gt; `${this.state.count} archived`}&lt;/span&gt;;
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/ArchiveCounter.jsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return (
+    &lt;span class=&quot;archived&quot; onConfig={(counter) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++)}&gt;
+      {() =&gt; `${state.count} archived`}
+    &lt;/span&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/ArchiveCounter.jsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; `${this.data.count} archived`}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/ArchiveCounter.js"><code>import { Component, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  view() {
+    return motifComponent(&quot;span&quot;, (span) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${this.state.count} archived`);
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/ArchiveCounter.js"><code>import { motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return motifComponent(&quot;span&quot;, {
+    onConfig: (counter) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++),
+    initializeComponent: (span) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${state.count} archived`);
+    },
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/ArchiveCounter.js"><code>import { motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; `${this.data.count} archived`));
+  },
+});</code></pre>
+</div>
+<p>The publisher broadcasts through the <code>context</code> of the component sending the event; the second argument of <code>fire</code> goes to the listeners as data:</p>
+<div class="doc-code" data-file="src/pages/NotePage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;button type=&quot;button&quot; onclick={(sender, e) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); }}&gt;Archive&lt;/button&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NotePage.ts"><code>const archive = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); });
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Archive&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;button type=&quot;button&quot; onclick={(sender, e) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); }}&gt;Archive&lt;/button&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NotePage.js"><code>const archive = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender, _e) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); });
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Archive&quot;)));
+});</code></pre>
+</div>
+<p>The <code>Application</code> event API:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app.on(event, handler)</code></td>
+<td>Listens; returns a function for unsubscribing. The handler's parameter is the data given to <code>fire</code> (<code>(note?: Note) =&gt; …</code>).</td>
+</tr>
+<tr>
+<td><code>app.fire(event, args?)</code></td>
+<td>Triggers the event.</td>
+</tr>
+<tr>
+<td><code>app.off(event, handler)</code></td>
+<td>Removes the listener.</td>
+</tr>
+<tr>
+<td><code>app.onRouterChanged(handler)</code></td>
+<td>A hook that runs on every navigation (startup and 404 included); returns a function for unsubscribing.</td>
+</tr>
+<tr>
+<td><code>app.onLifecycle(handler)</code></td>
+<td>Tab/application visibility and connectivity changes; see <a href="/docs/lifecycle#app-lifecycle">Application lifecycle</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>An event name can be a string or a <code>Symbol</code>; <code>fire</code> calls the listeners synchronously, in the order they were added.</p>
+<p>An error thrown by an application event listener is reported with the code <code>MJX123</code> (<code>The '&lt;event&gt;' event handler threw.</code>), and the event's other listeners run. The same goes for <code>onRouterChanged</code> handlers (<code>The 'motifjs-router-navigated' event handler threw.</code>); the navigation still completes.</p>
+<p>A component's <code>context</code> is a view of the application tied to the component: the <code>on</code> and <code>onRouterChanged</code> subscriptions opened through it are removed on their own when the component is disposed (<code>onLifecycle</code> is not covered by this). Subscriptions opened through <code>Application.main</code>, an <code>app</code> instance you hold, or <code>useApplication().application</code> are not tied to any component; call the returned function yourself, or register it on a component with <code>motif.setDisposable</code> (<a href="/docs/memory-and-dispose">Memory Management and Disposal</a>):</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>const unsubscribe = app.on&lt;Note&gt;(&quot;noteArchived&quot;, (note) =&gt; {
+  if (note) document.title = `${note.title} archived`;
+});
+
+unsubscribe();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>const unsubscribe = app.on(&quot;noteArchived&quot;, (note) =&gt; {
+  if (note) document.title = `${note.title} archived`;
+});
+
+unsubscribe();</code></pre>
+</div>
+<h2 id="emitter">Service events — <code>Emitter&lt;T&gt;</code></h2>
+<p>Application events work by name and are open to the whole application. For a service to broadcast its own event together with its type, use <code>Emitter&lt;T&gt;</code>; it is a small emitter that carries a single type and is independent of components. The service in the example announces the deleted note:</p>
+<div class="doc-code" data-file="src/services/notes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/notes.ts"><code>import { Emitter, Injectable, reactive } from &quot;@motifx/core&quot;;
+
+export interface Note {
+  id: number;
+  title: string;
+  body: string;
+  pinned: boolean;
+  archived: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  readonly state = reactive({ items: [] as Note[] });
+  private readonly removed = new Emitter&lt;Note&gt;();
+  readonly onRemoved = this.removed.event;
+
+  remove(id: number): boolean {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    const [note] = this.state.items.splice(index, 1);
+    this.removed.fire(note);
+    return true;
+  }
+
+  dispose() {
+    this.removed.dispose();
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/notes.js"><code>import { Emitter, Injectable, reactive } from &quot;@motifx/core&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  state = reactive({ items: [] });
+  removed = new Emitter();
+  onRemoved = this.removed.event;
+
+  remove(id) {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    const [note] = this.state.items.splice(index, 1);
+    this.removed.fire(note);
+    return true;
+  }
+
+  dispose() {
+    this.removed.dispose();
+  }
+}</code></pre>
+</div>
+<p>A component ties the subscription to its own lifetime with <code>motif.register</code>; when the component is disposed, the subscription goes away:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>this.motif.register(this.notes.onRemoved((note) =&gt; (this.state.removed = note.title)));</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>list.motif.register(notes.onRemoved((note) =&gt; (state.removed = note.title)));</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>this.motif.register(this.notes.onRemoved((note) =&gt; (this.state.removed = note.title)));</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>list.motif.register(notes.onRemoved((note) =&gt; (state.removed = note.title)));</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the function component, <code>list</code> is the component that carries the subscription: in JSX, the component that reaches the root's <code>onConfig</code> hook or <code>ref</code>, and without JSX, the component received by the function of the <code>motifComponent</code> call that builds the root.</p>
+</div>
+<ul>
+<li><code>event(listener, thisArgs?, disposables?)</code> subscribes and returns an <code>IDisposable</code>; if <code>disposables</code> is a <code>DisposableStore</code> or an <code>IDisposable[]</code>, the subscription is added there too (<code>notes.onRemoved(fn, undefined, store)</code>).</li>
+<li><code>fire(value)</code> calls the listeners synchronously, in the order they were added. A listener added during dispatch does not receive that dispatch; a removed listener is never called again.</li>
+<li>An error thrown by a listener does not stop the others; it goes down the unexpected error path (see <a href="/docs/error-handling#unexpected-errors">Unexpected errors</a>).</li>
+<li><code>dispose()</code> invalidates every subscription; later <code>event(...)</code> calls return an empty <code>IDisposable</code>. The provider calls the service's <code>dispose()</code> method; for a singleton that is the moment of <code>app.dispose()</code> (see <a href="/docs/service-disposal">Disposing Services</a>).</li>
+</ul>
+<h2 id="next">Next step</h2>
+<p>To learn about form input and two-way binding, go on to <a href="/docs/forms">Forms and Two-Way Binding</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

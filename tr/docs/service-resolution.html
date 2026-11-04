@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="ServiceProvider.get ve getAsync, bileşende getService, FromService, inject, deps ve useApplication.">
+    <title>Servis Çözümleme — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/service-resolution">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-resolution">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-resolution">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-resolution">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/service-resolution">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Servis Çözümleme">
+    <meta property="og:description" content="ServiceProvider.get ve getAsync, bileşende getService, FromService, inject, deps ve useApplication.">
+    <script type="application/json" id="doc-data">{"slug":"service-resolution","locale":"tr","title":"Servis Çözümleme","description":"ServiceProvider.get ve getAsync, bileşende getService, FromService, inject, deps ve useApplication.","category":{"id":"5","title":"Bağımlılık Enjeksiyonu"},"html":"\u003Ch2 id=\u0022resolution\u0022\u003EServis çözümleme\u003C/h2\u003E\n\u003Cp\u003EKayıtlı bir servis sağlayıcıdan istenir. Bileşende \u003Ccode\u003EgetService\u003C/code\u003E ya da \u003Ccode\u003EFromService\u003C/code\u003E, servis kurulurken \u003Ccode\u003Einject\u003C/code\u003E ya da \u003Ccode\u003Edeps\u003C/code\u003E, bunların dışında sağlayıcının kendisi (\u003Ccode\u003Eapp.provider\u003C/code\u003E) kullanılır.\u003C/p\u003E\n\u003Ch3 id=\u0022service-provider-get\u0022\u003E\u003Ccode\u003EServiceProvider.get\u003C/code\u003E\u003C/h3\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Econst provider = app.provider;\nconst notes = provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Econst provider = app.provider;\nconst notes = provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ERouter bir rota bileşenini, sağlayıcıda kayıtlıysa (\u003Ccode\u003Eadd*\u003C/code\u003E ya da \u003Ccode\u003E@Injectable\u003C/code\u003E) sağlayıcıdan çözer, kayıtlı değilse doğrudan kurar. Kayıtlı bir bileşen çözülemezse (eksik bağımlılık, döngü, yapıcı hatası) gezinme \u003Ccode\u003EMJX304\u003C/code\u003E ile hata verir, asıl hata \u003Ccode\u003Ecause\u003C/code\u003E\u0027da taşınır ve \u003Ccode\u003Efallbacks.error\u003C/code\u003E gösterilir.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eget\u003C/code\u003E senkrondur ve async fabrika ya da Promise ile kaydedilmiş bir servis için hata (\u003Ccode\u003EMJX402\u003C/code\u003E) fırlatır; onları \u003Ccode\u003Eawait provider.getAsync(token)\u003C/code\u003E ile çözümleyin. \u003Ccode\u003Eprovider.createScope(ad?)\u003C/code\u003E yeni bir alt kapsam üretir; \u003Ccode\u003Escoped\u003C/code\u003E servisler kapsam başına tek örnektir.\u003C/p\u003E\n\u003Cp\u003EUygulama örneğine erişimi olmayan bir yerden (bir yardımcı modül, rota kancası) çalışan uygulamanın sağlayıcısına \u003Ccode\u003EApplication.main.provider\u003C/code\u003E ile ulaşılır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Econst notes = Application.main.provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Econst notes = Application.main.provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022get-service\u0022\u003EBileşenden \u003Ccode\u003EgetService\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EgetService\u003C/code\u003E, en yakın sağlayıcıyı bulup token\u0027ı çözümler; bulunamazsa ya da çözümleme hata verirse \u003Ccode\u003Enull\u003C/code\u003E döner (geliştirme modunda \u003Ccode\u003EMJX407\u003C/code\u003E/\u003Ccode\u003EMJX408\u003C/code\u003E uyarısı yazılır). Örnekte not listesi başlığı, kurulurken toplam not sayısını \u003Ccode\u003Etitle\u003C/code\u003E özniteliğine yazar:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\u003Ccode\u003Econst notes = this.getService(NotesService);\nif (notes) this.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\u003Ccode\u003Econst notes = head.getService(NotesService);\nif (notes) head.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NotesHead.js\u0022\u003E\u003Ccode\u003Econst notes = this.getService(NotesService);\nif (notes) this.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NotesHead.js\u0022\u003E\u003Ccode\u003Econst notes = head.getService(NotesService);\nif (notes) head.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003ESınıf ve Options bileşeninde \u003Ccode\u003EgetService\u003C/code\u003E bileşenin kendisi üzerindedir; bu satırlar bir kancada (\u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonConfigured\u003C/code\u003E) ya da alan başlatıcısında \u003Ccode\u003Ethis\u003C/code\u003E ile yazılır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003EgetService\u003C/code\u003E bileşenin kendisi üzerindedir (örnekte \u003Ccode\u003Ehead\u003C/code\u003E): JSX\u0027te kökün \u003Ccode\u003EonConfig\u003C/code\u003E kancasına ya da \u003Ccode\u003Eref\u003C/code\u003E\u0027ine gelen bileşen, JSX\u0027siz yazımda kökü kuran \u003Ccode\u003EmotifComponent\u003C/code\u003E fonksiyonunun aldığı bileşen. Bileşen elde değilken aynı işi \u003Ca href=\u0022#from-service\u0022\u003E\u003Ccode\u003EFromService\u003C/code\u003E\u003C/a\u003E görür.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EgetService\u003C/code\u003E ve \u003Ccode\u003EFromService\u003C/code\u003E servis kayıtlı değilse \u003Ccode\u003Enull\u003C/code\u003E döner; \u003Ccode\u003Einject\u003C/code\u003E, \u003Ccode\u003Eprovider.get\u003C/code\u003E ve \u003Ccode\u003Eprovider.getAsync\u003C/code\u003E bulamazsa fırlatır.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022typescript\u0022\u003E\n\u003Cp\u003ESınıf token\u0027ı verildiğinde dönüş tipi o sınıftır; kurucusu parametre alan, soyut ya da \u003Ccode\u003Eprotected\u003C/code\u003E kurucusu olan sınıflar da buna dahildir. \u003Ccode\u003EgetService\u003C/code\u003E ve \u003Ccode\u003EFromService\u003C/code\u003E null olabilen tip (\u003Ccode\u003ET | null\u003C/code\u003E), \u003Ccode\u003Einject\u003C/code\u003E, \u003Ccode\u003Eprovider.get\u003C/code\u003E ve \u003Ccode\u003Eprovider.getAsync\u003C/code\u003E null olmayan tip verir. Generic\u0027i açıkça yazmak (\u003Ccode\u003EgetService\u0026lt;NotesService\u0026gt;(NotesService)\u003C/code\u003E) aynı tipi verir; sınıfı bir arayüzle tiplemek için kullanılabilir: \u003Ccode\u003EFromService\u0026lt;NoteStore\u0026gt;(NotesService)\u003C/code\u003E. Dizge ya da sembol token\u0027da tip generic\u0027le verilir: \u003Ccode\u003EgetService\u0026lt;{ apiUrl: string }\u0026gt;(\u0026quot;config\u0026quot;)\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022from-service\u0022\u003E\u003Ccode\u003EFromService\u003C/code\u003E yardımcısı\u003C/h3\u003E\n\u003Cp\u003EHerhangi bir yerde (bileşen dışında da) hızlı çözümleme için:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nconst notes = FromService(NotesService);   // çözümlenemezse null\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nconst notes = FromService(NotesService);   // çözümlenemezse null\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EServis kayıtlı değilse, döngüsel bağımlılık varsa ya da yapıcı hata fırlatırsa \u003Ccode\u003Enull\u003C/code\u003E döner; geliştirme modunda asıl hatayla birlikte \u003Ccode\u003EMJX414\u003C/code\u003E uyarısı yazılır. \u003Ccode\u003Escoped\u003C/code\u003E bir servis için güncel gezinmenin örneğine giden handle\u0027ı verir.\u003C/p\u003E\n\u003Ch3 id=\u0022inject\u0022\u003E\u003Ccode\u003Einject(token)\u003C/code\u003E — bağımlılık alma\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Einject\u003C/code\u003E, sağlayıcı bir sınıfı kurarken o sınıfın alan başlatıcılarında ve yapıcısında, ya da sağlayıcı bir \u003Ccode\u003EuseFactory\u003C/code\u003E fabrikasını çağırırken fabrikanın içinde çağrılır. Bağımlılığı sınıfı kuran sağlayıcıdan çözer: \u003Ccode\u003Escoped\u003C/code\u003E bir servis, onu isteyen rota kapsamının örneğidir. Dönüş tipi token\u0027dan gelir.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\u003Ccode\u003E@Injectable()\nexport class SearchIndex {\n  private notes = inject(NotesService);\n  private config = inject\u0026lt;{ apiUrl: string }\u0026gt;(\u0026quot;config\u0026quot;);\n  private readonly size: number;\n\n  constructor() {\n    this.size = this.notes.count(\u0026quot;notes\u0026quot;);   // yapıcıda da kullanılabilir\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/search.js\u0022\u003E\u003Ccode\u003E@Injectable()\nexport class SearchIndex {\n  notes = inject(NotesService);\n  config = inject(\u0026quot;config\u0026quot;);\n  size;\n\n  constructor() {\n    this.size = this.notes.count(\u0026quot;notes\u0026quot;);   // yapıcıda da kullanılabilir\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Einject\u003C/code\u003E yalnız kurulum anında çalışır. Bir metodun içinde, \u003Ccode\u003EsetTimeout\u003C/code\u003E geri çağrısında ya da sınıf elle \u003Ccode\u003Enew SearchIndex()\u003C/code\u003E ile kurulduğunda \u003Ccode\u003EMJX409\u003C/code\u003E hatası fırlatır. Kayıtlı olmayan token \u003Ccode\u003EMJX401\u003C/code\u003E, döngüsel bağımlılık \u003Ccode\u003EMJX404\u003C/code\u003E verir. \u003Ccode\u003Einject\u003C/code\u003E senkrondur; \u003Ccode\u003EgetAsync\u003C/code\u003E gerektiren async kayıtları \u003Ccode\u003Edeps\u003C/code\u003E ya da \u003Ccode\u003EgetAsync\u003C/code\u003E ile alın.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003ESınıf ve Options bileşeninde bağımlılık için \u003Ccode\u003Ethis.getService(token)\u003C/code\u003E kullanılır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde bağımlılık için \u003Ccode\u003EFromService(token)\u003C/code\u003E kullanılır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022deps\u0022\u003E\u003Ccode\u003Edeps\u003C/code\u003E — yapıcı parametreleri\u003C/h3\u003E\n\u003Cp\u003EBağımlılıklar yapıcıya parametre olarak da verilebilir. \u003Ccode\u003Edeps\u003C/code\u003E dizisindeki token\u0027lar sırayla çözümlenir ve yapıcıya aynı sırada geçirilir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\u003Ccode\u003E@Injectable({ deps: [NotesService, \u0026quot;config\u0026quot;] })\nexport class SearchIndex {\n  constructor(private notes: NotesService, private config: { apiUrl: string }) {}\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/search.js\u0022\u003E\u003Ccode\u003E@Injectable({ deps: [NotesService, \u0026quot;config\u0026quot;] })\nexport class SearchIndex {\n  constructor(notes, config) {\n    this.notes = notes;\n    this.config = config;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ESıra TypeScript tarafından denetlenmez; \u003Ccode\u003Edeps\u003C/code\u003E ile yapıcı parametreleri aynı sırada yazılmalıdır. Bu biçimde sınıf testte sahte bağımlılıklarla elle kurulabilir: \u003Ccode\u003Enew SearchIndex(sahteNotes, { apiUrl: \u0026quot;/test\u0026quot; })\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022use-application\u0022\u003E\u003Ccode\u003EuseApplication\u003C/code\u003E kancası\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EuseApplication()\u003C/code\u003E çalışan uygulamayı, sağlayıcısını ve router\u0027ı tek nesnede verir; \u003Ccode\u003Eattach(...bileşenler)\u003C/code\u003E bileşenleri uygulama kabuğuna ekler:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\n\nconst { application, services, router, attach } = useApplication();\nconst notes = services.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\n\nconst { application, services, router, attach } = useApplication();\nconst notes = services.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EServislerin ne zaman ve nasıl serbest bırakıldığını öğrenmek için \u003Ca href=\u0022/docs/service-disposal\u0022\u003EServislerin Serbest Bırakılması\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"resolution","text":"Servis çözümleme","level":2},{"id":"service-provider-get","text":"ServiceProvider.get","level":3},{"id":"get-service","text":"Bileşenden getService","level":3},{"id":"from-service","text":"FromService yardımcısı","level":3},{"id":"inject","text":"inject(token) — bağımlılık alma","level":3},{"id":"deps","text":"deps — yapıcı parametreleri","level":3},{"id":"use-application","text":"useApplication kancası","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"service-lifetimes","title":"Yaşam Süreleri ve Kapsamlar"},"next":{"slug":"service-disposal","title":"Servislerin Serbest Bırakılması"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Bağımlılık Enjeksiyonu</p>
+        <h1>Servis Çözümleme</h1>
+        <p>ServiceProvider.get ve getAsync, bileşende getService, FromService, inject, deps ve useApplication.</p>
+<h2 id="resolution">Servis çözümleme</h2>
+<p>Kayıtlı bir servis sağlayıcıdan istenir. Bileşende <code>getService</code> ya da <code>FromService</code>, servis kurulurken <code>inject</code> ya da <code>deps</code>, bunların dışında sağlayıcının kendisi (<code>app.provider</code>) kullanılır.</p>
+<h3 id="service-provider-get"><code>ServiceProvider.get</code></h3>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>const provider = app.provider;
+const notes = provider.get(NotesService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>const provider = app.provider;
+const notes = provider.get(NotesService);</code></pre>
+</div>
+<p>Router bir rota bileşenini, sağlayıcıda kayıtlıysa (<code>add*</code> ya da <code>@Injectable</code>) sağlayıcıdan çözer, kayıtlı değilse doğrudan kurar. Kayıtlı bir bileşen çözülemezse (eksik bağımlılık, döngü, yapıcı hatası) gezinme <code>MJX304</code> ile hata verir, asıl hata <code>cause</code>'da taşınır ve <code>fallbacks.error</code> gösterilir.</p>
+<p><code>get</code> senkrondur ve async fabrika ya da Promise ile kaydedilmiş bir servis için hata (<code>MJX402</code>) fırlatır; onları <code>await provider.getAsync(token)</code> ile çözümleyin. <code>provider.createScope(ad?)</code> yeni bir alt kapsam üretir; <code>scoped</code> servisler kapsam başına tek örnektir.</p>
+<p>Uygulama örneğine erişimi olmayan bir yerden (bir yardımcı modül, rota kancası) çalışan uygulamanın sağlayıcısına <code>Application.main.provider</code> ile ulaşılır:</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>const notes = Application.main.provider.get(NotesService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>const notes = Application.main.provider.get(NotesService);</code></pre>
+</div>
+<h3 id="get-service">Bileşenden <code>getService</code></h3>
+<p><code>getService</code>, en yakın sağlayıcıyı bulup token'ı çözümler; bulunamazsa ya da çözümleme hata verirse <code>null</code> döner (geliştirme modunda <code>MJX407</code>/<code>MJX408</code> uyarısı yazılır). Örnekte not listesi başlığı, kurulurken toplam not sayısını <code>title</code> özniteliğine yazar:</p>
+<div class="doc-code" data-file="src/parts/NotesHead.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NotesHead.ts"><code>const notes = this.getService(NotesService);
+if (notes) this.attr.add({ title: `${notes.count(&quot;notes&quot;)} not` });</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NotesHead.ts"><code>const notes = head.getService(NotesService);
+if (notes) head.attr.add({ title: `${notes.count(&quot;notes&quot;)} not` });</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NotesHead.js"><code>const notes = this.getService(NotesService);
+if (notes) this.attr.add({ title: `${notes.count(&quot;notes&quot;)} not` });</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NotesHead.js"><code>const notes = head.getService(NotesService);
+if (notes) head.attr.add({ title: `${notes.count(&quot;notes&quot;)} not` });</code></pre>
+</div>
+<div class="doc-variant" data-variant="class,options">
+<p>Sınıf ve Options bileşeninde <code>getService</code> bileşenin kendisi üzerindedir; bu satırlar bir kancada (<code>onConfig</code>, <code>onConfigured</code>) ya da alan başlatıcısında <code>this</code> ile yazılır.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>getService</code> bileşenin kendisi üzerindedir (örnekte <code>head</code>): JSX'te kökün <code>onConfig</code> kancasına ya da <code>ref</code>'ine gelen bileşen, JSX'siz yazımda kökü kuran <code>motifComponent</code> fonksiyonunun aldığı bileşen. Bileşen elde değilken aynı işi <a href="#from-service"><code>FromService</code></a> görür.</p>
+</div>
+<p><code>getService</code> ve <code>FromService</code> servis kayıtlı değilse <code>null</code> döner; <code>inject</code>, <code>provider.get</code> ve <code>provider.getAsync</code> bulamazsa fırlatır.</p>
+<div class="doc-variant" data-variant="typescript">
+<p>Sınıf token'ı verildiğinde dönüş tipi o sınıftır; kurucusu parametre alan, soyut ya da <code>protected</code> kurucusu olan sınıflar da buna dahildir. <code>getService</code> ve <code>FromService</code> null olabilen tip (<code>T | null</code>), <code>inject</code>, <code>provider.get</code> ve <code>provider.getAsync</code> null olmayan tip verir. Generic'i açıkça yazmak (<code>getService&lt;NotesService&gt;(NotesService)</code>) aynı tipi verir; sınıfı bir arayüzle tiplemek için kullanılabilir: <code>FromService&lt;NoteStore&gt;(NotesService)</code>. Dizge ya da sembol token'da tip generic'le verilir: <code>getService&lt;{ apiUrl: string }&gt;(&quot;config&quot;)</code>.</p>
+</div>
+<h3 id="from-service"><code>FromService</code> yardımcısı</h3>
+<p>Herhangi bir yerde (bileşen dışında da) hızlı çözümleme için:</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>import { FromService } from &quot;@motifx/core&quot;;
+const notes = FromService(NotesService);   // çözümlenemezse null</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>import { FromService } from &quot;@motifx/core&quot;;
+const notes = FromService(NotesService);   // çözümlenemezse null</code></pre>
+</div>
+<p>Servis kayıtlı değilse, döngüsel bağımlılık varsa ya da yapıcı hata fırlatırsa <code>null</code> döner; geliştirme modunda asıl hatayla birlikte <code>MJX414</code> uyarısı yazılır. <code>scoped</code> bir servis için güncel gezinmenin örneğine giden handle'ı verir.</p>
+<h3 id="inject"><code>inject(token)</code> — bağımlılık alma</h3>
+<p><code>inject</code>, sağlayıcı bir sınıfı kurarken o sınıfın alan başlatıcılarında ve yapıcısında, ya da sağlayıcı bir <code>useFactory</code> fabrikasını çağırırken fabrikanın içinde çağrılır. Bağımlılığı sınıfı kuran sağlayıcıdan çözer: <code>scoped</code> bir servis, onu isteyen rota kapsamının örneğidir. Dönüş tipi token'dan gelir.</p>
+<div class="doc-code" data-file="src/services/search.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/search.ts"><code>@Injectable()
+export class SearchIndex {
+  private notes = inject(NotesService);
+  private config = inject&lt;{ apiUrl: string }&gt;(&quot;config&quot;);
+  private readonly size: number;
+
+  constructor() {
+    this.size = this.notes.count(&quot;notes&quot;);   // yapıcıda da kullanılabilir
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/search.js"><code>@Injectable()
+export class SearchIndex {
+  notes = inject(NotesService);
+  config = inject(&quot;config&quot;);
+  size;
+
+  constructor() {
+    this.size = this.notes.count(&quot;notes&quot;);   // yapıcıda da kullanılabilir
+  }
+}</code></pre>
+</div>
+<p><code>inject</code> yalnız kurulum anında çalışır. Bir metodun içinde, <code>setTimeout</code> geri çağrısında ya da sınıf elle <code>new SearchIndex()</code> ile kurulduğunda <code>MJX409</code> hatası fırlatır. Kayıtlı olmayan token <code>MJX401</code>, döngüsel bağımlılık <code>MJX404</code> verir. <code>inject</code> senkrondur; <code>getAsync</code> gerektiren async kayıtları <code>deps</code> ya da <code>getAsync</code> ile alın.</p>
+<div class="doc-variant" data-variant="class,options">
+<p>Sınıf ve Options bileşeninde bağımlılık için <code>this.getService(token)</code> kullanılır.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde bağımlılık için <code>FromService(token)</code> kullanılır.</p>
+</div>
+<h3 id="deps"><code>deps</code> — yapıcı parametreleri</h3>
+<p>Bağımlılıklar yapıcıya parametre olarak da verilebilir. <code>deps</code> dizisindeki token'lar sırayla çözümlenir ve yapıcıya aynı sırada geçirilir:</p>
+<div class="doc-code" data-file="src/services/search.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/search.ts"><code>@Injectable({ deps: [NotesService, &quot;config&quot;] })
+export class SearchIndex {
+  constructor(private notes: NotesService, private config: { apiUrl: string }) {}
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/search.js"><code>@Injectable({ deps: [NotesService, &quot;config&quot;] })
+export class SearchIndex {
+  constructor(notes, config) {
+    this.notes = notes;
+    this.config = config;
+  }
+}</code></pre>
+</div>
+<p>Sıra TypeScript tarafından denetlenmez; <code>deps</code> ile yapıcı parametreleri aynı sırada yazılmalıdır. Bu biçimde sınıf testte sahte bağımlılıklarla elle kurulabilir: <code>new SearchIndex(sahteNotes, { apiUrl: &quot;/test&quot; })</code>.</p>
+<h2 id="use-application"><code>useApplication</code> kancası</h2>
+<p><code>useApplication()</code> çalışan uygulamayı, sağlayıcısını ve router'ı tek nesnede verir; <code>attach(...bileşenler)</code> bileşenleri uygulama kabuğuna ekler:</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>import { useApplication } from &quot;@motifx/core&quot;;
+
+const { application, services, router, attach } = useApplication();
+const notes = services.get(NotesService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>import { useApplication } from &quot;@motifx/core&quot;;
+
+const { application, services, router, attach } = useApplication();
+const notes = services.get(NotesService);</code></pre>
+</div>
+<h2 id="next">Sonraki adım</h2>
+<p>Servislerin ne zaman ve nasıl serbest bırakıldığını öğrenmek için <a href="/tr/docs/service-disposal">Servislerin Serbest Bırakılması</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

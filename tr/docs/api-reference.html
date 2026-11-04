@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="@motifx/core paketinden dışa aktarılan sembollerin hızlı referansı.">
+    <title>API Referansı — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/api-reference">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/api-reference">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/api-reference">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/api-reference">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/api-reference">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="API Referansı">
+    <meta property="og:description" content="@motifx/core paketinden dışa aktarılan sembollerin hızlı referansı.">
+    <script type="application/json" id="doc-data">{"slug":"api-reference","locale":"tr","title":"API Referansı","description":"@motifx/core paketinden dışa aktarılan sembollerin hızlı referansı.","category":{"id":"7","title":"Referans"},"html":"\u003Cp\u003EBu bölüm \u003Ccode\u003E@motifx/core\u003C/code\u003E paketinden dışa aktarılan başlıca sembollerin hızlı referansıdır. Her satır, ilgili ayrıntılı bölüme bağlanır.\u003C/p\u003E\n\u003Ch2 id=\u0022application\u0022\u003EUygulama (Application)\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003ETür\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EApplication\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003EUygulama örneği. \u003Ccode\u003EApplication.main\u003C/code\u003E ile global örneğe, bileşenden \u003Ccode\u003Econtext\u003C/code\u003E ile erişilir (sınıfta ve Options\u0027ta \u003Ccode\u003Ethis.context\u003C/code\u003E, fonksiyon bileşeninde \u003Ca href=\u0022/docs/components#function-root\u0022\u003Ekök bileşenin\u003C/a\u003E \u003Ccode\u003Econtext\u003C/code\u003E\u0027i).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Estatic\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EApplicationBuilder\u003C/code\u003E üretir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EApplicationBuilder\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eservices\u003C/code\u003E koleksiyonunu taşır; \u003Ccode\u003Ebuild()\u003C/code\u003E ile \u003Ccode\u003EApplication\u003C/code\u003E üretir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.run(host, root?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EUygulamayı bir DOM elemanına bağlar. \u003Ccode\u003Ehost\u003C/code\u003E bir yorum ya da metin düğümüyse uygulama o düğümün hemen önüne yerleşir, düğüm yerinde kalır; düğümün ebeveyn elemanı yoksa \u003Ccode\u003EMJX416\u003C/code\u003E fırlatılır. Serbest bırakılmış uygulama \u003Ccode\u003Erun()\u003C/code\u003E ile yeniden başlar: \u003Ccode\u003EApplication.main\u003C/code\u003E yeniden dolar, servisler ilk istekte yeniden yaratılır (\u003Ccode\u003Estartup: true\u003C/code\u003E olanlar hemen), router yapılandırmasıyla yeni bir modül kurulur, \u003Ccode\u003EuseTransitions\u003C/code\u003E kipi yeniden uygulanır, bu arada okunmuş bir katman varsa host\u0027tan sonraya taşınır ve \u003Ccode\u003Edispose()\u003C/code\u003E yeniden çalışır. Bu arada yeni bir uygulama kurulduysa \u003Ccode\u003EMJX405\u003C/code\u003E fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useRouter(opts)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EYönlendirmeyi tanımlar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.restartRouter(uri?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003ERouter\u0027ı sıfırdan kurar ve kökten (\u003Ccode\u003E/\u003C/code\u003E) ya da verilen adresten yeniden başlatır: çalışırken yeni bir \u003Ccode\u003EuseRouter\u003C/code\u003E yapılandırması verildiyse onu, yoksa mevcut yapılandırmayı kullanır. Rota listesi, keepAlive önbelleği ve yığın sıfırlanır; ekrandaki sayfa ayrılan sayfa gibi ayrılır, yeni sayfa kurulur (\u003Ccode\u003EonRouterChanged\u003C/code\u003E \u003Ccode\u003Einitial: true\u003C/code\u003E ile çalışır); adres mevcut geçmiş kaydının yerine yazılır. Açılış gezinmesinin sonucunu döndürür. \u003Ccode\u003Erun\u003C/code\u003E\u0027dan önce etkisizdir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.connectDocument(doc)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EAynı origin\u0027li başka bir belgeyi (\u003Ccode\u003Ewindow.open\u003C/code\u003E penceresi ya da \u003Ccode\u003E\u0026lt;iframe\u0026gt;\u003C/code\u003E) uygulamaya bağlar: router\u0027ın bağlantı yakalayıcısı ve yığının kaydırma dinleyicileri o belgeye de kurulur. Sayaçlıdır; döndürdüğü fonksiyon bağı çözer, belgenin penceresi \u003Ccode\u003Epagehide\u003C/code\u003E alınca kendiliğinden çözülür, \u003Ccode\u003Eapp.dispose()\u003C/code\u003E hepsini çözer. Sayfanın kendi belgesi için etkisizdir. Belge olmayan, penceresi olmayan ya da erişilemeyen değer \u003Ccode\u003EMJX417\u003C/code\u003E fırlatır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.windows\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eproperty\u003C/td\u003E\n\u003Ctd\u003EPencere yöneticisi (\u003Ccode\u003EWindowManager\u003C/code\u003E): \u003Ccode\u003Eopen(bileşen, seçenekler)\u003C/code\u003E bileşeni yeni pencerede ya da \u003Ccode\u003Ekind: \u0026quot;pip\u0026quot;\u003C/code\u003E ile hep üstte açar ve \u003Ccode\u003EAppWindow\u003C/code\u003E handle\u0027ı döndürür; \u003Ccode\u003Ecreate\u003C/code\u003E, \u003Ccode\u003Eattach\u003C/code\u003E, \u003Ccode\u003Eof\u003C/code\u003E, \u003Ccode\u003Esupports\u003C/code\u003E, \u003Ccode\u003EcloseAll\u003C/code\u003E; \u003Ccode\u003Elist\u003C/code\u003E reaktif; olaylar \u003Ccode\u003Ewindow-opened\u003C/code\u003E / \u003Ccode\u003Ewindow-closed\u003C/code\u003E. Bkz: \u003Ca href=\u0022/docs/windows\u0022\u003EPencereler\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.layer\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eproperty\u003C/td\u003E\n\u003Ctd\u003ESayfa katmanı (\u003Ccode\u003EComponent\u003C/code\u003E): ilk okunduğunda \u003Ccode\u003E\u0026lt;body\u0026gt;\u003C/code\u003E\u0027nin sonuna, host elemanından sonra düz bir \u003Ccode\u003E\u0026lt;div\u0026gt;\u003C/code\u003E koyar ve onu saran bileşeni döndürür (host \u003Ccode\u003E\u0026lt;body\u0026gt;\u003C/code\u003E\u0027nin kendisiyse ya da katmanı kapsıyorsa katman host\u0027un sonunda kalır, kabuk içeriği onun önüne girer); stil ve öznitelik yazmaz, \u003Ccode\u003Erun()\u003C/code\u003E\u0027dan önce de okunur (\u003Ccode\u003E\u0026lt;body\u0026gt;\u003C/code\u003E yoksa belge yüklenince yerleşir; eleman sayfadan çıkarılmışsa içerik ilk yer istediğinde ya da \u003Ccode\u003Erun()\u003C/code\u003E\u0027da gövdenin sonuna yeniden konur), \u003Ccode\u003Eapp.dispose()\u003C/code\u003E içindekilerle birlikte serbest bırakır ve elemanı kaldırır. Bkz: \u003Ca href=\u0022/docs/component-tree#layer\u0022\u003ESayfa katmanı\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.layerOf(hedef?, ...bileşenler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EHedefin (bileşen ya da DOM düğümü) belgesinin katmanını döndürür: \u003Ccode\u003Eapp.windows\u003C/code\u003E penceresiyse \u003Ccode\u003Ehost\u003C/code\u003E\u0027u, değilse ya da hedef yoksa \u003Ccode\u003Eapp.layer\u003C/code\u003E; verilen bileşenleri oraya \u003Ccode\u003Econtrols.add\u003C/code\u003E ile ekler. Ebeveynsiz ve elemanı hiçbir belgede olmayan ilk bileşen hedef değil içeriktir; elemanı bir belgede duran ebeveynsiz kök hedeftir. Bileşen ve düğüm olmayan hedef \u003Ccode\u003EMJX424\u003C/code\u003E fırlatır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.navigate(uri, seçenekler?)\u003C/code\u003E / \u003Ccode\u003Eapp.navigateByName(name, params?, seçenekler?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EProgramatik gezinme; seçenekler router\u0027a iletilir (\u003Ccode\u003ENavigationOptions\u003C/code\u003E). Gezinme sonucunu döndürür (ör. guard iptalinde \u003Ccode\u003E{ ok: false, cancelled: true, reason: \u0027guard\u0027 }\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router.navigate(uri, seçenekler?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003ESeçenekli gezinme: \u003Ccode\u003E{ replace?, state?, force?, scroll? }\u003C/code\u003E (\u003Ccode\u003ENavigationOptions\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eproperty\u003C/td\u003E\n\u003Ctd\u003EUygulama boyunca tek nesne (\u003Ccode\u003ERouter\u003C/code\u003E); reaktif, salt okunur rota alanları: \u003Ccode\u003Eparams\u003C/code\u003E, \u003Ccode\u003Eroute\u003C/code\u003E, \u003Ccode\u003Euri\u003C/code\u003E, \u003Ccode\u003Eok\u003C/code\u003E, \u003Ccode\u003Emeta\u003C/code\u003E, \u003Ccode\u003Eextend\u003C/code\u003E, \u003Ccode\u003EfullPath\u003C/code\u003E, \u003Ccode\u003EaliasOf\u003C/code\u003E, \u003Ccode\u003Echain\u003C/code\u003E, \u003Ccode\u003Edirection\u003C/code\u003E, \u003Ccode\u003Estate\u003C/code\u003E, \u003Ccode\u003Estack\u003C/code\u003E (yalnızca \u003Ccode\u003Estack\u003C/code\u003E açıkken). Bkz: \u003Ca href=\u0022/docs/navigation#live-route-state\u0022\u003EGezinme ve Rota Durumu\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useGuard(guard)\u003C/code\u003E / \u003Ccode\u003Eapp.use(mw)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EGezinme guard\u0027ı / middleware. Gezinme sonrası için \u003Ccode\u003Eapp.onRouterChanged(fn)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.on/fire/off\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EUygulama olay veriyolu. \u003Ccode\u003Eon\u003C/code\u003E abonelikten çıkma fonksiyonu döndürür.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.onRouterChanged(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EHer gezinmede (açılış ve 404 dâhil) \u003Ccode\u003E{ uri, params, meta, route, ok, initial, redirectedFrom?, direction, state }\u003C/code\u003E ile çalışır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.onLifecycle(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EUygulama yaşam döngüsü: \u003Ccode\u003E{ state, visible, online }\u003C/code\u003E; \u003Ccode\u003Estate\u003C/code\u003E: \u003Ccode\u003E\u0027visible\u0027 \\| \u0027hidden\u0027 \\| \u0027frozen\u0027 \\| \u0027resumed\u0027 \\| \u0027restored\u0027 \\| \u0027online\u0027 \\| \u0027offline\u0027\u003C/code\u003E. Abonelikten çıkma fonksiyonu döndürür. Bkz: \u003Ca href=\u0022/docs/lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.isVisible\u003C/code\u003E / \u003Ccode\u003Eapp.isOnline\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eproperty\u003C/td\u003E\n\u003Ctd\u003EAnlık görünürlük ve bağlantı durumu.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router.evict(ad \\| rota?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EkeepAlive\u003C/code\u003E önbelleğindeki örnekleri dispose eder (argümansız: hepsi).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router.resolve(uri)\u003C/code\u003E / \u003Ccode\u003Eapp.router.href(ad, params?)\u003C/code\u003E / \u003Ccode\u003Eapp.router.routes\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod / property\u003C/td\u003E\n\u003Ctd\u003EGezinmeden eşleşme (\u003Ccode\u003ERouteResolution\u003C/code\u003E: \u003Ccode\u003E{ chain, result }\u003C/code\u003E), adlandırılmış rotanın yolu, tanım sırasıyla rota listesi (\u003Ccode\u003ERouteInfo[]\u003C/code\u003E). Bkz: \u003Ca href=\u0022/docs/routes#resolve-href-routes\u0022\u003ERota Tablosu\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router.scrollPositions()\u003C/code\u003E / \u003Ccode\u003Eapp.router.restoreScrollPositions(positions)\u003C/code\u003E / \u003Ccode\u003Eapp.router.saveScrollPositions(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EKaydırma hafızasının konumları (\u003Ccode\u003E{ \u0026quot;/notes\u0026quot;: 1200 }\u003C/code\u003E, ekrandaki sayfanınki dahil); verilen konumları hafızaya ekler (\u003Ccode\u003Erun()\u003C/code\u003E\u0027dan önce de); kayıt gereken her anda (sayfadan ayrılırken, \u003Ccode\u003Epagehide\u003C/code\u003E, sayfa gizlenince, \u003Ccode\u003Eapp.dispose()\u003C/code\u003E) \u003Ccode\u003Efn(positions)\u003C/code\u003E çağırır, aboneliği kaldıran fonksiyon döndürür. \u003Ccode\u003EscrollMemory\u003C/code\u003E kapalıyken boş / etkisiz. Bkz: \u003Ca href=\u0022/docs/navigation#scroll-memory\u0022\u003EKaydırma hafızası\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useDevelopment(b)\u003C/code\u003E / \u003Ccode\u003Eapp.useLogging(b)\u003C/code\u003E / \u003Ccode\u003Eapp.useReactiveMonitor(o)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod\u003C/td\u003E\n\u003Ctd\u003EGeliştirme yapılandırması.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.dispose()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emethod → \u003Ccode\u003EPromise\u0026lt;void\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.state\u003C/code\u003E\u0027i \u003Ccode\u003E\u0027disposing\u0027\u003C/code\u003E yapar; router\u0027ı ve yaşam döngüsü dinleyicilerini serbest bırakır, adresi router\u0027ın kipine göre geri alır (\u003Ccode\u003Ehistory\u003C/code\u003E: \u003Ccode\u003E/\u003C/code\u003E; \u003Ccode\u003Ehash\u003C/code\u003E/\u003Ccode\u003Efile\u003C/code\u003E: yalnız \u003Ccode\u003E#\u003C/code\u003E silinir; \u003Ccode\u003Eshell\u003C/code\u003E ve router yok: dokunulmaz) (bunlar senkron olur). Ardından route sayfalarını (leave animasyonlarıyla) ve \u003Ccode\u003Erun()\u003C/code\u003E\u0027ın kurduğu kabuğu (\u003Ccode\u003ERouterView\u003C/code\u003E\u0027ı ve \u003Ccode\u003Erun()\u003C/code\u003E\u0027a verilen kökü dahil) serbest bırakır, en son servis sağlayıcıyı serbest bırakır ve \u003Ccode\u003EApplication.main\u003C/code\u003E\u0027i boşaltır. Ağaç sökülürken her bileşen ve animasyon sırasında çalışan kod aynı servisleri ve \u003Ccode\u003Econtext\u003C/code\u003E\u0027i görür. Host elemanı sayfada boş olarak kalır. Promise, servislerin async \u003Ccode\u003Edispose\u003C/code\u003E\u0027ları dahil her şey bitince çözülür: \u003Ccode\u003Eawait app.dispose()\u003C/code\u003E; aynı hayatta ikinci çağrı aynı promise\u0027i döndürür; \u003Ccode\u003Erun()\u003C/code\u003E ile yeniden başlatılan uygulamada \u003Ccode\u003Edispose()\u003C/code\u003E yeniden çalışır; bitmiş uygulamada yeniden çağrılırsa o aradan beri kurulan katmanı, pencereleri, belge bağlantılarını ve yeniden yaratılan servisleri serbest bırakır, adrese ve geçiş kipine dokunmaz; bu geçiş sürerken gelen çağrı da aynı promise\u0027i alır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.state\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eözellik → \u003Ccode\u003EApplicationState\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027initializing\u0027\u003C/code\u003E (kuruldu), \u003Ccode\u003E\u0027running\u0027\u003C/code\u003E (\u003Ccode\u003Erun()\u003C/code\u003E çağrıldı), \u003Ccode\u003E\u0027disposing\u0027\u003C/code\u003E (\u003Ccode\u003Edispose()\u003C/code\u003E sürüyor), \u003Ccode\u003E\u0027disposed\u0027\u003C/code\u003E (\u003Ccode\u003Erun()\u003C/code\u003E ile yeniden başlatılabilir). Bir uygulama \u003Ccode\u003E\u0027disposing\u0027\u003C/code\u003E iken yeni \u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E kurulabilir; sökülen sayfalar kendi uygulamasının servislerini görmeye devam eder.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EuseApplication()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Efn\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ application, services, router, windows, layer, layerOf, attach }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EuseNavigation()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Efn\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router\u003C/code\u003E ile aynı nesne (\u003Ccode\u003ERouter\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/getting-started\u0022\u003EBaşlarken\u003C/a\u003E, \u003Ca href=\u0022/docs/routing\u0022\u003EYönlendirmeye Giriş\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022components\u0022\u003EBileşenler (Component)\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003ETür\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003ESomut bileşen sınıfı. \u003Ccode\u003Esuper(\u0027div\u0027)\u003C/code\u003E veya \u003Ccode\u003Esuper()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponentBase\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003ETüm bileşenlerin temeli.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponentMotif\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponentBase.motif\u003C/code\u003E ad alanının tipi; kullanıcı \u003Ccode\u003Enew\u003C/code\u003E ile oluşturmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EFNComponent(view)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Efn\u003C/td\u003E\n\u003Ctd\u003EFonksiyon görünümünü bileşene sarar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(el, props?)\u003C/code\u003E / \u003Ccode\u003EmotifFragment(props?)\u003C/code\u003E / \u003Ccode\u003EmotifCompiled(sözleşme)\u003C/code\u003E / \u003Ccode\u003EmotifReport(hata)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Efn\u003C/td\u003E\n\u003Ctd\u003EDerleyicinin ürettiği koddaki çağrılar (\u003Ccode\u003E_mc\u003C/code\u003E, \u003Ccode\u003E_mf\u003C/code\u003E, \u003Ccode\u003E_mv\u003C/code\u003E, \u003Ccode\u003E_mr\u003C/code\u003E); \u003Ccode\u003EmotifCompiled\u003C/code\u003E derleyici sözleşmesi uyuşmazsa geliştirme modunda \u003Ccode\u003EMJX121\u003C/code\u003E uyarısı verir; \u003Ccode\u003EmotifReport\u003C/code\u003E derleyicinin \u003Ccode\u003Etry\u003C/code\u003E/\u003Ccode\u003Ecatch\u003C/code\u003E içine aldığı ifadede (çocuk konumundaki üye çağrısı, \u003Ccode\u003E??\u003C/code\u003E/\u003Ccode\u003E||\u003C/code\u003E sol tarafı, \u003Ccode\u003E\u0026amp;\u0026amp;\u003C/code\u003E koşulu) yakalanan hatayı \u003Ccode\u003EMJX208\u003C/code\u003E olarak raporlar, ifadenin geri dönüş değeri değişmez.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifOptions(nesne)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Efn\u003C/td\u003E\n\u003Ctd\u003EOptions nesnesini olduğu gibi döndürür; tip tarafında metotlardaki \u003Ccode\u003Ethis\u003C/code\u003E\u0027i bileşen (\u003Ccode\u003EComponentBase \u0026amp; nesne\u003C/code\u003E) yapar: \u003Ccode\u003Ethis.class\u003C/code\u003E, \u003Ccode\u003Ethis.motif\u003C/code\u003E, \u003Ccode\u003Ethis.props\u003C/code\u003E strict kipte derlenir ve editör tamamlar. Tipi \u003Ccode\u003EMotifOptions\u0026lt;T\u0026gt;\u003C/code\u003E; \u003Ccode\u003Eel\u003C/code\u003E anahtarı zorunlu (\u003Ccode\u003Eundefined\u003C/code\u003E/\u003Ccode\u003Enull\u003C/code\u003E fragment).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EFrame\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003ETek bir dinamik içeriği tutan/değiştiren fragment kapsayıcı: \u003Ccode\u003Enavigate(page, keepOldControl?)\u003C/code\u003E önceki içeriği serbest bırakıp yenisini yerleştirir (dizi de alır), \u003Ccode\u003EnavigateLazy(() =\u0026gt; import(...), options?)\u003C/code\u003E \u003Ccode\u003ELazy\u003C/code\u003E ile yükler, \u003Ccode\u003Eflush()\u003C/code\u003E içeriği serbest bırakır, \u003Ccode\u003Ecurrent\u003C/code\u003E gösterilen içerik, \u003Ccode\u003EisBusy\u003C/code\u003E gezinme sürüyor mu. \u003Ccode\u003E{() =\u0026gt; ifade}\u003C/code\u003E çocukları ve \u003Ccode\u003Ewhen\u003C/code\u003E/\u003Ccode\u003Eternary\u003C/code\u003E/\u003Ccode\u003EswitchCase\u003C/code\u003E dalları bunun üstüne kuruludur. Bkz: \u003Ca href=\u0022/docs/frame\u0022\u003EFrame\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EContentBody\u003C/code\u003E / \u003Ccode\u003EContentBlock\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003EÇok parçalı gövde: \u003Ccode\u003E\u0026lt;ContentBody name=\u0026quot;x\u0026quot;/\u0026gt;\u003C/code\u003E gövde, \u003Ccode\u003E\u0026lt;ContentBlock target=\u0026quot;x\u0026quot;\u0026gt;…\u0026lt;/ContentBlock\u0026gt;\u003C/code\u003E parça; birden çok blok aynı gövdede birikir, her blok serbest bırakılınca yalnız kendi parçalarını kaldırır. Bkz: \u003Ca href=\u0022/docs/content-body\u0022\u003EContentBody ve ContentBlock\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransport\u003C/code\u003E / \u003Ccode\u003ETransportTo\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003EBir bileşenin içeriğini ağacı dışındaki adlandırılmış bir yuvada gösterme (ör. sayfa komutlarını layout başlığına taşıma). Bkz: \u003Ca href=\u0022/docs/transport\u0022\u003ETransport ve TransportTo\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransporter\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003EProgramatik taşıma: \u003Ccode\u003ETransporter.transport(child, newParent, { index?, keepState?, owner? })\u003C/code\u003E, \u003Ccode\u003EtransportMany(children, newParent, options?)\u003C/code\u003E. Bkz: \u003Ca href=\u0022/docs/transport#transporter\u0022\u003ETransport ve TransportTo\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EFragmentNode\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003EFragment (yorum düğümü) köklü bileşen; \u003Ccode\u003EmotifFragment()\u003C/code\u003E ve \u003Ccode\u003E\u0026lt;\u0026gt;…\u0026lt;/\u0026gt;\u003C/code\u003E bunu üretir. \u003Ccode\u003Echilds\u003C/code\u003E ve \u003Ccode\u003Eprops.nodes\u003C/code\u003E içeriğe eklenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EControlCollection\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecomponent.controls\u003C/code\u003E\u0027un tipi; \u003Ccode\u003Enew\u003C/code\u003E ile oluşturulmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ELazy({ caller, options? })\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Efn\u003C/td\u003E\n\u003Ctd\u003EDinamik import ile tembel içerik (\u003Ccode\u003E\u0026lt;Lazy caller={() =\u0026gt; import(\u0027./X\u0027)} /\u0026gt;\u003C/code\u003E; \u003Ccode\u003ELazyOptions\u003C/code\u003E: \u003Ccode\u003ELoaderview\u003C/code\u003E, \u003Ccode\u003EPlaceholderview\u003C/code\u003E, \u003Ccode\u003EFallbackview\u003C/code\u003E, \u003Ccode\u003EminDelayMs\u003C/code\u003E, \u003Ccode\u003EtimeoutMs\u003C/code\u003E, \u003Ccode\u003Esignal\u003C/code\u003E, \u003Ccode\u003EonError\u003C/code\u003E, \u003Ccode\u003EmapResult\u003C/code\u003E, \u003Ccode\u003Eretry\u003C/code\u003E, \u003Ccode\u003EonRetry\u003C/code\u003E). Bkz: \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EVirtualization\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003ESanal kaydırmalı liste.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch3 id=\u0022component-base-members\u0022\u003E\u003Ccode\u003EComponentBase\u003C/code\u003E başlıca üyeleri\u003C/h3\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EÜye\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eelement\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGerçek DOM düğümü.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eprops\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşen props\u0027u.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Econtrols\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAlt kontrol koleksiyonu (\u003Ccode\u003Eadd(...c)\u003C/code\u003E/\u003Ccode\u003Eadd(index, ...c)\u003C/code\u003E/\u003Ccode\u003Einsert(index, ...c)\u003C/code\u003E/\u003Ccode\u003Eremove\u003C/code\u003E/\u003Ccode\u003Eclear\u003C/code\u003E/\u003Ccode\u003EclearAsync\u003C/code\u003E/\u003Ccode\u003Edetach\u003C/code\u003E/\u003Ccode\u003EsilentDetach\u003C/code\u003E/\u003Ccode\u003EsilentUnlink\u003C/code\u003E/\u003Ccode\u003Emove\u003C/code\u003E/\u003Ccode\u003EmoveToIndex\u003C/code\u003E/\u003Ccode\u003EforEach\u003C/code\u003E/\u003Ccode\u003Emap\u003C/code\u003E/\u003Ccode\u003Eitems\u003C/code\u003E/\u003Ccode\u003Elength\u003C/code\u003E). Bkz: \u003Ca href=\u0022/docs/component-tree#controls\u0022\u003EBileşenler\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Econtext\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÇalışan \u003Ccode\u003EApplication\u003C/code\u003E; üzerinden açılan \u003Ccode\u003Eon\u003C/code\u003E/\u003Ccode\u003EonRouterChanged\u003C/code\u003E abonelikleri bileşen serbest bırakılınca kalkar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass\u003C/code\u003E / \u003Ccode\u003Eattr\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESınıf ve öznitelik yardımcıları.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBağ koleksiyonu.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estate\u003C/code\u003E (kullanıcı tanımlı)\u003C/td\u003E\n\u003Ctd\u003EGenelde \u003Ccode\u003Ereactive({...})\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eview()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşenin içeriğini döndüren metot; kökü değil (kök eleman sınıfa bildirilir).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÇerçeve işlemlerinin ad alanı (\u003Ccode\u003EComponentMotif\u003C/code\u003E). Alt sınıf \u003Ccode\u003Eshow\u003C/code\u003E, \u003Ccode\u003Eon\u003C/code\u003E, \u003Ccode\u003Eclear\u003C/code\u003E, \u003Ccode\u003Eoptions\u003C/code\u003E gibi adları kendi amacıyla tanımlayabilir; çerçeve yalnız \u003Ccode\u003Ethis.motif.*\u003C/code\u003E yolunu kullanır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.on/off/trigger/addHandler\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOlay yönetimi; \u003Ccode\u003Ex:\u003C/code\u003E önekli adlar yaşam döngüsü olaylarıdır (\u003Ccode\u003Ex:built\u003C/code\u003E, \u003Ccode\u003Ex:mounted\u003C/code\u003E, \u003Ccode\u003Ex:disposed\u003C/code\u003E…).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.show/hide/toggle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGörünürlük.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.options\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşen ayar nesnesi (\u003Ccode\u003Etransition\u003C/code\u003E, \u003Ccode\u003EhideStrategy\u003C/code\u003E, \u003Ccode\u003EdisableDisposal\u003C/code\u003E, \u003Ccode\u003Echunk\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.stopAnimations()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESüren CSS sınıf geçişini bitirir, WAAPI animasyonlarını iptal eder.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisWait\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBekletme (\u003Ccode\u003Ex-wait\u003C/code\u003E karşılığı; yazılabilir).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisBuilt\u003C/code\u003E / \u003Ccode\u003EisInitialized\u003C/code\u003E / \u003Ccode\u003EisConfigured\u003C/code\u003E / \u003Ccode\u003EisVisible\u003C/code\u003E / \u003Ccode\u003EisDisposed\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDurum bayrakları.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eparent\u003C/code\u003E / \u003Ccode\u003Echilds\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EEbeveyn bileşen / etiket arasına yazılan JSX çocukları.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eusing(promise, onfulfilled?, onrejected?)\u003C/code\u003E / \u003Ccode\u003EdoWork(promise)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESerbest bırakma sonrası güvenli asenkron sonuç işleme. Bkz: \u003Ca href=\u0022/docs/using\u0022\u003Eusing\u003C/a\u003E, \u003Ca href=\u0022/docs/do-work\u0022\u003EdoWork\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edispose/disposeAsync\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESerbest bırakma.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.clear()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİçeriği (çocukları) serbest bırakır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.register/setDisposable\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKaynak kaydı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EgetService(token)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDI çözümleme.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EuseModel(model)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReaktif model üretir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle(...)\u003C/code\u003E / \u003Ccode\u003EsetText(...)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYardımcılar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Esiblings\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eall/next/prev/nextAll/prevAll\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E$(selector)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EfromDom()\u003C/code\u003E / \u003Ccode\u003EfromComponent()\u003C/code\u003E sorgu.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch3 id=\u0022lifecycle-hooks\u0022\u003EYaşam döngüsü kancaları\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EonInitializing\u003C/code\u003E, \u003Ccode\u003EonInitialized\u003C/code\u003E, \u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonConfigured\u003C/code\u003E, \u003Ccode\u003EonBuilding\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003EoninitializeComponent\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E, \u003Ccode\u003EonVisibilityChanged\u003C/code\u003E, \u003Ccode\u003EonActivated\u003C/code\u003E, \u003Ccode\u003EonDeactivated\u003C/code\u003E, \u003Ccode\u003EonDisposing\u003C/code\u003E, \u003Ccode\u003EonDisposed\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EonRefCreated(sender)\u003C/code\u003E: sınıfın \u003Ccode\u003Eview()\u003C/code\u003E\u0027ındaki her \u003Ccode\u003Eref={this.x}\u003C/code\u003E / \u003Ccode\u003Eref={ad}\u003C/code\u003E uygulandıktan sonra çağrılır (\u003Ccode\u003Esender\u003C/code\u003E ref verilen bileşen); geri çağırım biçimindeki \u003Ccode\u003Eref\u003C/code\u003E için çağrılmaz. Bkz: \u003Ca href=\u0022/docs/component-element#on-ref-created\u0022\u003EBileşenler\u003C/a\u003E.\u003C/p\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/components\u0022\u003EBileşenler\u003C/a\u003E, \u003Ca href=\u0022/docs/lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022reactivity\u0022\u003EReaktivite (store)\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003Eİmza\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereactive(model)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(m: T) =\u0026gt; T\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReaktif proxy.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EuseModel(model)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(m: T) =\u0026gt; T\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereactive\u003C/code\u003E eş adı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcreateSignal(v)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(v: T) =\u0026gt; Signal\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETek değer signal\u0027i.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcreateComputed(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(fn) =\u0026gt; Computed\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETüretilmiş değer; kurulumda ve her değişimde hesaplanır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcreateLazyComputed(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(fn) =\u0026gt; LazyComputed\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETembel türetilmiş değer; değişimde kirli işaretlenir, okunduğunda hesaplanır (\u003Ccode\u003Evalue\u003C/code\u003E, \u003Ccode\u003Epeek\u003C/code\u003E, \u003Ccode\u003EisDirty\u003C/code\u003E, \u003Ccode\u003Edispose\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcreateSelection(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(fn: () =\u0026gt; T) =\u0026gt; KeySelection\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAnahtarlı seçim: \u003Ccode\u003EisSelected(key)\u003C/code\u003E onu çağıran bağı yalnız o anahtara abone eder; kaynak değişince yalnız eski ve yeni değerin bağları uyanır. \u003Ccode\u003Edispose()\u003C/code\u003E izlemeyi bırakır. Bkz: \u003Ca href=\u0022/docs/reactivity#create-selection\u0022\u003EReaktivite\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EasReadonly(obj)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(o: T) =\u0026gt; DeepReadonly\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECanlı salt-okunur görünüm; okumalar izlenir, yazma ve değiştiren metotlar \u003Ccode\u003EMJX212\u003C/code\u003E fırlatır. Bkz: \u003Ca href=\u0022/docs/reactivity#as-readonly\u0022\u003EReaktivite\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisReadonly(v)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(v: unknown) =\u0026gt; boolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDeğer \u003Ccode\u003EasReadonly\u003C/code\u003E ile alınmış bir görünümse \u003Ccode\u003Etrue\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eeffect(fn, onValue?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(fn, cb?) =\u0026gt; () =\u0026gt; void\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYan etki; durdurucu döner. \u003Ccode\u003EonValue\u003C/code\u003E her koşudan sonra \u003Ccode\u003Efn\u003C/code\u003E\u0027in dönüş değerini alır, içindeki okumalar izlenmez.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EasyncTracking\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Enesne\u003C/td\u003E\n\u003Ctd\u003EDerleyicinin \u003Ccode\u003EVirtualization dataRequest\u003C/code\u003E içindeki \u003Ccode\u003Eawait\u003C/code\u003E\u0027leri sarmak için kullandığı çalışma zamanı yardımcısı (\u003Ccode\u003Ecapture\u003C/code\u003E/\u003Ccode\u003Esuspend\u003C/code\u003E/\u003Ccode\u003Eresume\u003C/code\u003E/\u003Ccode\u003Eend\u003C/code\u003E); elle çağrılmaz. Bkz: \u003Ca href=\u0022/docs/reactivity#await-reads\u0022\u003EReaktivite\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Euntracked(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;T\u0026gt;(fn: () =\u0026gt; T) =\u0026gt; T\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİzlemesiz bölge; \u003Ccode\u003Efn\u003C/code\u003E\u0027in dönüş değerini verir. İçindeki \u003Ccode\u003Eeffect\u003C/code\u003E çağrıları normal izler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdeepClone(v)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(v) =\u0026gt; v\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDerin kopya.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EclearModel(m)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(m) =\u0026gt; void\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReaktif kaydı temizle.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ESignal\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EComputed\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003ELazyComputed\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eclass\u003C/td\u003E\n\u003Ctd\u003Eİnce taneli ilkeller.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/reactivity\u0022\u003EReaktivite\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022bindings\u0022\u003EBağlar (bindings) — \u003Ccode\u003Ecomponent.bindings\u003C/code\u003E\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMetot\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eadd(prop, source, member?, format?, formatInfo?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETek yönlü bağ. \u003Ccode\u003EformatInfo\u003C/code\u003E: \u003Ccode\u003E{ locale?, currency? }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(source, member?, format?, formatInfo?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİki yönlü bağ (eleman türüne göre).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(getter, setter)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EFonksiyonlarla iki yönlü bağ; \u003Ccode\u003Ex-model\u003C/code\u003E buna derlenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EwriteModel(value)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDeğeri bileşendeki \u003Ccode\u003Emodel\u003C/code\u003E/\u003Ccode\u003Ex-model\u003C/code\u003E bağlarına geri yazar; yazdıysa \u003Ccode\u003Etrue\u003C/code\u003E (bkz. \u003Ca href=\u0022/docs/forms#component-model\u0022\u003EFormlar\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etext(fn)\u003C/code\u003E / \u003Ccode\u003Evalue(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EtextContent\u003C/code\u003E / \u003Ccode\u003Evalue\u003C/code\u003E bağı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewhen(condFn, renderFn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKoşullu içerik; dal koşulun değeri değişince (\u003Ccode\u003EObject.is\u003C/code\u003E, iki yanlış değer aynı sayılır) yeniden kurulur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eternary(condFn, trueFn, falseFn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİki dallı koşul; dal koşulun değeri değişince (\u003Ccode\u003EObject.is\u003C/code\u003E) yeniden kurulur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Elist(itemsFn, renderFn)\u003C/code\u003E / \u003Ccode\u003Eloop(...)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EListe; satırlar öğe nesnesiyle eşleşir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EswitchCase(discFn, cases, defaultFn?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÇoklu dal.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emethod(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReaktif metin/tek içerik.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewatch(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOtomatik temizlenen izleyici.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewait(fn)\u003C/code\u003E / \u003Ccode\u003Edisplay(fn)\u003C/code\u003E / \u003Ccode\u003Ehtml(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBekletme / görünürlük / innerHTML.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eremove(binding)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBağı koleksiyondan çıkarır ve devre dışı bırakır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EKoşullu Gösterim ve Listeler\u003C/a\u003E, \u003Ca href=\u0022/docs/forms\u0022\u003EFormlar ve İki Yönlü Bağlama\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022dependency-injection\u0022\u003EBağımlılık enjeksiyonu\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EServiceCollection\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKayıt koleksiyonu (\u003Ccode\u003EaddSingleton/addScoped/addTransient\u003C/code\u003E, \u003Ccode\u003EtryAdd*\u003C/code\u003E, \u003Ccode\u003Ereplace\u003C/code\u003E, \u003Ccode\u003Eremove\u003C/code\u003E, \u003Ccode\u003Ehas\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EServiceProvider\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÇözümleyici: \u003Ccode\u003Eget(token)\u003C/code\u003E senkron, \u003Ccode\u003EgetAsync(token)\u003C/code\u003E async fabrika/Promise kayıtları için, \u003Ccode\u003EcreateScope(ad?)\u003C/code\u003E alt kapsam, \u003Ccode\u003EenableAutoDisposeTransients()\u003C/code\u003E alt kapsamdaki transient\u0027ları kapsamla serbest bırakır, \u003Ccode\u003EgetAllServices()\u003C/code\u003E koleksiyon, \u003Ccode\u003Edispose()\u003C/code\u003E. Bkz: \u003Ca href=\u0022/docs/service-resolution\u0022\u003EServis Çözümleme\u003C/a\u003E, \u003Ca href=\u0022/docs/service-disposal\u0022\u003EServislerin Serbest Bırakılması\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E@Injectable(opts?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESınıfı otomatik kayıt için işaretler; \u003Ccode\u003Edeps\u003C/code\u003E yapıcı parametrelerini sırayla verir, \u003Ccode\u003Estartup: true\u003C/code\u003E singleton\u0027ı \u003Ccode\u003Eapp.run()\u003C/code\u003E içinde oluşturur. Standart (TC39) sınıf dekoratörüdür.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Einject(token)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESağlayıcının kurduğu sınıfın alan başlatıcısında veya yapıcısında bağımlılığı çözer; dönüş tipi token\u0027dan gelir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EFromService(token)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EUygulamanın sağlayıcısından hızlı çözümleme; dönüş tipi \u003Ccode\u003ET | null\u003C/code\u003E: çözümlenemezse \u003Ccode\u003Enull\u003C/code\u003E döner ve geliştirme modunda \u003Ccode\u003EMJX414\u003C/code\u003E uyarısı verir. Kayıtlı olduğundan eminseniz \u003Ccode\u003EFromService(X)!\u003C/code\u003E yazın.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EServiceLifetime\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027transient\u0027 \\| \u0027singleton\u0027 \\| \u0027scoped\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/dependency-injection\u0022\u003EBağımlılık Enjeksiyonuna Giriş\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022routing\u0022\u003EYönlendirme\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteItem\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERota tanımı tipi (\u003Ccode\u003Econtrol\u003C/code\u003E ya da \u003Ccode\u003Eredirect\u003C/code\u003E\u0027ten biri zorunlu).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteRedirect\u003C/code\u003E / \u003Ccode\u003ERedirectTarget\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eredirect\u003C/code\u003E değeri (\u003Ccode\u003Estring \\| (to) =\u0026gt; string\u003C/code\u003E) ve fonksiyona geçen \u003Ccode\u003E{ path, params, meta }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouterView\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERota çıktısı yuvası (\u003Ccode\u003Ename?\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouterLink\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAktif/eşleşme sınıflı bağlantı bileşeni (varsayılan eleman \u003Ccode\u003E\u0026lt;a\u0026gt;\u003C/code\u003E). Prop\u0027lar: \u003Ccode\u003Eto\u003C/code\u003E, \u003Ccode\u003Eel\u003C/code\u003E, \u003Ccode\u003EactiveClass\u003C/code\u003E, \u003Ccode\u003EexactClass\u003C/code\u003E, \u003Ccode\u003EonActive\u003C/code\u003E/\u003Ccode\u003EoffActive\u003C/code\u003E, \u003Ccode\u003EonExact\u003C/code\u003E/\u003Ccode\u003EoffExact\u003C/code\u003E, \u003Ccode\u003EshowHref\u003C/code\u003E, \u003Ccode\u003Etarget\u003C/code\u003E, \u003Ccode\u003Etext\u003C/code\u003E, \u003Ccode\u003Ebypass\u003C/code\u003E (tıklamayı tarayıcıya bırakır). Bkz: \u003Ca href=\u0022/docs/router-links#router-link\u0022\u003EBağlantılar\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ENavigationDirection\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027initial\u0027 \\| \u0027push\u0027 \\| \u0027replace\u0027 \\| \u0027back\u0027 \\| \u0027forward\u0027 \\| \u0027traverse\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EStackOptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EuseRouter({ stack })\u003C/code\u003E ayarları: \u003Ccode\u003Eretain\u003C/code\u003E, \u003Ccode\u003Edepth\u003C/code\u003E, \u003Ccode\u003Epersist\u003C/code\u003E, \u003Ccode\u003Eanimation\u003C/code\u003E, \u003Ccode\u003Eduration\u003C/code\u003E, \u003Ccode\u003EswipeBack\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EStackEntryInfo\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router.stack\u003C/code\u003E öğesi: \u003Ccode\u003E{ index, uri, current, retained }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteInfo\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router.routes\u003C/code\u003E öğesi: \u003Ccode\u003E{ fullPath, name, meta, route, chain }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EStackTransitionContext\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÖzel yığın animasyonuna gelen \u003Ccode\u003E{ direction, entering, leaving }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EScrollMemoryOptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EscrollMemory\u003C/code\u003E ayarları; \u003Ccode\u003Econtainer\u003C/code\u003E ile kap kaydırması.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EAyrıca \u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E özniteliği ile standart \u003Ccode\u003E\u0026lt;a\u0026gt;\u003C/code\u003E bağlantıları yönlendirmeye dahil edilir.\u003C/p\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/routing\u0022\u003EYönlendirmeye Giriş\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022disposable\u0022\u003ESerbest bırakma (disposable)\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EIDisposable\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ dispose(): void }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EDisposable\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESerbest bırakılabilir nesnelerin temel sınıfı (\u003Ccode\u003EComponentBase\u003C/code\u003E bundan türer); \u003Ccode\u003Edispose()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EDisposableStore\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGrup temizliği (\u003Ccode\u003Eadd\u003C/code\u003E, \u003Ccode\u003Edelete\u003C/code\u003E, \u003Ccode\u003Edetach\u003C/code\u003E, \u003Ccode\u003Eclear\u003C/code\u003E, \u003Ccode\u003Edispose\u003C/code\u003E, \u003Ccode\u003EisDisposed\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdisposableCore.toDisposable(fn)\u003C/code\u003E / \u003Ccode\u003EtoDisposable(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EFonksiyonu \u003Ccode\u003EIDisposable\u003C/code\u003E\u0027a sarar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdisposableCore.disposableTracker\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECanlı bileşen sayımı için izleyici kancası (\u003Ccode\u003EIDisposableTracker\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022common\u0022\u003EOrtak (common) yardımcılar\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edom\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDOM oluşturma yardımcıları: \u003Ccode\u003EcreateElement(tag, options?)\u003C/code\u003E (etiket başına şablon eleman önbelleğe alınır ve klonlanır; \u003Ccode\u003Eoptions\u003C/code\u003E yalnız ilk oluşturmada geçer; \u003Ccode\u003E\u0027text\u0027\u003C/code\u003E metin düğümü verir; \u003Ccode\u003Edocument\u003C/code\u003E yoksa \u003Ccode\u003EMJX101\u003C/code\u003E), \u003Ccode\u003EcreateElementNS(ns, tag, options?)\u003C/code\u003E (hata \u003Ccode\u003EMJX103\u003C/code\u003E), \u003Ccode\u003EcreateDocumentFragment()\u003C/code\u003E, \u003Ccode\u003EcreateComment(metin)\u003C/code\u003E, \u003Ccode\u003EcreateTextNode(metin)\u003C/code\u003E, \u003Ccode\u003EquerySelectorAll(seçici)\u003C/code\u003E, \u003Ccode\u003EconvertToSvgElement(el)\u003C/code\u003E (elemanı SVG ad alanında yeniden oluşturup yerine koyar), \u003Ccode\u003Ewindow\u003C/code\u003E, \u003Ccode\u003Edocument\u003C/code\u003E, \u003Ccode\u003Ebody\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EList\u003C/code\u003E, \u003Ccode\u003EDictionary\u003C/code\u003E, \u003Ccode\u003ELinkedList\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKoleksiyon yapıları. Bkz: \u003Ca href=\u0022/docs/collections\u0022\u003EKoleksiyonlar\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EQuery\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EQuery.from(kaynak)\u003C/code\u003E / \u003Ccode\u003EGroup\u0026lt;TKey, T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EZincirlenebilir sorgu sarmalayıcısı (\u003Ccode\u003Ewhere\u003C/code\u003E, \u003Ccode\u003Eselect\u003C/code\u003E, \u003Ccode\u003EorderBy\u003C/code\u003E, \u003Ccode\u003EgroupBy\u003C/code\u003E, \u003Ccode\u003Efirst\u003C/code\u003E, \u003Ccode\u003Eany\u003C/code\u003E, \u003Ccode\u003Eaggregate\u003C/code\u003E, \u003Ccode\u003EtoArray\u003C/code\u003E …). Bkz: \u003Ca href=\u0022/docs/query\u0022\u003EKoleksiyon Sorguları (Query)\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ENameValuePair\u0026lt;K, V\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ Key, value }\u003C/code\u003E çifti (\u003Ccode\u003EDictionary\u003C/code\u003E öğesi). Bkz: \u003Ca href=\u0022/docs/collections#dictionary\u0022\u003EKoleksiyonlar\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ENodeTypes\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDüğüm türü sabitleri (enum).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EEmitter\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETipli olay yayıcı: \u003Ccode\u003Eemitter.event(listener, thisArgs?, disposables?)\u003C/code\u003E abone olur ve \u003Ccode\u003EIDisposable\u003C/code\u003E döndürür, \u003Ccode\u003Efire(value)\u003C/code\u003E yayınlar, \u003Ccode\u003Edispose()\u003C/code\u003E kapatır. Dinleyici hatası \u003Ccode\u003EsetUnexpectedErrorHandler\u003C/code\u003E\u0027a gider. Bkz: \u003Ca href=\u0022/docs/events#emitter\u0022\u003EHata Yönetimi\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EJSX\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EJSX tip ad alanı (\u003Ccode\u003EJSX.Element\u003C/code\u003E, \u003Ccode\u003EJSX.IntrinsicElements\u003C/code\u003E); derleyici \u003Ccode\u003Ejsx-runtime\u003C/code\u003E için kullanır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EpreProcessing(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGeri çağrıyı kalıcı bir listeye ekler ve listedeki bütün geri çağrıları hemen çalıştırır; stil enjeksiyonu gibi tek seferlik kurulumlar için.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsafeCall\u003C/code\u003E, \u003Ccode\u003EsafeCallAsync\u003C/code\u003E, \u003Ccode\u003EsafeCallSilent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHata-güvenli çağrı yardımcıları.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EerrorHandler\u003C/code\u003E / \u003Ccode\u003EsetUnexpectedErrorHandler(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EMerkezî hata yöneticisi. \u003Ccode\u003EerrorHandler.addListener(fn)\u003C/code\u003E çerçevenin raporladığı her hatayı \u003Ccode\u003EMotifError\u003C/code\u003E olarak alır. \u003Ccode\u003EsetUnexpectedErrorHandler(fn)\u003C/code\u003E yalnız kodsuz beklenmeyen hataları alır (\u003Ccode\u003EsafeCall\u003C/code\u003E/\u003Ccode\u003EsafeCallAsync\u003C/code\u003E içinde ve \u003Ccode\u003EEmitter\u003C/code\u003E dinleyicilerinde yakalananlar; bunlar \u003Ccode\u003EaddListener\u003C/code\u003E dinleyicilerine de olduğu gibi gider); varsayılanı hatayı \u003Ccode\u003EsetTimeout\u003C/code\u003E ile yeniden fırlatır. Kodlu raporlar (\u003Ccode\u003EMJX122\u003C/code\u003E, \u003Ccode\u003EMJX123\u003C/code\u003E, \u003Ccode\u003EMJX208\u003C/code\u003E …) ona gitmez. Bkz: \u003Ca href=\u0022/docs/error-handling\u0022\u003EHata Yönetimi\u003C/a\u003E, \u003Ca href=\u0022/docs/error-codes\u0022\u003EHata ve Uyarı Kodları\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMotifError\u003C/code\u003E / \u003Ccode\u003EMotifErrorCode\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÇerçevenin fırlattığı ve raporladığı hataların sınıfı; \u003Ccode\u003Ecode\u003C/code\u003E (\u003Ccode\u003E\u0026quot;MJX302\u0026quot;\u003C/code\u003E gibi) ve \u003Ccode\u003E[motifjs] MJX302: …\u003C/code\u003E biçiminde İngilizce mesaj taşır, varsa asıl hata \u003Ccode\u003Ecause\u003C/code\u003E\u0027dadır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransitionProps\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGeçiş yapılandırması arayüzü (tip).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EBind\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EtoGetter(v)\u003C/code\u003E / \u003Ccode\u003Eread(v)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EProp sözleşmesi: \u003Ccode\u003ET \\| (() =\u0026gt; T)\u003C/code\u003E; \u003Ccode\u003EtoGetter\u003C/code\u003E canlı okuma için getter\u0027a çevirir, \u003Ccode\u003Eread\u003C/code\u003E anlık değeri verir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EResilience\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDayanıklılık yardımcıları: \u003Ccode\u003EResilience.create.retry(...).timeout(...).execute(fn)\u003C/code\u003E (ayrıca \u003Ccode\u003EcircuitBreaker\u003C/code\u003E, \u003Ccode\u003Ebulkhead\u003C/code\u003E, \u003Ccode\u003ErateLimiter\u003C/code\u003E, \u003Ccode\u003Efallback\u003C/code\u003E). Hataları \u003Ccode\u003EMJX602\u003C/code\u003E–\u003Ccode\u003EMJX605\u003C/code\u003E. Bkz: \u003Ca href=\u0022/docs/resilience\u0022\u003EDayanıklılık (Resilience)\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edecorate(policy, fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBir dayanıklılık politikasını fonksiyona sarar: \u003Ccode\u003E(ctx?) =\u0026gt; policy.execute(fn, ctx)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EErrorHandler\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EerrorHandler\u003C/code\u003E örneğinin sınıfı: \u003Ccode\u003Ereport(err)\u003C/code\u003E, \u003Ccode\u003EaddListener(fn)\u003C/code\u003E, \u003Ccode\u003EsetDevelopmentMode(b)\u003C/code\u003E, \u003Ccode\u003EsetConsoleLogging(b)\u003C/code\u003E, \u003Ccode\u003EisDevelopment()\u003C/code\u003E, \u003Ccode\u003EsafeCall\u003C/code\u003E/\u003Ccode\u003EsafeCallSilent\u003C/code\u003E/\u003Ccode\u003EwrapSafe\u003C/code\u003E/\u003Ccode\u003EwrapSafeAsync\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022types\u0022\u003ETipler\u003C/h2\u003E\n\u003Cp\u003EDeğer taşımayan, yalnız \u003Ccode\u003Eimport type\u003C/code\u003E ile alınan dışa aktarımlar. Davranışları ilgili bölümde anlatılır; burada ad ve biçimleri toplanmıştır.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ETip\u003C/th\u003E\n\u003Cth\u003EBiçim / Açıklama\u003C/th\u003E\n\u003Cth\u003EBkz.\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EIBaseProp\u0026lt;TProps\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHer bileşen yapıcısının kabul ettiği ortak prop\u0027lar: \u003Ccode\u003ETProps\u003C/code\u003E \u002B \u003Ccode\u003Echilds\u003C/code\u003E, \u003Ccode\u003Eoptions\u003C/code\u003E, \u003Ccode\u003EonElementCreating\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, yaşam döngüsü kancaları (\u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E, \u003Ccode\u003EonActivated\u003C/code\u003E …); diğer anahtarlar serbesttir (\u003Ccode\u003Eref\u003C/code\u003E, \u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Etransition\u003C/code\u003E burada ayrıca tiplenmez).\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-props#props\u0022\u003EBileşenler\u003C/a\u003E, \u003Ca href=\u0022/docs/lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMotifBaseProps\u003C/code\u003E / \u003Ccode\u003EMotifBindable\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EMotifValue\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EMotifClass\u003C/code\u003E / \u003Ccode\u003EMotifStyle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EJSX öznitelik tipleri: değer ya da getter kabul eden \u003Ccode\u003Eclass\u003C/code\u003E/\u003Ccode\u003Estyle\u003C/code\u003E/öznitelik biçimleri.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/jsx\u0022\u003EJSX ve Şablonlar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EBind\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ET \\| (() =\u0026gt; T)\u003C/code\u003E; prop sözleşmesi.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/jsx#attribute-ternary\u0022\u003EJSX ve Şablonlar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponentBaseOptions\u0026lt;TProps\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.options\u003C/code\u003E nesnesinin tipi: \u003Ccode\u003Etransition\u003C/code\u003E (API), \u003Ccode\u003EenableRouterClassing\u003C/code\u003E (setter), \u003Ccode\u003EhideStrategy\u003C/code\u003E, \u003Ccode\u003EdisableDisposal\u003C/code\u003E, \u003Ccode\u003Echunk\u003C/code\u003E, \u003Ccode\u003Eprops\u003C/code\u003E, \u003Ccode\u003EgetInstance()\u003C/code\u003E, \u003Ccode\u003EhasEvent(ad)\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lifecycle#hide-strategy\u0022\u003EYaşam Döngüsü\u003C/a\u003E, \u003Ca href=\u0022/docs/styling-and-transitions\u0022\u003EStil ve Animasyon\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouterClassingSettings\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ to, path, activeClass?, exactClass?, onActive?, offActive?, onExact?, offExact? }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/router-links#router-classing\u0022\u003EBağlantılar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransitionProps\u003C/code\u003E / \u003Ccode\u003ETransitionMode\u003C/code\u003E / \u003Ccode\u003ECSSTransitionInfo\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGeçiş sınıf adları ve süresi / \u003Ccode\u003E\u0027concurrent\u0027 \\| \u0027out-in\u0027 \\| \u0027in-out\u0027\u003C/code\u003E / elemanın hesaplanmış geçiş bilgisi.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/styling-and-transitions\u0022\u003EStil ve Animasyon\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EIDisposeOptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ deep?, skipLeaveTransition? }\u003C/code\u003E — \u003Ccode\u003Edispose()\u003C/code\u003E seçenekleri.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lifecycle#dispose\u0022\u003EYaşam Döngüsü\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EIDisposable\u003C/code\u003E / \u003Ccode\u003EIDisposableTracker\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ dispose() }\u003C/code\u003E / \u003Ccode\u003EdisposableCore.disposableTracker\u003C/code\u003E kancası.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EEventArgs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ cancel: boolean }\u003C/code\u003E — kanca ve \u003Ccode\u003Emotif.trigger\u003C/code\u003E olay nesnesi.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lifecycle#class-hooks\u0022\u003EYaşam Döngüsü\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EVisibilityChangedEventArgs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EEventArgs\u003C/code\u003E \u002B \u003Ccode\u003Evisible: boolean\u003C/code\u003E — \u003Ccode\u003EonVisibilityChanged\u003C/code\u003E argümanı; \u003Ccode\u003Evisible\u003C/code\u003E yeni durumdur.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lifecycle#class-hooks\u0022\u003EYaşam Döngüsü\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EHtmlElementEvents\u003C/code\u003E / \u003Ccode\u003EAnyEvents\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.on\u003C/code\u003E olay adlarının tipi: DOM olay adları değiştiricileriyle (\u003Ccode\u003E\u0027click:once:prevent\u0027\u003C/code\u003E) ve \u003Ccode\u003Ex:\u003C/code\u003E yaşam döngüsü adları.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/events#modifiers\u0022\u003EOlaylar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EElementType\u003C/code\u003E / \u003Ccode\u003EIElement\u003C/code\u003E / \u003Ccode\u003EIHtmlElement\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponent\u0026lt;TElement\u0026gt;\u003C/code\u003E generic\u0027inin kabul ettiği eleman tipleri.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/components#root-element\u0022\u003EBileşenler\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMotifComponentType\u003C/code\u003E / \u003Ccode\u003EMotifComponentConstructor\u003C/code\u003E / \u003Ccode\u003EMotifFunctionalComponent\u003C/code\u003E / \u003Ccode\u003EMotifFunctionalComponentBasic\u003C/code\u003E / \u003Ccode\u003EAnyFunctionalComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESınıf, yapıcı ve fonksiyon bileşeni tipleri (JSX etiket tipleri için).\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/components\u0022\u003EBileşenler\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EEffectFn\u003C/code\u003E / \u003Ccode\u003EAsyncTrackingToken\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eeffect\u003C/code\u003E fonksiyon tipi / \u003Ccode\u003EasyncTracking\u003C/code\u003E belirteci.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/reactivity\u0022\u003EReaktivite\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EReadonlySignal\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EasReadonly()\u003C/code\u003E görünümü: \u003Ccode\u003Evalue\u003C/code\u003E, \u003Ccode\u003Epeek()\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/reactivity#create-signal\u0022\u003EReaktivite\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EKeySelection\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EcreateSelection\u003C/code\u003E dönüşü: \u003Ccode\u003E(key: T) =\u0026gt; boolean\u003C/code\u003E ve \u003Ccode\u003Edispose()\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/reactivity#create-selection\u0022\u003EReaktivite\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EDeepReadonly\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EasReadonly\u003C/code\u003E dönüş tipi: alanlar, dizi elemanları, \u003Ccode\u003EMap\u003C/code\u003E ve \u003Ccode\u003ESet\u003C/code\u003E içeriği iç içe salt-okunur.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/reactivity#as-readonly\u0022\u003EReaktivite\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EAppLifecycleState\u003C/code\u003E / \u003Ccode\u003EAppLifecycleEventArgs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027visible\u0027 \\| \u0027hidden\u0027 \\| \u0027frozen\u0027 \\| \u0027resumed\u0027 \\| \u0027restored\u0027 \\| \u0027online\u0027 \\| \u0027offline\u0027\u003C/code\u003E / \u003Ccode\u003E{ state, visible, online }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lifecycle#app-lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteItem\u003C/code\u003E / \u003Ccode\u003ERouteItemBase\u003C/code\u003E / \u003Ccode\u003ERouteControl\u003C/code\u003E / \u003Ccode\u003ERouteRedirect\u003C/code\u003E / \u003Ccode\u003ERedirectTarget\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERota tanımı ve parçaları.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/routes#route-item\u0022\u003ERota Tablosu\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouterOptions\u003C/code\u003E / \u003Ccode\u003ERouterEvents\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EuseRouter({...})\u003C/code\u003E nesnesi / genel kancalar \u003Ccode\u003E{ onEntering?, onEnter?, onLeave?, onUpdate? }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/routing#use-router\u0022\u003EYönlendirmeye Giriş\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EWindowOptions\u003C/code\u003E / \u003Ccode\u003EAppWindow\u003C/code\u003E / \u003Ccode\u003EWindowClosedResult\u003C/code\u003E / \u003Ccode\u003EWindowClosingEventArgs\u003C/code\u003E / \u003Ccode\u003EWindowCloseReason\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.windows.open\u003C/code\u003E seçenekleri, dönen handle, kapanış sonucu \u003Ccode\u003E{ returned, disposed, kept }\u003C/code\u003E, \u003Ccode\u003EonClosing\u003C/code\u003E kancasının aldığı \u003Ccode\u003E{ window, components, reason }\u003C/code\u003E ve nedenin türü.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/windows\u0022\u003EPencereler\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouter\u003C/code\u003E / \u003Ccode\u003ERouteInfo\u003C/code\u003E / \u003Ccode\u003ERouteResolution\u003C/code\u003E / \u003Ccode\u003EResolveResult\u003C/code\u003E / \u003Ccode\u003ERouterViewProps\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.router\u003C/code\u003E nesnesi / \u003Ccode\u003Eroutes\u003C/code\u003E öğesi / \u003Ccode\u003Eresolve()\u003C/code\u003E sonucu (\u003Ccode\u003E{ chain: string[], result: ResolveResult }\u003C/code\u003E) / gezinme ve eşleşme sonucu / \u003Ccode\u003ERouterView\u003C/code\u003E prop\u0027ları (\u003Ccode\u003Ename?\u003C/code\u003E).\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/navigation#live-route-state\u0022\u003EGezinme ve Rota Durumu\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ENavigationOptions\u003C/code\u003E / \u003Ccode\u003ENavigationDirection\u003C/code\u003E / \u003Ccode\u003ENavigationGuard\u003C/code\u003E / \u003Ccode\u003ENavigationGuardContext\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGezinme seçenekleri / yön / guard imzası \u003Ccode\u003E(ctx, next) =\u0026gt; void\u003C/code\u003E / \u003Ccode\u003E{ to, from }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/route-guards#guards\u0022\u003ERota Kancaları ve Guard\u0027lar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouterNavigatedEventArgs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonRouterChanged\u003C/code\u003E yükü: \u003Ccode\u003E{ uri, params, meta, route, ok, initial, redirectedFrom?, direction?, state? }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/route-guards#guards\u0022\u003ERota Kancaları ve Guard\u0027lar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouterValidateEventArgs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Evalidate(e)\u003C/code\u003E argümanı: \u003Ccode\u003E{ uri, key, routes, params }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/routes#route-item-fields\u0022\u003ERota Tablosu\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteResolveContext\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EMiddleware bağlamı: \u003Ccode\u003E{ uri, context, rewritePath(uri) }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/route-guards#middleware\u0022\u003ERota Kancaları ve Guard\u0027lar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EScrollMemoryOptions\u003C/code\u003E / \u003Ccode\u003EStackOptions\u003C/code\u003E / \u003Ccode\u003EStackSwipeBackOptions\u003C/code\u003E / \u003Ccode\u003EStackEntryInfo\u003C/code\u003E / \u003Ccode\u003EStackTransitionContext\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKaydırma hafızası ve yığın gezinmesi ayarları.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/navigation#scroll-memory\u0022\u003EGezinme ve Rota Durumu\u003C/a\u003E, \u003Ca href=\u0022/docs/navigation-stack#stack\u0022\u003EYığın Gezinmesi\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EServiceLifetime\u003C/code\u003E / \u003Ccode\u003EServiceDescriptor\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027transient\u0027 \\| \u0027singleton\u0027 \\| \u0027scoped\u0027\u003C/code\u003E / kayıt tanımı (\u003Ccode\u003Etoken\u003C/code\u003E, \u003Ccode\u003Elifetime\u003C/code\u003E, \u003Ccode\u003EuseClass\u003C/code\u003E/\u003Ccode\u003EuseValue\u003C/code\u003E/\u003Ccode\u003EuseFactory\u003C/code\u003E, \u003Ccode\u003Edeps\u003C/code\u003E, \u003Ccode\u003Estartup\u003C/code\u003E).\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/service-registration#registration-forms\u0022\u003EServis Kaydı\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ELazyOptions\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003ELazyRetryOptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ELazy\u003C/code\u003E seçenekleri / \u003Ccode\u003E{ count, delayMs?, whenOnline? }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lazy#options\u0022\u003ELazy\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ERetryOptions\u003C/code\u003E / \u003Ccode\u003ETimeoutOptions\u003C/code\u003E / \u003Ccode\u003ECircuitBreakerOptions\u003C/code\u003E / \u003Ccode\u003EBulkheadOptions\u003C/code\u003E / \u003Ccode\u003ERateLimiterOptions\u003C/code\u003E / \u003Ccode\u003EFallbackOptions\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EResilience\u003C/code\u003E politika seçenekleri.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/resilience#policies\u0022\u003EDayanıklılık (Resilience)\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EResiliencePolicy\u003C/code\u003E / \u003Ccode\u003EResilienceAction\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EResilienceContext\u003C/code\u003E / \u003Ccode\u003ECircuitState\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E{ execute(action, ctx?) }\u003C/code\u003E arabirimi (\u003Ccode\u003EResilience\u003C/code\u003E uygular, \u003Ccode\u003Edecorate\u003C/code\u003E kabul eder) / \u003Ccode\u003E(ctx?) =\u0026gt; T \\| Promise\u0026lt;T\u0026gt;\u003C/code\u003E / serbest bağlam nesnesi / \u003Ccode\u003E\u0027CLOSED\u0027 \\| \u0027OPEN\u0027 \\| \u0027HALF_OPEN\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/resilience#chain\u0022\u003EDayanıklılık (Resilience)\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransportOptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransporter.transport\u003C/code\u003E seçenekleri \u003Ccode\u003E{ index?, keepState?, owner? }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/transport#transporter\u0022\u003ETransport ve TransportTo\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EVirtualizationProps\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EVirtualizationDataRequest\u003C/code\u003E / \u003Ccode\u003EVirtualizationDataResponse\u0026lt;T\u0026gt;\u003C/code\u003E / \u003Ccode\u003EVirtualizationState\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESanal liste prop\u0027ları, istek/yanıt ve durum nesneleri.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/virtualization#props\u0022\u003ESanal Listeler (Virtualization)\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMotifErrorCode\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBütün \u003Ccode\u003EMJX\u003C/code\u003E kodlarının birleşimi.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/error-handling#motif-error\u0022\u003EHata Yönetimi\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EGroup\u0026lt;TKey, T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EQuery.groupBy\u003C/code\u003E öğesi \u003Ccode\u003E{ key, items }\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/query#chaining\u0022\u003EKoleksiyon Sorguları (Query)\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EEvent\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EEmitter.event\u003C/code\u003E\u0027in tipi: \u003Ccode\u003E(listener, thisArgs?, disposables?) =\u0026gt; IDisposable\u003C/code\u003E.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/events#emitter\u0022\u003EOlaylar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EJSX\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EJSX tip ad alanı.\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/jsx\u0022\u003EJSX ve Şablonlar\u003C/a\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E__attr\u003C/code\u003E, \u003Ccode\u003ECustomParameters\u003C/code\u003E, \u003Ccode\u003EIsOptional\u003C/code\u003E, \u003Ccode\u003EOptionalParams\u003C/code\u003E, \u003Ccode\u003EIAttribute\u003C/code\u003E, \u003Ccode\u003EIClass\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETip yardımcıları ve \u003Ccode\u003Eattr\u003C/code\u003E/\u003Ccode\u003Eclass\u003C/code\u003E yardımcılarının arayüzleri; doğrudan kullanılmaz.\u003C/td\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022devtools\u0022\u003EGeliştirici araçları\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESembol\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useReactiveMonitor(o)\u003C/code\u003E / \u003Ccode\u003EconfigureReactivityLeakMonitor(o)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReaktif bağımlılık uyarıları: \u003Ccode\u003E{ enabled, threshold, name }\u003C/code\u003E sızıntı gözlemcisi (bir alanı izleyen effect sayısı \u003Ccode\u003Ethreshold\u003C/code\u003E\u0027a ulaşınca \u003Ccode\u003EMJX507\u003C/code\u003E), \u003Ccode\u003Edependencies\u003C/code\u003E bir effect\u0027in tek koşuda toplayabileceği bağımlılık eşiği (varsayılan 1000, aşılınca \u003Ccode\u003EMJX209\u003C/code\u003E; \u003Ccode\u003E0\u003C/code\u003E kapatır); \u003Ccode\u003Escans\u003C/code\u003E aynı listeyi aynı bileşen türünün birden çok örneğinin taramasını çalışma anında yakalayan \u003Ccode\u003EMJX210\u003C/code\u003E denetimi (varsayılan açık, \u003Ccode\u003Efalse\u003C/code\u003E kapatır).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdebugGetDeps(hedef)\u003C/code\u003E / \u003Ccode\u003EdebugGetDepMap()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReaktif bağımlılık haritaları; \u003Ccode\u003E@motifx/core/devtools\u003C/code\u003E alt yolundan: \u003Ccode\u003Eimport { debugGetDeps } from \u0026quot;@motifx/core/devtools\u0026quot;\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EregisterDevtools(ad, { describe?, inspect? })\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBir paketin kendi durumunu DevTools\u0027a açması; \u003Ccode\u003E@motifx/core/devtools\u003C/code\u003E alt yolundan. \u003Ccode\u003E{ emit, pathOf, dispose }\u003C/code\u003E döndürür (\u003Ca href=\u0022/docs/devtools-packages#extensions\u0022\u003EDevTools sözleşmesi\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMotifDevtools\u003C/code\u003E, \u003Ccode\u003EDevtoolsEvent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EglobalThis.__MOTIF_DEVTOOLS__\u003C/code\u003E nesnesinin ve olaylarının tipleri; \u003Ccode\u003E@motifx/core/devtools\u003C/code\u003E alt yolundan (\u003Ca href=\u0022/docs/devtools\u0022\u003EDevTools sözleşmesi\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EDevtoolsTreeNode\u003C/code\u003E, \u003Ccode\u003EDevtoolsPath\u003C/code\u003E, \u003Ccode\u003EDevtoolsResult\u003C/code\u003E, \u003Ccode\u003EDevtoolsComponentRef\u003C/code\u003E, \u003Ccode\u003EDevtoolsStoreHolder\u003C/code\u003E, \u003Ccode\u003EDevtoolsExtension\u003C/code\u003E, \u003Ccode\u003EDevtoolsExtensionHandle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESözleşmenin parça tipleri: ağaç düğümü, yol, yazma sonucu, bileşen başvurusu, store tutucusu, eklenti kaydı ve kaydın döndürdüğü nesne; \u003Ccode\u003E@motifx/core/devtools\u003C/code\u003E alt yolundan.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EnameModuleStore\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDerleyicinin geliştirme derlemesinde modül store\u0027larını adlandırmak için ürettiği çağrı; elle çağrılmaz (\u003Ca href=\u0022/docs/devtools#enable\u0022\u003EDevTools sözleşmesi\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022jsx-attributes\u0022\u003EJSX özel öznitelikleri\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003EJSX\u0027siz yazımda bu özniteliklerin karşılıkları props nesnesinin anahtarları ve bileşenin çağrılarıdır (bkz. \u003Ca href=\u0022/docs/imperative#props-keys\u0022\u003EProps nesnesinin anahtarları\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EÖznitelik\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass\u003C/code\u003E / \u003Ccode\u003EclassName\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESınıf (string/dizi/nesne/getter).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle\u003C/code\u003E / \u003Ccode\u003Ex-style\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EStil.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eon\u0026lt;event\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDOM olayı (\u003Ccode\u003E:once\u003C/code\u003E, \u003Ccode\u003E:prevent\u003C/code\u003E, \u003Ccode\u003E:stop\u003C/code\u003E, \u003Ccode\u003E:capture\u003C/code\u003E, \u003Ccode\u003E:passive\u003C/code\u003E, \u003Ccode\u003E:self\u003C/code\u003E, \u003Ccode\u003E:trusted\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eon:ad\u003C/code\u003E / \u003Ccode\u003Eon-ad\u003C/code\u003E / \u003Ccode\u003Eon_ad\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİşleyiciyi olduğu gibi \u003Ccode\u003Emotif.on(\u0026quot;ad\u0026quot;, fn)\u003C/code\u003E ile bağlar (DOM ve özel olaylar; yalnız önek atılır, \u003Ccode\u003Eon-my-event\u003C/code\u003E → \u003Ccode\u003Emy-event\u003C/code\u003E); parametre sayısı ≤ 1 → \u003Ccode\u003Efn(event)\u003C/code\u003E, 2\u002B → \u003Ccode\u003Efn(sender, event)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eref\u003C/code\u003E / \u003Ccode\u003Ex-ref\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EEtiketin bileşen örneğini yakala: \u003Ccode\u003Eref={(c) =\u0026gt; …}\u003C/code\u003E ya da \u003Ccode\u003Eref={this.alan}\u003C/code\u003E (fonksiyon bileşeninde \u003Ccode\u003Eref={alan}\u003C/code\u003E), her etikette, tam bir kez; ikisi aynı etikette birlikte yazılırsa kaynaktaki sırayla çalışır. Yalnız verildiği bileşende çalışır (fonksiyon bileşeninde döndürülen kök); \u003Ccode\u003Eprops\u003C/code\u003E\u0027ta ve \u003Ccode\u003Ethis.props\u003C/code\u003E\u0027ta yer almaz. İçteki bir öğe için ayrı bir prop adı kullanın (ör. \u003Ccode\u003EinputRef\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EinitializeComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EEtiketin bileşeniyle kurulumda bir kez çağrılır (düz DOM, sınıf ve fonksiyon bileşeni etiketinde aynı; fonksiyonda döndürülen kök). Derleyicinin ürettiği kurulum koduyla birlikte çalışır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EoninitializeComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBütün \u003Ccode\u003EinitializeComponent\u003C/code\u003E kodundan (sınıf metodu, etiketteki değer, derleyicinin ürettiği) hemen sonra, \u003Ccode\u003Eview()\u003C/code\u003E\u0027den önce çağrılır. Sınıf metodu ya da etiket prop\u0027u olarak yazılır; fonksiyon bileşeninde döndürülen köke uygulanır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-html\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReaktif \u003Ccode\u003EinnerHTML\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-wait\u003C/code\u003E / \u003Ccode\u003Ex-display\u003C/code\u003E / \u003Ccode\u003Ex-chunk\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBekletme / görünürlük / çocukları dilim dilim kurma (\u003Ccode\u003Ex-chunk\u003C/code\u003E: karede kurulacak sayıyı kare süresi belirler; \u003Ccode\u003Ex-chunk={50}\u003C/code\u003E: ilk turda 50, sonra her karede en az 50 çocuk).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EListe öğesini tanımlar; geliştirme modunda yinelenmeye karşı denetlenir (\u003Ccode\u003EMJX202\u003C/code\u003E). Satır eşleşmesi öğe nesnesiyle yapılır, \u003Ccode\u003Ekey\u003C/code\u003E DOM\u0027un yeniden kullanımını değiştirmez.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etransition\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGiriş/çıkış geçişi (string veya \u003Ccode\u003ETransitionProps\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eon\u0026lt;lifecycle\u0026gt;\u003C/code\u003E / \u003Ccode\u003Ex-\u0026lt;lifecycle\u0026gt;\u003C/code\u003E / \u003Ccode\u003Ex:\u0026lt;lifecycle\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYaşam döngüsü kancaları; aynı etikette birden çok yazım birleşir, hepsi kaynaktaki sırayla çalışır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eoptions={{ hideStrategy, disableDisposal, chunk }}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşen ayarları; \u003Ccode\u003Emotif.options\u003C/code\u003E\u0027a kopyalanır (düz DOM etiketinde de; öznitelik yazılmaz). Bkz: \u003Ca href=\u0022/docs/lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EMetot adlı öznitelikler\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Efocus\u003C/code\u003E, \u003Ccode\u003Eblur\u003C/code\u003E, \u003Ccode\u003Eclick\u003C/code\u003E, \u003Ccode\u003Eselect\u003C/code\u003E, \u003Ccode\u003EscrollTo\u003C/code\u003E/\u003Ccode\u003EscrollBy\u003C/code\u003E/\u003Ccode\u003EscrollIntoView\u003C/code\u003E, \u003Ccode\u003Eshow\u003C/code\u003E, \u003Ccode\u003EshowModal\u003C/code\u003E, \u003Ccode\u003Eclose\u003C/code\u003E, \u003Ccode\u003EshowPopover\u003C/code\u003E, \u003Ccode\u003EhidePopover\u003C/code\u003E, \u003Ccode\u003EtogglePopover\u003C/code\u003E, \u003Ccode\u003ErequestSubmit\u003C/code\u003E, \u003Ccode\u003EcheckValidity\u003C/code\u003E, \u003Ccode\u003EreportValidity\u003C/code\u003E, \u003Ccode\u003EshowPicker\u003C/code\u003E, \u003Ccode\u003Eload\u003C/code\u003E, \u003Ccode\u003EsetSelectionRange\u003C/code\u003E, \u003Ccode\u003EsetRangeText\u003C/code\u003E, \u003Ccode\u003EsetPointerCapture\u003C/code\u003E, \u003Ccode\u003EreleasePointerCapture\u003C/code\u003E, \u003Ccode\u003EfastSeek\u003C/code\u003E … elemanın aynı adlı metodunu çağırır, öznitelik yazılmaz; getter verilirse her değişimde yeniden çağrılır. \u003Ccode\u003Eshow\u003C/code\u003E/\u003Ccode\u003EshowModal\u003C/code\u003E/\u003Ccode\u003EshowPopover\u003C/code\u003E \u003Ccode\u003Etrue\u003C/code\u003E ile açar, \u003Ccode\u003Efalse\u003C/code\u003E ile kapatır (\u003Ccode\u003Eclose()\u003C/code\u003E/\u003Ccode\u003EhidePopover()\u003C/code\u003E); \u003Ccode\u003EtogglePopover\u003C/code\u003E boolean\u0027ı iletir; \u003Ccode\u003Eclose\u003C/code\u003E, \u003Ccode\u003ErequestSubmit\u003C/code\u003E, \u003Ccode\u003Eload\u003C/code\u003E gibi metotlar doğru (truthy) değerde çağrılır; \u003Ccode\u003EsetSelectionRange\u003C/code\u003E gibi argümanlı metotlar değeri argüman olarak alır (dizi → argüman listesi).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EBkz: \u003Ca href=\u0022/docs/jsx\u0022\u003EJSX ve Şablonlar\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022error-codes\u0022\u003EHata ve uyarı kodları\u003C/h2\u003E\n\u003Cp\u003EBütün \u003Ccode\u003EMJX\u003C/code\u003E kodları, konsoldaki mesajları ve anlamları \u003Ca href=\u0022/docs/error-codes\u0022\u003EHata ve Uyarı Kodları\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EKodların tam listesi için \u003Ca href=\u0022/docs/error-codes\u0022\u003EHata ve Uyarı Kodları\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"application","text":"Uygulama (Application)","level":2},{"id":"components","text":"Bileşenler (Component)","level":2},{"id":"component-base-members","text":"ComponentBase başlıca üyeleri","level":3},{"id":"lifecycle-hooks","text":"Yaşam döngüsü kancaları","level":3},{"id":"reactivity","text":"Reaktivite (store)","level":2},{"id":"bindings","text":"Bağlar (bindings) — component.bindings","level":2},{"id":"dependency-injection","text":"Bağımlılık enjeksiyonu","level":2},{"id":"routing","text":"Yönlendirme","level":2},{"id":"disposable","text":"Serbest bırakma (disposable)","level":2},{"id":"common","text":"Ortak (common) yardımcılar","level":2},{"id":"types","text":"Tipler","level":2},{"id":"devtools","text":"Geliştirici araçları","level":2},{"id":"jsx-attributes","text":"JSX özel öznitelikleri","level":2},{"id":"error-codes","text":"Hata ve uyarı kodları","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"component-libraries","title":"Bileşen Kütüphanesi Yazmak"},"next":{"slug":"error-codes","title":"Hata ve Uyarı Kodları"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Referans</p>
+        <h1>API Referansı</h1>
+        <p>@motifx/core paketinden dışa aktarılan sembollerin hızlı referansı.</p>
+<p>Bu bölüm <code>@motifx/core</code> paketinden dışa aktarılan başlıca sembollerin hızlı referansıdır. Her satır, ilgili ayrıntılı bölüme bağlanır.</p>
+<h2 id="application">Uygulama (Application)</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>Tür</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Application</code></td>
+<td>class</td>
+<td>Uygulama örneği. <code>Application.main</code> ile global örneğe, bileşenden <code>context</code> ile erişilir (sınıfta ve Options'ta <code>this.context</code>, fonksiyon bileşeninde <a href="/tr/docs/components#function-root">kök bileşenin</a> <code>context</code>'i).</td>
+</tr>
+<tr>
+<td><code>Application.CreateBuilder()</code></td>
+<td>static</td>
+<td><code>ApplicationBuilder</code> üretir.</td>
+</tr>
+<tr>
+<td><code>ApplicationBuilder</code></td>
+<td>class</td>
+<td><code>services</code> koleksiyonunu taşır; <code>build()</code> ile <code>Application</code> üretir.</td>
+</tr>
+<tr>
+<td><code>app.run(host, root?)</code></td>
+<td>method</td>
+<td>Uygulamayı bir DOM elemanına bağlar. <code>host</code> bir yorum ya da metin düğümüyse uygulama o düğümün hemen önüne yerleşir, düğüm yerinde kalır; düğümün ebeveyn elemanı yoksa <code>MJX416</code> fırlatılır. Serbest bırakılmış uygulama <code>run()</code> ile yeniden başlar: <code>Application.main</code> yeniden dolar, servisler ilk istekte yeniden yaratılır (<code>startup: true</code> olanlar hemen), router yapılandırmasıyla yeni bir modül kurulur, <code>useTransitions</code> kipi yeniden uygulanır, bu arada okunmuş bir katman varsa host'tan sonraya taşınır ve <code>dispose()</code> yeniden çalışır. Bu arada yeni bir uygulama kurulduysa <code>MJX405</code> fırlatılır.</td>
+</tr>
+<tr>
+<td><code>app.useRouter(opts)</code></td>
+<td>method</td>
+<td>Yönlendirmeyi tanımlar.</td>
+</tr>
+<tr>
+<td><code>app.restartRouter(uri?)</code></td>
+<td>method</td>
+<td>Router'ı sıfırdan kurar ve kökten (<code>/</code>) ya da verilen adresten yeniden başlatır: çalışırken yeni bir <code>useRouter</code> yapılandırması verildiyse onu, yoksa mevcut yapılandırmayı kullanır. Rota listesi, keepAlive önbelleği ve yığın sıfırlanır; ekrandaki sayfa ayrılan sayfa gibi ayrılır, yeni sayfa kurulur (<code>onRouterChanged</code> <code>initial: true</code> ile çalışır); adres mevcut geçmiş kaydının yerine yazılır. Açılış gezinmesinin sonucunu döndürür. <code>run</code>'dan önce etkisizdir.</td>
+</tr>
+<tr>
+<td><code>app.connectDocument(doc)</code></td>
+<td>method</td>
+<td>Aynı origin'li başka bir belgeyi (<code>window.open</code> penceresi ya da <code>&lt;iframe&gt;</code>) uygulamaya bağlar: router'ın bağlantı yakalayıcısı ve yığının kaydırma dinleyicileri o belgeye de kurulur. Sayaçlıdır; döndürdüğü fonksiyon bağı çözer, belgenin penceresi <code>pagehide</code> alınca kendiliğinden çözülür, <code>app.dispose()</code> hepsini çözer. Sayfanın kendi belgesi için etkisizdir. Belge olmayan, penceresi olmayan ya da erişilemeyen değer <code>MJX417</code> fırlatır.</td>
+</tr>
+<tr>
+<td><code>app.windows</code></td>
+<td>property</td>
+<td>Pencere yöneticisi (<code>WindowManager</code>): <code>open(bileşen, seçenekler)</code> bileşeni yeni pencerede ya da <code>kind: &quot;pip&quot;</code> ile hep üstte açar ve <code>AppWindow</code> handle'ı döndürür; <code>create</code>, <code>attach</code>, <code>of</code>, <code>supports</code>, <code>closeAll</code>; <code>list</code> reaktif; olaylar <code>window-opened</code> / <code>window-closed</code>. Bkz: <a href="/tr/docs/windows">Pencereler</a>.</td>
+</tr>
+<tr>
+<td><code>app.layer</code></td>
+<td>property</td>
+<td>Sayfa katmanı (<code>Component</code>): ilk okunduğunda <code>&lt;body&gt;</code>'nin sonuna, host elemanından sonra düz bir <code>&lt;div&gt;</code> koyar ve onu saran bileşeni döndürür (host <code>&lt;body&gt;</code>'nin kendisiyse ya da katmanı kapsıyorsa katman host'un sonunda kalır, kabuk içeriği onun önüne girer); stil ve öznitelik yazmaz, <code>run()</code>'dan önce de okunur (<code>&lt;body&gt;</code> yoksa belge yüklenince yerleşir; eleman sayfadan çıkarılmışsa içerik ilk yer istediğinde ya da <code>run()</code>'da gövdenin sonuna yeniden konur), <code>app.dispose()</code> içindekilerle birlikte serbest bırakır ve elemanı kaldırır. Bkz: <a href="/tr/docs/component-tree#layer">Sayfa katmanı</a>.</td>
+</tr>
+<tr>
+<td><code>app.layerOf(hedef?, ...bileşenler)</code></td>
+<td>method</td>
+<td>Hedefin (bileşen ya da DOM düğümü) belgesinin katmanını döndürür: <code>app.windows</code> penceresiyse <code>host</code>'u, değilse ya da hedef yoksa <code>app.layer</code>; verilen bileşenleri oraya <code>controls.add</code> ile ekler. Ebeveynsiz ve elemanı hiçbir belgede olmayan ilk bileşen hedef değil içeriktir; elemanı bir belgede duran ebeveynsiz kök hedeftir. Bileşen ve düğüm olmayan hedef <code>MJX424</code> fırlatır.</td>
+</tr>
+<tr>
+<td><code>app.navigate(uri, seçenekler?)</code> / <code>app.navigateByName(name, params?, seçenekler?)</code></td>
+<td>method</td>
+<td>Programatik gezinme; seçenekler router'a iletilir (<code>NavigationOptions</code>). Gezinme sonucunu döndürür (ör. guard iptalinde <code>{ ok: false, cancelled: true, reason: 'guard' }</code>).</td>
+</tr>
+<tr>
+<td><code>app.router.navigate(uri, seçenekler?)</code></td>
+<td>method</td>
+<td>Seçenekli gezinme: <code>{ replace?, state?, force?, scroll? }</code> (<code>NavigationOptions</code>).</td>
+</tr>
+<tr>
+<td><code>app.router</code></td>
+<td>property</td>
+<td>Uygulama boyunca tek nesne (<code>Router</code>); reaktif, salt okunur rota alanları: <code>params</code>, <code>route</code>, <code>uri</code>, <code>ok</code>, <code>meta</code>, <code>extend</code>, <code>fullPath</code>, <code>aliasOf</code>, <code>chain</code>, <code>direction</code>, <code>state</code>, <code>stack</code> (yalnızca <code>stack</code> açıkken). Bkz: <a href="/tr/docs/navigation#live-route-state">Gezinme ve Rota Durumu</a>.</td>
+</tr>
+<tr>
+<td><code>app.useGuard(guard)</code> / <code>app.use(mw)</code></td>
+<td>method</td>
+<td>Gezinme guard'ı / middleware. Gezinme sonrası için <code>app.onRouterChanged(fn)</code>.</td>
+</tr>
+<tr>
+<td><code>app.on/fire/off</code></td>
+<td>method</td>
+<td>Uygulama olay veriyolu. <code>on</code> abonelikten çıkma fonksiyonu döndürür.</td>
+</tr>
+<tr>
+<td><code>app.onRouterChanged(fn)</code></td>
+<td>method</td>
+<td>Her gezinmede (açılış ve 404 dâhil) <code>{ uri, params, meta, route, ok, initial, redirectedFrom?, direction, state }</code> ile çalışır.</td>
+</tr>
+<tr>
+<td><code>app.onLifecycle(fn)</code></td>
+<td>method</td>
+<td>Uygulama yaşam döngüsü: <code>{ state, visible, online }</code>; <code>state</code>: <code>'visible' \| 'hidden' \| 'frozen' \| 'resumed' \| 'restored' \| 'online' \| 'offline'</code>. Abonelikten çıkma fonksiyonu döndürür. Bkz: <a href="/tr/docs/lifecycle">Yaşam Döngüsü</a>.</td>
+</tr>
+<tr>
+<td><code>app.isVisible</code> / <code>app.isOnline</code></td>
+<td>property</td>
+<td>Anlık görünürlük ve bağlantı durumu.</td>
+</tr>
+<tr>
+<td><code>app.router.evict(ad \| rota?)</code></td>
+<td>method</td>
+<td><code>keepAlive</code> önbelleğindeki örnekleri dispose eder (argümansız: hepsi).</td>
+</tr>
+<tr>
+<td><code>app.router.resolve(uri)</code> / <code>app.router.href(ad, params?)</code> / <code>app.router.routes</code></td>
+<td>method / property</td>
+<td>Gezinmeden eşleşme (<code>RouteResolution</code>: <code>{ chain, result }</code>), adlandırılmış rotanın yolu, tanım sırasıyla rota listesi (<code>RouteInfo[]</code>). Bkz: <a href="/tr/docs/routes#resolve-href-routes">Rota Tablosu</a>.</td>
+</tr>
+<tr>
+<td><code>app.router.scrollPositions()</code> / <code>app.router.restoreScrollPositions(positions)</code> / <code>app.router.saveScrollPositions(fn)</code></td>
+<td>method</td>
+<td>Kaydırma hafızasının konumları (<code>{ &quot;/notes&quot;: 1200 }</code>, ekrandaki sayfanınki dahil); verilen konumları hafızaya ekler (<code>run()</code>'dan önce de); kayıt gereken her anda (sayfadan ayrılırken, <code>pagehide</code>, sayfa gizlenince, <code>app.dispose()</code>) <code>fn(positions)</code> çağırır, aboneliği kaldıran fonksiyon döndürür. <code>scrollMemory</code> kapalıyken boş / etkisiz. Bkz: <a href="/tr/docs/navigation#scroll-memory">Kaydırma hafızası</a>.</td>
+</tr>
+<tr>
+<td><code>app.useDevelopment(b)</code> / <code>app.useLogging(b)</code> / <code>app.useReactiveMonitor(o)</code></td>
+<td>method</td>
+<td>Geliştirme yapılandırması.</td>
+</tr>
+<tr>
+<td><code>app.dispose()</code></td>
+<td>method → <code>Promise&lt;void&gt;</code></td>
+<td><code>app.state</code>'i <code>'disposing'</code> yapar; router'ı ve yaşam döngüsü dinleyicilerini serbest bırakır, adresi router'ın kipine göre geri alır (<code>history</code>: <code>/</code>; <code>hash</code>/<code>file</code>: yalnız <code>#</code> silinir; <code>shell</code> ve router yok: dokunulmaz) (bunlar senkron olur). Ardından route sayfalarını (leave animasyonlarıyla) ve <code>run()</code>'ın kurduğu kabuğu (<code>RouterView</code>'ı ve <code>run()</code>'a verilen kökü dahil) serbest bırakır, en son servis sağlayıcıyı serbest bırakır ve <code>Application.main</code>'i boşaltır. Ağaç sökülürken her bileşen ve animasyon sırasında çalışan kod aynı servisleri ve <code>context</code>'i görür. Host elemanı sayfada boş olarak kalır. Promise, servislerin async <code>dispose</code>'ları dahil her şey bitince çözülür: <code>await app.dispose()</code>; aynı hayatta ikinci çağrı aynı promise'i döndürür; <code>run()</code> ile yeniden başlatılan uygulamada <code>dispose()</code> yeniden çalışır; bitmiş uygulamada yeniden çağrılırsa o aradan beri kurulan katmanı, pencereleri, belge bağlantılarını ve yeniden yaratılan servisleri serbest bırakır, adrese ve geçiş kipine dokunmaz; bu geçiş sürerken gelen çağrı da aynı promise'i alır.</td>
+</tr>
+<tr>
+<td><code>app.state</code></td>
+<td>özellik → <code>ApplicationState</code></td>
+<td><code>'initializing'</code> (kuruldu), <code>'running'</code> (<code>run()</code> çağrıldı), <code>'disposing'</code> (<code>dispose()</code> sürüyor), <code>'disposed'</code> (<code>run()</code> ile yeniden başlatılabilir). Bir uygulama <code>'disposing'</code> iken yeni <code>Application.CreateBuilder()</code> kurulabilir; sökülen sayfalar kendi uygulamasının servislerini görmeye devam eder.</td>
+</tr>
+<tr>
+<td><code>useApplication()</code></td>
+<td>fn</td>
+<td><code>{ application, services, router, windows, layer, layerOf, attach }</code>.</td>
+</tr>
+<tr>
+<td><code>useNavigation()</code></td>
+<td>fn</td>
+<td><code>app.router</code> ile aynı nesne (<code>Router</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>Bkz: <a href="/tr/docs/getting-started">Başlarken</a>, <a href="/tr/docs/routing">Yönlendirmeye Giriş</a>.</p>
+<h2 id="components">Bileşenler (Component)</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>Tür</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Component</code></td>
+<td>class</td>
+<td>Somut bileşen sınıfı. <code>super('div')</code> veya <code>super()</code>.</td>
+</tr>
+<tr>
+<td><code>ComponentBase</code></td>
+<td>class</td>
+<td>Tüm bileşenlerin temeli.</td>
+</tr>
+<tr>
+<td><code>ComponentMotif</code></td>
+<td>class</td>
+<td><code>ComponentBase.motif</code> ad alanının tipi; kullanıcı <code>new</code> ile oluşturmaz.</td>
+</tr>
+<tr>
+<td><code>FNComponent(view)</code></td>
+<td>fn</td>
+<td>Fonksiyon görünümünü bileşene sarar.</td>
+</tr>
+<tr>
+<td><code>motifComponent(el, props?)</code> / <code>motifFragment(props?)</code> / <code>motifCompiled(sözleşme)</code> / <code>motifReport(hata)</code></td>
+<td>fn</td>
+<td>Derleyicinin ürettiği koddaki çağrılar (<code>_mc</code>, <code>_mf</code>, <code>_mv</code>, <code>_mr</code>); <code>motifCompiled</code> derleyici sözleşmesi uyuşmazsa geliştirme modunda <code>MJX121</code> uyarısı verir; <code>motifReport</code> derleyicinin <code>try</code>/<code>catch</code> içine aldığı ifadede (çocuk konumundaki üye çağrısı, <code>??</code>/<code>||</code> sol tarafı, <code>&amp;&amp;</code> koşulu) yakalanan hatayı <code>MJX208</code> olarak raporlar, ifadenin geri dönüş değeri değişmez.</td>
+</tr>
+<tr>
+<td><code>motifOptions(nesne)</code></td>
+<td>fn</td>
+<td>Options nesnesini olduğu gibi döndürür; tip tarafında metotlardaki <code>this</code>'i bileşen (<code>ComponentBase &amp; nesne</code>) yapar: <code>this.class</code>, <code>this.motif</code>, <code>this.props</code> strict kipte derlenir ve editör tamamlar. Tipi <code>MotifOptions&lt;T&gt;</code>; <code>el</code> anahtarı zorunlu (<code>undefined</code>/<code>null</code> fragment).</td>
+</tr>
+<tr>
+<td><code>Frame</code></td>
+<td>class</td>
+<td>Tek bir dinamik içeriği tutan/değiştiren fragment kapsayıcı: <code>navigate(page, keepOldControl?)</code> önceki içeriği serbest bırakıp yenisini yerleştirir (dizi de alır), <code>navigateLazy(() =&gt; import(...), options?)</code> <code>Lazy</code> ile yükler, <code>flush()</code> içeriği serbest bırakır, <code>current</code> gösterilen içerik, <code>isBusy</code> gezinme sürüyor mu. <code>{() =&gt; ifade}</code> çocukları ve <code>when</code>/<code>ternary</code>/<code>switchCase</code> dalları bunun üstüne kuruludur. Bkz: <a href="/tr/docs/frame">Frame</a>.</td>
+</tr>
+<tr>
+<td><code>ContentBody</code> / <code>ContentBlock</code></td>
+<td>class</td>
+<td>Çok parçalı gövde: <code>&lt;ContentBody name=&quot;x&quot;/&gt;</code> gövde, <code>&lt;ContentBlock target=&quot;x&quot;&gt;…&lt;/ContentBlock&gt;</code> parça; birden çok blok aynı gövdede birikir, her blok serbest bırakılınca yalnız kendi parçalarını kaldırır. Bkz: <a href="/tr/docs/content-body">ContentBody ve ContentBlock</a>.</td>
+</tr>
+<tr>
+<td><code>Transport</code> / <code>TransportTo</code></td>
+<td>class</td>
+<td>Bir bileşenin içeriğini ağacı dışındaki adlandırılmış bir yuvada gösterme (ör. sayfa komutlarını layout başlığına taşıma). Bkz: <a href="/tr/docs/transport">Transport ve TransportTo</a>.</td>
+</tr>
+<tr>
+<td><code>Transporter</code></td>
+<td>class</td>
+<td>Programatik taşıma: <code>Transporter.transport(child, newParent, { index?, keepState?, owner? })</code>, <code>transportMany(children, newParent, options?)</code>. Bkz: <a href="/tr/docs/transport#transporter">Transport ve TransportTo</a>.</td>
+</tr>
+<tr>
+<td><code>FragmentNode</code></td>
+<td>class</td>
+<td>Fragment (yorum düğümü) köklü bileşen; <code>motifFragment()</code> ve <code>&lt;&gt;…&lt;/&gt;</code> bunu üretir. <code>childs</code> ve <code>props.nodes</code> içeriğe eklenir.</td>
+</tr>
+<tr>
+<td><code>ControlCollection</code></td>
+<td>class</td>
+<td><code>component.controls</code>'un tipi; <code>new</code> ile oluşturulmaz.</td>
+</tr>
+<tr>
+<td><code>Lazy({ caller, options? })</code></td>
+<td>fn</td>
+<td>Dinamik import ile tembel içerik (<code>&lt;Lazy caller={() =&gt; import('./X')} /&gt;</code>; <code>LazyOptions</code>: <code>Loaderview</code>, <code>Placeholderview</code>, <code>Fallbackview</code>, <code>minDelayMs</code>, <code>timeoutMs</code>, <code>signal</code>, <code>onError</code>, <code>mapResult</code>, <code>retry</code>, <code>onRetry</code>). Bkz: <a href="/tr/docs/lazy">Lazy</a>.</td>
+</tr>
+<tr>
+<td><code>Virtualization&lt;T&gt;</code></td>
+<td>class</td>
+<td>Sanal kaydırmalı liste.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="component-base-members"><code>ComponentBase</code> başlıca üyeleri</h3>
+<table>
+<thead>
+<tr>
+<th>Üye</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>element</code></td>
+<td>Gerçek DOM düğümü.</td>
+</tr>
+<tr>
+<td><code>props</code></td>
+<td>Bileşen props'u.</td>
+</tr>
+<tr>
+<td><code>controls</code></td>
+<td>Alt kontrol koleksiyonu (<code>add(...c)</code>/<code>add(index, ...c)</code>/<code>insert(index, ...c)</code>/<code>remove</code>/<code>clear</code>/<code>clearAsync</code>/<code>detach</code>/<code>silentDetach</code>/<code>silentUnlink</code>/<code>move</code>/<code>moveToIndex</code>/<code>forEach</code>/<code>map</code>/<code>items</code>/<code>length</code>). Bkz: <a href="/tr/docs/component-tree#controls">Bileşenler</a>.</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td>Çalışan <code>Application</code>; üzerinden açılan <code>on</code>/<code>onRouterChanged</code> abonelikleri bileşen serbest bırakılınca kalkar.</td>
+</tr>
+<tr>
+<td><code>class</code> / <code>attr</code></td>
+<td>Sınıf ve öznitelik yardımcıları.</td>
+</tr>
+<tr>
+<td><code>bindings</code></td>
+<td>Bağ koleksiyonu.</td>
+</tr>
+<tr>
+<td><code>state</code> (kullanıcı tanımlı)</td>
+<td>Genelde <code>reactive({...})</code>.</td>
+</tr>
+<tr>
+<td><code>view()</code></td>
+<td>Bileşenin içeriğini döndüren metot; kökü değil (kök eleman sınıfa bildirilir).</td>
+</tr>
+<tr>
+<td><code>motif</code></td>
+<td>Çerçeve işlemlerinin ad alanı (<code>ComponentMotif</code>). Alt sınıf <code>show</code>, <code>on</code>, <code>clear</code>, <code>options</code> gibi adları kendi amacıyla tanımlayabilir; çerçeve yalnız <code>this.motif.*</code> yolunu kullanır.</td>
+</tr>
+<tr>
+<td><code>motif.on/off/trigger/addHandler</code></td>
+<td>Olay yönetimi; <code>x:</code> önekli adlar yaşam döngüsü olaylarıdır (<code>x:built</code>, <code>x:mounted</code>, <code>x:disposed</code>…).</td>
+</tr>
+<tr>
+<td><code>motif.show/hide/toggle</code></td>
+<td>Görünürlük.</td>
+</tr>
+<tr>
+<td><code>motif.options</code></td>
+<td>Bileşen ayar nesnesi (<code>transition</code>, <code>hideStrategy</code>, <code>disableDisposal</code>, <code>chunk</code>).</td>
+</tr>
+<tr>
+<td><code>motif.stopAnimations()</code></td>
+<td>Süren CSS sınıf geçişini bitirir, WAAPI animasyonlarını iptal eder.</td>
+</tr>
+<tr>
+<td><code>isWait</code></td>
+<td>Bekletme (<code>x-wait</code> karşılığı; yazılabilir).</td>
+</tr>
+<tr>
+<td><code>isBuilt</code> / <code>isInitialized</code> / <code>isConfigured</code> / <code>isVisible</code> / <code>isDisposed</code></td>
+<td>Durum bayrakları.</td>
+</tr>
+<tr>
+<td><code>parent</code> / <code>childs</code></td>
+<td>Ebeveyn bileşen / etiket arasına yazılan JSX çocukları.</td>
+</tr>
+<tr>
+<td><code>using(promise, onfulfilled?, onrejected?)</code> / <code>doWork(promise)</code></td>
+<td>Serbest bırakma sonrası güvenli asenkron sonuç işleme. Bkz: <a href="/tr/docs/using">using</a>, <a href="/tr/docs/do-work">doWork</a>.</td>
+</tr>
+<tr>
+<td><code>dispose/disposeAsync</code></td>
+<td>Serbest bırakma.</td>
+</tr>
+<tr>
+<td><code>motif.clear()</code></td>
+<td>İçeriği (çocukları) serbest bırakır.</td>
+</tr>
+<tr>
+<td><code>motif.register/setDisposable</code></td>
+<td>Kaynak kaydı.</td>
+</tr>
+<tr>
+<td><code>getService(token)</code></td>
+<td>DI çözümleme.</td>
+</tr>
+<tr>
+<td><code>useModel(model)</code></td>
+<td>Reaktif model üretir.</td>
+</tr>
+<tr>
+<td><code>style(...)</code> / <code>setText(...)</code></td>
+<td>Yardımcılar.</td>
+</tr>
+<tr>
+<td><code>siblings</code></td>
+<td><code>all/next/prev/nextAll/prevAll</code>.</td>
+</tr>
+<tr>
+<td><code>$(selector)</code></td>
+<td><code>fromDom()</code> / <code>fromComponent()</code> sorgu.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lifecycle-hooks">Yaşam döngüsü kancaları</h3>
+<p><code>onInitializing</code>, <code>onInitialized</code>, <code>onConfig</code>, <code>onConfigured</code>, <code>onBuilding</code>, <code>initializeComponent</code>, <code>oninitializeComponent</code>, <code>onBuilt</code>, <code>onMounted</code>, <code>onVisibilityChanged</code>, <code>onActivated</code>, <code>onDeactivated</code>, <code>onDisposing</code>, <code>onDisposed</code>.</p>
+<p><code>onRefCreated(sender)</code>: sınıfın <code>view()</code>'ındaki her <code>ref={this.x}</code> / <code>ref={ad}</code> uygulandıktan sonra çağrılır (<code>sender</code> ref verilen bileşen); geri çağırım biçimindeki <code>ref</code> için çağrılmaz. Bkz: <a href="/tr/docs/component-element#on-ref-created">Bileşenler</a>.</p>
+<p>Bkz: <a href="/tr/docs/components">Bileşenler</a>, <a href="/tr/docs/lifecycle">Yaşam Döngüsü</a>.</p>
+<h2 id="reactivity">Reaktivite (store)</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>İmza</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reactive(model)</code></td>
+<td><code>&lt;T&gt;(m: T) =&gt; T</code></td>
+<td>Reaktif proxy.</td>
+</tr>
+<tr>
+<td><code>useModel(model)</code></td>
+<td><code>&lt;T&gt;(m: T) =&gt; T</code></td>
+<td><code>reactive</code> eş adı.</td>
+</tr>
+<tr>
+<td><code>createSignal(v)</code></td>
+<td><code>&lt;T&gt;(v: T) =&gt; Signal&lt;T&gt;</code></td>
+<td>Tek değer signal'i.</td>
+</tr>
+<tr>
+<td><code>createComputed(fn)</code></td>
+<td><code>&lt;T&gt;(fn) =&gt; Computed&lt;T&gt;</code></td>
+<td>Türetilmiş değer; kurulumda ve her değişimde hesaplanır.</td>
+</tr>
+<tr>
+<td><code>createLazyComputed(fn)</code></td>
+<td><code>&lt;T&gt;(fn) =&gt; LazyComputed&lt;T&gt;</code></td>
+<td>Tembel türetilmiş değer; değişimde kirli işaretlenir, okunduğunda hesaplanır (<code>value</code>, <code>peek</code>, <code>isDirty</code>, <code>dispose</code>).</td>
+</tr>
+<tr>
+<td><code>createSelection(fn)</code></td>
+<td><code>&lt;T&gt;(fn: () =&gt; T) =&gt; KeySelection&lt;T&gt;</code></td>
+<td>Anahtarlı seçim: <code>isSelected(key)</code> onu çağıran bağı yalnız o anahtara abone eder; kaynak değişince yalnız eski ve yeni değerin bağları uyanır. <code>dispose()</code> izlemeyi bırakır. Bkz: <a href="/tr/docs/reactivity#create-selection">Reaktivite</a>.</td>
+</tr>
+<tr>
+<td><code>asReadonly(obj)</code></td>
+<td><code>&lt;T&gt;(o: T) =&gt; DeepReadonly&lt;T&gt;</code></td>
+<td>Canlı salt-okunur görünüm; okumalar izlenir, yazma ve değiştiren metotlar <code>MJX212</code> fırlatır. Bkz: <a href="/tr/docs/reactivity#as-readonly">Reaktivite</a>.</td>
+</tr>
+<tr>
+<td><code>isReadonly(v)</code></td>
+<td><code>(v: unknown) =&gt; boolean</code></td>
+<td>Değer <code>asReadonly</code> ile alınmış bir görünümse <code>true</code>.</td>
+</tr>
+<tr>
+<td><code>effect(fn, onValue?)</code></td>
+<td><code>(fn, cb?) =&gt; () =&gt; void</code></td>
+<td>Yan etki; durdurucu döner. <code>onValue</code> her koşudan sonra <code>fn</code>'in dönüş değerini alır, içindeki okumalar izlenmez.</td>
+</tr>
+<tr>
+<td><code>asyncTracking</code></td>
+<td>nesne</td>
+<td>Derleyicinin <code>Virtualization dataRequest</code> içindeki <code>await</code>'leri sarmak için kullandığı çalışma zamanı yardımcısı (<code>capture</code>/<code>suspend</code>/<code>resume</code>/<code>end</code>); elle çağrılmaz. Bkz: <a href="/tr/docs/reactivity#await-reads">Reaktivite</a>.</td>
+</tr>
+<tr>
+<td><code>untracked(fn)</code></td>
+<td><code>&lt;T&gt;(fn: () =&gt; T) =&gt; T</code></td>
+<td>İzlemesiz bölge; <code>fn</code>'in dönüş değerini verir. İçindeki <code>effect</code> çağrıları normal izler.</td>
+</tr>
+<tr>
+<td><code>deepClone(v)</code></td>
+<td><code>(v) =&gt; v</code></td>
+<td>Derin kopya.</td>
+</tr>
+<tr>
+<td><code>clearModel(m)</code></td>
+<td><code>(m) =&gt; void</code></td>
+<td>Reaktif kaydı temizle.</td>
+</tr>
+<tr>
+<td><code>Signal&lt;T&gt;</code> / <code>Computed&lt;T&gt;</code> / <code>LazyComputed&lt;T&gt;</code></td>
+<td>class</td>
+<td>İnce taneli ilkeller.</td>
+</tr>
+</tbody>
+</table>
+<p>Bkz: <a href="/tr/docs/reactivity">Reaktivite</a>.</p>
+<h2 id="bindings">Bağlar (bindings) — <code>component.bindings</code></h2>
+<table>
+<thead>
+<tr>
+<th>Metot</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add(prop, source, member?, format?, formatInfo?)</code></td>
+<td>Tek yönlü bağ. <code>formatInfo</code>: <code>{ locale?, currency? }</code>.</td>
+</tr>
+<tr>
+<td><code>model(source, member?, format?, formatInfo?)</code></td>
+<td>İki yönlü bağ (eleman türüne göre).</td>
+</tr>
+<tr>
+<td><code>model(getter, setter)</code></td>
+<td>Fonksiyonlarla iki yönlü bağ; <code>x-model</code> buna derlenir.</td>
+</tr>
+<tr>
+<td><code>writeModel(value)</code></td>
+<td>Değeri bileşendeki <code>model</code>/<code>x-model</code> bağlarına geri yazar; yazdıysa <code>true</code> (bkz. <a href="/tr/docs/forms#component-model">Formlar</a>).</td>
+</tr>
+<tr>
+<td><code>text(fn)</code> / <code>value(fn)</code></td>
+<td><code>textContent</code> / <code>value</code> bağı.</td>
+</tr>
+<tr>
+<td><code>when(condFn, renderFn)</code></td>
+<td>Koşullu içerik; dal koşulun değeri değişince (<code>Object.is</code>, iki yanlış değer aynı sayılır) yeniden kurulur.</td>
+</tr>
+<tr>
+<td><code>ternary(condFn, trueFn, falseFn)</code></td>
+<td>İki dallı koşul; dal koşulun değeri değişince (<code>Object.is</code>) yeniden kurulur.</td>
+</tr>
+<tr>
+<td><code>list(itemsFn, renderFn)</code> / <code>loop(...)</code></td>
+<td>Liste; satırlar öğe nesnesiyle eşleşir.</td>
+</tr>
+<tr>
+<td><code>switchCase(discFn, cases, defaultFn?)</code></td>
+<td>Çoklu dal.</td>
+</tr>
+<tr>
+<td><code>method(fn)</code></td>
+<td>Reaktif metin/tek içerik.</td>
+</tr>
+<tr>
+<td><code>watch(fn)</code></td>
+<td>Otomatik temizlenen izleyici.</td>
+</tr>
+<tr>
+<td><code>wait(fn)</code> / <code>display(fn)</code> / <code>html(fn)</code></td>
+<td>Bekletme / görünürlük / innerHTML.</td>
+</tr>
+<tr>
+<td><code>remove(binding)</code></td>
+<td>Bağı koleksiyondan çıkarır ve devre dışı bırakır.</td>
+</tr>
+</tbody>
+</table>
+<p>Bkz: <a href="/tr/docs/conditionals-and-lists">Koşullu Gösterim ve Listeler</a>, <a href="/tr/docs/forms">Formlar ve İki Yönlü Bağlama</a>.</p>
+<h2 id="dependency-injection">Bağımlılık enjeksiyonu</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ServiceCollection</code></td>
+<td>Kayıt koleksiyonu (<code>addSingleton/addScoped/addTransient</code>, <code>tryAdd*</code>, <code>replace</code>, <code>remove</code>, <code>has</code>).</td>
+</tr>
+<tr>
+<td><code>ServiceProvider</code></td>
+<td>Çözümleyici: <code>get(token)</code> senkron, <code>getAsync(token)</code> async fabrika/Promise kayıtları için, <code>createScope(ad?)</code> alt kapsam, <code>enableAutoDisposeTransients()</code> alt kapsamdaki transient'ları kapsamla serbest bırakır, <code>getAllServices()</code> koleksiyon, <code>dispose()</code>. Bkz: <a href="/tr/docs/service-resolution">Servis Çözümleme</a>, <a href="/tr/docs/service-disposal">Servislerin Serbest Bırakılması</a>.</td>
+</tr>
+<tr>
+<td><code>@Injectable(opts?)</code></td>
+<td>Sınıfı otomatik kayıt için işaretler; <code>deps</code> yapıcı parametrelerini sırayla verir, <code>startup: true</code> singleton'ı <code>app.run()</code> içinde oluşturur. Standart (TC39) sınıf dekoratörüdür.</td>
+</tr>
+<tr>
+<td><code>inject(token)</code></td>
+<td>Sağlayıcının kurduğu sınıfın alan başlatıcısında veya yapıcısında bağımlılığı çözer; dönüş tipi token'dan gelir.</td>
+</tr>
+<tr>
+<td><code>FromService(token)</code></td>
+<td>Uygulamanın sağlayıcısından hızlı çözümleme; dönüş tipi <code>T | null</code>: çözümlenemezse <code>null</code> döner ve geliştirme modunda <code>MJX414</code> uyarısı verir. Kayıtlı olduğundan eminseniz <code>FromService(X)!</code> yazın.</td>
+</tr>
+<tr>
+<td><code>ServiceLifetime</code></td>
+<td><code>'transient' \| 'singleton' \| 'scoped'</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Bkz: <a href="/tr/docs/dependency-injection">Bağımlılık Enjeksiyonuna Giriş</a>.</p>
+<h2 id="routing">Yönlendirme</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RouteItem</code></td>
+<td>Rota tanımı tipi (<code>control</code> ya da <code>redirect</code>'ten biri zorunlu).</td>
+</tr>
+<tr>
+<td><code>RouteRedirect</code> / <code>RedirectTarget</code></td>
+<td><code>redirect</code> değeri (<code>string \| (to) =&gt; string</code>) ve fonksiyona geçen <code>{ path, params, meta }</code>.</td>
+</tr>
+<tr>
+<td><code>RouterView</code></td>
+<td>Rota çıktısı yuvası (<code>name?</code>).</td>
+</tr>
+<tr>
+<td><code>RouterLink</code></td>
+<td>Aktif/eşleşme sınıflı bağlantı bileşeni (varsayılan eleman <code>&lt;a&gt;</code>). Prop'lar: <code>to</code>, <code>el</code>, <code>activeClass</code>, <code>exactClass</code>, <code>onActive</code>/<code>offActive</code>, <code>onExact</code>/<code>offExact</code>, <code>showHref</code>, <code>target</code>, <code>text</code>, <code>bypass</code> (tıklamayı tarayıcıya bırakır). Bkz: <a href="/tr/docs/router-links#router-link">Bağlantılar</a>.</td>
+</tr>
+<tr>
+<td><code>NavigationDirection</code></td>
+<td><code>'initial' \| 'push' \| 'replace' \| 'back' \| 'forward' \| 'traverse'</code>.</td>
+</tr>
+<tr>
+<td><code>StackOptions</code></td>
+<td><code>useRouter({ stack })</code> ayarları: <code>retain</code>, <code>depth</code>, <code>persist</code>, <code>animation</code>, <code>duration</code>, <code>swipeBack</code>.</td>
+</tr>
+<tr>
+<td><code>StackEntryInfo</code></td>
+<td><code>app.router.stack</code> öğesi: <code>{ index, uri, current, retained }</code>.</td>
+</tr>
+<tr>
+<td><code>RouteInfo</code></td>
+<td><code>app.router.routes</code> öğesi: <code>{ fullPath, name, meta, route, chain }</code>.</td>
+</tr>
+<tr>
+<td><code>StackTransitionContext</code></td>
+<td>Özel yığın animasyonuna gelen <code>{ direction, entering, leaving }</code>.</td>
+</tr>
+<tr>
+<td><code>ScrollMemoryOptions</code></td>
+<td><code>scrollMemory</code> ayarları; <code>container</code> ile kap kaydırması.</td>
+</tr>
+</tbody>
+</table>
+<p>Ayrıca <code>rel=&quot;router&quot;</code> özniteliği ile standart <code>&lt;a&gt;</code> bağlantıları yönlendirmeye dahil edilir.</p>
+<p>Bkz: <a href="/tr/docs/routing">Yönlendirmeye Giriş</a>.</p>
+<h2 id="disposable">Serbest bırakma (disposable)</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IDisposable</code></td>
+<td><code>{ dispose(): void }</code>.</td>
+</tr>
+<tr>
+<td><code>Disposable</code></td>
+<td>Serbest bırakılabilir nesnelerin temel sınıfı (<code>ComponentBase</code> bundan türer); <code>dispose()</code>.</td>
+</tr>
+<tr>
+<td><code>DisposableStore</code></td>
+<td>Grup temizliği (<code>add</code>, <code>delete</code>, <code>detach</code>, <code>clear</code>, <code>dispose</code>, <code>isDisposed</code>).</td>
+</tr>
+<tr>
+<td><code>disposableCore.toDisposable(fn)</code> / <code>toDisposable(fn)</code></td>
+<td>Fonksiyonu <code>IDisposable</code>'a sarar.</td>
+</tr>
+<tr>
+<td><code>disposableCore.disposableTracker</code></td>
+<td>Canlı bileşen sayımı için izleyici kancası (<code>IDisposableTracker</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>Bkz: <a href="/tr/docs/memory-and-dispose">Bellek Yönetimi ve Serbest Bırakma</a>.</p>
+<h2 id="common">Ortak (common) yardımcılar</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dom</code></td>
+<td>DOM oluşturma yardımcıları: <code>createElement(tag, options?)</code> (etiket başına şablon eleman önbelleğe alınır ve klonlanır; <code>options</code> yalnız ilk oluşturmada geçer; <code>'text'</code> metin düğümü verir; <code>document</code> yoksa <code>MJX101</code>), <code>createElementNS(ns, tag, options?)</code> (hata <code>MJX103</code>), <code>createDocumentFragment()</code>, <code>createComment(metin)</code>, <code>createTextNode(metin)</code>, <code>querySelectorAll(seçici)</code>, <code>convertToSvgElement(el)</code> (elemanı SVG ad alanında yeniden oluşturup yerine koyar), <code>window</code>, <code>document</code>, <code>body</code>.</td>
+</tr>
+<tr>
+<td><code>List</code>, <code>Dictionary</code>, <code>LinkedList</code></td>
+<td>Koleksiyon yapıları. Bkz: <a href="/tr/docs/collections">Koleksiyonlar</a>.</td>
+</tr>
+<tr>
+<td><code>Query&lt;T&gt;</code> / <code>Query.from(kaynak)</code> / <code>Group&lt;TKey, T&gt;</code></td>
+<td>Zincirlenebilir sorgu sarmalayıcısı (<code>where</code>, <code>select</code>, <code>orderBy</code>, <code>groupBy</code>, <code>first</code>, <code>any</code>, <code>aggregate</code>, <code>toArray</code> …). Bkz: <a href="/tr/docs/query">Koleksiyon Sorguları (Query)</a>.</td>
+</tr>
+<tr>
+<td><code>NameValuePair&lt;K, V&gt;</code></td>
+<td><code>{ Key, value }</code> çifti (<code>Dictionary</code> öğesi). Bkz: <a href="/tr/docs/collections#dictionary">Koleksiyonlar</a>.</td>
+</tr>
+<tr>
+<td><code>NodeTypes</code></td>
+<td>Düğüm türü sabitleri (enum).</td>
+</tr>
+<tr>
+<td><code>Emitter&lt;T&gt;</code></td>
+<td>Tipli olay yayıcı: <code>emitter.event(listener, thisArgs?, disposables?)</code> abone olur ve <code>IDisposable</code> döndürür, <code>fire(value)</code> yayınlar, <code>dispose()</code> kapatır. Dinleyici hatası <code>setUnexpectedErrorHandler</code>'a gider. Bkz: <a href="/tr/docs/events#emitter">Hata Yönetimi</a>.</td>
+</tr>
+<tr>
+<td><code>JSX</code></td>
+<td>JSX tip ad alanı (<code>JSX.Element</code>, <code>JSX.IntrinsicElements</code>); derleyici <code>jsx-runtime</code> için kullanır.</td>
+</tr>
+<tr>
+<td><code>preProcessing(fn)</code></td>
+<td>Geri çağrıyı kalıcı bir listeye ekler ve listedeki bütün geri çağrıları hemen çalıştırır; stil enjeksiyonu gibi tek seferlik kurulumlar için.</td>
+</tr>
+<tr>
+<td><code>safeCall</code>, <code>safeCallAsync</code>, <code>safeCallSilent</code></td>
+<td>Hata-güvenli çağrı yardımcıları.</td>
+</tr>
+<tr>
+<td><code>errorHandler</code> / <code>setUnexpectedErrorHandler(fn)</code></td>
+<td>Merkezî hata yöneticisi. <code>errorHandler.addListener(fn)</code> çerçevenin raporladığı her hatayı <code>MotifError</code> olarak alır. <code>setUnexpectedErrorHandler(fn)</code> yalnız kodsuz beklenmeyen hataları alır (<code>safeCall</code>/<code>safeCallAsync</code> içinde ve <code>Emitter</code> dinleyicilerinde yakalananlar; bunlar <code>addListener</code> dinleyicilerine de olduğu gibi gider); varsayılanı hatayı <code>setTimeout</code> ile yeniden fırlatır. Kodlu raporlar (<code>MJX122</code>, <code>MJX123</code>, <code>MJX208</code> …) ona gitmez. Bkz: <a href="/tr/docs/error-handling">Hata Yönetimi</a>, <a href="/tr/docs/error-codes">Hata ve Uyarı Kodları</a>.</td>
+</tr>
+<tr>
+<td><code>MotifError</code> / <code>MotifErrorCode</code></td>
+<td>Çerçevenin fırlattığı ve raporladığı hataların sınıfı; <code>code</code> (<code>&quot;MJX302&quot;</code> gibi) ve <code>[motifjs] MJX302: …</code> biçiminde İngilizce mesaj taşır, varsa asıl hata <code>cause</code>'dadır.</td>
+</tr>
+<tr>
+<td><code>TransitionProps</code></td>
+<td>Geçiş yapılandırması arayüzü (tip).</td>
+</tr>
+<tr>
+<td><code>Bind&lt;T&gt;</code> / <code>toGetter(v)</code> / <code>read(v)</code></td>
+<td>Prop sözleşmesi: <code>T \| (() =&gt; T)</code>; <code>toGetter</code> canlı okuma için getter'a çevirir, <code>read</code> anlık değeri verir.</td>
+</tr>
+<tr>
+<td><code>Resilience</code></td>
+<td>Dayanıklılık yardımcıları: <code>Resilience.create.retry(...).timeout(...).execute(fn)</code> (ayrıca <code>circuitBreaker</code>, <code>bulkhead</code>, <code>rateLimiter</code>, <code>fallback</code>). Hataları <code>MJX602</code>–<code>MJX605</code>. Bkz: <a href="/tr/docs/resilience">Dayanıklılık (Resilience)</a>.</td>
+</tr>
+<tr>
+<td><code>decorate(policy, fn)</code></td>
+<td>Bir dayanıklılık politikasını fonksiyona sarar: <code>(ctx?) =&gt; policy.execute(fn, ctx)</code>.</td>
+</tr>
+<tr>
+<td><code>ErrorHandler</code></td>
+<td><code>errorHandler</code> örneğinin sınıfı: <code>report(err)</code>, <code>addListener(fn)</code>, <code>setDevelopmentMode(b)</code>, <code>setConsoleLogging(b)</code>, <code>isDevelopment()</code>, <code>safeCall</code>/<code>safeCallSilent</code>/<code>wrapSafe</code>/<code>wrapSafeAsync</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="types">Tipler</h2>
+<p>Değer taşımayan, yalnız <code>import type</code> ile alınan dışa aktarımlar. Davranışları ilgili bölümde anlatılır; burada ad ve biçimleri toplanmıştır.</p>
+<table>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Biçim / Açıklama</th>
+<th>Bkz.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IBaseProp&lt;TProps&gt;</code></td>
+<td>Her bileşen yapıcısının kabul ettiği ortak prop'lar: <code>TProps</code> + <code>childs</code>, <code>options</code>, <code>onElementCreating</code>, <code>initializeComponent</code>, yaşam döngüsü kancaları (<code>onConfig</code>, <code>onBuilt</code>, <code>onMounted</code>, <code>onActivated</code> …); diğer anahtarlar serbesttir (<code>ref</code>, <code>key</code>, <code>transition</code> burada ayrıca tiplenmez).</td>
+<td><a href="/tr/docs/component-props#props">Bileşenler</a>, <a href="/tr/docs/lifecycle">Yaşam Döngüsü</a></td>
+</tr>
+<tr>
+<td><code>MotifBaseProps</code> / <code>MotifBindable&lt;T&gt;</code> / <code>MotifValue&lt;T&gt;</code> / <code>MotifClass</code> / <code>MotifStyle</code></td>
+<td>JSX öznitelik tipleri: değer ya da getter kabul eden <code>class</code>/<code>style</code>/öznitelik biçimleri.</td>
+<td><a href="/tr/docs/jsx">JSX ve Şablonlar</a></td>
+</tr>
+<tr>
+<td><code>Bind&lt;T&gt;</code></td>
+<td><code>T \| (() =&gt; T)</code>; prop sözleşmesi.</td>
+<td><a href="/tr/docs/jsx#attribute-ternary">JSX ve Şablonlar</a></td>
+</tr>
+<tr>
+<td><code>ComponentBaseOptions&lt;TProps&gt;</code></td>
+<td><code>motif.options</code> nesnesinin tipi: <code>transition</code> (API), <code>enableRouterClassing</code> (setter), <code>hideStrategy</code>, <code>disableDisposal</code>, <code>chunk</code>, <code>props</code>, <code>getInstance()</code>, <code>hasEvent(ad)</code>.</td>
+<td><a href="/tr/docs/lifecycle#hide-strategy">Yaşam Döngüsü</a>, <a href="/tr/docs/styling-and-transitions">Stil ve Animasyon</a></td>
+</tr>
+<tr>
+<td><code>RouterClassingSettings</code></td>
+<td><code>{ to, path, activeClass?, exactClass?, onActive?, offActive?, onExact?, offExact? }</code>.</td>
+<td><a href="/tr/docs/router-links#router-classing">Bağlantılar</a></td>
+</tr>
+<tr>
+<td><code>TransitionProps</code> / <code>TransitionMode</code> / <code>CSSTransitionInfo</code></td>
+<td>Geçiş sınıf adları ve süresi / <code>'concurrent' \| 'out-in' \| 'in-out'</code> / elemanın hesaplanmış geçiş bilgisi.</td>
+<td><a href="/tr/docs/styling-and-transitions">Stil ve Animasyon</a></td>
+</tr>
+<tr>
+<td><code>IDisposeOptions</code></td>
+<td><code>{ deep?, skipLeaveTransition? }</code> — <code>dispose()</code> seçenekleri.</td>
+<td><a href="/tr/docs/lifecycle#dispose">Yaşam Döngüsü</a></td>
+</tr>
+<tr>
+<td><code>IDisposable</code> / <code>IDisposableTracker</code></td>
+<td><code>{ dispose() }</code> / <code>disposableCore.disposableTracker</code> kancası.</td>
+<td><a href="/tr/docs/memory-and-dispose">Bellek Yönetimi ve Serbest Bırakma</a></td>
+</tr>
+<tr>
+<td><code>EventArgs</code></td>
+<td><code>{ cancel: boolean }</code> — kanca ve <code>motif.trigger</code> olay nesnesi.</td>
+<td><a href="/tr/docs/lifecycle#class-hooks">Yaşam Döngüsü</a></td>
+</tr>
+<tr>
+<td><code>VisibilityChangedEventArgs</code></td>
+<td><code>EventArgs</code> + <code>visible: boolean</code> — <code>onVisibilityChanged</code> argümanı; <code>visible</code> yeni durumdur.</td>
+<td><a href="/tr/docs/lifecycle#class-hooks">Yaşam Döngüsü</a></td>
+</tr>
+<tr>
+<td><code>HtmlElementEvents</code> / <code>AnyEvents</code></td>
+<td><code>motif.on</code> olay adlarının tipi: DOM olay adları değiştiricileriyle (<code>'click:once:prevent'</code>) ve <code>x:</code> yaşam döngüsü adları.</td>
+<td><a href="/tr/docs/events#modifiers">Olaylar</a></td>
+</tr>
+<tr>
+<td><code>ElementType</code> / <code>IElement</code> / <code>IHtmlElement</code></td>
+<td><code>Component&lt;TElement&gt;</code> generic'inin kabul ettiği eleman tipleri.</td>
+<td><a href="/tr/docs/components#root-element">Bileşenler</a></td>
+</tr>
+<tr>
+<td><code>MotifComponentType</code> / <code>MotifComponentConstructor</code> / <code>MotifFunctionalComponent</code> / <code>MotifFunctionalComponentBasic</code> / <code>AnyFunctionalComponent</code></td>
+<td>Sınıf, yapıcı ve fonksiyon bileşeni tipleri (JSX etiket tipleri için).</td>
+<td><a href="/tr/docs/components">Bileşenler</a></td>
+</tr>
+<tr>
+<td><code>EffectFn</code> / <code>AsyncTrackingToken</code></td>
+<td><code>effect</code> fonksiyon tipi / <code>asyncTracking</code> belirteci.</td>
+<td><a href="/tr/docs/reactivity">Reaktivite</a></td>
+</tr>
+<tr>
+<td><code>ReadonlySignal&lt;T&gt;</code></td>
+<td><code>asReadonly()</code> görünümü: <code>value</code>, <code>peek()</code>.</td>
+<td><a href="/tr/docs/reactivity#create-signal">Reaktivite</a></td>
+</tr>
+<tr>
+<td><code>KeySelection&lt;T&gt;</code></td>
+<td><code>createSelection</code> dönüşü: <code>(key: T) =&gt; boolean</code> ve <code>dispose()</code>.</td>
+<td><a href="/tr/docs/reactivity#create-selection">Reaktivite</a></td>
+</tr>
+<tr>
+<td><code>DeepReadonly&lt;T&gt;</code></td>
+<td><code>asReadonly</code> dönüş tipi: alanlar, dizi elemanları, <code>Map</code> ve <code>Set</code> içeriği iç içe salt-okunur.</td>
+<td><a href="/tr/docs/reactivity#as-readonly">Reaktivite</a></td>
+</tr>
+<tr>
+<td><code>AppLifecycleState</code> / <code>AppLifecycleEventArgs</code></td>
+<td><code>'visible' \| 'hidden' \| 'frozen' \| 'resumed' \| 'restored' \| 'online' \| 'offline'</code> / <code>{ state, visible, online }</code>.</td>
+<td><a href="/tr/docs/lifecycle#app-lifecycle">Yaşam Döngüsü</a></td>
+</tr>
+<tr>
+<td><code>RouteItem</code> / <code>RouteItemBase</code> / <code>RouteControl</code> / <code>RouteRedirect</code> / <code>RedirectTarget</code></td>
+<td>Rota tanımı ve parçaları.</td>
+<td><a href="/tr/docs/routes#route-item">Rota Tablosu</a></td>
+</tr>
+<tr>
+<td><code>RouterOptions</code> / <code>RouterEvents</code></td>
+<td><code>useRouter({...})</code> nesnesi / genel kancalar <code>{ onEntering?, onEnter?, onLeave?, onUpdate? }</code>.</td>
+<td><a href="/tr/docs/routing#use-router">Yönlendirmeye Giriş</a></td>
+</tr>
+<tr>
+<td><code>WindowOptions</code> / <code>AppWindow</code> / <code>WindowClosedResult</code> / <code>WindowClosingEventArgs</code> / <code>WindowCloseReason</code></td>
+<td><code>app.windows.open</code> seçenekleri, dönen handle, kapanış sonucu <code>{ returned, disposed, kept }</code>, <code>onClosing</code> kancasının aldığı <code>{ window, components, reason }</code> ve nedenin türü.</td>
+<td><a href="/tr/docs/windows">Pencereler</a></td>
+</tr>
+<tr>
+<td><code>Router</code> / <code>RouteInfo</code> / <code>RouteResolution</code> / <code>ResolveResult</code> / <code>RouterViewProps</code></td>
+<td><code>app.router</code> nesnesi / <code>routes</code> öğesi / <code>resolve()</code> sonucu (<code>{ chain: string[], result: ResolveResult }</code>) / gezinme ve eşleşme sonucu / <code>RouterView</code> prop'ları (<code>name?</code>).</td>
+<td><a href="/tr/docs/navigation#live-route-state">Gezinme ve Rota Durumu</a></td>
+</tr>
+<tr>
+<td><code>NavigationOptions</code> / <code>NavigationDirection</code> / <code>NavigationGuard</code> / <code>NavigationGuardContext</code></td>
+<td>Gezinme seçenekleri / yön / guard imzası <code>(ctx, next) =&gt; void</code> / <code>{ to, from }</code>.</td>
+<td><a href="/tr/docs/route-guards#guards">Rota Kancaları ve Guard'lar</a></td>
+</tr>
+<tr>
+<td><code>RouterNavigatedEventArgs</code></td>
+<td><code>onRouterChanged</code> yükü: <code>{ uri, params, meta, route, ok, initial, redirectedFrom?, direction?, state? }</code>.</td>
+<td><a href="/tr/docs/route-guards#guards">Rota Kancaları ve Guard'lar</a></td>
+</tr>
+<tr>
+<td><code>RouterValidateEventArgs</code></td>
+<td><code>validate(e)</code> argümanı: <code>{ uri, key, routes, params }</code>.</td>
+<td><a href="/tr/docs/routes#route-item-fields">Rota Tablosu</a></td>
+</tr>
+<tr>
+<td><code>RouteResolveContext</code></td>
+<td>Middleware bağlamı: <code>{ uri, context, rewritePath(uri) }</code>.</td>
+<td><a href="/tr/docs/route-guards#middleware">Rota Kancaları ve Guard'lar</a></td>
+</tr>
+<tr>
+<td><code>ScrollMemoryOptions</code> / <code>StackOptions</code> / <code>StackSwipeBackOptions</code> / <code>StackEntryInfo</code> / <code>StackTransitionContext</code></td>
+<td>Kaydırma hafızası ve yığın gezinmesi ayarları.</td>
+<td><a href="/tr/docs/navigation#scroll-memory">Gezinme ve Rota Durumu</a>, <a href="/tr/docs/navigation-stack#stack">Yığın Gezinmesi</a></td>
+</tr>
+<tr>
+<td><code>ServiceLifetime</code> / <code>ServiceDescriptor</code></td>
+<td><code>'transient' \| 'singleton' \| 'scoped'</code> / kayıt tanımı (<code>token</code>, <code>lifetime</code>, <code>useClass</code>/<code>useValue</code>/<code>useFactory</code>, <code>deps</code>, <code>startup</code>).</td>
+<td><a href="/tr/docs/service-registration#registration-forms">Servis Kaydı</a></td>
+</tr>
+<tr>
+<td><code>LazyOptions&lt;T&gt;</code> / <code>LazyRetryOptions</code></td>
+<td><code>Lazy</code> seçenekleri / <code>{ count, delayMs?, whenOnline? }</code>.</td>
+<td><a href="/tr/docs/lazy#options">Lazy</a></td>
+</tr>
+<tr>
+<td><code>RetryOptions</code> / <code>TimeoutOptions</code> / <code>CircuitBreakerOptions</code> / <code>BulkheadOptions</code> / <code>RateLimiterOptions</code> / <code>FallbackOptions&lt;T&gt;</code></td>
+<td><code>Resilience</code> politika seçenekleri.</td>
+<td><a href="/tr/docs/resilience#policies">Dayanıklılık (Resilience)</a></td>
+</tr>
+<tr>
+<td><code>ResiliencePolicy</code> / <code>ResilienceAction&lt;T&gt;</code> / <code>ResilienceContext</code> / <code>CircuitState</code></td>
+<td><code>{ execute(action, ctx?) }</code> arabirimi (<code>Resilience</code> uygular, <code>decorate</code> kabul eder) / <code>(ctx?) =&gt; T \| Promise&lt;T&gt;</code> / serbest bağlam nesnesi / <code>'CLOSED' \| 'OPEN' \| 'HALF_OPEN'</code>.</td>
+<td><a href="/tr/docs/resilience#chain">Dayanıklılık (Resilience)</a></td>
+</tr>
+<tr>
+<td><code>TransportOptions</code></td>
+<td><code>Transporter.transport</code> seçenekleri <code>{ index?, keepState?, owner? }</code>.</td>
+<td><a href="/tr/docs/transport#transporter">Transport ve TransportTo</a></td>
+</tr>
+<tr>
+<td><code>VirtualizationProps&lt;T&gt;</code> / <code>VirtualizationDataRequest</code> / <code>VirtualizationDataResponse&lt;T&gt;</code> / <code>VirtualizationState&lt;T&gt;</code></td>
+<td>Sanal liste prop'ları, istek/yanıt ve durum nesneleri.</td>
+<td><a href="/tr/docs/virtualization#props">Sanal Listeler (Virtualization)</a></td>
+</tr>
+<tr>
+<td><code>MotifErrorCode</code></td>
+<td>Bütün <code>MJX</code> kodlarının birleşimi.</td>
+<td><a href="/tr/docs/error-handling#motif-error">Hata Yönetimi</a></td>
+</tr>
+<tr>
+<td><code>Group&lt;TKey, T&gt;</code></td>
+<td><code>Query.groupBy</code> öğesi <code>{ key, items }</code>.</td>
+<td><a href="/tr/docs/query#chaining">Koleksiyon Sorguları (Query)</a></td>
+</tr>
+<tr>
+<td><code>Event&lt;T&gt;</code></td>
+<td><code>Emitter.event</code>'in tipi: <code>(listener, thisArgs?, disposables?) =&gt; IDisposable</code>.</td>
+<td><a href="/tr/docs/events#emitter">Olaylar</a></td>
+</tr>
+<tr>
+<td><code>JSX</code></td>
+<td>JSX tip ad alanı.</td>
+<td><a href="/tr/docs/jsx">JSX ve Şablonlar</a></td>
+</tr>
+<tr>
+<td><code>__attr</code>, <code>CustomParameters</code>, <code>IsOptional</code>, <code>OptionalParams</code>, <code>IAttribute</code>, <code>IClass</code></td>
+<td>Tip yardımcıları ve <code>attr</code>/<code>class</code> yardımcılarının arayüzleri; doğrudan kullanılmaz.</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="devtools">Geliştirici araçları</h2>
+<table>
+<thead>
+<tr>
+<th>Sembol</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app.useReactiveMonitor(o)</code> / <code>configureReactivityLeakMonitor(o)</code></td>
+<td>Reaktif bağımlılık uyarıları: <code>{ enabled, threshold, name }</code> sızıntı gözlemcisi (bir alanı izleyen effect sayısı <code>threshold</code>'a ulaşınca <code>MJX507</code>), <code>dependencies</code> bir effect'in tek koşuda toplayabileceği bağımlılık eşiği (varsayılan 1000, aşılınca <code>MJX209</code>; <code>0</code> kapatır); <code>scans</code> aynı listeyi aynı bileşen türünün birden çok örneğinin taramasını çalışma anında yakalayan <code>MJX210</code> denetimi (varsayılan açık, <code>false</code> kapatır).</td>
+</tr>
+<tr>
+<td><code>debugGetDeps(hedef)</code> / <code>debugGetDepMap()</code></td>
+<td>Reaktif bağımlılık haritaları; <code>@motifx/core/devtools</code> alt yolundan: <code>import { debugGetDeps } from &quot;@motifx/core/devtools&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>registerDevtools(ad, { describe?, inspect? })</code></td>
+<td>Bir paketin kendi durumunu DevTools'a açması; <code>@motifx/core/devtools</code> alt yolundan. <code>{ emit, pathOf, dispose }</code> döndürür (<a href="/tr/docs/devtools-packages#extensions">DevTools sözleşmesi</a>).</td>
+</tr>
+<tr>
+<td><code>MotifDevtools</code>, <code>DevtoolsEvent</code></td>
+<td><code>globalThis.__MOTIF_DEVTOOLS__</code> nesnesinin ve olaylarının tipleri; <code>@motifx/core/devtools</code> alt yolundan (<a href="/tr/docs/devtools">DevTools sözleşmesi</a>).</td>
+</tr>
+<tr>
+<td><code>DevtoolsTreeNode</code>, <code>DevtoolsPath</code>, <code>DevtoolsResult</code>, <code>DevtoolsComponentRef</code>, <code>DevtoolsStoreHolder</code>, <code>DevtoolsExtension</code>, <code>DevtoolsExtensionHandle</code></td>
+<td>Sözleşmenin parça tipleri: ağaç düğümü, yol, yazma sonucu, bileşen başvurusu, store tutucusu, eklenti kaydı ve kaydın döndürdüğü nesne; <code>@motifx/core/devtools</code> alt yolundan.</td>
+</tr>
+<tr>
+<td><code>nameModuleStore</code></td>
+<td>Derleyicinin geliştirme derlemesinde modül store'larını adlandırmak için ürettiği çağrı; elle çağrılmaz (<a href="/tr/docs/devtools#enable">DevTools sözleşmesi</a>).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="jsx-attributes">JSX özel öznitelikleri</h2>
+<div class="doc-variant" data-variant="imperative">
+<p>JSX'siz yazımda bu özniteliklerin karşılıkları props nesnesinin anahtarları ve bileşenin çağrılarıdır (bkz. <a href="/tr/docs/imperative#props-keys">Props nesnesinin anahtarları</a>).</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Öznitelik</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class</code> / <code>className</code></td>
+<td>Sınıf (string/dizi/nesne/getter).</td>
+</tr>
+<tr>
+<td><code>style</code> / <code>x-style</code></td>
+<td>Stil.</td>
+</tr>
+<tr>
+<td><code>on&lt;event&gt;</code></td>
+<td>DOM olayı (<code>:once</code>, <code>:prevent</code>, <code>:stop</code>, <code>:capture</code>, <code>:passive</code>, <code>:self</code>, <code>:trusted</code>).</td>
+</tr>
+<tr>
+<td><code>on:ad</code> / <code>on-ad</code> / <code>on_ad</code></td>
+<td>İşleyiciyi olduğu gibi <code>motif.on(&quot;ad&quot;, fn)</code> ile bağlar (DOM ve özel olaylar; yalnız önek atılır, <code>on-my-event</code> → <code>my-event</code>); parametre sayısı ≤ 1 → <code>fn(event)</code>, 2+ → <code>fn(sender, event)</code>.</td>
+</tr>
+<tr>
+<td><code>ref</code> / <code>x-ref</code></td>
+<td>Etiketin bileşen örneğini yakala: <code>ref={(c) =&gt; …}</code> ya da <code>ref={this.alan}</code> (fonksiyon bileşeninde <code>ref={alan}</code>), her etikette, tam bir kez; ikisi aynı etikette birlikte yazılırsa kaynaktaki sırayla çalışır. Yalnız verildiği bileşende çalışır (fonksiyon bileşeninde döndürülen kök); <code>props</code>'ta ve <code>this.props</code>'ta yer almaz. İçteki bir öğe için ayrı bir prop adı kullanın (ör. <code>inputRef</code>).</td>
+</tr>
+<tr>
+<td><code>initializeComponent</code></td>
+<td>Etiketin bileşeniyle kurulumda bir kez çağrılır (düz DOM, sınıf ve fonksiyon bileşeni etiketinde aynı; fonksiyonda döndürülen kök). Derleyicinin ürettiği kurulum koduyla birlikte çalışır.</td>
+</tr>
+<tr>
+<td><code>oninitializeComponent</code></td>
+<td>Bütün <code>initializeComponent</code> kodundan (sınıf metodu, etiketteki değer, derleyicinin ürettiği) hemen sonra, <code>view()</code>'den önce çağrılır. Sınıf metodu ya da etiket prop'u olarak yazılır; fonksiyon bileşeninde döndürülen köke uygulanır.</td>
+</tr>
+<tr>
+<td><code>x-html</code></td>
+<td>Reaktif <code>innerHTML</code>.</td>
+</tr>
+<tr>
+<td><code>x-wait</code> / <code>x-display</code> / <code>x-chunk</code></td>
+<td>Bekletme / görünürlük / çocukları dilim dilim kurma (<code>x-chunk</code>: karede kurulacak sayıyı kare süresi belirler; <code>x-chunk={50}</code>: ilk turda 50, sonra her karede en az 50 çocuk).</td>
+</tr>
+<tr>
+<td><code>key</code></td>
+<td>Liste öğesini tanımlar; geliştirme modunda yinelenmeye karşı denetlenir (<code>MJX202</code>). Satır eşleşmesi öğe nesnesiyle yapılır, <code>key</code> DOM'un yeniden kullanımını değiştirmez.</td>
+</tr>
+<tr>
+<td><code>transition</code></td>
+<td>Giriş/çıkış geçişi (string veya <code>TransitionProps</code>).</td>
+</tr>
+<tr>
+<td><code>on&lt;lifecycle&gt;</code> / <code>x-&lt;lifecycle&gt;</code> / <code>x:&lt;lifecycle&gt;</code></td>
+<td>Yaşam döngüsü kancaları; aynı etikette birden çok yazım birleşir, hepsi kaynaktaki sırayla çalışır.</td>
+</tr>
+<tr>
+<td><code>options={{ hideStrategy, disableDisposal, chunk }}</code></td>
+<td>Bileşen ayarları; <code>motif.options</code>'a kopyalanır (düz DOM etiketinde de; öznitelik yazılmaz). Bkz: <a href="/tr/docs/lifecycle">Yaşam Döngüsü</a>.</td>
+</tr>
+<tr>
+<td>Metot adlı öznitelikler</td>
+<td><code>focus</code>, <code>blur</code>, <code>click</code>, <code>select</code>, <code>scrollTo</code>/<code>scrollBy</code>/<code>scrollIntoView</code>, <code>show</code>, <code>showModal</code>, <code>close</code>, <code>showPopover</code>, <code>hidePopover</code>, <code>togglePopover</code>, <code>requestSubmit</code>, <code>checkValidity</code>, <code>reportValidity</code>, <code>showPicker</code>, <code>load</code>, <code>setSelectionRange</code>, <code>setRangeText</code>, <code>setPointerCapture</code>, <code>releasePointerCapture</code>, <code>fastSeek</code> … elemanın aynı adlı metodunu çağırır, öznitelik yazılmaz; getter verilirse her değişimde yeniden çağrılır. <code>show</code>/<code>showModal</code>/<code>showPopover</code> <code>true</code> ile açar, <code>false</code> ile kapatır (<code>close()</code>/<code>hidePopover()</code>); <code>togglePopover</code> boolean'ı iletir; <code>close</code>, <code>requestSubmit</code>, <code>load</code> gibi metotlar doğru (truthy) değerde çağrılır; <code>setSelectionRange</code> gibi argümanlı metotlar değeri argüman olarak alır (dizi → argüman listesi).</td>
+</tr>
+</tbody>
+</table>
+<p>Bkz: <a href="/tr/docs/jsx">JSX ve Şablonlar</a>.</p>
+<h2 id="error-codes">Hata ve uyarı kodları</h2>
+<p>Bütün <code>MJX</code> kodları, konsoldaki mesajları ve anlamları <a href="/tr/docs/error-codes">Hata ve Uyarı Kodları</a> sayfasındadır.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Kodların tam listesi için <a href="/tr/docs/error-codes">Hata ve Uyarı Kodları</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

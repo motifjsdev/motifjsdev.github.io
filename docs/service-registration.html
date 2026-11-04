@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="ServiceCollection registration forms, singletons created at startup, automatic registration with @Injectable and its options.">
+    <title>Registering Services — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/service-registration">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-registration">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-registration">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-registration">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/service-registration">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Registering Services">
+    <meta property="og:description" content="ServiceCollection registration forms, singletons created at startup, automatic registration with @Injectable and its options.">
+    <script type="application/json" id="doc-data">{"slug":"service-registration","locale":"en","title":"Registering Services","description":"ServiceCollection registration forms, singletons created at startup, automatic registration with @Injectable and its options.","category":{"id":"5","title":"Dependency Injection"},"html":"\u003Ch2 id=\u0022registration\u0022\u003ERegistering a service\u003C/h2\u003E\n\u003Cp\u003EServices are registered on the \u003Ccode\u003Eservices\u003C/code\u003E collection (\u003Ccode\u003EServiceCollection\u003C/code\u003E) of the builder returned by \u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E, before \u003Ccode\u003Ebuild()\u003C/code\u003E. Each registration ties a token (usually the class itself; it can also be a string or a symbol) to an implementation and a lifetime; the lifetimes are on the \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003ELifetimes and Scopes\u003C/a\u003E page:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Econst builder = Application.CreateBuilder();\n\nbuilder.services.addSingleton(NotesService, NotesService);   // a single instance for the whole app\nbuilder.services.addScoped(NoteDraft, NoteDraft);            // one instance per navigation\nbuilder.services.addTransient(SearchIndex, SearchIndex);     // a new instance on every resolution\n\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Econst builder = Application.CreateBuilder();\n\nbuilder.services.addSingleton(NotesService, NotesService);   // a single instance for the whole app\nbuilder.services.addScoped(NoteDraft, NoteDraft);            // one instance per navigation\nbuilder.services.addTransient(SearchIndex, SearchIndex);     // a new instance on every resolution\n\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022registration-forms\u0022\u003ERegistration forms\u003C/h3\u003E\n\u003Cp\u003EIn the \u003Ccode\u003Eadd*(token, impl)\u003C/code\u003E methods, \u003Ccode\u003Eimpl\u003C/code\u003E can be one of these:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003E// 1) Class (useClass)\nbuilder.services.addSingleton(NotesService, NotesService);\n\n// 2) Ready value (useValue): an object that is not a class is registered as is\nbuilder.services.addSingleton(\u0026quot;config\u0026quot;, { apiUrl: \u0026quot;/api/notes\u0026quot; });\n\n// 3) Factory / descriptor object: with \u0060deps\u0060, the factory is called as (…dependencies, provider)\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes: NotesService) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n});\n\n// a factory without deps receives only the provider\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) });\n\n// 4) Async value (Promise): wrapped in an async factory; resolve it with \u0060getAsync\u0060, not \u0060get\u0060\nbuilder.services.addSingleton(SyncService, import(\u0026quot;./services/sync\u0026quot;).then((m) =\u0026gt; new m.SyncService()));\nconst sync = await app.provider.getAsync(SyncService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003E// 1) Class (useClass)\nbuilder.services.addSingleton(NotesService, NotesService);\n\n// 2) Ready value (useValue): an object that is not a class is registered as is\nbuilder.services.addSingleton(\u0026quot;config\u0026quot;, { apiUrl: \u0026quot;/api/notes\u0026quot; });\n\n// 3) Factory / descriptor object: with \u0060deps\u0060, the factory is called as (…dependencies, provider)\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n});\n\n// a factory without deps receives only the provider\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) });\n\n// 4) Async value (Promise): wrapped in an async factory; resolve it with \u0060getAsync\u0060, not \u0060get\u0060\nbuilder.services.addSingleton(SyncService, import(\u0026quot;./services/sync\u0026quot;).then((m) =\u0026gt; new m.SyncService()));\nconst sync = await app.provider.getAsync(SyncService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe \u003Ccode\u003Edeps\u003C/code\u003E array works for both class and factory registrations: the entries are resolved in order and passed to the constructor/factory in the same order; in a factory the last parameter is always the \u003Ccode\u003EServiceProvider\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003EThe provider builds only a class registration (\u003Ccode\u003EuseClass\u003C/code\u003E) with \u003Ccode\u003Enew\u003C/code\u003E. A value given with \u003Ccode\u003EuseValue\u003C/code\u003E and the value a factory returns are handed out as they are; \u003Ccode\u003Eget\u003C/code\u003E and \u003Ccode\u003EgetAsync\u003C/code\u003E return the same value. To hand out a function or the class itself as a service, use \u003Ccode\u003E{ useValue: fn }\u003C/code\u003E or a factory that returns it; a factory that wants an instance writes the \u003Ccode\u003Enew\u003C/code\u003E itself.\u003C/p\u003E\n\u003Cp\u003EA function given directly to \u003Ccode\u003Eadd*(token, impl)\u003C/code\u003E is constructed as a class. A function that cannot be constructed (an arrow function, an \u003Ccode\u003Easync\u003C/code\u003E function, an object method) gives a compile error in TypeScript, and at run time it throws \u003Ccode\u003EMJX413\u003C/code\u003E on the registration line:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(\u0027formatter\u0027, (x: number) =\u0026gt; x.toFixed(2));             // error: MJX413\nbuilder.services.addSingleton(\u0027formatter\u0027, { useValue: (x: number) =\u0026gt; x.toFixed(2) }); // the function itself\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) }); // factory\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(\u0027formatter\u0027, (x) =\u0026gt; x.toFixed(2));             // error: MJX413\nbuilder.services.addSingleton(\u0027formatter\u0027, { useValue: (x) =\u0026gt; x.toFixed(2) }); // the function itself\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) }); // factory\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EServiceCollection\u003C/code\u003E methods:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMethod\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EaddSingleton/addScoped/addTransient(token, impl)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERegistration.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtryAddSingleton/tryAddScoped/tryAddTransient(token, impl)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAdds only if not registered yet; returns a \u003Ccode\u003Eboolean\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereplace(token, impl, lifetime?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReplaces an existing registration.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eremove(token)\u003C/code\u003E / \u003Ccode\u003Ehas(token)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERemove / check.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereset()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EClear everything.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EbuildServiceProvider()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EProduces a \u003Ccode\u003EServiceProvider\u003C/code\u003E (\u003Ccode\u003Ebuild()\u003C/code\u003E does this automatically).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch3 id=\u0022startup\u0022\u003ESingletons created at startup\u003C/h3\u003E\n\u003Cp\u003EFor a singleton to be created when the application starts, without being asked for from anywhere, give \u003Ccode\u003Estartup: true\u003C/code\u003E on the registration. Services whose constructor does work on its own (writing an attribute to the document, attaching a listener, opening a connection) are registered this way. The service in the example opens an \u003Ccode\u003Eeffect\u003C/code\u003E while it is being built and writes the selected theme to the \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E element; it has to run even if no component asks for it:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot;, startup: true })\nexport class SettingsService {\n  readonly state = reactive({ theme: \u0026quot;system\u0026quot; as Theme });\n\n  constructor() {\n    effect(() =\u0026gt; {\n      const root = document.documentElement;\n      if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n      else root.dataset.theme = this.state.theme;\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/settings.js\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot;, startup: true })\nexport class SettingsService {\n  state = reactive({ theme: \u0026quot;system\u0026quot; });\n\n  constructor() {\n    effect(() =\u0026gt; {\n      const root = document.documentElement;\n      if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n      else root.dataset.theme = this.state.theme;\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EIn an explicit registration \u003Ccode\u003Estartup\u003C/code\u003E is given in the object form; it works with \u003Ccode\u003EuseClass\u003C/code\u003E and \u003Ccode\u003EuseFactory\u003C/code\u003E, and \u003Ccode\u003EtryAddSingleton\u003C/code\u003E takes the same form:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes: NotesService) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n  startup: true,\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n  startup: true,\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EThe services are created inside \u003Ccode\u003Eapp.run()\u003C/code\u003E, before the shell and the first page are built; \u003Ccode\u003Ebuild()\u003C/code\u003E does not create them. The \u003Ccode\u003EuseDevelopment\u003C/code\u003E and \u003Ccode\u003EuseLogging\u003C/code\u003E settings called before \u003Ccode\u003Erun()\u003C/code\u003E apply in the constructor.\u003C/li\u003E\n\u003Cli\u003EThe creation order is the registration order: the \u003Ccode\u003Eadd*\u003C/code\u003E calls before \u003Ccode\u003Ebuild()\u003C/code\u003E in the order they are written, then the \u003Ccode\u003E@Injectable\u003C/code\u003E classes. Dependencies are built first, as usual.\u003C/li\u003E\n\u003Cli\u003EA service resolved with \u003Ccode\u003Eget\u003C/code\u003E before \u003Ccode\u003Erun()\u003C/code\u003E is not created again; components, \u003Ccode\u003EFromService\u003C/code\u003E and \u003Ccode\u003Einject\u003C/code\u003E get the same instance.\u003C/li\u003E\n\u003Cli\u003EIf the constructor throws, \u003Ccode\u003Erun()\u003C/code\u003E throws the same error and the application does not start.\u003C/li\u003E\n\u003Cli\u003EThe services are created synchronously, with \u003Ccode\u003Eget\u003C/code\u003E: for a service registered with an async factory or a Promise, \u003Ccode\u003Erun()\u003C/code\u003E throws \u003Ccode\u003EMJX402\u003C/code\u003E. Do not give these services \u003Ccode\u003Estartup\u003C/code\u003E; start them with \u003Ccode\u003Eawait app.provider.getAsync(token)\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Estartup\u003C/code\u003E applies only to a \u003Ccode\u003Esingleton\u003C/code\u003E registration. On \u003Ccode\u003Etransient\u003C/code\u003E and \u003Ccode\u003Escoped\u003C/code\u003E registrations it is ignored, and in development mode an \u003Ccode\u003EMJX415\u003C/code\u003E warning is written; the service is created on its first resolution.\u003C/li\u003E\n\u003Cli\u003EOf the \u003Ccode\u003E@Injectable\u003C/code\u003E classes, the ones whose module is loaded at the time of \u003Ccode\u003Erun()\u003C/code\u003E are created. A class whose module loads after \u003Ccode\u003Erun()\u003C/code\u003E (a service imported only by a lazy page) is not created when it loads; it is created on its first resolution.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ereplace(token, impl)\u003C/code\u003E keeps the previous registration\u0027s \u003Ccode\u003Estartup\u003C/code\u003E value if \u003Ccode\u003Estartup\u003C/code\u003E is not written in the new registration; \u003Ccode\u003Estartup: false\u003C/code\u003E turns it off.\u003C/li\u003E\n\u003Cli\u003EWhile the application is running, \u003Ccode\u003Ebuilder.rebuild()\u003C/code\u003E sets up a new provider and immediately creates the \u003Ccode\u003Estartup\u003C/code\u003E singletons again in that provider; if a constructor throws, \u003Ccode\u003Erebuild()\u003C/code\u003E throws the same error. Components, \u003Ccode\u003Eapp.provider\u003C/code\u003E and the \u003Ccode\u003EServiceProvider\u003C/code\u003E token give the new provider. The old provider is disposed; \u003Ccode\u003Erebuild()\u003C/code\u003E does not wait for this disposal. A \u003Ccode\u003Erebuild()\u003C/code\u003E called before \u003Ccode\u003Erun()\u003C/code\u003E does not create the services; \u003Ccode\u003Erun()\u003C/code\u003E does.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022injectable-decorator\u0022\u003EAutomatic registration with decorators\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003E@Injectable\u003C/code\u003E marks a class for automatic registration, so no explicit \u003Ccode\u003Eadd*\u003C/code\u003E line is needed. When the application is built (\u003Ccode\u003EautoRegisterInjectables\u003C/code\u003E is called inside \u003Ccode\u003Ebuilder.build()\u003C/code\u003E), the marked classes are registered with their options.\u003C/p\u003E\n\u003Cp\u003EClasses whose module loads \u003Cstrong\u003Eafter\u003C/strong\u003E \u003Ccode\u003Ebuild()\u003C/code\u003E (services imported only by a lazy page) are registered too: when the descriptor is not found, the registration happens at the moment of the first resolution. An explicit registration (\u003Ccode\u003EaddSingleton\u003C/code\u003E/\u003Ccode\u003EaddScoped\u003C/code\u003E/\u003Ccode\u003EaddTransient\u003C/code\u003E) always overrides the decorator, and the decorator cannot override an explicit registration.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\u003Ccode\u003Eimport { Injectable, inject, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  readonly state = reactive({ items: [] as Note[] });\n}\n\n@Injectable()   // default lifetime: \u0027transient\u0027\nexport class SearchIndex {\n  private notes = inject(NotesService);\n\n  count() {\n    return this.notes.state.items.length;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/search.js\u0022\u003E\u003Ccode\u003Eimport { Injectable, inject, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  state = reactive({ items: [] });\n}\n\n@Injectable()   // default lifetime: \u0027transient\u0027\nexport class SearchIndex {\n  notes = inject(NotesService);\n\n  count() {\n    return this.notes.state.items.length;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003E@Injectable\u003C/code\u003E is a standard (TC39) class decorator; it needs no extra setting in \u003Ccode\u003Etsconfig.json\u003C/code\u003E or in Vite\u0027s \u003Ccode\u003Eesbuild\u003C/code\u003E setting. \u003Ccode\u003E@motifx/compiler\u003C/code\u003E compiles decorators in \u003Ccode\u003E.ts\u003C/code\u003E and \u003Ccode\u003E.js\u003C/code\u003E files just as in \u003Ccode\u003E.tsx\u003C/code\u003E files; \u003Ccode\u003Evite dev\u003C/code\u003E and \u003Ccode\u003Evite build\u003C/code\u003E give the same result. Files whose nearest \u003Ccode\u003Etsconfig.json\u003C/code\u003E has \u003Ccode\u003EexperimentalDecorators: true\u003C/code\u003E are left to TypeScript\u0027s legacy decorator transform; \u003Ccode\u003E@Injectable\u003C/code\u003E works in that form as well.\u003C/p\u003E\n\u003Ch3 id=\u0022injectable-options\u0022\u003E\u003Ccode\u003E@Injectable\u003C/code\u003E options\u003C/h3\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Elifetime\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027singleton\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027scoped\u0027\u003C/code\u003E or \u003Ccode\u003E\u0027transient\u0027\u003C/code\u003E; \u003Ccode\u003E\u0027transient\u0027\u003C/code\u003E if not given.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edeps\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETokens resolved in order as constructor parameters (see \u003Ca href=\u0022/docs/service-resolution#deps\u0022\u003E\u003Ccode\u003Edeps\u003C/code\u003E\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estartup\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESingleton only: the service is created inside \u003Ccode\u003Erun()\u003C/code\u003E without being asked for (see \u003Ca href=\u0022#startup\u0022\u003ESingletons created at startup\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn how long a service lives, go on to \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003ELifetimes and Scopes\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"registration","text":"Registering a service","level":2},{"id":"registration-forms","text":"Registration forms","level":3},{"id":"startup","text":"Singletons created at startup","level":3},{"id":"injectable-decorator","text":"Automatic registration with decorators","level":2},{"id":"injectable-options","text":"@Injectable options","level":3},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"dependency-injection","title":"Introduction to Dependency Injection"},"next":{"slug":"service-lifetimes","title":"Lifetimes and Scopes"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Dependency Injection</p>
+        <h1>Registering Services</h1>
+        <p>ServiceCollection registration forms, singletons created at startup, automatic registration with @Injectable and its options.</p>
+<h2 id="registration">Registering a service</h2>
+<p>Services are registered on the <code>services</code> collection (<code>ServiceCollection</code>) of the builder returned by <code>Application.CreateBuilder()</code>, before <code>build()</code>. Each registration ties a token (usually the class itself; it can also be a string or a symbol) to an implementation and a lifetime; the lifetimes are on the <a href="/docs/service-lifetimes">Lifetimes and Scopes</a> page:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>const builder = Application.CreateBuilder();
+
+builder.services.addSingleton(NotesService, NotesService);   // a single instance for the whole app
+builder.services.addScoped(NoteDraft, NoteDraft);            // one instance per navigation
+builder.services.addTransient(SearchIndex, SearchIndex);     // a new instance on every resolution
+
+const app = builder.build();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>const builder = Application.CreateBuilder();
+
+builder.services.addSingleton(NotesService, NotesService);   // a single instance for the whole app
+builder.services.addScoped(NoteDraft, NoteDraft);            // one instance per navigation
+builder.services.addTransient(SearchIndex, SearchIndex);     // a new instance on every resolution
+
+const app = builder.build();</code></pre>
+</div>
+<h3 id="registration-forms">Registration forms</h3>
+<p>In the <code>add*(token, impl)</code> methods, <code>impl</code> can be one of these:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>// 1) Class (useClass)
+builder.services.addSingleton(NotesService, NotesService);
+
+// 2) Ready value (useValue): an object that is not a class is registered as is
+builder.services.addSingleton(&quot;config&quot;, { apiUrl: &quot;/api/notes&quot; });
+
+// 3) Factory / descriptor object: with `deps`, the factory is called as (…dependencies, provider)
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes: NotesService) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+});
+
+// a factory without deps receives only the provider
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) });
+
+// 4) Async value (Promise): wrapped in an async factory; resolve it with `getAsync`, not `get`
+builder.services.addSingleton(SyncService, import(&quot;./services/sync&quot;).then((m) =&gt; new m.SyncService()));
+const sync = await app.provider.getAsync(SyncService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>// 1) Class (useClass)
+builder.services.addSingleton(NotesService, NotesService);
+
+// 2) Ready value (useValue): an object that is not a class is registered as is
+builder.services.addSingleton(&quot;config&quot;, { apiUrl: &quot;/api/notes&quot; });
+
+// 3) Factory / descriptor object: with `deps`, the factory is called as (…dependencies, provider)
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+});
+
+// a factory without deps receives only the provider
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) });
+
+// 4) Async value (Promise): wrapped in an async factory; resolve it with `getAsync`, not `get`
+builder.services.addSingleton(SyncService, import(&quot;./services/sync&quot;).then((m) =&gt; new m.SyncService()));
+const sync = await app.provider.getAsync(SyncService);</code></pre>
+</div>
+<p>The <code>deps</code> array works for both class and factory registrations: the entries are resolved in order and passed to the constructor/factory in the same order; in a factory the last parameter is always the <code>ServiceProvider</code>.</p>
+<p>The provider builds only a class registration (<code>useClass</code>) with <code>new</code>. A value given with <code>useValue</code> and the value a factory returns are handed out as they are; <code>get</code> and <code>getAsync</code> return the same value. To hand out a function or the class itself as a service, use <code>{ useValue: fn }</code> or a factory that returns it; a factory that wants an instance writes the <code>new</code> itself.</p>
+<p>A function given directly to <code>add*(token, impl)</code> is constructed as a class. A function that cannot be constructed (an arrow function, an <code>async</code> function, an object method) gives a compile error in TypeScript, and at run time it throws <code>MJX413</code> on the registration line:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>builder.services.addSingleton('formatter', (x: number) =&gt; x.toFixed(2));             // error: MJX413
+builder.services.addSingleton('formatter', { useValue: (x: number) =&gt; x.toFixed(2) }); // the function itself
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) }); // factory</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>builder.services.addSingleton('formatter', (x) =&gt; x.toFixed(2));             // error: MJX413
+builder.services.addSingleton('formatter', { useValue: (x) =&gt; x.toFixed(2) }); // the function itself
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) }); // factory</code></pre>
+</div>
+<p><code>ServiceCollection</code> methods:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>addSingleton/addScoped/addTransient(token, impl)</code></td>
+<td>Registration.</td>
+</tr>
+<tr>
+<td><code>tryAddSingleton/tryAddScoped/tryAddTransient(token, impl)</code></td>
+<td>Adds only if not registered yet; returns a <code>boolean</code>.</td>
+</tr>
+<tr>
+<td><code>replace(token, impl, lifetime?)</code></td>
+<td>Replaces an existing registration.</td>
+</tr>
+<tr>
+<td><code>remove(token)</code> / <code>has(token)</code></td>
+<td>Remove / check.</td>
+</tr>
+<tr>
+<td><code>reset()</code></td>
+<td>Clear everything.</td>
+</tr>
+<tr>
+<td><code>buildServiceProvider()</code></td>
+<td>Produces a <code>ServiceProvider</code> (<code>build()</code> does this automatically).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="startup">Singletons created at startup</h3>
+<p>For a singleton to be created when the application starts, without being asked for from anywhere, give <code>startup: true</code> on the registration. Services whose constructor does work on its own (writing an attribute to the document, attaching a listener, opening a connection) are registered this way. The service in the example opens an <code>effect</code> while it is being built and writes the selected theme to the <code>&lt;html&gt;</code> element; it has to run even if no component asks for it:</p>
+<div class="doc-code" data-file="src/services/settings.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/settings.ts"><code>@Injectable({ lifetime: &quot;singleton&quot;, startup: true })
+export class SettingsService {
+  readonly state = reactive({ theme: &quot;system&quot; as Theme });
+
+  constructor() {
+    effect(() =&gt; {
+      const root = document.documentElement;
+      if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+      else root.dataset.theme = this.state.theme;
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/settings.js"><code>@Injectable({ lifetime: &quot;singleton&quot;, startup: true })
+export class SettingsService {
+  state = reactive({ theme: &quot;system&quot; });
+
+  constructor() {
+    effect(() =&gt; {
+      const root = document.documentElement;
+      if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+      else root.dataset.theme = this.state.theme;
+    });
+  }
+}</code></pre>
+</div>
+<p>In an explicit registration <code>startup</code> is given in the object form; it works with <code>useClass</code> and <code>useFactory</code>, and <code>tryAddSingleton</code> takes the same form:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes: NotesService) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+  startup: true,
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+  startup: true,
+});</code></pre>
+</div>
+<ul>
+<li>The services are created inside <code>app.run()</code>, before the shell and the first page are built; <code>build()</code> does not create them. The <code>useDevelopment</code> and <code>useLogging</code> settings called before <code>run()</code> apply in the constructor.</li>
+<li>The creation order is the registration order: the <code>add*</code> calls before <code>build()</code> in the order they are written, then the <code>@Injectable</code> classes. Dependencies are built first, as usual.</li>
+<li>A service resolved with <code>get</code> before <code>run()</code> is not created again; components, <code>FromService</code> and <code>inject</code> get the same instance.</li>
+<li>If the constructor throws, <code>run()</code> throws the same error and the application does not start.</li>
+<li>The services are created synchronously, with <code>get</code>: for a service registered with an async factory or a Promise, <code>run()</code> throws <code>MJX402</code>. Do not give these services <code>startup</code>; start them with <code>await app.provider.getAsync(token)</code>.</li>
+<li><code>startup</code> applies only to a <code>singleton</code> registration. On <code>transient</code> and <code>scoped</code> registrations it is ignored, and in development mode an <code>MJX415</code> warning is written; the service is created on its first resolution.</li>
+<li>Of the <code>@Injectable</code> classes, the ones whose module is loaded at the time of <code>run()</code> are created. A class whose module loads after <code>run()</code> (a service imported only by a lazy page) is not created when it loads; it is created on its first resolution.</li>
+<li><code>replace(token, impl)</code> keeps the previous registration's <code>startup</code> value if <code>startup</code> is not written in the new registration; <code>startup: false</code> turns it off.</li>
+<li>While the application is running, <code>builder.rebuild()</code> sets up a new provider and immediately creates the <code>startup</code> singletons again in that provider; if a constructor throws, <code>rebuild()</code> throws the same error. Components, <code>app.provider</code> and the <code>ServiceProvider</code> token give the new provider. The old provider is disposed; <code>rebuild()</code> does not wait for this disposal. A <code>rebuild()</code> called before <code>run()</code> does not create the services; <code>run()</code> does.</li>
+</ul>
+<h2 id="injectable-decorator">Automatic registration with decorators</h2>
+<p><code>@Injectable</code> marks a class for automatic registration, so no explicit <code>add*</code> line is needed. When the application is built (<code>autoRegisterInjectables</code> is called inside <code>builder.build()</code>), the marked classes are registered with their options.</p>
+<p>Classes whose module loads <strong>after</strong> <code>build()</code> (services imported only by a lazy page) are registered too: when the descriptor is not found, the registration happens at the moment of the first resolution. An explicit registration (<code>addSingleton</code>/<code>addScoped</code>/<code>addTransient</code>) always overrides the decorator, and the decorator cannot override an explicit registration.</p>
+<div class="doc-code" data-file="src/services/search.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/search.ts"><code>import { Injectable, inject, reactive } from &quot;@motifx/core&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  readonly state = reactive({ items: [] as Note[] });
+}
+
+@Injectable()   // default lifetime: 'transient'
+export class SearchIndex {
+  private notes = inject(NotesService);
+
+  count() {
+    return this.notes.state.items.length;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/search.js"><code>import { Injectable, inject, reactive } from &quot;@motifx/core&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  state = reactive({ items: [] });
+}
+
+@Injectable()   // default lifetime: 'transient'
+export class SearchIndex {
+  notes = inject(NotesService);
+
+  count() {
+    return this.notes.state.items.length;
+  }
+}</code></pre>
+</div>
+<p><code>@Injectable</code> is a standard (TC39) class decorator; it needs no extra setting in <code>tsconfig.json</code> or in Vite's <code>esbuild</code> setting. <code>@motifx/compiler</code> compiles decorators in <code>.ts</code> and <code>.js</code> files just as in <code>.tsx</code> files; <code>vite dev</code> and <code>vite build</code> give the same result. Files whose nearest <code>tsconfig.json</code> has <code>experimentalDecorators: true</code> are left to TypeScript's legacy decorator transform; <code>@Injectable</code> works in that form as well.</p>
+<h3 id="injectable-options"><code>@Injectable</code> options</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lifetime</code></td>
+<td><code>'singleton'</code>, <code>'scoped'</code> or <code>'transient'</code>; <code>'transient'</code> if not given.</td>
+</tr>
+<tr>
+<td><code>deps</code></td>
+<td>Tokens resolved in order as constructor parameters (see <a href="/docs/service-resolution#deps"><code>deps</code></a>).</td>
+</tr>
+<tr>
+<td><code>startup</code></td>
+<td>Singleton only: the service is created inside <code>run()</code> without being asked for (see <a href="#startup">Singletons created at startup</a>).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Next step</h2>
+<p>To learn how long a service lives, go on to <a href="/docs/service-lifetimes">Lifetimes and Scopes</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

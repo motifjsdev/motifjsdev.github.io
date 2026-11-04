@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Bileşenler arası veri akışı: `props`, prop tipleri, canlı prop&#x27;lar ve `childs` ile içerik yerleştirme.">
+    <title>Props ve Çocuklar — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/component-props">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-props">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-props">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-props">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/component-props">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Props ve Çocuklar">
+    <meta property="og:description" content="Bileşenler arası veri akışı: `props`, prop tipleri, canlı prop&#x27;lar ve `childs` ile içerik yerleştirme.">
+    <script type="application/json" id="doc-data">{"slug":"component-props","locale":"tr","title":"Props ve Çocuklar","description":"Bileşenler arası veri akışı: \u0060props\u0060, prop tipleri, canlı prop\u0027lar ve \u0060childs\u0060 ile içerik yerleştirme.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Ch2 id=\u0022props\u0022\u003E\u003Ccode\u003Eprops\u003C/code\u003E ve bileşenler arası veri akışı\u003C/h2\u003E\n\u003Cp\u003EJSX\u0027te bir bileşene yazdığınız öznitelikler o bileşenin \u003Ccode\u003Eprops\u003C/code\u003E\u0027u olur. JSX\u0027siz yazımda aynı nesne yaratma çağrısına verilir: sınıfta \u003Ccode\u003Enew Bileşen(props)\u003C/code\u003E, fonksiyon ve Options bileşeninde \u003Ccode\u003EmotifComponent(Bileşen, props)\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003EÖrnek, ayarlar sayfasındaki bir satırdır: solda ayarın adı ve altında kısa bir açıklama, sağda ayarı değiştiren denetim. \u003Ccode\u003ESetting\u003C/code\u003E adı ve açıklamayı props ile alır, denetimi çocuk olarak alır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/Setting.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/Setting.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\ninterface SettingProps {\n  name: string;\n  hint: Bind\u0026lt;string\u0026gt;;\n}\n\nexport class Setting extends Component\u0026lt;HTMLDivElement, SettingProps\u0026gt; {\n  override onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  }\n\n  override view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;div class=\u0026quot;setting__text\u0026quot;\u0026gt;\n          \u0026lt;span\u0026gt;{this.props.name}\u0026lt;/span\u0026gt;\n          \u0026lt;small\u0026gt;{() =\u0026gt; read(this.props.hint)}\u0026lt;/small\u0026gt;\n        \u0026lt;/div\u0026gt;\n        {this.childs}\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/Setting.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\ninterface SettingProps {\n  name: string;\n  hint: Bind\u0026lt;string\u0026gt;;\n}\n\nexport class Setting extends Component\u0026lt;HTMLDivElement, SettingProps\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  }\n\n  override view() {\n    const text = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n      div.class.add(\u0026quot;setting__text\u0026quot;);\n      const name = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.setText(this.props.name));\n      const hint = motifComponent(\u0026quot;small\u0026quot;, (small: ComponentBase) =\u0026gt; small.bindings.text(() =\u0026gt; read(this.props.hint)));\n      div.controls.add(name, hint);\n    });\n    return motifFragment({ childs: [text, ...(this.childs ?? [])] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/Setting.tsx\u0022\u003E\u003Ccode\u003Eimport { read, type Bind, type ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\n\ninterface SettingProps {\n  name: string;\n  hint: Bind\u0026lt;string\u0026gt;;\n  childs?: ComponentBase[];\n}\n\nexport function Setting(props: SettingProps) {\n  return (\n    \u0026lt;div class=\u0026quot;setting\u0026quot;\u0026gt;\n      \u0026lt;div class=\u0026quot;setting__text\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{props.name}\u0026lt;/span\u0026gt;\n        \u0026lt;small\u0026gt;{() =\u0026gt; read(props.hint)}\u0026lt;/small\u0026gt;\n      \u0026lt;/div\u0026gt;\n      {props.childs}\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/Setting.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\ninterface SettingProps {\n  name: string;\n  hint: Bind\u0026lt;string\u0026gt;;\n  childs?: ComponentBase[];\n}\n\nexport function Setting(props: SettingProps) {\n  return motifComponent(\u0026quot;div\u0026quot;, (setting: ComponentBase) =\u0026gt; {\n    setting.class.add(\u0026quot;setting\u0026quot;);\n    const text = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n      div.class.add(\u0026quot;setting__text\u0026quot;);\n      const name = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.setText(props.name));\n      const hint = motifComponent(\u0026quot;small\u0026quot;, (small: ComponentBase) =\u0026gt; small.bindings.text(() =\u0026gt; read(props.hint)));\n      div.controls.add(name, hint);\n    });\n    setting.controls.add(text, ...(props.childs ?? []));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/Setting.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\ninterface SettingProps {\n  name: string;\n  hint: Bind\u0026lt;string\u0026gt;;\n}\n\nexport const Setting = (props: SettingProps) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;div class=\u0026quot;setting__text\u0026quot;\u0026gt;\n          \u0026lt;span\u0026gt;{props.name}\u0026lt;/span\u0026gt;\n          \u0026lt;small\u0026gt;{() =\u0026gt; read(props.hint)}\u0026lt;/small\u0026gt;\n        \u0026lt;/div\u0026gt;\n        {this.childs}\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/Setting.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifFragment, motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\ninterface SettingProps {\n  name: string;\n  hint: Bind\u0026lt;string\u0026gt;;\n}\n\nexport const Setting = (props: SettingProps) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  },\n\n  view() {\n    const text = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n      div.class.add(\u0026quot;setting__text\u0026quot;);\n      const name = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.setText(props.name));\n      const hint = motifComponent(\u0026quot;small\u0026quot;, (small: ComponentBase) =\u0026gt; small.bindings.text(() =\u0026gt; read(props.hint)));\n      div.controls.add(name, hint);\n    });\n    return motifFragment({ childs: [text, ...(this.childs ?? [])] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/Setting.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class Setting extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  }\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;div class=\u0026quot;setting__text\u0026quot;\u0026gt;\n          \u0026lt;span\u0026gt;{this.props.name}\u0026lt;/span\u0026gt;\n          \u0026lt;small\u0026gt;{() =\u0026gt; read(this.props.hint)}\u0026lt;/small\u0026gt;\n        \u0026lt;/div\u0026gt;\n        {this.childs}\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/Setting.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class Setting extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  }\n\n  view() {\n    const text = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n      div.class.add(\u0026quot;setting__text\u0026quot;);\n      const name = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.setText(this.props.name));\n      const hint = motifComponent(\u0026quot;small\u0026quot;, (small) =\u0026gt; small.bindings.text(() =\u0026gt; read(this.props.hint)));\n      div.controls.add(name, hint);\n    });\n    return motifFragment({ childs: [text, ...(this.childs ?? [])] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/Setting.jsx\u0022\u003E\u003Ccode\u003Eimport { read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function Setting(props) {\n  return (\n    \u0026lt;div class=\u0026quot;setting\u0026quot;\u0026gt;\n      \u0026lt;div class=\u0026quot;setting__text\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{props.name}\u0026lt;/span\u0026gt;\n        \u0026lt;small\u0026gt;{() =\u0026gt; read(props.hint)}\u0026lt;/small\u0026gt;\n      \u0026lt;/div\u0026gt;\n      {props.childs}\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/Setting.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function Setting(props) {\n  return motifComponent(\u0026quot;div\u0026quot;, (setting) =\u0026gt; {\n    setting.class.add(\u0026quot;setting\u0026quot;);\n    const text = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n      div.class.add(\u0026quot;setting__text\u0026quot;);\n      const name = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.setText(props.name));\n      const hint = motifComponent(\u0026quot;small\u0026quot;, (small) =\u0026gt; small.bindings.text(() =\u0026gt; read(props.hint)));\n      div.controls.add(name, hint);\n    });\n    setting.controls.add(text, ...(props.childs ?? []));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/Setting.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const Setting = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;div class=\u0026quot;setting__text\u0026quot;\u0026gt;\n          \u0026lt;span\u0026gt;{props.name}\u0026lt;/span\u0026gt;\n          \u0026lt;small\u0026gt;{() =\u0026gt; read(props.hint)}\u0026lt;/small\u0026gt;\n        \u0026lt;/div\u0026gt;\n        {this.childs}\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/Setting.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const Setting = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;setting\u0026quot;);\n  },\n\n  view() {\n    const text = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n      div.class.add(\u0026quot;setting__text\u0026quot;);\n      const name = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.setText(props.name));\n      const hint = motifComponent(\u0026quot;small\u0026quot;, (small) =\u0026gt; small.bindings.text(() =\u0026gt; read(props.hint)));\n      div.controls.add(name, hint);\n    });\n    return motifFragment({ childs: [text, ...(this.childs ?? [])] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EProps\u0027a sınıfta \u003Ccode\u003Ethis.props\u003C/code\u003E ile, fonksiyonda parametreyle, Options\u0027ta fabrikanın parametresiyle ulaşılır. TypeScript\u0027te props\u0027un tipi sınıfta \u003Ccode\u003EComponent\u003C/code\u003E\u0027in ikinci generic argümanıdır (\u003Ccode\u003EComponent\u0026lt;HTMLDivElement, SettingProps\u0026gt;\u003C/code\u003E), fonksiyonda ve Options\u0027ta parametrenin tipidir. Bu tip \u003Ccode\u003Ethis.props\u003C/code\u003E\u0027u tipler ve etiketi de, \u003Ccode\u003Enew Setting(…)\u003C/code\u003E çağrısını da denetler: zorunlu bir prop eksikse ya da tipi uymuyorsa derleme hata verir.\u003C/p\u003E\n\u003Cp\u003EArşiv ayarı \u003Ccode\u003ESetting\u003C/code\u003E\u0027i şöyle kullanır. Açıklama arşivdeki not sayısını gösterir, denetim arşivi boşaltan düğmedir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Setting name=\u0026quot;Arşiv\u0026quot; hint={() =\u0026gt; \u0060${this.notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060}\u0026gt;\n  \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm danger\u0026quot; disabled={() =\u0026gt; this.notes.count(\u0026quot;archive\u0026quot;) === 0} onclick={() =\u0026gt; this.notes.emptyArchive()}\u0026gt;\n    Arşivi boşalt\n  \u0026lt;/button\u0026gt;\n\u0026lt;/Setting\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Setting name=\u0026quot;Arşiv\u0026quot; hint={() =\u0026gt; \u0060${notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060}\u0026gt;\n  \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm danger\u0026quot; disabled={() =\u0026gt; notes.count(\u0026quot;archive\u0026quot;) === 0} onclick={() =\u0026gt; notes.emptyArchive()}\u0026gt;\n    Arşivi boşalt\n  \u0026lt;/button\u0026gt;\n\u0026lt;/Setting\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; this.notes.count(\u0026quot;archive\u0026quot;) === 0 });\n  button.class.add(\u0026quot;button--sm danger\u0026quot;);\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.emptyArchive());\n  button.setText(\u0026quot;Arşivi boşalt\u0026quot;);\n});\nnew Setting({\n  name: \u0026quot;Arşiv\u0026quot;,\n  hint: () =\u0026gt; \u0060${this.notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060,\n  childs: [empty],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; this.notes.count(\u0026quot;archive\u0026quot;) === 0 });\n  button.class.add(\u0026quot;button--sm danger\u0026quot;);\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.emptyArchive());\n  button.setText(\u0026quot;Arşivi boşalt\u0026quot;);\n});\nmotifComponent(Setting, {\n  name: \u0026quot;Arşiv\u0026quot;,\n  hint: () =\u0026gt; \u0060${this.notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060,\n  childs: [empty],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; notes.count(\u0026quot;archive\u0026quot;) === 0 });\n  button.class.add(\u0026quot;button--sm danger\u0026quot;);\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.emptyArchive());\n  button.setText(\u0026quot;Arşivi boşalt\u0026quot;);\n});\nmotifComponent(Setting, {\n  name: \u0026quot;Arşiv\u0026quot;,\n  hint: () =\u0026gt; \u0060${notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060,\n  childs: [empty],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Setting name=\u0026quot;Arşiv\u0026quot; hint={() =\u0026gt; \u0060${this.notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060}\u0026gt;\n  \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm danger\u0026quot; disabled={() =\u0026gt; this.notes.count(\u0026quot;archive\u0026quot;) === 0} onclick={() =\u0026gt; this.notes.emptyArchive()}\u0026gt;\n    Arşivi boşalt\n  \u0026lt;/button\u0026gt;\n\u0026lt;/Setting\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Setting name=\u0026quot;Arşiv\u0026quot; hint={() =\u0026gt; \u0060${notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060}\u0026gt;\n  \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm danger\u0026quot; disabled={() =\u0026gt; notes.count(\u0026quot;archive\u0026quot;) === 0} onclick={() =\u0026gt; notes.emptyArchive()}\u0026gt;\n    Arşivi boşalt\n  \u0026lt;/button\u0026gt;\n\u0026lt;/Setting\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; this.notes.count(\u0026quot;archive\u0026quot;) === 0 });\n  button.class.add(\u0026quot;button--sm danger\u0026quot;);\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.emptyArchive());\n  button.setText(\u0026quot;Arşivi boşalt\u0026quot;);\n});\nnew Setting({\n  name: \u0026quot;Arşiv\u0026quot;,\n  hint: () =\u0026gt; \u0060${this.notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060,\n  childs: [empty],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; this.notes.count(\u0026quot;archive\u0026quot;) === 0 });\n  button.class.add(\u0026quot;button--sm danger\u0026quot;);\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.emptyArchive());\n  button.setText(\u0026quot;Arşivi boşalt\u0026quot;);\n});\nmotifComponent(Setting, {\n  name: \u0026quot;Arşiv\u0026quot;,\n  hint: () =\u0026gt; \u0060${this.notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060,\n  childs: [empty],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; notes.count(\u0026quot;archive\u0026quot;) === 0 });\n  button.class.add(\u0026quot;button--sm danger\u0026quot;);\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.emptyArchive());\n  button.setText(\u0026quot;Arşivi boşalt\u0026quot;);\n});\nmotifComponent(Setting, {\n  name: \u0026quot;Arşiv\u0026quot;,\n  hint: () =\u0026gt; \u0060${notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not. Silinen notlar geri gelmez.\u0060,\n  childs: [empty],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Enotes\u003C/code\u003E, sayfanın \u003Ccode\u003EFromService(NotesService)\u003C/code\u003E ile aldığı servistir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022live-props\u0022\u003EDüz değer ve canlı değer\u003C/h3\u003E\n\u003Cp\u003EProps nesnesi reaktif değildir; bileşen yaratılırken bir kez verilir. \u003Ccode\u003Ename=\u0026quot;Arşiv\u0026quot;\u003C/code\u003E düz bir değerdir: bir kez okunur ve yazılır. Sonradan değişecek bir değer fonksiyon olarak verilir. \u003Ccode\u003Ehint={() =\u0026gt; …}\u003C/code\u003E böyledir: arşivdeki not sayısı değiştikçe açıklama da değişir.\u003C/p\u003E\n\u003Cp\u003EAlıcı taraf böyle bir prop\u0027u \u003Ccode\u003EBind\u0026lt;T\u0026gt;\u003C/code\u003E ile tipler ve bir fonksiyonun içinde \u003Ccode\u003Eread(…)\u003C/code\u003E ile okur: \u003Ccode\u003E() =\u0026gt; read(props.hint)\u003C/code\u003E. \u003Ccode\u003Eread\u003C/code\u003E değer fonksiyonsa çağırır, değilse olduğu gibi döndürür; bu yüzden aynı prop\u0027a \u003Ccode\u003Ehint=\u0026quot;Sabit metin\u0026quot;\u003C/code\u003E de verilebilir. Okuma bir fonksiyonun içinde yapıldığı için bağ, fonksiyonun okuduğu reaktif değerleri izler (bkz. \u003Ca href=\u0022/docs/reactivity\u0022\u003EReaktivite\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003EFonksiyon olarak verilmeyen bir ifade, yaratılma anındaki değeriyle kalır: \u003Ccode\u003Ehint={\u0060${notes.count(\u0026quot;archive\u0026quot;)} arşivlenmiş not\u0060}\u003C/code\u003E sayı değişince güncellenmez. Tek istisna koşul ifadesidir: bileşen etiketindeki \u003Ccode\u003Ea ? b : c\u003C/code\u003E ifadesini derleyici kendisi bir fonksiyona sarar, alıcı onu da \u003Ccode\u003Eread\u003C/code\u003E ile okur (bkz. \u003Ca href=\u0022/docs/jsx#attribute-ternary\u0022\u003EÖzniteliklerde ternary\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022callback-props\u0022\u003EGeri çağrı prop\u0027ları\u003C/h3\u003E\n\u003Cp\u003EÇocuktan ebeveyne veri, ebeveynin verdiği bir fonksiyonla gider: ebeveyn \u003Ccode\u003EonChoose={(theme) =\u0026gt; settings.setTheme(theme)}\u003C/code\u003E gibi bir prop verir, çocuk seçim yapılınca \u003Ccode\u003Eprops.onChoose(value)\u003C/code\u003E çağırır. Bu fonksiyon da sıradan bir prop\u0027tur ve çocuğun props\u0027unda kalır. Adı \u003Ccode\u003Eon\u003C/code\u003E ile başlıyorsa, derleyicinin tanıdığı bir DOM olayının adı olmamalıdır (aşağıdaki nota bakın).\u003C/p\u003E\n\u003Cp\u003EVar olan bir bileşeni genişleten alt sınıfta props\u0027un tipi \u003Ccode\u003Edeclare\u003C/code\u003E ile daraltılır: \u003Ccode\u003Edeclare props: DialogProps;\u003C/code\u003E. Bu satır yalnız tiptir, kod üretmez. \u003Ccode\u003Eprops: DialogProps;\u003C/code\u003E ya da \u003Ccode\u003Eprops!: DialogProps;\u003C/code\u003E ise sınıfta yeni bir alan açar ve taban sınıfın kurduğu \u003Ccode\u003Eprops\u003C/code\u003E değerini \u003Ccode\u003Eundefined\u003C/code\u003E ile ezer.\u003C/p\u003E\n\u003Cblockquote\u003E\n\u003Cp\u003ENot: Yaşam döngüsü prop\u0027ları (\u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E… ve \u003Ccode\u003Ex-\u003C/code\u003E biçimleri) ile \u003Ccode\u003EinitializeComponent\u003C/code\u003E kanca olarak kaydedilir ve \u003Ccode\u003Eprops\u003C/code\u003E sözlüğünden ayıklanır. JSX\u0027siz yazımda \u003Ccode\u003EmotifComponent(Bileşen, { … })\u003C/code\u003E ile verilen nesnede de aynıdır; fonksiyon bileşeninde kancalar döndürülen köke uygulanır ve fonksiyonun aldığı \u003Ccode\u003Eprops\u003C/code\u003E\u0027ta yer almaz (bkz. \u003Ca href=\u0022/docs/components#function-tag-directives\u0022\u003EEtikete yazılan direktifler ve kancalar\u003C/a\u003E). \u003Ccode\u003Eref\u003C/code\u003E de bileşene uygulanır ve \u003Ccode\u003Ethis.props\u003C/code\u003E\u0027ta yer almaz. Bileşen etiketinde derleyicinin tanıdığı bir DOM olay adı (\u003Ccode\u003Eonclick\u003C/code\u003E, \u003Ccode\u003EonChange\u003C/code\u003E, \u003Ccode\u003Eoninput:once\u003C/code\u003E) bileşenin elemanına dinleyici olarak bağlanır ve \u003Ccode\u003Eprops\u003C/code\u003E\u0027a hiç ulaşmaz; elemanı olmayan sınıfta bu dinleyici içeriğin üst düzey elemanlarını dinler. \u003Ccode\u003Eonmouseenter\u003C/code\u003E, \u003Ccode\u003Eonpointerdown\u003C/code\u003E, \u003Ccode\u003Eonfocusin\u003C/code\u003E, \u003Ccode\u003Eontransitionend\u003C/code\u003E gibi adları derleyici tanımaz: dinleyici kurulmaz, değer uyarısız olarak \u003Ccode\u003Eprops\u003C/code\u003E\u0027ta kalır; bu olayları bileşen etiketinde \u003Ccode\u003Eon:mouseenter={…}\u003C/code\u003E yazımıyla dinleyin (bkz. \u003Ca href=\u0022/docs/events#context-events\u0022\u003E\u003Ccode\u003Eon:ad\u003C/code\u003E yazımı\u003C/a\u003E). Bunların dışındaki \u003Ccode\u003Eon...\u003C/code\u003E prop\u0027ları (\u003Ccode\u003EonSave\u003C/code\u003E, \u003Ccode\u003EonChoose\u003C/code\u003E, \u003Ccode\u003EonValueChange\u003C/code\u003E) sıradan geri çağrı prop\u0027udur, \u003Ccode\u003Ethis.props\u003C/code\u003E içinde kalır; adı derleyicinin tanıdığı bir olayla çakışmamalıdır (\u003Ccode\u003EonSearch\u003C/code\u003E → \u003Ccode\u003Esearch\u003C/code\u003E olayı, \u003Ccode\u003EMJX002\u003C/code\u003E uyarısı).\u003C/p\u003E\n\u003C/blockquote\u003E\n\u003Ch2 id=\u0022childs\u0022\u003EÇocuk bileşenler (\u003Ccode\u003Echilds\u003C/code\u003E)\u003C/h2\u003E\n\u003Cp\u003EBir bileşenin açılış ve kapanış etiketi arasına yazılan JSX içeriği o bileşene \u003Ccode\u003Echilds\u003C/code\u003E olarak ulaşır (\u003Ccode\u003EComponentBase[]\u003C/code\u003E). JSX\u0027siz yazımda aynı dizi \u003Ccode\u003Echilds\u003C/code\u003E anahtarıyla verilir. \u003Ccode\u003ESetting\u003C/code\u003E arşiv düğmesini böyle alır. Bileşen çocukları görünümün istediği yerine koyar: JSX\u0027te \u003Ccode\u003E{this.childs}\u003C/code\u003E ya da \u003Ccode\u003E{props.childs}\u003C/code\u003E ile, JSX\u0027siz yazımda \u003Ccode\u003Econtrols.add(...)\u003C/code\u003E ile ya da elemansız bir parçanın \u003Ccode\u003Echilds\u003C/code\u003E dizisine ekleyerek.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Echilds\u003C/code\u003E derleyici için rezerve bir isimdir: \u003Ccode\u003E{this.childs}\u003C/code\u003E, \u003Ccode\u003E{props.childs}\u003C/code\u003E ve \u003Ccode\u003E{childs}\u003C/code\u003E biçimlerinin hepsi metin değil \u003Cstrong\u003Eiçerik yerleştirme\u003C/strong\u003E olarak derlenir (\u003Ccode\u003Econtrols.add\u003C/code\u003E). Aynı şey elinizdeki bileşen dizisi için de geçerlidir: \u003Ccode\u003E{[kartA, kartB]}\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003EBirkaç ayrıntı:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EYerleştirme \u003Cstrong\u003Estatiktir\u003C/strong\u003E: \u003Ccode\u003Echilds\u003C/code\u003E kurulum sırasında bir kez gelen düz bir dizidir (\u003Ccode\u003Ethis.childs\u003C/code\u003E, fonksiyon bileşeninde \u003Ccode\u003Eprops.childs\u003C/code\u003E). Bu alana sonradan yeni dizi atamak, diziye eleman eklemek ya da \u003Ccode\u003EsetState()\u003C/code\u003E çağırmak yuvadaki içeriği değiştirmez; \u003Ccode\u003E{() =\u0026gt; this.childs}\u003C/code\u003E biçiminde de böyledir: getter bir \u003Ccode\u003EFrame\u003C/code\u003E üretir ama yalnız içinde okunan reaktif bir değer değişince yeniden çalışır. Çocukların kendi bağları ise canlıdır: \u003Ccode\u003Edisabled={() =\u0026gt; notes.count(\u0026quot;archive\u0026quot;) === 0}\u003C/code\u003E gibi bir bağ, yuva hangi biçimde olursa olsun sayı değişince güncellenir.\u003C/li\u003E\n\u003Cli\u003EKural tektir: \u003Ccode\u003Eview()\u003C/code\u003E yazan sınıf çocuklarını kendisi yerleştirir, \u003Ccode\u003Eview()\u003C/code\u003E yazmayan sınıfta çocuklar içeriğin kendisidir.\nYapıcıya eleman verilmeyen ve \u003Ccode\u003Eview()\u003C/code\u003E yazmayan sınıfta (eleman bildirmeyen sınıf ya da \u003Ccode\u003EComponent\u0026lt;HTMLDivElement\u0026gt;\u003C/code\u003E / \u003Ccode\u003Estatic elementTag\u003C/code\u003E\nile bildirilen eleman) \u003Ccode\u003Echilds\u003C/code\u003E köke otomatik eklenir. \u003Ccode\u003Eview()\u003C/code\u003E yazan sınıfta otomatik ekleme yoktur: çocukları \u003Ccode\u003E{this.childs}\u003C/code\u003E\n(ya da \u003Ccode\u003E{() =\u0026gt; this.childs}\u003C/code\u003E) ile ya da \u003Ccode\u003Econtrols.add(...this.childs)\u003C/code\u003E ile nereye ve ne zaman isterseniz yerleştirirsiniz; çocuklar yalnız\nyerleştirildikleri yuvada kurulur. Yuva \u003Ccode\u003Ex-wait\u003C/code\u003E / \u003Ccode\u003Ex-display\u003C/code\u003E arkasında ya da iç içe bir elemandaysa çocuklar da onunla birlikte bekler;\nçağrının \u003Ccode\u003Eview()\u003C/code\u003E gövdesinde ya da yuvanın kurulum fonksiyonunda olması fark etmez. \u003Ccode\u003Esuper(\u0026quot;div\u0026quot;, props)\u003C/code\u003E\ngibi somut etiket verilen sınıflarda ve etiket adıyla yaratılan bileşende (\u003Ccode\u003Enew Component(\u0026quot;div\u0026quot;, { childs })\u003C/code\u003E) yerleştirmeyi siz yaparsınız. Options nesnesi de aynı kurala uyar: \u003Ccode\u003Eview()\u003C/code\u003E yazmayan Options bileşeninde \u003Ccode\u003Echilds\u003C/code\u003E \u003Ccode\u003Eel\u003C/code\u003E elemanına otomatik eklenir, \u003Ccode\u003Eview()\u003C/code\u003E yazan Options onları kendisi yerleştirir.\u003C/li\u003E\n\u003Cli\u003EHiç yerleştirilmeyen çocuklar (yuva hiç açılmadıysa ya da bileşen onları hiç yerleştirmediyse), onları alan\nbileşen serbest bırakılırken serbest bırakılır.\u003C/li\u003E\n\u003Cli\u003EYalnızca birebir \u003Ccode\u003Echilds\u003C/code\u003E özeldir; \u003Ccode\u003E{childsCount}\u003C/code\u003E gibi isimler normal metin bağlaması olur.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBileşenin alt kontrollerini yönetmek için \u003Ca href=\u0022/docs/component-tree\u0022\u003Econtrols ve Bileşen Ağacı\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"props","text":"props ve bileşenler arası veri akışı","level":2},{"id":"live-props","text":"Düz değer ve canlı değer","level":3},{"id":"callback-props","text":"Geri çağrı prop\u0027ları","level":3},{"id":"childs","text":"Çocuk bileşenler (childs)","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"component-creation","title":"Bileşen Oluşturma"},"next":{"slug":"component-tree","title":"controls ve Bileşen Ağacı"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>Props ve Çocuklar</h1>
+        <p>Bileşenler arası veri akışı: `props`, prop tipleri, canlı prop&#x27;lar ve `childs` ile içerik yerleştirme.</p>
+<h2 id="props"><code>props</code> ve bileşenler arası veri akışı</h2>
+<p>JSX'te bir bileşene yazdığınız öznitelikler o bileşenin <code>props</code>'u olur. JSX'siz yazımda aynı nesne yaratma çağrısına verilir: sınıfta <code>new Bileşen(props)</code>, fonksiyon ve Options bileşeninde <code>motifComponent(Bileşen, props)</code>.</p>
+<p>Örnek, ayarlar sayfasındaki bir satırdır: solda ayarın adı ve altında kısa bir açıklama, sağda ayarı değiştiren denetim. <code>Setting</code> adı ve açıklamayı props ile alır, denetimi çocuk olarak alır:</p>
+<div class="doc-code" data-file="src/parts/Setting.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/Setting.tsx"><code>import { Component, read, type Bind } from &quot;@motifx/core&quot;;
+
+interface SettingProps {
+  name: string;
+  hint: Bind&lt;string&gt;;
+}
+
+export class Setting extends Component&lt;HTMLDivElement, SettingProps&gt; {
+  override onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  }
+
+  override view() {
+    return (
+      &lt;&gt;
+        &lt;div class=&quot;setting__text&quot;&gt;
+          &lt;span&gt;{this.props.name}&lt;/span&gt;
+          &lt;small&gt;{() =&gt; read(this.props.hint)}&lt;/small&gt;
+        &lt;/div&gt;
+        {this.childs}
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/Setting.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment, read, type Bind } from &quot;@motifx/core&quot;;
+
+interface SettingProps {
+  name: string;
+  hint: Bind&lt;string&gt;;
+}
+
+export class Setting extends Component&lt;HTMLDivElement, SettingProps&gt; {
+  static override elementTag = &quot;div&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  }
+
+  override view() {
+    const text = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+      div.class.add(&quot;setting__text&quot;);
+      const name = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.setText(this.props.name));
+      const hint = motifComponent(&quot;small&quot;, (small: ComponentBase) =&gt; small.bindings.text(() =&gt; read(this.props.hint)));
+      div.controls.add(name, hint);
+    });
+    return motifFragment({ childs: [text, ...(this.childs ?? [])] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/Setting.tsx"><code>import { read, type Bind, type ComponentBase } from &quot;@motifx/core&quot;;
+
+interface SettingProps {
+  name: string;
+  hint: Bind&lt;string&gt;;
+  childs?: ComponentBase[];
+}
+
+export function Setting(props: SettingProps) {
+  return (
+    &lt;div class=&quot;setting&quot;&gt;
+      &lt;div class=&quot;setting__text&quot;&gt;
+        &lt;span&gt;{props.name}&lt;/span&gt;
+        &lt;small&gt;{() =&gt; read(props.hint)}&lt;/small&gt;
+      &lt;/div&gt;
+      {props.childs}
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/Setting.ts"><code>import { ComponentBase, motifComponent, read, type Bind } from &quot;@motifx/core&quot;;
+
+interface SettingProps {
+  name: string;
+  hint: Bind&lt;string&gt;;
+  childs?: ComponentBase[];
+}
+
+export function Setting(props: SettingProps) {
+  return motifComponent(&quot;div&quot;, (setting: ComponentBase) =&gt; {
+    setting.class.add(&quot;setting&quot;);
+    const text = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+      div.class.add(&quot;setting__text&quot;);
+      const name = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.setText(props.name));
+      const hint = motifComponent(&quot;small&quot;, (small: ComponentBase) =&gt; small.bindings.text(() =&gt; read(props.hint)));
+      div.controls.add(name, hint);
+    });
+    setting.controls.add(text, ...(props.childs ?? []));
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/Setting.tsx"><code>import { motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+
+interface SettingProps {
+  name: string;
+  hint: Bind&lt;string&gt;;
+}
+
+export const Setting = (props: SettingProps) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;div class=&quot;setting__text&quot;&gt;
+          &lt;span&gt;{props.name}&lt;/span&gt;
+          &lt;small&gt;{() =&gt; read(props.hint)}&lt;/small&gt;
+        &lt;/div&gt;
+        {this.childs}
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/Setting.ts"><code>import { ComponentBase, motifComponent, motifFragment, motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+
+interface SettingProps {
+  name: string;
+  hint: Bind&lt;string&gt;;
+}
+
+export const Setting = (props: SettingProps) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  },
+
+  view() {
+    const text = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+      div.class.add(&quot;setting__text&quot;);
+      const name = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.setText(props.name));
+      const hint = motifComponent(&quot;small&quot;, (small: ComponentBase) =&gt; small.bindings.text(() =&gt; read(props.hint)));
+      div.controls.add(name, hint);
+    });
+    return motifFragment({ childs: [text, ...(this.childs ?? [])] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/Setting.jsx"><code>import { Component, read } from &quot;@motifx/core&quot;;
+
+export class Setting extends Component {
+  static elementTag = &quot;div&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  }
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;div class=&quot;setting__text&quot;&gt;
+          &lt;span&gt;{this.props.name}&lt;/span&gt;
+          &lt;small&gt;{() =&gt; read(this.props.hint)}&lt;/small&gt;
+        &lt;/div&gt;
+        {this.childs}
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/Setting.js"><code>import { Component, motifComponent, motifFragment, read } from &quot;@motifx/core&quot;;
+
+export class Setting extends Component {
+  static elementTag = &quot;div&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  }
+
+  view() {
+    const text = motifComponent(&quot;div&quot;, (div) =&gt; {
+      div.class.add(&quot;setting__text&quot;);
+      const name = motifComponent(&quot;span&quot;, (span) =&gt; span.setText(this.props.name));
+      const hint = motifComponent(&quot;small&quot;, (small) =&gt; small.bindings.text(() =&gt; read(this.props.hint)));
+      div.controls.add(name, hint);
+    });
+    return motifFragment({ childs: [text, ...(this.childs ?? [])] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/Setting.jsx"><code>import { read } from &quot;@motifx/core&quot;;
+
+export function Setting(props) {
+  return (
+    &lt;div class=&quot;setting&quot;&gt;
+      &lt;div class=&quot;setting__text&quot;&gt;
+        &lt;span&gt;{props.name}&lt;/span&gt;
+        &lt;small&gt;{() =&gt; read(props.hint)}&lt;/small&gt;
+      &lt;/div&gt;
+      {props.childs}
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/Setting.js"><code>import { motifComponent, read } from &quot;@motifx/core&quot;;
+
+export function Setting(props) {
+  return motifComponent(&quot;div&quot;, (setting) =&gt; {
+    setting.class.add(&quot;setting&quot;);
+    const text = motifComponent(&quot;div&quot;, (div) =&gt; {
+      div.class.add(&quot;setting__text&quot;);
+      const name = motifComponent(&quot;span&quot;, (span) =&gt; span.setText(props.name));
+      const hint = motifComponent(&quot;small&quot;, (small) =&gt; small.bindings.text(() =&gt; read(props.hint)));
+      div.controls.add(name, hint);
+    });
+    setting.controls.add(text, ...(props.childs ?? []));
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/Setting.jsx"><code>import { motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const Setting = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;div class=&quot;setting__text&quot;&gt;
+          &lt;span&gt;{props.name}&lt;/span&gt;
+          &lt;small&gt;{() =&gt; read(props.hint)}&lt;/small&gt;
+        &lt;/div&gt;
+        {this.childs}
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/Setting.js"><code>import { motifComponent, motifFragment, motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const Setting = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;setting&quot;);
+  },
+
+  view() {
+    const text = motifComponent(&quot;div&quot;, (div) =&gt; {
+      div.class.add(&quot;setting__text&quot;);
+      const name = motifComponent(&quot;span&quot;, (span) =&gt; span.setText(props.name));
+      const hint = motifComponent(&quot;small&quot;, (small) =&gt; small.bindings.text(() =&gt; read(props.hint)));
+      div.controls.add(name, hint);
+    });
+    return motifFragment({ childs: [text, ...(this.childs ?? [])] });
+  },
+});</code></pre>
+</div>
+<p>Props'a sınıfta <code>this.props</code> ile, fonksiyonda parametreyle, Options'ta fabrikanın parametresiyle ulaşılır. TypeScript'te props'un tipi sınıfta <code>Component</code>'in ikinci generic argümanıdır (<code>Component&lt;HTMLDivElement, SettingProps&gt;</code>), fonksiyonda ve Options'ta parametrenin tipidir. Bu tip <code>this.props</code>'u tipler ve etiketi de, <code>new Setting(…)</code> çağrısını da denetler: zorunlu bir prop eksikse ya da tipi uymuyorsa derleme hata verir.</p>
+<p>Arşiv ayarı <code>Setting</code>'i şöyle kullanır. Açıklama arşivdeki not sayısını gösterir, denetim arşivi boşaltan düğmedir:</p>
+<div class="doc-code" data-file="src/pages/SettingsPage.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/pages/SettingsPage.tsx"><code>&lt;Setting name=&quot;Arşiv&quot; hint={() =&gt; `${this.notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`}&gt;
+  &lt;button type=&quot;button&quot; class=&quot;button--sm danger&quot; disabled={() =&gt; this.notes.count(&quot;archive&quot;) === 0} onclick={() =&gt; this.notes.emptyArchive()}&gt;
+    Arşivi boşalt
+  &lt;/button&gt;
+&lt;/Setting&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/SettingsPage.tsx"><code>&lt;Setting name=&quot;Arşiv&quot; hint={() =&gt; `${notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`}&gt;
+  &lt;button type=&quot;button&quot; class=&quot;button--sm danger&quot; disabled={() =&gt; notes.count(&quot;archive&quot;) === 0} onclick={() =&gt; notes.emptyArchive()}&gt;
+    Arşivi boşalt
+  &lt;/button&gt;
+&lt;/Setting&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/pages/SettingsPage.ts"><code>const empty = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; this.notes.count(&quot;archive&quot;) === 0 });
+  button.class.add(&quot;button--sm danger&quot;);
+  button.motif.on(&quot;click&quot;, () =&gt; this.notes.emptyArchive());
+  button.setText(&quot;Arşivi boşalt&quot;);
+});
+new Setting({
+  name: &quot;Arşiv&quot;,
+  hint: () =&gt; `${this.notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`,
+  childs: [empty],
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/pages/SettingsPage.ts"><code>const empty = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; this.notes.count(&quot;archive&quot;) === 0 });
+  button.class.add(&quot;button--sm danger&quot;);
+  button.motif.on(&quot;click&quot;, () =&gt; this.notes.emptyArchive());
+  button.setText(&quot;Arşivi boşalt&quot;);
+});
+motifComponent(Setting, {
+  name: &quot;Arşiv&quot;,
+  hint: () =&gt; `${this.notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`,
+  childs: [empty],
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/SettingsPage.ts"><code>const empty = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; notes.count(&quot;archive&quot;) === 0 });
+  button.class.add(&quot;button--sm danger&quot;);
+  button.motif.on(&quot;click&quot;, () =&gt; notes.emptyArchive());
+  button.setText(&quot;Arşivi boşalt&quot;);
+});
+motifComponent(Setting, {
+  name: &quot;Arşiv&quot;,
+  hint: () =&gt; `${notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`,
+  childs: [empty],
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/pages/SettingsPage.jsx"><code>&lt;Setting name=&quot;Arşiv&quot; hint={() =&gt; `${this.notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`}&gt;
+  &lt;button type=&quot;button&quot; class=&quot;button--sm danger&quot; disabled={() =&gt; this.notes.count(&quot;archive&quot;) === 0} onclick={() =&gt; this.notes.emptyArchive()}&gt;
+    Arşivi boşalt
+  &lt;/button&gt;
+&lt;/Setting&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/SettingsPage.jsx"><code>&lt;Setting name=&quot;Arşiv&quot; hint={() =&gt; `${notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`}&gt;
+  &lt;button type=&quot;button&quot; class=&quot;button--sm danger&quot; disabled={() =&gt; notes.count(&quot;archive&quot;) === 0} onclick={() =&gt; notes.emptyArchive()}&gt;
+    Arşivi boşalt
+  &lt;/button&gt;
+&lt;/Setting&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/pages/SettingsPage.js"><code>const empty = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; this.notes.count(&quot;archive&quot;) === 0 });
+  button.class.add(&quot;button--sm danger&quot;);
+  button.motif.on(&quot;click&quot;, () =&gt; this.notes.emptyArchive());
+  button.setText(&quot;Arşivi boşalt&quot;);
+});
+new Setting({
+  name: &quot;Arşiv&quot;,
+  hint: () =&gt; `${this.notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`,
+  childs: [empty],
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/pages/SettingsPage.js"><code>const empty = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; this.notes.count(&quot;archive&quot;) === 0 });
+  button.class.add(&quot;button--sm danger&quot;);
+  button.motif.on(&quot;click&quot;, () =&gt; this.notes.emptyArchive());
+  button.setText(&quot;Arşivi boşalt&quot;);
+});
+motifComponent(Setting, {
+  name: &quot;Arşiv&quot;,
+  hint: () =&gt; `${this.notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`,
+  childs: [empty],
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/SettingsPage.js"><code>const empty = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; notes.count(&quot;archive&quot;) === 0 });
+  button.class.add(&quot;button--sm danger&quot;);
+  button.motif.on(&quot;click&quot;, () =&gt; notes.emptyArchive());
+  button.setText(&quot;Arşivi boşalt&quot;);
+});
+motifComponent(Setting, {
+  name: &quot;Arşiv&quot;,
+  hint: () =&gt; `${notes.count(&quot;archive&quot;)} arşivlenmiş not. Silinen notlar geri gelmez.`,
+  childs: [empty],
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>notes</code>, sayfanın <code>FromService(NotesService)</code> ile aldığı servistir.</p>
+</div>
+<h3 id="live-props">Düz değer ve canlı değer</h3>
+<p>Props nesnesi reaktif değildir; bileşen yaratılırken bir kez verilir. <code>name=&quot;Arşiv&quot;</code> düz bir değerdir: bir kez okunur ve yazılır. Sonradan değişecek bir değer fonksiyon olarak verilir. <code>hint={() =&gt; …}</code> böyledir: arşivdeki not sayısı değiştikçe açıklama da değişir.</p>
+<p>Alıcı taraf böyle bir prop'u <code>Bind&lt;T&gt;</code> ile tipler ve bir fonksiyonun içinde <code>read(…)</code> ile okur: <code>() =&gt; read(props.hint)</code>. <code>read</code> değer fonksiyonsa çağırır, değilse olduğu gibi döndürür; bu yüzden aynı prop'a <code>hint=&quot;Sabit metin&quot;</code> de verilebilir. Okuma bir fonksiyonun içinde yapıldığı için bağ, fonksiyonun okuduğu reaktif değerleri izler (bkz. <a href="/tr/docs/reactivity">Reaktivite</a>).</p>
+<p>Fonksiyon olarak verilmeyen bir ifade, yaratılma anındaki değeriyle kalır: <code>hint={`${notes.count(&quot;archive&quot;)} arşivlenmiş not`}</code> sayı değişince güncellenmez. Tek istisna koşul ifadesidir: bileşen etiketindeki <code>a ? b : c</code> ifadesini derleyici kendisi bir fonksiyona sarar, alıcı onu da <code>read</code> ile okur (bkz. <a href="/tr/docs/jsx#attribute-ternary">Özniteliklerde ternary</a>).</p>
+<h3 id="callback-props">Geri çağrı prop'ları</h3>
+<p>Çocuktan ebeveyne veri, ebeveynin verdiği bir fonksiyonla gider: ebeveyn <code>onChoose={(theme) =&gt; settings.setTheme(theme)}</code> gibi bir prop verir, çocuk seçim yapılınca <code>props.onChoose(value)</code> çağırır. Bu fonksiyon da sıradan bir prop'tur ve çocuğun props'unda kalır. Adı <code>on</code> ile başlıyorsa, derleyicinin tanıdığı bir DOM olayının adı olmamalıdır (aşağıdaki nota bakın).</p>
+<p>Var olan bir bileşeni genişleten alt sınıfta props'un tipi <code>declare</code> ile daraltılır: <code>declare props: DialogProps;</code>. Bu satır yalnız tiptir, kod üretmez. <code>props: DialogProps;</code> ya da <code>props!: DialogProps;</code> ise sınıfta yeni bir alan açar ve taban sınıfın kurduğu <code>props</code> değerini <code>undefined</code> ile ezer.</p>
+<blockquote>
+<p>Not: Yaşam döngüsü prop'ları (<code>onConfig</code>, <code>onBuilt</code>, <code>onMounted</code>… ve <code>x-</code> biçimleri) ile <code>initializeComponent</code> kanca olarak kaydedilir ve <code>props</code> sözlüğünden ayıklanır. JSX'siz yazımda <code>motifComponent(Bileşen, { … })</code> ile verilen nesnede de aynıdır; fonksiyon bileşeninde kancalar döndürülen köke uygulanır ve fonksiyonun aldığı <code>props</code>'ta yer almaz (bkz. <a href="/tr/docs/components#function-tag-directives">Etikete yazılan direktifler ve kancalar</a>). <code>ref</code> de bileşene uygulanır ve <code>this.props</code>'ta yer almaz. Bileşen etiketinde derleyicinin tanıdığı bir DOM olay adı (<code>onclick</code>, <code>onChange</code>, <code>oninput:once</code>) bileşenin elemanına dinleyici olarak bağlanır ve <code>props</code>'a hiç ulaşmaz; elemanı olmayan sınıfta bu dinleyici içeriğin üst düzey elemanlarını dinler. <code>onmouseenter</code>, <code>onpointerdown</code>, <code>onfocusin</code>, <code>ontransitionend</code> gibi adları derleyici tanımaz: dinleyici kurulmaz, değer uyarısız olarak <code>props</code>'ta kalır; bu olayları bileşen etiketinde <code>on:mouseenter={…}</code> yazımıyla dinleyin (bkz. <a href="/tr/docs/events#context-events"><code>on:ad</code> yazımı</a>). Bunların dışındaki <code>on...</code> prop'ları (<code>onSave</code>, <code>onChoose</code>, <code>onValueChange</code>) sıradan geri çağrı prop'udur, <code>this.props</code> içinde kalır; adı derleyicinin tanıdığı bir olayla çakışmamalıdır (<code>onSearch</code> → <code>search</code> olayı, <code>MJX002</code> uyarısı).</p>
+</blockquote>
+<h2 id="childs">Çocuk bileşenler (<code>childs</code>)</h2>
+<p>Bir bileşenin açılış ve kapanış etiketi arasına yazılan JSX içeriği o bileşene <code>childs</code> olarak ulaşır (<code>ComponentBase[]</code>). JSX'siz yazımda aynı dizi <code>childs</code> anahtarıyla verilir. <code>Setting</code> arşiv düğmesini böyle alır. Bileşen çocukları görünümün istediği yerine koyar: JSX'te <code>{this.childs}</code> ya da <code>{props.childs}</code> ile, JSX'siz yazımda <code>controls.add(...)</code> ile ya da elemansız bir parçanın <code>childs</code> dizisine ekleyerek.</p>
+<p><code>childs</code> derleyici için rezerve bir isimdir: <code>{this.childs}</code>, <code>{props.childs}</code> ve <code>{childs}</code> biçimlerinin hepsi metin değil <strong>içerik yerleştirme</strong> olarak derlenir (<code>controls.add</code>). Aynı şey elinizdeki bileşen dizisi için de geçerlidir: <code>{[kartA, kartB]}</code>.</p>
+<p>Birkaç ayrıntı:</p>
+<ul>
+<li>Yerleştirme <strong>statiktir</strong>: <code>childs</code> kurulum sırasında bir kez gelen düz bir dizidir (<code>this.childs</code>, fonksiyon bileşeninde <code>props.childs</code>). Bu alana sonradan yeni dizi atamak, diziye eleman eklemek ya da <code>setState()</code> çağırmak yuvadaki içeriği değiştirmez; <code>{() =&gt; this.childs}</code> biçiminde de böyledir: getter bir <code>Frame</code> üretir ama yalnız içinde okunan reaktif bir değer değişince yeniden çalışır. Çocukların kendi bağları ise canlıdır: <code>disabled={() =&gt; notes.count(&quot;archive&quot;) === 0}</code> gibi bir bağ, yuva hangi biçimde olursa olsun sayı değişince güncellenir.</li>
+<li>Kural tektir: <code>view()</code> yazan sınıf çocuklarını kendisi yerleştirir, <code>view()</code> yazmayan sınıfta çocuklar içeriğin kendisidir.
+Yapıcıya eleman verilmeyen ve <code>view()</code> yazmayan sınıfta (eleman bildirmeyen sınıf ya da <code>Component&lt;HTMLDivElement&gt;</code> / <code>static elementTag</code>
+ile bildirilen eleman) <code>childs</code> köke otomatik eklenir. <code>view()</code> yazan sınıfta otomatik ekleme yoktur: çocukları <code>{this.childs}</code>
+(ya da <code>{() =&gt; this.childs}</code>) ile ya da <code>controls.add(...this.childs)</code> ile nereye ve ne zaman isterseniz yerleştirirsiniz; çocuklar yalnız
+yerleştirildikleri yuvada kurulur. Yuva <code>x-wait</code> / <code>x-display</code> arkasında ya da iç içe bir elemandaysa çocuklar da onunla birlikte bekler;
+çağrının <code>view()</code> gövdesinde ya da yuvanın kurulum fonksiyonunda olması fark etmez. <code>super(&quot;div&quot;, props)</code>
+gibi somut etiket verilen sınıflarda ve etiket adıyla yaratılan bileşende (<code>new Component(&quot;div&quot;, { childs })</code>) yerleştirmeyi siz yaparsınız. Options nesnesi de aynı kurala uyar: <code>view()</code> yazmayan Options bileşeninde <code>childs</code> <code>el</code> elemanına otomatik eklenir, <code>view()</code> yazan Options onları kendisi yerleştirir.</li>
+<li>Hiç yerleştirilmeyen çocuklar (yuva hiç açılmadıysa ya da bileşen onları hiç yerleştirmediyse), onları alan
+bileşen serbest bırakılırken serbest bırakılır.</li>
+<li>Yalnızca birebir <code>childs</code> özeldir; <code>{childsCount}</code> gibi isimler normal metin bağlaması olur.</li>
+</ul>
+<h2 id="next">Sonraki adım</h2>
+<p>Bileşenin alt kontrollerini yönetmek için <a href="/tr/docs/component-tree">controls ve Bileşen Ağacı</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

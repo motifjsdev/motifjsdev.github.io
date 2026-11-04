@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Servislerin kaydedilip bileşenlerden çözümlenmesi; kayıttan kullanıma tam örnek ve DI hata kodları; JSX ile ve JSX&#x27;siz.">
+    <title>Bağımlılık Enjeksiyonuna Giriş — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/dependency-injection">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/dependency-injection">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/dependency-injection">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/dependency-injection">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/dependency-injection">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Bağımlılık Enjeksiyonuna Giriş">
+    <meta property="og:description" content="Servislerin kaydedilip bileşenlerden çözümlenmesi; kayıttan kullanıma tam örnek ve DI hata kodları; JSX ile ve JSX&#x27;siz.">
+    <script type="application/json" id="doc-data">{"slug":"dependency-injection","locale":"tr","title":"Bağımlılık Enjeksiyonuna Giriş","description":"Servislerin kaydedilip bileşenlerden çözümlenmesi; kayıttan kullanıma tam örnek ve DI hata kodları; JSX ile ve JSX\u0027siz.","category":{"id":"5","title":"Bağımlılık Enjeksiyonu"},"html":"\u003Cp\u003EMotifJS bütünleşik bir bağımlılık enjeksiyonu (DI) sistemi içerir. Servisleri uygulama başlarken kaydeder, sonra bileşenlerden veya başka servislerden çözümlersiniz (resolve). Servis, bileşenler arasında paylaşılan durumu ve işi tutan bir sınıf ya da değerdir. Bileşen servisi kendisi kurmaz, sağlayıcıdan (\u003Ccode\u003EServiceProvider\u003C/code\u003E) ister; sağlayıcı kaydın yaşam süresine göre ya aynı örneği ya da yeni bir örnek verir.\u003C/p\u003E\n\u003Ch2 id=\u0022full-example\u0022\u003EKayıttan kullanıma\u003C/h2\u003E\n\u003Cp\u003EServisler \u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E\u0027ın \u003Ccode\u003Eservices\u003C/code\u003E koleksiyonuna, \u003Ccode\u003Ebuild()\u003C/code\u003E\u0027den önce kaydedilir. \u003Ccode\u003EaddSingleton(token, { useClass })\u003C/code\u003E sınıfı tek örnekli kaydeder; \u003Ccode\u003Estartup: true\u003C/code\u003E verilen singleton bir bileşen istemeden \u003Ccode\u003Eapp.run()\u003C/code\u003E başında oluşturulur. Örnekteki iki kayıt (\u003Ca href=\u0022/docs/components\u0022\u003EBileşenler\u003C/a\u003E sayfasındaki \u003Ccode\u003ENotesService\u003C/code\u003E ve \u003Ccode\u003ESettingsService\u003C/code\u003E):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/main.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBileşen kayıtlı bir servisi sağlayıcıdan alır: sınıf bileşeni ve Options nesnesi \u003Ccode\u003Ethis.getService(token)\u003C/code\u003E, fonksiyon bileşeni \u003Ccode\u003EFromService(token)\u003C/code\u003E kullanır. Servisin reaktif durumu bir getter içinde okunduğunda bağ, durum değiştikçe yenilenir. Örnekteki \u003Ccode\u003EFolderBadge\u003C/code\u003E bir klasördeki not sayısını gösterir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component\u0026lt;HTMLSpanElement, { folder: Folder }\u0026gt; {\n  notes = this.getService(NotesService)!;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  override view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(this.props.folder)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props: { folder: Folder }) {\n  const notes = FromService(NotesService)!;\n  return \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; notes.count(props.folder)}\u0026lt;/span\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props: { folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(props.folder)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/FolderBadge.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component\u0026lt;HTMLSpanElement, { folder: Folder }\u0026gt; {\n  static override elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService)!;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(this.props.folder)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/FolderBadge.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props: { folder: Folder }) {\n  const notes = FromService(NotesService)!;\n  return motifComponent(\u0026quot;span\u0026quot;, (badge: ComponentBase) =\u0026gt; {\n    badge.class.add(\u0026quot;badge\u0026quot;);\n    badge.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; notes.count(props.folder))));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/FolderBadge.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props: { folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(props.folder)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/FolderBadge.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component {\n  static elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService);\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(this.props.folder)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/FolderBadge.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props) {\n  const notes = FromService(NotesService);\n  return \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; notes.count(props.folder)}\u0026lt;/span\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/FolderBadge.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(props.folder)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/FolderBadge.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component {\n  static elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService);\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(this.props.folder)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/FolderBadge.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props) {\n  const notes = FromService(NotesService);\n  return motifComponent(\u0026quot;span\u0026quot;, (badge) =\u0026gt; {\n    badge.class.add(\u0026quot;badge\u0026quot;);\n    badge.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; notes.count(props.folder))));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/FolderBadge.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(props.folder)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBileşen etiketiyle kullanılır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;Tüm notlar \u0026lt;FolderBadge folder=\u0026quot;notes\u0026quot; /\u0026gt;\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Tüm notlar \u0026quot;)), motifComponent(FolderBadge, { folder: \u0026quot;notes\u0026quot; })],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;Tüm notlar \u0026lt;FolderBadge folder=\u0026quot;notes\u0026quot; /\u0026gt;\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Tüm notlar \u0026quot;)), motifComponent(FolderBadge, { folder: \u0026quot;notes\u0026quot; })],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ESingleton kaydedilmiş bir servisi isteyen her bileşen aynı örneği alır. Servis durumunu \u003Ccode\u003Ereactive\u003C/code\u003E bir nesnede tutuyorsa bir bileşenin yaptığı değişiklik (örneğin \u003Ccode\u003Enotes.create()\u003C/code\u003E) o durumu okuyan bütün bağları yeniler; ayrıca bir olay ya da bildirim gerekmez.\u003C/p\u003E\n\u003Cp\u003EFonksiyon bileşeninin \u003Ccode\u003Ethis\u003C/code\u003E\u0027i olmadığı için \u003Ccode\u003EFromService\u003C/code\u003E servisi uygulamanın sağlayıcısından alır; \u003Ccode\u003Escoped\u003C/code\u003E bir servis için bu da güncel gezinmenin handle\u0027ını verir. Ayrıntılar \u003Ca href=\u0022/docs/service-resolution\u0022\u003EServis Çözümleme\u003C/a\u003E, kaydın diğer biçimleri ve \u003Ccode\u003E@Injectable\u003C/code\u003E ile otomatik kayıt \u003Ca href=\u0022/docs/service-registration\u0022\u003EServis Kaydı\u003C/a\u003E, bir servisin ne kadar yaşadığı \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003EYaşam Süreleri ve Kapsamlar\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n\u003Ch2 id=\u0022error-codes\u0022\u003EDI hata kodları\u003C/h2\u003E\n\u003Cp\u003EFırlatılan kodlar çağrıyı yapan satırda hata olarak gelir; uyarılar yalnız geliştirme kipinde konsola ve DevTools uyarı listesine yazılır, \u003Ccode\u003EerrorHandler\u003C/code\u003E dinleyicilerine gitmez (bkz. \u003Ca href=\u0022/docs/error-handling\u0022\u003EHata Yönetimi\u003C/a\u003E). Bütün kodlar \u003Ca href=\u0022/docs/error-codes#di\u0022\u003EHata ve Uyarı Kodları\u003C/a\u003E sayfasındadır:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EKod\u003C/th\u003E\n\u003Cth\u003ENe zaman\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX401\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKayıtlı olmayan bir token \u003Ccode\u003Eget\u003C/code\u003E, \u003Ccode\u003EgetAsync\u003C/code\u003E ya da \u003Ccode\u003Einject\u003C/code\u003E ile istendi; fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX402\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAsync fabrika ya da Promise ile kaydedilmiş bir servis \u003Ccode\u003Eget\u003C/code\u003E ile istendi (\u003Ccode\u003Estartup\u003C/code\u003E servis dahil); fırlatılır, \u003Ccode\u003EgetAsync\u003C/code\u003E kullanılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX403\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKayıt tanımı geçersiz; fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX404\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDöngüsel bağımlılık; fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX405\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİkinci bir \u003Ccode\u003EApplicationBuilder\u003C/code\u003E kuruldu; fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX406\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.run\u003C/code\u003E seçiciyle verilen host elemanını bulamadı; fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX407\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EgetService\u003C/code\u003E bileşen için bir sağlayıcı bulamadı; geliştirme kipinde uyarı, \u003Ccode\u003Enull\u003C/code\u003E döner.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX408\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EgetService\u003C/code\u003E çözümlemesi hata verdi; geliştirme kipinde uyarı, \u003Ccode\u003Enull\u003C/code\u003E döner.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX409\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Einject\u003C/code\u003E bir servis kurulumunun dışında çağrıldı; fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX410\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBir kayıtta birden çok kaynak verildi; geliştirme kipinde uyarı, öncelik \u003Ccode\u003EuseValue\u003C/code\u003E \u0026gt; \u003Ccode\u003EuseFactory\u003C/code\u003E \u0026gt; \u003Ccode\u003EuseClass\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX411\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Edeps\u003C/code\u003E bir dizi değil; geliştirme kipinde uyarı, geçersiz \u003Ccode\u003Edeps\u003C/code\u003E yok sayılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX413\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKurulamayan bir fonksiyon (ok fonksiyonu, \u003Ccode\u003Easync\u003C/code\u003E fonksiyon, nesne metodu) sınıf olarak kaydedildi; kayıt satırında fırlatılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX414\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EFromService\u003C/code\u003E çözümleyemedi; geliştirme kipinde uyarı, \u003Ccode\u003Enull\u003C/code\u003E döner.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX415\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Estartup\u003C/code\u003E singleton olmayan bir kayda verildi; geliştirme kipinde uyarı, servis ilk çözümlemede oluşturulur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EServislerin nasıl kaydedildiğini öğrenmek için \u003Ca href=\u0022/docs/service-registration\u0022\u003EServis Kaydı\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"full-example","text":"Kayıttan kullanıma","level":2},{"id":"error-codes","text":"DI hata kodları","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"navigation-stack","title":"Yığın Gezinmesi"},"next":{"slug":"service-registration","title":"Servis Kaydı"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Bağımlılık Enjeksiyonu</p>
+        <h1>Bağımlılık Enjeksiyonuna Giriş</h1>
+        <p>Servislerin kaydedilip bileşenlerden çözümlenmesi; kayıttan kullanıma tam örnek ve DI hata kodları; JSX ile ve JSX&#x27;siz.</p>
+<p>MotifJS bütünleşik bir bağımlılık enjeksiyonu (DI) sistemi içerir. Servisleri uygulama başlarken kaydeder, sonra bileşenlerden veya başka servislerden çözümlersiniz (resolve). Servis, bileşenler arasında paylaşılan durumu ve işi tutan bir sınıf ya da değerdir. Bileşen servisi kendisi kurmaz, sağlayıcıdan (<code>ServiceProvider</code>) ister; sağlayıcı kaydın yaşam süresine göre ya aynı örneği ya da yeni bir örnek verir.</p>
+<h2 id="full-example">Kayıttan kullanıma</h2>
+<p>Servisler <code>Application.CreateBuilder()</code>'ın <code>services</code> koleksiyonuna, <code>build()</code>'den önce kaydedilir. <code>addSingleton(token, { useClass })</code> sınıfı tek örnekli kaydeder; <code>startup: true</code> verilen singleton bir bileşen istemeden <code>app.run()</code> başında oluşturulur. Örnekteki iki kayıt (<a href="/tr/docs/components">Bileşenler</a> sayfasındaki <code>NotesService</code> ve <code>SettingsService</code>):</p>
+<div class="doc-code" data-file="src/main.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/main.ts"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/main.js"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();</code></pre>
+</div>
+<p>Bileşen kayıtlı bir servisi sağlayıcıdan alır: sınıf bileşeni ve Options nesnesi <code>this.getService(token)</code>, fonksiyon bileşeni <code>FromService(token)</code> kullanır. Servisin reaktif durumu bir getter içinde okunduğunda bağ, durum değiştikçe yenilenir. Örnekteki <code>FolderBadge</code> bir klasördeki not sayısını gösterir:</p>
+<div class="doc-code" data-file="src/parts/FolderBadge.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/FolderBadge.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component&lt;HTMLSpanElement, { folder: Folder }&gt; {
+  notes = this.getService(NotesService)!;
+
+  override onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  override view() {
+    return &lt;&gt;{() =&gt; this.notes.count(this.props.folder)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/FolderBadge.tsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props: { folder: Folder }) {
+  const notes = FromService(NotesService)!;
+  return &lt;span class=&quot;badge&quot;&gt;{() =&gt; notes.count(props.folder)}&lt;/span&gt;;
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/FolderBadge.tsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props: { folder: Folder }) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; this.notes.count(props.folder)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/FolderBadge.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component&lt;HTMLSpanElement, { folder: Folder }&gt; {
+  static override elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService)!;
+
+  override onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  override view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; this.notes.count(this.props.folder)));
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/FolderBadge.ts"><code>import { ComponentBase, FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props: { folder: Folder }) {
+  const notes = FromService(NotesService)!;
+  return motifComponent(&quot;span&quot;, (badge: ComponentBase) =&gt; {
+    badge.class.add(&quot;badge&quot;);
+    badge.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; notes.count(props.folder))));
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/FolderBadge.ts"><code>import { ComponentBase, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props: { folder: Folder }) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; this.notes.count(props.folder)));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/FolderBadge.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component {
+  static elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService);
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  view() {
+    return &lt;&gt;{() =&gt; this.notes.count(this.props.folder)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/FolderBadge.jsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props) {
+  const notes = FromService(NotesService);
+  return &lt;span class=&quot;badge&quot;&gt;{() =&gt; notes.count(props.folder)}&lt;/span&gt;;
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/FolderBadge.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; this.notes.count(props.folder)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/FolderBadge.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component {
+  static elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService);
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; this.notes.count(this.props.folder)));
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/FolderBadge.js"><code>import { FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props) {
+  const notes = FromService(NotesService);
+  return motifComponent(&quot;span&quot;, (badge) =&gt; {
+    badge.class.add(&quot;badge&quot;);
+    badge.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; notes.count(props.folder))));
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/FolderBadge.js"><code>import { motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; this.notes.count(props.folder)));
+  },
+});</code></pre>
+</div>
+<p>Bileşen etiketiyle kullanılır:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/MainLayout.tsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;Tüm notlar &lt;FolderBadge folder=&quot;notes&quot; /&gt;&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/MainLayout.ts"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Tüm notlar &quot;)), motifComponent(FolderBadge, { folder: &quot;notes&quot; })],
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/MainLayout.jsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;Tüm notlar &lt;FolderBadge folder=&quot;notes&quot; /&gt;&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/MainLayout.js"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Tüm notlar &quot;)), motifComponent(FolderBadge, { folder: &quot;notes&quot; })],
+});</code></pre>
+</div>
+<p>Singleton kaydedilmiş bir servisi isteyen her bileşen aynı örneği alır. Servis durumunu <code>reactive</code> bir nesnede tutuyorsa bir bileşenin yaptığı değişiklik (örneğin <code>notes.create()</code>) o durumu okuyan bütün bağları yeniler; ayrıca bir olay ya da bildirim gerekmez.</p>
+<p>Fonksiyon bileşeninin <code>this</code>'i olmadığı için <code>FromService</code> servisi uygulamanın sağlayıcısından alır; <code>scoped</code> bir servis için bu da güncel gezinmenin handle'ını verir. Ayrıntılar <a href="/tr/docs/service-resolution">Servis Çözümleme</a>, kaydın diğer biçimleri ve <code>@Injectable</code> ile otomatik kayıt <a href="/tr/docs/service-registration">Servis Kaydı</a>, bir servisin ne kadar yaşadığı <a href="/tr/docs/service-lifetimes">Yaşam Süreleri ve Kapsamlar</a> sayfasındadır.</p>
+<h2 id="error-codes">DI hata kodları</h2>
+<p>Fırlatılan kodlar çağrıyı yapan satırda hata olarak gelir; uyarılar yalnız geliştirme kipinde konsola ve DevTools uyarı listesine yazılır, <code>errorHandler</code> dinleyicilerine gitmez (bkz. <a href="/tr/docs/error-handling">Hata Yönetimi</a>). Bütün kodlar <a href="/tr/docs/error-codes#di">Hata ve Uyarı Kodları</a> sayfasındadır:</p>
+<table>
+<thead>
+<tr>
+<th>Kod</th>
+<th>Ne zaman</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MJX401</code></td>
+<td>Kayıtlı olmayan bir token <code>get</code>, <code>getAsync</code> ya da <code>inject</code> ile istendi; fırlatılır.</td>
+</tr>
+<tr>
+<td><code>MJX402</code></td>
+<td>Async fabrika ya da Promise ile kaydedilmiş bir servis <code>get</code> ile istendi (<code>startup</code> servis dahil); fırlatılır, <code>getAsync</code> kullanılır.</td>
+</tr>
+<tr>
+<td><code>MJX403</code></td>
+<td>Kayıt tanımı geçersiz; fırlatılır.</td>
+</tr>
+<tr>
+<td><code>MJX404</code></td>
+<td>Döngüsel bağımlılık; fırlatılır.</td>
+</tr>
+<tr>
+<td><code>MJX405</code></td>
+<td>İkinci bir <code>ApplicationBuilder</code> kuruldu; fırlatılır.</td>
+</tr>
+<tr>
+<td><code>MJX406</code></td>
+<td><code>app.run</code> seçiciyle verilen host elemanını bulamadı; fırlatılır.</td>
+</tr>
+<tr>
+<td><code>MJX407</code></td>
+<td><code>getService</code> bileşen için bir sağlayıcı bulamadı; geliştirme kipinde uyarı, <code>null</code> döner.</td>
+</tr>
+<tr>
+<td><code>MJX408</code></td>
+<td><code>getService</code> çözümlemesi hata verdi; geliştirme kipinde uyarı, <code>null</code> döner.</td>
+</tr>
+<tr>
+<td><code>MJX409</code></td>
+<td><code>inject</code> bir servis kurulumunun dışında çağrıldı; fırlatılır.</td>
+</tr>
+<tr>
+<td><code>MJX410</code></td>
+<td>Bir kayıtta birden çok kaynak verildi; geliştirme kipinde uyarı, öncelik <code>useValue</code> &gt; <code>useFactory</code> &gt; <code>useClass</code>.</td>
+</tr>
+<tr>
+<td><code>MJX411</code></td>
+<td><code>deps</code> bir dizi değil; geliştirme kipinde uyarı, geçersiz <code>deps</code> yok sayılır.</td>
+</tr>
+<tr>
+<td><code>MJX413</code></td>
+<td>Kurulamayan bir fonksiyon (ok fonksiyonu, <code>async</code> fonksiyon, nesne metodu) sınıf olarak kaydedildi; kayıt satırında fırlatılır.</td>
+</tr>
+<tr>
+<td><code>MJX414</code></td>
+<td><code>FromService</code> çözümleyemedi; geliştirme kipinde uyarı, <code>null</code> döner.</td>
+</tr>
+<tr>
+<td><code>MJX415</code></td>
+<td><code>startup</code> singleton olmayan bir kayda verildi; geliştirme kipinde uyarı, servis ilk çözümlemede oluşturulur.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Sonraki adım</h2>
+<p>Servislerin nasıl kaydedildiğini öğrenmek için <a href="/tr/docs/service-registration">Servis Kaydı</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

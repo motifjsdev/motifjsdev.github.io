@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Sınıf, fonksiyon ve Options API bileşenleri, JSX ile ve JSX&#x27;siz; kök eleman, `view()` ve `controls`, sınıf üyelerinin adları.">
+    <title>Bileşenler — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/components">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/components">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/components">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/components">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/components">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Bileşenler">
+    <meta property="og:description" content="Sınıf, fonksiyon ve Options API bileşenleri, JSX ile ve JSX&#x27;siz; kök eleman, `view()` ve `controls`, sınıf üyelerinin adları.">
+    <script type="application/json" id="doc-data">{"slug":"components","locale":"tr","title":"Bileşenler","description":"Sınıf, fonksiyon ve Options API bileşenleri, JSX ile ve JSX\u0027siz; kök eleman, \u0060view()\u0060 ve \u0060controls\u0060, sınıf üyelerinin adları.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Cp\u003EMotifJS\u0027te bir bileşen, bir DOM elemanını ve onun alt kontrollerini (\u003Ccode\u003Econtrols\u003C/code\u003E) yöneten bir nesnedir. Her bileşen \u003Ccode\u003EComponentBase\u003C/code\u003E\u0027ten türer; günlük kullanımda somut \u003Ccode\u003EComponent\u003C/code\u003E sınıfını kullanırsınız. Görünüm JSX ile yazılır ya da aynı çağrılarla doğrudan kurulur; bu sayfadaki her örnek JSX ile ve JSX\u0027siz, TypeScript ve JavaScript olarak verilir.\u003C/p\u003E\n\u003Cp\u003EBileşen yazmanın \u003Cstrong\u003Eüç stili\u003C/strong\u003E vardır: sınıf, fonksiyon ve Options API. Üçü de aynı çekirdeği kullanır; birini seçmek tercihe bağlıdır. Örnekler bir not uygulamasından alınmıştır; şu servis hepsinde ortaktır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface Note {\n  id: number;\n  title: string;\n  body: string;\n  pinned: boolean;\n  archived: boolean;\n  createdAt: number;\n  updatedAt: number;\n}\n\nexport type Folder = \u0026quot;notes\u0026quot; | \u0026quot;pinned\u0026quot; | \u0026quot;archive\u0026quot;;\n\nexport const FOLDERS: Record\u0026lt;Folder, { title: string; empty: string }\u0026gt; = {\n  notes: { title: \u0026quot;Tüm notlar\u0026quot;, empty: \u0026quot;Henüz not yok. İlkini siz yazın.\u0026quot; },\n  pinned: { title: \u0026quot;Sabitlenenler\u0026quot;, empty: \u0026quot;Sabitlenmiş not yok. Üstte kalmasını istediğiniz notu sabitleyin.\u0026quot; },\n  archive: { title: \u0026quot;Arşiv\u0026quot;, empty: \u0026quot;Arşiv boş.\u0026quot; },\n};\n\nconst inFolder: Record\u0026lt;Folder, (note: Note) =\u0026gt; boolean\u0026gt; = {\n  notes: (note) =\u0026gt; !note.archived,\n  pinned: (note) =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived,\n  archive: (note) =\u0026gt; note.archived,\n};\n\nexport class NotesService {\n  readonly state = reactive({ items: [] as Note[] });\n  private nextId = this.state.items.length \u002B 1;\n\n  list(folder: Folder, query = \u0026quot;\u0026quot;): Note[] {\n    const q = query.trim().toLowerCase();\n    return this.state.items\n      .filter(inFolder[folder])\n      .filter((note) =\u0026gt; !q || \u0060${note.title}\\n${note.body}\u0060.toLowerCase().includes(q))\n      .sort((a, b) =\u0026gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);\n  }\n\n  count(folder: Folder): number {\n    return this.state.items.filter(inFolder[folder]).length;\n  }\n\n  find(id: number | string): Note | undefined {\n    const wanted = Number(id);\n    return this.state.items.find((note) =\u0026gt; note.id === wanted);\n  }\n\n  create(): Note {\n    const now = Date.now();\n    this.state.items.unshift({ id: this.nextId\u002B\u002B, title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });\n    return this.state.items[0];\n  }\n\n  touch(note: Note): void {\n    note.updatedAt = Date.now();\n  }\n\n  togglePin(note: Note): void {\n    note.pinned = !note.pinned;\n    this.touch(note);\n  }\n\n  archive(note: Note): void {\n    note.archived = true;\n    note.pinned = false;\n    this.touch(note);\n  }\n\n  restore(note: Note): void {\n    note.archived = false;\n    this.touch(note);\n  }\n\n  remove(id: number): boolean {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    this.state.items.splice(index, 1);\n    return true;\n  }\n\n  emptyArchive(): number {\n    let removed = 0;\n    for (let i = this.state.items.length - 1; i \u0026gt;= 0; i--) {\n      if (!this.state.items[i].archived) continue;\n      this.state.items.splice(i, 1);\n      removed\u002B\u002B;\n    }\n    return removed;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/notes.js\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const FOLDERS = {\n  notes: { title: \u0026quot;Tüm notlar\u0026quot;, empty: \u0026quot;Henüz not yok. İlkini siz yazın.\u0026quot; },\n  pinned: { title: \u0026quot;Sabitlenenler\u0026quot;, empty: \u0026quot;Sabitlenmiş not yok. Üstte kalmasını istediğiniz notu sabitleyin.\u0026quot; },\n  archive: { title: \u0026quot;Arşiv\u0026quot;, empty: \u0026quot;Arşiv boş.\u0026quot; },\n};\n\nconst inFolder = {\n  notes: (note) =\u0026gt; !note.archived,\n  pinned: (note) =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived,\n  archive: (note) =\u0026gt; note.archived,\n};\n\nexport class NotesService {\n  state = reactive({ items: [] });\n  nextId = this.state.items.length \u002B 1;\n\n  list(folder, query = \u0026quot;\u0026quot;) {\n    const q = query.trim().toLowerCase();\n    return this.state.items\n      .filter(inFolder[folder])\n      .filter((note) =\u0026gt; !q || \u0060${note.title}\\n${note.body}\u0060.toLowerCase().includes(q))\n      .sort((a, b) =\u0026gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);\n  }\n\n  count(folder) {\n    return this.state.items.filter(inFolder[folder]).length;\n  }\n\n  find(id) {\n    const wanted = Number(id);\n    return this.state.items.find((note) =\u0026gt; note.id === wanted);\n  }\n\n  create() {\n    const now = Date.now();\n    this.state.items.unshift({ id: this.nextId\u002B\u002B, title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });\n    return this.state.items[0];\n  }\n\n  touch(note) {\n    note.updatedAt = Date.now();\n  }\n\n  togglePin(note) {\n    note.pinned = !note.pinned;\n    this.touch(note);\n  }\n\n  archive(note) {\n    note.archived = true;\n    note.pinned = false;\n    this.touch(note);\n  }\n\n  restore(note) {\n    note.archived = false;\n    this.touch(note);\n  }\n\n  remove(id) {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    this.state.items.splice(index, 1);\n    return true;\n  }\n\n  emptyArchive() {\n    let removed = 0;\n    for (let i = this.state.items.length - 1; i \u0026gt;= 0; i--) {\n      if (!this.state.items[i].archived) continue;\n      this.state.items.splice(i, 1);\n      removed\u002B\u002B;\n    }\n    return removed;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022class-components\u0022\u003E1. Sınıf bileşenleri\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EComponent\u003C/code\u003E\u0027ten türetir, \u003Ccode\u003Eview()\u003C/code\u003E metodunda görünümü döndürürsünüz. \u003Ccode\u003ENoteEmptyPage\u003C/code\u003E, bir klasörde açık not yokken gösterilen sayfadır. Sınıf bileşeninin olağan parçalarını kullanır: servisi alan bir alan (\u003Ccode\u003Ethis.getService\u003C/code\u003E), router\u0027a erişim (\u003Ccode\u003EuseNavigation()\u003C/code\u003E), türetilmiş değer için bir getter, bir metot, \u003Ccode\u003EonConfig\u003C/code\u003E kancası ve \u003Ccode\u003Eview()\u003C/code\u003E. \u003Ccode\u003Ethis.context.navigate\u003C/code\u003E uygulamanın router\u0027ıyla gezinir. Prop alan ve prop tipini bildiren sınıf bileşeni \u003Ca href=\u0022/docs/component-props#props\u0022\u003EProps ve Çocuklar\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteEmptyPage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NoteEmptyPage.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NoteEmptyPage extends Component {\n  notes = this.getService(NotesService)!;\n  nav = useNavigation();\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  }\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  override onConfig() {\n    const wide = globalThis.matchMedia?.(\u0026quot;(min-width: 40rem)\u0026quot;).matches ?? false;\n    const first = this.notes.list(this.folder)[0];\n    if (wide \u0026amp;\u0026amp; first) this.context.navigate(\u0060/${this.folder}/${first.id}\u0060, { replace: true });\n  }\n\n  override view() {\n    return (\n      \u0026lt;div class=\u0026quot;pane\u0026quot;\u0026gt;\n        \u0026lt;div class=\u0026quot;toolbar\u0026quot;\u0026gt;\n          \u0026lt;span class=\u0026quot;toolbar__spacer\u0026quot;\u0026gt;\u0026lt;/span\u0026gt;\n        \u0026lt;/div\u0026gt;\n        \u0026lt;div class=\u0026quot;placeholder\u0026quot;\u0026gt;\n          \u0026lt;p\u0026gt;{() =\u0026gt; (this.notes.count(this.folder) ? \u0026quot;Bir not seçin ya da yenisini yazın.\u0026quot; : FOLDERS[this.folder].empty)}\u0026lt;/p\u0026gt;\n          \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;accent\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;\n            Yeni not\n          \u0026lt;/button\u0026gt;\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NoteEmptyPage.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NoteEmptyPage extends Component {\n  notes = this.getService(NotesService)!;\n  nav = useNavigation();\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  }\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  override onConfig() {\n    const wide = globalThis.matchMedia?.(\u0026quot;(min-width: 40rem)\u0026quot;).matches ?? false;\n    const first = this.notes.list(this.folder)[0];\n    if (wide \u0026amp;\u0026amp; first) this.context.navigate(\u0060/${this.folder}/${first.id}\u0060, { replace: true });\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (pane: ComponentBase) =\u0026gt; {\n      pane.class.add(\u0026quot;pane\u0026quot;);\n      const toolbar = motifComponent(\u0026quot;div\u0026quot;, (bar: ComponentBase) =\u0026gt; {\n        bar.class.add(\u0026quot;toolbar\u0026quot;);\n        bar.controls.add(motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.class.add(\u0026quot;toolbar__spacer\u0026quot;)));\n      });\n      const placeholder = motifComponent(\u0026quot;div\u0026quot;, (box: ComponentBase) =\u0026gt; {\n        box.class.add(\u0026quot;placeholder\u0026quot;);\n        const message = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n          p.bindings.text(() =\u0026gt; (this.notes.count(this.folder) ? \u0026quot;Bir not seçin ya da yenisini yazın.\u0026quot; : FOLDERS[this.folder].empty));\n        });\n        const newNote = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot; });\n          button.class.add(\u0026quot;accent\u0026quot;);\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Yeni not\u0026quot;)));\n        });\n        box.controls.add(message, newNote);\n      });\n      pane.controls.add(toolbar, placeholder);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NoteEmptyPage.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NoteEmptyPage extends Component {\n  notes = this.getService(NotesService);\n  nav = useNavigation();\n\n  get folder() {\n    return this.nav.meta.folder;\n  }\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  onConfig() {\n    const wide = globalThis.matchMedia?.(\u0026quot;(min-width: 40rem)\u0026quot;).matches ?? false;\n    const first = this.notes.list(this.folder)[0];\n    if (wide \u0026amp;\u0026amp; first) this.context.navigate(\u0060/${this.folder}/${first.id}\u0060, { replace: true });\n  }\n\n  view() {\n    return (\n      \u0026lt;div class=\u0026quot;pane\u0026quot;\u0026gt;\n        \u0026lt;div class=\u0026quot;toolbar\u0026quot;\u0026gt;\n          \u0026lt;span class=\u0026quot;toolbar__spacer\u0026quot;\u0026gt;\u0026lt;/span\u0026gt;\n        \u0026lt;/div\u0026gt;\n        \u0026lt;div class=\u0026quot;placeholder\u0026quot;\u0026gt;\n          \u0026lt;p\u0026gt;{() =\u0026gt; (this.notes.count(this.folder) ? \u0026quot;Bir not seçin ya da yenisini yazın.\u0026quot; : FOLDERS[this.folder].empty)}\u0026lt;/p\u0026gt;\n          \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;accent\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;\n            Yeni not\n          \u0026lt;/button\u0026gt;\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NoteEmptyPage.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NoteEmptyPage extends Component {\n  notes = this.getService(NotesService);\n  nav = useNavigation();\n\n  get folder() {\n    return this.nav.meta.folder;\n  }\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  onConfig() {\n    const wide = globalThis.matchMedia?.(\u0026quot;(min-width: 40rem)\u0026quot;).matches ?? false;\n    const first = this.notes.list(this.folder)[0];\n    if (wide \u0026amp;\u0026amp; first) this.context.navigate(\u0060/${this.folder}/${first.id}\u0060, { replace: true });\n  }\n\n  view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (pane) =\u0026gt; {\n      pane.class.add(\u0026quot;pane\u0026quot;);\n      const toolbar = motifComponent(\u0026quot;div\u0026quot;, (bar) =\u0026gt; {\n        bar.class.add(\u0026quot;toolbar\u0026quot;);\n        bar.controls.add(motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.class.add(\u0026quot;toolbar__spacer\u0026quot;)));\n      });\n      const placeholder = motifComponent(\u0026quot;div\u0026quot;, (box) =\u0026gt; {\n        box.class.add(\u0026quot;placeholder\u0026quot;);\n        const message = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n          p.bindings.text(() =\u0026gt; (this.notes.count(this.folder) ? \u0026quot;Bir not seçin ya da yenisini yazın.\u0026quot; : FOLDERS[this.folder].empty));\n        });\n        const newNote = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot; });\n          button.class.add(\u0026quot;accent\u0026quot;);\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Yeni not\u0026quot;)));\n        });\n        box.controls.add(message, newNote);\n      });\n      pane.controls.add(toolbar, placeholder);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ESınıf bileşeni JSX\u0027te etiketle (\u003Ccode\u003E\u0026lt;NoteEmptyPage /\u0026gt;\u003C/code\u003E), JSX\u0027siz \u003Ccode\u003Enew NoteEmptyPage()\u003C/code\u003E ya da \u003Ccode\u003EmotifComponent(NoteEmptyPage)\u003C/code\u003E ile kurulur.\u003C/p\u003E\n\u003Ch3 id=\u0022root-element\u0022\u003EKök eleman\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Esuper(...)\u003C/code\u003E\u0027a geçtiğiniz değer bileşenin \u003Cstrong\u003Ekendi elemanını\u003C/strong\u003E (\u003Ccode\u003Ethis.element\u003C/code\u003E) belirler:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Esuper(\u0027div\u0027)\u003C/code\u003E → bileşenin elemanı bir \u003Ccode\u003E\u0026lt;div\u0026gt;\u003C/code\u003E olur. SVG elemanı için \u003Ccode\u003Esuper(\u0027svg\u0027, { options: { isSvg: true } })\u003C/code\u003E yazılır; eleman SVG ad alanında üretilir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Esuper(node)\u003C/code\u003E → elinizdeki bir DOM düğümü (\u003Ccode\u003Edocument.createElement(\u0027canvas\u0027)\u003C/code\u003E, sayfadaki mevcut bir eleman) bileşenin elemanı olur; bileşen onu yaratmaz, sahiplenir (bkz. \u003Ca href=\u0022/docs/wrapping-libraries\u0022\u003EÜçüncü parti sarmalama\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003EArgüman vermezseniz (\u003Ccode\u003Esuper()\u003C/code\u003E), bileşenin \u003Cstrong\u003Ekendi elemanı yoktur\u003C/strong\u003E (fragment): \u003Ccode\u003Ethis.element\u003C/code\u003E bir yorum işaretçisidir, \u003Ccode\u003Eview()\u003C/code\u003E\u0027in döndürdüğü içerik açılış/kapanış işaretçilerinin (\u003Ccode\u003E\u0026lt;!--[--\u0026gt;\u003C/code\u003E … \u003Ccode\u003E\u0026lt;!--]--\u0026gt;\u003C/code\u003E) arasına yerleşir. Elemansız bileşende \u003Ccode\u003Eprops\u003C/code\u003E ilk argüman olarak da verilebilir: \u003Ccode\u003Esuper(props)\u003C/code\u003E ile \u003Ccode\u003Esuper(undefined, props)\u003C/code\u003E aynıdır; yapıcı yazmayan bir sınıfta \u003Ccode\u003Enew Bileşen(props)\u003C/code\u003E da böyle çalışır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EComponent\u0026lt;HTMLDivElement\u0026gt;\u003C/code\u003E gibi bir eleman generic\u0027i verdiyseniz \u003Ccode\u003E@motifx/compiler\u003C/code\u003E sınıfa \u003Ccode\u003Estatic elementTag = \u0027div\u0027\u003C/code\u003E ekler; bu durumda \u003Ccode\u003Esuper()\u003C/code\u003E fragment değil, o türde gerçek bir eleman üretir (bkz. \u003Ca href=\u0022/docs/wrapping-libraries#root-element\u0022\u003EKök element\u003C/a\u003E). \u003Ccode\u003EComponent\u0026lt;SVGSVGElement\u0026gt;\u003C/code\u003E gibi SVG generic\u0027lerinde derleyici ayrıca \u003Ccode\u003Estatic elementNamespace = \u0027http://www.w3.org/2000/svg\u0027\u003C/code\u003E ekler; eleman SVG ad alanında üretilir. İki statik alanı elle de yazabilirsiniz; yazılmışsa derleyici dokunmaz. Vite eklentisi bunu \u003Ccode\u003E.ts\u003C/code\u003E, \u003Ccode\u003E.mts\u003C/code\u003E ve \u003Ccode\u003E.cts\u003C/code\u003E dosyalarında da yapar; JSX\u0027siz sınıfta da eleman türü generic\u0027ten gelir. Eklentinin işlemediği bir dosyada (örneğin yalnız \u003Ccode\u003Etsc\u003C/code\u003E ile derlenen bir kütüphanede) \u003Ccode\u003Estatic elementTag = \u0027ul\u0027\u003C/code\u003E yazın ya da \u003Ccode\u003Esuper(\u0027ul\u0027)\u003C/code\u003E çağırın. JavaScript\u0027te generic olmadığından eleman her zaman \u003Ccode\u003Estatic elementTag\u003C/code\u003E ya da \u003Ccode\u003Esuper(\u0027ul\u0027)\u003C/code\u003E ile bildirilir.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EYapıcıya hazır bir bileşen örneği verilirse (\u003Ccode\u003Enew Component(örnek)\u003C/code\u003E) yeni bileşen oluşturulmaz, o örnek döner.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eview()\u003C/code\u003E içeriği döndürür, bileşenin elemanını değil. \u003Ccode\u003ENoteEmptyPage\u003C/code\u003E gibi eleman bildirmeyen sınıfta (\u003Ccode\u003Eextends Component\u003C/code\u003E, generic yok) \u003Ccode\u003Eview()\u003C/code\u003E\u0027in döndürdüğü \u003Ccode\u003E\u0026lt;div class=\u0026quot;pane\u0026quot;\u0026gt;\u003C/code\u003E bileşenin elemanı değil, içeriğin ilk ve tek çocuğudur. Bu yüzden etikete yazılan \u003Ccode\u003Eclass\u003C/code\u003E ve \u003Ccode\u003Eid\u003C/code\u003E ile sınıf içindeki \u003Ccode\u003Ethis.class.add\u003C/code\u003E ve \u003Ccode\u003Ethis.attr.add\u003C/code\u003E hiçbir elemana ulaşmaz; etikete yazılan \u003Ccode\u003Eonclick\u003C/code\u003E ve sınıf içindeki \u003Ccode\u003Ethis.motif.on\u003C/code\u003E ise içeriğin üst düzey elemanlarını dinler (bkz. \u003Ca href=\u0022/docs/events\u0022\u003EOlaylar\u003C/a\u003E); \u003Ccode\u003Ex-display\u003C/code\u003E ve \u003Ccode\u003Ethis.motif.hide()\u003C/code\u003E işaretçiler arasındaki içeriği gizler. Sınıf ve öznitelik doğrudan \u003Ccode\u003Ediv\u003C/code\u003E\u0027e yazılır. Bileşenin kendisine eleman vermek için somut bir etiket bildirin (\u003Ccode\u003EComponent\u0026lt;HTMLUListElement\u0026gt;\u003C/code\u003E generic\u0027i, \u003Ccode\u003Estatic elementTag\u003C/code\u003E ya da \u003Ccode\u003Esuper(\u0027ul\u0027)\u003C/code\u003E): etikete yazılan ortak öznitelikler (\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003Erole\u003C/code\u003E, \u003Ccode\u003Earia-*\u003C/code\u003E, \u003Ccode\u003Edata-*\u003C/code\u003E …; bkz. \u003Ca href=\u0022/docs/jsx#attribute-fallthrough\u0022\u003Eortak öznitelikler\u003C/a\u003E), DOM olayları (\u003Ccode\u003Eonclick\u003C/code\u003E …) ve \u003Ccode\u003Ethis.class\u003C/code\u003E bu elemana uygulanır; \u003Ccode\u003Etitle\u003C/code\u003E gibi diğer prop\u0027lar yalnız \u003Ccode\u003Ethis.props\u003C/code\u003E\u0027ta kalır. \u003Ccode\u003Eview()\u003C/code\u003E yalnız içeriği döndürür; aşağıdaki \u003Ccode\u003EActivityLog\u003C/code\u003E böyledir. \u003Ccode\u003EComponent\u0026lt;HTMLDivElement\u0026gt;\u003C/code\u003E ile \u003Ccode\u003Eview()\u003C/code\u003E\u0027de ayrıca bir \u003Ccode\u003E\u0026lt;div\u0026gt;\u003C/code\u003E döndürmek iç içe iki \u003Ccode\u003Ediv\u003C/code\u003E üretir.\u003C/p\u003E\n\u003Ch3 id=\u0022view-or-controls\u0022\u003E\u003Ccode\u003Eview()\u003C/code\u003E mi, yoksa doğrudan \u003Ccode\u003Econtrols\u003C/code\u003E mü?\u003C/h3\u003E\n\u003Cp\u003Eİçerik iki yolla gelir:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003Eview()\u003C/code\u003E döndür:\u003C/strong\u003E Bileşen build edilirken \u003Ccode\u003Eview()\u003C/code\u003E bir kez çağrılır ve sonucu alt kontrol olarak eklenir.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003Econtrols.add(...)\u003C/code\u003E çağır:\u003C/strong\u003E Kurulmuş bir bileşende çocuk o anda kurulup yerine konur; henüz kurulmamış bir bileşende sahibiyle birlikte kurulur. İkisi birlikte de kullanılır: \u003Ccode\u003Eview()\u003C/code\u003E iskeleti kurar, sonradan gelen içerik \u003Ccode\u003Econtrols.add\u003C/code\u003E ile eklenir.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003E\u003Ccode\u003EActivityLog\u003C/code\u003E elemanı \u003Ccode\u003E\u0026lt;ul\u0026gt;\u003C/code\u003E olan bir bileşendir; \u003Ccode\u003Eview()\u003C/code\u003E yazmaz, her \u003Ccode\u003EnoteSaved\u003C/code\u003E uygulama olayında (verisi kaydedilen notun başlığı) listeye bir satır ekler. \u003Ccode\u003Ethis.context.on\u003C/code\u003E aboneliği bileşen serbest bırakılınca kendiliğinden kalkar (bkz. \u003Ca href=\u0022/docs/component-state#context\u0022\u003EBağlam\u003C/a\u003E):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/ActivityLog.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/ActivityLog.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ActivityLog extends Component\u0026lt;HTMLUListElement\u0026gt; {\n  override onConfigured() {\n    this.class.add(\u0026quot;log\u0026quot;);\n  }\n\n  override onBuilt() {\n    this.context.on(\u0026quot;noteSaved\u0026quot;, (title?: string) =\u0026gt; {\n      this.controls.add(\u0026lt;li\u0026gt;{title?.trim() || \u0026quot;Adsız\u0026quot;} kaydedildi\u0026lt;/li\u0026gt;);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/ActivityLog.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ActivityLog extends Component\u0026lt;HTMLUListElement\u0026gt; {\n  static override elementTag = \u0026quot;ul\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;log\u0026quot;);\n  }\n\n  override onBuilt() {\n    this.context.on(\u0026quot;noteSaved\u0026quot;, (title?: string) =\u0026gt; {\n      const row = motifComponent(\u0026quot;li\u0026quot;, (li: ComponentBase) =\u0026gt; {\n        li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0060${title?.trim() || \u0026quot;Adsız\u0026quot;} kaydedildi\u0060)));\n      });\n      this.controls.add(row);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/ActivityLog.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ActivityLog extends Component {\n  static elementTag = \u0026quot;ul\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;log\u0026quot;);\n  }\n\n  onBuilt() {\n    this.context.on(\u0026quot;noteSaved\u0026quot;, (title) =\u0026gt; {\n      this.controls.add(\u0026lt;li\u0026gt;{title?.trim() || \u0026quot;Adsız\u0026quot;} kaydedildi\u0026lt;/li\u0026gt;);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/ActivityLog.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ActivityLog extends Component {\n  static elementTag = \u0026quot;ul\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;log\u0026quot;);\n  }\n\n  onBuilt() {\n    this.context.on(\u0026quot;noteSaved\u0026quot;, (title) =\u0026gt; {\n      const row = motifComponent(\u0026quot;li\u0026quot;, (li) =\u0026gt; {\n        li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0060${title?.trim() || \u0026quot;Adsız\u0026quot;} kaydedildi\u0060)));\n      });\n      this.controls.add(row);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022member-names\u0022\u003ESınıf üyelerinin adları\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EComponentBase\u003C/code\u003E\u0027in üyeleri sınıf bileşeninde aynı adla tanımlanmaz; tanımlanırsa MotifJS\u0027in kullandığı üye gizlenir. Ayrılmış adlar:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EMetotlar ve erişiciler:\u003C/strong\u003E \u003Ccode\u003Ebuild\u003C/code\u003E, \u003Ccode\u003Edispose\u003C/code\u003E, \u003Ccode\u003EdisposeAsync\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003EsetText\u003C/code\u003E, \u003Ccode\u003EsetState\u003C/code\u003E, \u003Ccode\u003EreState\u003C/code\u003E, \u003Ccode\u003Eusing\u003C/code\u003E, \u003Ccode\u003EdoWork\u003C/code\u003E, \u003Ccode\u003EgetService\u003C/code\u003E, \u003Ccode\u003EuseModel\u003C/code\u003E, \u003Ccode\u003E$\u003C/code\u003E, \u003Ccode\u003Econtext\u003C/code\u003E, \u003Ccode\u003Esiblings\u003C/code\u003E, \u003Ccode\u003EserviceProvider\u003C/code\u003E, \u003Ccode\u003EisWait\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EMotifJS\u0027in kurduğu nesneler ve durum alanları:\u003C/strong\u003E \u003Ccode\u003Eelement\u003C/code\u003E, \u003Ccode\u003Eprops\u003C/code\u003E, \u003Ccode\u003Econtrols\u003C/code\u003E, \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E, \u003Ccode\u003Ebindings\u003C/code\u003E, \u003Ccode\u003Emotif\u003C/code\u003E, \u003Ccode\u003Eparent\u003C/code\u003E, \u003Ccode\u003Echilds\u003C/code\u003E, \u003Ccode\u003EisBuilt\u003C/code\u003E, \u003Ccode\u003EisInitialized\u003C/code\u003E, \u003Ccode\u003EisDisposed\u003C/code\u003E, \u003Ccode\u003EisConfigured\u003C/code\u003E, \u003Ccode\u003EisVisible\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003E\u003Ccode\u003Eview()\u003C/code\u003E, yaşam döngüsü kancaları (\u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonDisposing\u003C/code\u003E …), \u003Ccode\u003EinitializeComponent\u003C/code\u003E ve \u003Ccode\u003EonElementCreating\u003C/code\u003E sınıfta yazılmak için vardır. \u003Ccode\u003Ebuild\u003C/code\u003E, \u003Ccode\u003Edispose\u003C/code\u003E ya da \u003Ccode\u003Estyle\u003C/code\u003E gibi bir metodu genişletmek gerekiyorsa override \u003Ccode\u003Esuper.build(...)\u003C/code\u003E, \u003Ccode\u003Esuper.dispose(...)\u003C/code\u003E … çağırır. Ezilmiş \u003Ccode\u003Edispose()\u003C/code\u003E yalnız bileşenin kendi \u003Ccode\u003Edispose()\u003C/code\u003E\u0027u çağrıldığında çalışır (elle ya da \u003Ccode\u003Econtrols.remove\u003C/code\u003E/\u003Ccode\u003Eclear\u003C/code\u003E ile). Bir üst bileşenle birlikte serbest bırakılan bileşende çerçeve çocuğun \u003Ccode\u003Edispose()\u003C/code\u003E\u0027unu çağırmaz, kendi iç yolunu kullanır; bu durumda yalnız \u003Ccode\u003EonDisposing\u003C/code\u003E/\u003Ccode\u003EonDisposed\u003C/code\u003E kancaları ve \u003Ccode\u003EsetDisposable\u003C/code\u003E kayıtları çalışır. Serbest bırakılırken yapılacak işi bu yüzden kancalara ya da \u003Ccode\u003Ethis.motif.setDisposable(...)\u003C/code\u003E\u0027a yazın. Çerçeve işlemleri (\u003Ccode\u003Eshow\u003C/code\u003E, \u003Ccode\u003Ehide\u003C/code\u003E, \u003Ccode\u003Eon\u003C/code\u003E, \u003Ccode\u003Eoff\u003C/code\u003E, \u003Ccode\u003Etrigger\u003C/code\u003E, \u003Ccode\u003EsetDisposable\u003C/code\u003E …) \u003Ccode\u003Ethis.motif\u003C/code\u003E altındadır; bu adlar sınıfta serbestçe kullanılır.\u003C/p\u003E\n\u003Cp\u003ETypeScript tipi açıkça uyumsuz olan çakışmayı derlemede bildirir (\u003Ccode\u003Estyle = \u0027red\u0027\u003C/code\u003E → TS2416). Erişici olan adlarla — \u003Ccode\u003Emotif\u003C/code\u003E, \u003Ccode\u003Econtrols\u003C/code\u003E, \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E, \u003Ccode\u003Ebindings\u003C/code\u003E, \u003Ccode\u003Econtext\u003C/code\u003E, \u003Ccode\u003Esiblings\u003C/code\u003E, \u003Ccode\u003EserviceProvider\u003C/code\u003E, \u003Ccode\u003EisWait\u003C/code\u003E ve durum alanları (\u003Ccode\u003EisVisible\u003C/code\u003E …) — alan tanımlamak, tipi ne olursa olsun (\u003Ccode\u003Eany\u003C/code\u003E ya da \u003Ccode\u003Edeclare\u003C/code\u003E ile de) TS2610 hatası verir. Metot adlarında ise \u003Ccode\u003Eany\u003C/code\u003E tipli alanı ve uyumlu imzalı metodu (\u003Ccode\u003Ebuild() {}\u003C/code\u003E, parametresiz \u003Ccode\u003Estyle()\u003C/code\u003E) bildirmez. \u003Ccode\u003E@motifx/compiler\u003C/code\u003E derleme sırasında \u003Ccode\u003Esuper\u003C/code\u003E\u0027a her yolda ulaşmayan override\u0027ı \u003Ccode\u003EMJX015\u003C/code\u003E uyarısıyla bildirir: hiç çağırmayan, erken \u003Ccode\u003Ereturn\u003C/code\u003E, tek dallı \u003Ccode\u003Eif\u003C/code\u003E, döngü ya da \u003Ccode\u003Ecatch\u003C/code\u003E yüzünden bir yolda atlayan üye (\u003Ca href=\u0022/docs/jsx#compile-time-diagnostics\u0022\u003Ederleme uyarıları\u003C/a\u003E; \u003Ccode\u003Emotif-lint\u003C/code\u003E de aynı kuralı çalıştırır). Geliştirme modunda (\u003Ccode\u003Eapp.useDevelopment()\u003C/code\u003E) MotifJS bileşen yerleştirilirken bu çakışmaları sınıf başına bir kez \u003Ccode\u003EMJX128\u003C/code\u003E uyarısıyla bildirir: \u003Ccode\u003Esuper\u003C/code\u003E çağırmayan override, metodu ya da erişiciyi gizleyen örnek alanı, \u003Ccode\u003Econtrols\u003C/code\u003E / \u003Ccode\u003Eattr\u003C/code\u003E / \u003Ccode\u003Eclass\u003C/code\u003E / \u003Ccode\u003Ebindings\u003C/code\u003E / \u003Ccode\u003Emotif\u003C/code\u003E / \u003Ccode\u003Eelement\u003C/code\u003E / \u003Ccode\u003Eparent\u003C/code\u003E yerine konan başka bir değer. Durum alanları (\u003Ccode\u003EisVisible\u003C/code\u003E …) ve \u003Ccode\u003Eprops\u003C/code\u003E çalışma anında denetlenmez.\u003C/p\u003E\n\u003Ch2 id=\u0022function-components\u0022\u003E2. Fonksiyon bileşenleri\u003C/h2\u003E\n\u003Cp\u003EBir fonksiyon, tek bir bileşen döndürür. State ve olay yakalayıcıları closure ile tutulur. \u003Ccode\u003ENoteRow\u003C/code\u003E listedeki bir satırdır: notu ve klasörü \u003Ccode\u003Eprops\u003C/code\u003E ile alır, açık notu router\u0027ın parametresinden okur.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteRow(props: { note: Note; folder: Folder }) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n  return (\n    \u0026lt;a\n      rel=\u0026quot;router\u0026quot;\n      href={\u0060/${folder}/${note.id}\u0060}\n      class={() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060}\n      aria-current={() =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null)}\n    \u0026gt;\n      \u0026lt;b\u0026gt;\n        \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Sabitlendi\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Adsız\u0026quot;}\u0026lt;/span\u0026gt;\n      \u0026lt;/b\u0026gt;\n      \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n      \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;Metin yok\u0026quot;}\u0026lt;/p\u0026gt;\n    \u0026lt;/a\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteRow(props: { note: Note; folder: Folder }) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n\n  return motifComponent(\u0026quot;a\u0026quot;, (row: ComponentBase) =\u0026gt; {\n    row.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null) });\n    row.class.add(() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b: ComponentBase) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i: ComponentBase) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Sabitlendi\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Adsız\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time: ComponentBase) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;Metin yok\u0026quot;));\n\n    row.controls.add(title, when, preview);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteRow.jsx\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteRow(props) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n  return (\n    \u0026lt;a\n      rel=\u0026quot;router\u0026quot;\n      href={\u0060/${folder}/${note.id}\u0060}\n      class={() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060}\n      aria-current={() =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null)}\n    \u0026gt;\n      \u0026lt;b\u0026gt;\n        \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Sabitlendi\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Adsız\u0026quot;}\u0026lt;/span\u0026gt;\n      \u0026lt;/b\u0026gt;\n      \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n      \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;Metin yok\u0026quot;}\u0026lt;/p\u0026gt;\n    \u0026lt;/a\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteRow(props) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n\n  return motifComponent(\u0026quot;a\u0026quot;, (row) =\u0026gt; {\n    row.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null) });\n    row.class.add(() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Sabitlendi\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Adsız\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;Metin yok\u0026quot;));\n\n    row.controls.add(title, when, preview);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EFonksiyon bileşeni JSX\u0027te sınıflarla aynı şekilde, etiket olarak kullanılır; JSX\u0027siz yazımda etiketin karşılığı \u003Ccode\u003EmotifComponent(NoteRow, props)\u003C/code\u003E\u0027tur. Fonksiyon doğrudan da çağrılabilir; bu sıradan bir fonksiyon çağrısıdır ve yalnız fonksiyonun kendi okuduğu prop\u0027larda (\u003Ccode\u003Enote\u003C/code\u003E, \u003Ccode\u003Efolder\u003C/code\u003E) aynı sonucu verir: \u003Ccode\u003Eref\u003C/code\u003E, ortak öznitelikler (\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E …) ve \u003Ccode\u003Eoptions\u003C/code\u003E gibi çerçeve prop\u0027larını köke yalnız \u003Ccode\u003EmotifComponent\u003C/code\u003E uygular (etikete yazılan direktifler ve kancalar için bkz. \u003Ca href=\u0022#function-tag-directives\u0022\u003Eaşağısı\u003C/a\u003E):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={this.folder} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={folder()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: this.folder });\nNoteRow({ note, folder: this.folder });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: folder() });\nNoteRow({ note, folder: folder() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={this.folder} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={folder()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: this.folder });\nNoteRow({ note, folder: this.folder });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: folder() });\nNoteRow({ note, folder: folder() });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Efolder()\u003C/code\u003E klasörü döndüren yerel fonksiyondur.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022function-root\u0022\u003EKök bileşen\u003C/h3\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Ethis\u003C/code\u003E yoktur. Sınıfta \u003Ccode\u003Ethis.motif\u003C/code\u003E, \u003Ccode\u003Ethis.context\u003C/code\u003E, \u003Ccode\u003Ethis.class\u003C/code\u003E ya da \u003Ccode\u003Ethis.bindings\u003C/code\u003E ile yapılan işler fonksiyon bileşeninde kök bileşen üzerinden yapılır. Kök bileşen, fonksiyonun döndürdüğü kök elemanın bileşenidir; o da bir \u003Ccode\u003EComponent\u003C/code\u003E\u0027tir. Ona kök elemana yazılan bir kancanın aldığı ilk argümanla (\u003Ccode\u003EonConfig={(root) =\u0026gt; …}\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E) ya da kök elemana yazılan \u003Ccode\u003Eref\u003C/code\u003E ile ulaşılır; döndürülen JSX ifadesi bir değişkene atanırsa (\u003Ccode\u003Econst root = \u0026lt;section\u0026gt;…\u0026lt;/section\u0026gt;\u003C/code\u003E) o değişken de kök bileşendir. JSX\u0027siz yazımda kök, \u003Ccode\u003EmotifComponent(etiket, …)\u003C/code\u003E çağrısının döndürdüğü bileşendir ve kancalar aynı çağrının nesne biçimine yazılır.\u003C/p\u003E\n\u003Ch3 id=\u0022function-lifecycle\u0022\u003EYaşam döngüsüne bağlanma\u003C/h3\u003E\n\u003Cp\u003EFonksiyon bileşenlerinde yaşam döngüsü kancalarına, döndürülen kök elemana \u003Cstrong\u003Eprop\u003C/strong\u003E olarak bağlanabilirsiniz (bkz. \u003Ca href=\u0022/docs/lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E). JSX\u0027siz yazımda kancalar \u003Ccode\u003EmotifComponent\u003C/code\u003E\u0027in nesne biçimine yazılır. \u003Ccode\u003ESearchField\u003C/code\u003E DOM\u0027a girince odağı alır; \u003Ccode\u003Eoninput\u003C/code\u003E işleyicisi iki parametreli yazıldığı için ilk parametresi alanın bileşenidir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/SearchField.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/SearchField.tsx\u0022\u003E\u003Ccode\u003Eexport function SearchField(props: { onQueryChange: (query: string) =\u0026gt; void }) {\n  return (\n    \u0026lt;input\n      type=\u0026quot;search\u0026quot;\n      placeholder=\u0026quot;Notlarda ara\u0026quot;\n      onMounted={(field) =\u0026gt; field.element.focus()}\n      oninput={(field, e) =\u0026gt; props.onQueryChange(field.element.value)}\n    /\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/SearchField.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function SearchField(props: { onQueryChange: (query: string) =\u0026gt; void }) {\n  return motifComponent(\u0026quot;input\u0026quot;, {\n    onMounted: (field: ComponentBase) =\u0026gt; field.element.focus(),\n    initializeComponent: (field: ComponentBase) =\u0026gt; {\n      field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; });\n      field.motif.on(\u0026quot;input\u0026quot;, (sender: ComponentBase, e: Event) =\u0026gt; props.onQueryChange(sender.element.value));\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/SearchField.jsx\u0022\u003E\u003Ccode\u003Eexport function SearchField(props) {\n  return (\n    \u0026lt;input\n      type=\u0026quot;search\u0026quot;\n      placeholder=\u0026quot;Notlarda ara\u0026quot;\n      onMounted={(field) =\u0026gt; field.element.focus()}\n      oninput={(field, e) =\u0026gt; props.onQueryChange(field.element.value)}\n    /\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/SearchField.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function SearchField(props) {\n  return motifComponent(\u0026quot;input\u0026quot;, {\n    onMounted: (field) =\u0026gt; field.element.focus(),\n    initializeComponent: (field) =\u0026gt; {\n      field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; });\n      field.motif.on(\u0026quot;input\u0026quot;, (sender, e) =\u0026gt; props.onQueryChange(sender.element.value));\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022function-tag-directives\u0022\u003EEtikete yazılan direktifler ve kancalar\u003C/h3\u003E\n\u003Cp\u003EFonksiyon bileşeninin \u003Cstrong\u003Eetiketine\u003C/strong\u003E yazdığınız çerçeve prop\u0027ları — \u003Ccode\u003Ex-display\u003C/code\u003E, \u003Ccode\u003Ex-wait\u003C/code\u003E gibi\ndirektifler, \u003Ccode\u003EonConfig\u003C/code\u003E/\u003Ccode\u003EonBuilt\u003C/code\u003E/\u003Ccode\u003Ex-mounted\u003C/code\u003E/\u003Ccode\u003Ex-initializing\u003C/code\u003E gibi yaşam döngüsü kancaları (\u003Ccode\u003Ex-\u003C/code\u003E ve \u003Ccode\u003Ex:\u003C/code\u003E yazımlarıyla),\n\u003Ccode\u003EinitializeComponent\u003C/code\u003E ve \u003Ccode\u003Eref\u003C/code\u003E — fonksiyonun döndürdüğü köke uygulanır. JSX\u0027siz yazımda aynı anahtarlar \u003Ccode\u003EmotifComponent\u003C/code\u003E\u0027e verilen nesneye yazılır; \u003Ccode\u003Ex-display\u003C/code\u003E ve \u003Ccode\u003Ex-wait\u003C/code\u003E yerine \u003Ccode\u003Epreconfig\u003C/code\u003E içinde \u003Ccode\u003Ebindings.display\u003C/code\u003E / \u003Ccode\u003Ebindings.wait\u003C/code\u003E de kullanılabilir. Bu anahtarlar ve \u003Ccode\u003Eref\u003C/code\u003E fonksiyona giden \u003Ccode\u003Eprops\u003C/code\u003E\u0027ta yer almaz, sınıfın \u003Ccode\u003Ethis.props\u003C/code\u003E\u0027unda da yer almaz:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow x-display={() =\u0026gt; !note.archived} note={note} folder={this.folder} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow x-display={() =\u0026gt; !note.archived} note={note} folder={folder()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, {\n  note,\n  folder: this.folder,\n  preconfig: (row: ComponentBase) =\u0026gt; row.bindings.display(() =\u0026gt; !note.archived),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, {\n  note,\n  folder: folder(),\n  preconfig: (row: ComponentBase) =\u0026gt; row.bindings.display(() =\u0026gt; !note.archived),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow x-display={() =\u0026gt; !note.archived} note={note} folder={this.folder} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow x-display={() =\u0026gt; !note.archived} note={note} folder={folder()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, {\n  note,\n  folder: this.folder,\n  preconfig: (row) =\u0026gt; row.bindings.display(() =\u0026gt; !note.archived),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, {\n  note,\n  folder: folder(),\n  preconfig: (row) =\u0026gt; row.bindings.display(() =\u0026gt; !note.archived),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EFonksiyonun bunun için hiçbir şey yapması gerekmez; prop\u0027ları köküne aktarması da\ngerekmez. (Fonksiyon prop\u0027ları köküne zaten aktarıyorsa — \u003Ccode\u003EmotifComponent(\u0027div\u0027, props)\u003C/code\u003E\n— çerçeve prop\u0027ları ikinci kez uygulanmaz.) Sınıf bileşenlerinde aynı prop\u0027lar yapıcıya geçer.\u003C/p\u003E\n\u003Ch2 id=\u0022options-components\u0022\u003E3. Options API bileşenleri\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EmotifOptions\u003C/code\u003E ile sarılmış bir nesne döndürürsünüz: \u003Ccode\u003Eel\u003C/code\u003E, \u003Ccode\u003Edata\u003C/code\u003E, \u003Ccode\u003Eview\u003C/code\u003E ve isteğe bağlı \u003Ccode\u003Ector\u003C/code\u003E. \u003Ccode\u003EmotifOptions\u003C/code\u003E nesneyi olduğu gibi döndürür; yalnız TypeScript\u0027e metotların içindeki \u003Ccode\u003Ethis\u003C/code\u003E\u0027in bileşen olduğunu söyler, böylece \u003Ccode\u003Ethis.class\u003C/code\u003E, \u003Ccode\u003Ethis.motif\u003C/code\u003E, \u003Ccode\u003Ethis.props\u003C/code\u003E strict kipte derlenir ve editör tamamlar. Nesneyi döndüren fonksiyon bir bileşen gibi kullanılır: JSX\u0027te (\u003Ccode\u003E\u0026lt;NoteFilter /\u0026gt;\u003C/code\u003E), JSX\u0027siz \u003Ccode\u003EmotifComponent(NoteFilter, props)\u003C/code\u003E ile, rota \u003Ccode\u003Econtrol\u003C/code\u003E\u0027ü olarak ve \u003Ccode\u003ELazy\u003C/code\u003E ile yüklenen \u003Ccode\u003Edefault\u003C/code\u003E olarak. \u003Ccode\u003ENoteFilter\u003C/code\u003E bir arama kutusudur; başlangıç sorgusunu \u003Ccode\u003Ector\u003C/code\u003E içinde fabrikanın \u003Ccode\u003Eprops\u003C/code\u003E parametresinden alır. Fabrikanın parametresi etiketin prop tipini de bildirir (\u003Ccode\u003E\u0026lt;NoteFilter initial=\u0026quot;…\u0026quot; /\u0026gt;\u003C/code\u003E):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFilter.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteFilter.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFilter = (props?: { initial?: string }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ query: \u0026quot;\u0026quot; }),\n\n  view() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; x-model={() =\u0026gt; this.data.query} /\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; x-display={() =\u0026gt; this.data.query !== \u0026quot;\u0026quot;} onclick={() =\u0026gt; (this.data.query = \u0026quot;\u0026quot;)}\u0026gt;Temizle\u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n\n  ctor() {\n    if (props?.initial) this.data.query = props.initial;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteFilter.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFilter = (props?: { initial?: string }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ query: \u0026quot;\u0026quot; }),\n\n  view() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    const field = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; });\n      input.bindings.model(() =\u0026gt; this.data.query, (value: string) =\u0026gt; (this.data.query = value));\n    });\n    const clear = motifComponent(\u0026quot;button\u0026quot;, {\n      preconfig: (button: ComponentBase) =\u0026gt; button.bindings.display(() =\u0026gt; this.data.query !== \u0026quot;\u0026quot;),\n      initializeComponent: (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.data.query = \u0026quot;\u0026quot;));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Temizle\u0026quot;)));\n      },\n    });\n    return [field, clear];\n  },\n\n  ctor() {\n    if (props?.initial) this.data.query = props.initial;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteFilter.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFilter = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ query: \u0026quot;\u0026quot; }),\n\n  view() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; x-model={() =\u0026gt; this.data.query} /\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; x-display={() =\u0026gt; this.data.query !== \u0026quot;\u0026quot;} onclick={() =\u0026gt; (this.data.query = \u0026quot;\u0026quot;)}\u0026gt;Temizle\u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n\n  ctor() {\n    if (props?.initial) this.data.query = props.initial;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteFilter.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFilter = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ query: \u0026quot;\u0026quot; }),\n\n  view() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    const field = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; });\n      input.bindings.model(() =\u0026gt; this.data.query, (value) =\u0026gt; (this.data.query = value));\n    });\n    const clear = motifComponent(\u0026quot;button\u0026quot;, {\n      preconfig: (button) =\u0026gt; button.bindings.display(() =\u0026gt; this.data.query !== \u0026quot;\u0026quot;),\n      initializeComponent: (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.data.query = \u0026quot;\u0026quot;));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Temizle\u0026quot;)));\n      },\n    });\n    return [field, clear];\n  },\n\n  ctor() {\n    if (props?.initial) this.data.query = props.initial;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteFilter initial=\u0026quot;toplantı\u0026quot; /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003EmotifComponent(NoteFilter, { initial: \u0026quot;toplantı\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteFilter initial=\u0026quot;toplantı\u0026quot; /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003EmotifComponent(NoteFilter, { initial: \u0026quot;toplantı\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ENesnenin \u003Ccode\u003Eel\u003C/code\u003E dışındaki tüm alanları bileşene kopyalanır; \u003Ccode\u003Ector\u003C/code\u003E kopyalanmaz, bileşen oluşturulduktan hemen sonra (\u003Ccode\u003Ebuild()\u003C/code\u003E/\u003Ccode\u003Eview()\u003C/code\u003E\u0027den önce) \u003Cstrong\u003Ebir kez\u003C/strong\u003E çağrılır: \u003Ccode\u003Ethis\u003C/code\u003E bileşendir, tek argümanı etikete yazılan \u003Ccode\u003Eprops\u003C/code\u003E\u0027tur. İçinde fırlatılan hata bileşen oluşturmayı bozmaz, merkezî hata yöneticisine \u003Ccode\u003EMJX122\u003C/code\u003E olarak raporlanır. Etikete yazılan \u003Ccode\u003Eprops\u003C/code\u003E ayrıca \u003Ccode\u003Ethis.props\u003C/code\u003E olarak da erişilebilir. \u003Ccode\u003Eel\u003C/code\u003E bir etiket adı (\u003Ccode\u003E\u0027div\u0027\u003C/code\u003E), bir DOM düğümü ya da başka bir bileşen (sınıf, fonksiyon, Options nesnesi) olabilir; bileşen verilirse onun kökü kullanılır.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eel\u003C/code\u003E bileşenin kendi elemanıdır, \u003Ccode\u003Eview()\u003C/code\u003E içeriği döndürür: JSX\u0027te bir fragment (\u003Ccode\u003E\u0026lt;\u0026gt;…\u0026lt;/\u0026gt;\u003C/code\u003E), JSX\u0027siz bir dizi. Köke sınıf vermek için \u003Ccode\u003Eview()\u003C/code\u003E içinde (ya da \u003Ccode\u003Ector\u003C/code\u003E/\u003Ccode\u003EonConfigured\u003C/code\u003E\u0027da) \u003Ccode\u003Ethis.class.add(...)\u003C/code\u003E, öznitelik vermek için \u003Ccode\u003Ethis.attr.add({ ... })\u003C/code\u003E yazılır. \u003Ccode\u003Eview()\u003C/code\u003E\u0027de \u003Ccode\u003Eel\u003C/code\u003E ile aynı etikette bir sarmalayıcı döndürmek iç içe iki eleman üretir.\u003C/p\u003E\n\u003Cp\u003ENesnedeki \u003Ccode\u003Eget\u003C/code\u003E/\u003Ccode\u003Eset\u003C/code\u003E erişicileri bileşene erişici olarak taşınır: kopyalama sırasında çalışmaz, her okumada \u003Ccode\u003Ethis\u003C/code\u003E bileşen olarak yeniden çalışır. Türetilmiş değeri bir erişiciyle (\u003Ccode\u003Eget visible() { … }\u003C/code\u003E) ya da bir metotla (\u003Ccode\u003Evisible() { … }\u003C/code\u003E) yazabilirsiniz. Nesneye yazılan yaşam döngüsü metotlarından \u003Ccode\u003EonConfigured\u003C/code\u003E, \u003Ccode\u003EonBuilding\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E, \u003Ccode\u003EonVisibilityChanged\u003C/code\u003E, \u003Ccode\u003EonActivated\u003C/code\u003E, \u003Ccode\u003EonDeactivated\u003C/code\u003E, \u003Ccode\u003EonDisposing\u003C/code\u003E, \u003Ccode\u003EonDisposed\u003C/code\u003E çalışır. \u003Ccode\u003EonInitializing\u003C/code\u003E ve \u003Ccode\u003EonInitialized\u003C/code\u003E çalışmaz: bu iki evre \u003Ccode\u003Eel\u003C/code\u003E yaratılırken, alanlar nesneden kopyalanmadan önce biter. Nesneye yazılan \u003Ccode\u003EonConfig\u003C/code\u003E yalnız \u003Ccode\u003Eel\u003C/code\u003E bir sınıf bileşeniyse çalışır (sınıf bileşeninin yapılandırma evresi \u003Ccode\u003Ebuild()\u003C/code\u003E başına, \u003Ccode\u003EonConfigured\u003C/code\u003E\u0027dan hemen öncesine ertelenir); \u003Ccode\u003Eel\u003C/code\u003E bir etiket adı, DOM düğümü ya da düz eleman döndüren bir fonksiyonsa bu evre de eleman yaratılırken biter ve nesnedeki \u003Ccode\u003EonConfig\u003C/code\u003E çalışmaz. Etikete yazılan \u003Ccode\u003EonConfig={…}\u003C/code\u003E prop\u0027u çalışır, ama \u003Ccode\u003Eel\u003C/code\u003E etiket adıysa kök yaratılırken: o anda nesnenin üyeleri (\u003Ccode\u003Edata\u003C/code\u003E, \u003Ccode\u003Eview\u003C/code\u003E, metotlar) henüz kopyalanmamıştır, \u003Ccode\u003Ector\u003C/code\u003E çalışmamıştır ve \u003Ccode\u003Eparent\u003C/code\u003E \u003Ccode\u003Enull\u003C/code\u003E\u0027dır. Üyelere dokunan kurulum kodunu \u003Ccode\u003Ector\u003C/code\u003E ya da \u003Ccode\u003EonConfigured\u003C/code\u003E içine yazın.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBileşeni kodla yaratmanın yolları için \u003Ca href=\u0022/docs/component-creation\u0022\u003EBileşen Oluşturma\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"class-components","text":"1. Sınıf bileşenleri","level":2},{"id":"root-element","text":"Kök eleman","level":3},{"id":"view-or-controls","text":"view() mi, yoksa doğrudan controls mü?","level":3},{"id":"member-names","text":"Sınıf üyelerinin adları","level":3},{"id":"function-components","text":"2. Fonksiyon bileşenleri","level":2},{"id":"function-root","text":"Kök bileşen","level":3},{"id":"function-lifecycle","text":"Yaşam döngüsüne bağlanma","level":3},{"id":"function-tag-directives","text":"Etikete yazılan direktifler ve kancalar","level":3},{"id":"options-components","text":"3. Options API bileşenleri","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"getting-started","title":"Başlarken"},"next":{"slug":"component-creation","title":"Bileşen Oluşturma"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>Bileşenler</h1>
+        <p>Sınıf, fonksiyon ve Options API bileşenleri, JSX ile ve JSX&#x27;siz; kök eleman, `view()` ve `controls`, sınıf üyelerinin adları.</p>
+<p>MotifJS'te bir bileşen, bir DOM elemanını ve onun alt kontrollerini (<code>controls</code>) yöneten bir nesnedir. Her bileşen <code>ComponentBase</code>'ten türer; günlük kullanımda somut <code>Component</code> sınıfını kullanırsınız. Görünüm JSX ile yazılır ya da aynı çağrılarla doğrudan kurulur; bu sayfadaki her örnek JSX ile ve JSX'siz, TypeScript ve JavaScript olarak verilir.</p>
+<p>Bileşen yazmanın <strong>üç stili</strong> vardır: sınıf, fonksiyon ve Options API. Üçü de aynı çekirdeği kullanır; birini seçmek tercihe bağlıdır. Örnekler bir not uygulamasından alınmıştır; şu servis hepsinde ortaktır:</p>
+<div class="doc-code" data-file="src/services/notes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/notes.ts"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export interface Note {
+  id: number;
+  title: string;
+  body: string;
+  pinned: boolean;
+  archived: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export type Folder = &quot;notes&quot; | &quot;pinned&quot; | &quot;archive&quot;;
+
+export const FOLDERS: Record&lt;Folder, { title: string; empty: string }&gt; = {
+  notes: { title: &quot;Tüm notlar&quot;, empty: &quot;Henüz not yok. İlkini siz yazın.&quot; },
+  pinned: { title: &quot;Sabitlenenler&quot;, empty: &quot;Sabitlenmiş not yok. Üstte kalmasını istediğiniz notu sabitleyin.&quot; },
+  archive: { title: &quot;Arşiv&quot;, empty: &quot;Arşiv boş.&quot; },
+};
+
+const inFolder: Record&lt;Folder, (note: Note) =&gt; boolean&gt; = {
+  notes: (note) =&gt; !note.archived,
+  pinned: (note) =&gt; note.pinned &amp;&amp; !note.archived,
+  archive: (note) =&gt; note.archived,
+};
+
+export class NotesService {
+  readonly state = reactive({ items: [] as Note[] });
+  private nextId = this.state.items.length + 1;
+
+  list(folder: Folder, query = &quot;&quot;): Note[] {
+    const q = query.trim().toLowerCase();
+    return this.state.items
+      .filter(inFolder[folder])
+      .filter((note) =&gt; !q || `${note.title}\n${note.body}`.toLowerCase().includes(q))
+      .sort((a, b) =&gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);
+  }
+
+  count(folder: Folder): number {
+    return this.state.items.filter(inFolder[folder]).length;
+  }
+
+  find(id: number | string): Note | undefined {
+    const wanted = Number(id);
+    return this.state.items.find((note) =&gt; note.id === wanted);
+  }
+
+  create(): Note {
+    const now = Date.now();
+    this.state.items.unshift({ id: this.nextId++, title: &quot;&quot;, body: &quot;&quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });
+    return this.state.items[0];
+  }
+
+  touch(note: Note): void {
+    note.updatedAt = Date.now();
+  }
+
+  togglePin(note: Note): void {
+    note.pinned = !note.pinned;
+    this.touch(note);
+  }
+
+  archive(note: Note): void {
+    note.archived = true;
+    note.pinned = false;
+    this.touch(note);
+  }
+
+  restore(note: Note): void {
+    note.archived = false;
+    this.touch(note);
+  }
+
+  remove(id: number): boolean {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    this.state.items.splice(index, 1);
+    return true;
+  }
+
+  emptyArchive(): number {
+    let removed = 0;
+    for (let i = this.state.items.length - 1; i &gt;= 0; i--) {
+      if (!this.state.items[i].archived) continue;
+      this.state.items.splice(i, 1);
+      removed++;
+    }
+    return removed;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/notes.js"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export const FOLDERS = {
+  notes: { title: &quot;Tüm notlar&quot;, empty: &quot;Henüz not yok. İlkini siz yazın.&quot; },
+  pinned: { title: &quot;Sabitlenenler&quot;, empty: &quot;Sabitlenmiş not yok. Üstte kalmasını istediğiniz notu sabitleyin.&quot; },
+  archive: { title: &quot;Arşiv&quot;, empty: &quot;Arşiv boş.&quot; },
+};
+
+const inFolder = {
+  notes: (note) =&gt; !note.archived,
+  pinned: (note) =&gt; note.pinned &amp;&amp; !note.archived,
+  archive: (note) =&gt; note.archived,
+};
+
+export class NotesService {
+  state = reactive({ items: [] });
+  nextId = this.state.items.length + 1;
+
+  list(folder, query = &quot;&quot;) {
+    const q = query.trim().toLowerCase();
+    return this.state.items
+      .filter(inFolder[folder])
+      .filter((note) =&gt; !q || `${note.title}\n${note.body}`.toLowerCase().includes(q))
+      .sort((a, b) =&gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);
+  }
+
+  count(folder) {
+    return this.state.items.filter(inFolder[folder]).length;
+  }
+
+  find(id) {
+    const wanted = Number(id);
+    return this.state.items.find((note) =&gt; note.id === wanted);
+  }
+
+  create() {
+    const now = Date.now();
+    this.state.items.unshift({ id: this.nextId++, title: &quot;&quot;, body: &quot;&quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });
+    return this.state.items[0];
+  }
+
+  touch(note) {
+    note.updatedAt = Date.now();
+  }
+
+  togglePin(note) {
+    note.pinned = !note.pinned;
+    this.touch(note);
+  }
+
+  archive(note) {
+    note.archived = true;
+    note.pinned = false;
+    this.touch(note);
+  }
+
+  restore(note) {
+    note.archived = false;
+    this.touch(note);
+  }
+
+  remove(id) {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    this.state.items.splice(index, 1);
+    return true;
+  }
+
+  emptyArchive() {
+    let removed = 0;
+    for (let i = this.state.items.length - 1; i &gt;= 0; i--) {
+      if (!this.state.items[i].archived) continue;
+      this.state.items.splice(i, 1);
+      removed++;
+    }
+    return removed;
+  }
+}</code></pre>
+</div>
+<h2 id="class-components">1. Sınıf bileşenleri</h2>
+<p><code>Component</code>'ten türetir, <code>view()</code> metodunda görünümü döndürürsünüz. <code>NoteEmptyPage</code>, bir klasörde açık not yokken gösterilen sayfadır. Sınıf bileşeninin olağan parçalarını kullanır: servisi alan bir alan (<code>this.getService</code>), router'a erişim (<code>useNavigation()</code>), türetilmiş değer için bir getter, bir metot, <code>onConfig</code> kancası ve <code>view()</code>. <code>this.context.navigate</code> uygulamanın router'ıyla gezinir. Prop alan ve prop tipini bildiren sınıf bileşeni <a href="/tr/docs/component-props#props">Props ve Çocuklar</a> sayfasındadır.</p>
+<div class="doc-code" data-file="src/pages/NoteEmptyPage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NoteEmptyPage.tsx"><code>import { Component, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export default class NoteEmptyPage extends Component {
+  notes = this.getService(NotesService)!;
+  nav = useNavigation();
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  }
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  override onConfig() {
+    const wide = globalThis.matchMedia?.(&quot;(min-width: 40rem)&quot;).matches ?? false;
+    const first = this.notes.list(this.folder)[0];
+    if (wide &amp;&amp; first) this.context.navigate(`/${this.folder}/${first.id}`, { replace: true });
+  }
+
+  override view() {
+    return (
+      &lt;div class=&quot;pane&quot;&gt;
+        &lt;div class=&quot;toolbar&quot;&gt;
+          &lt;span class=&quot;toolbar__spacer&quot;&gt;&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;placeholder&quot;&gt;
+          &lt;p&gt;{() =&gt; (this.notes.count(this.folder) ? &quot;Bir not seçin ya da yenisini yazın.&quot; : FOLDERS[this.folder].empty)}&lt;/p&gt;
+          &lt;button type=&quot;button&quot; class=&quot;accent&quot; onclick={() =&gt; this.create()}&gt;
+            Yeni not
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NoteEmptyPage.ts"><code>import { Component, ComponentBase, motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export default class NoteEmptyPage extends Component {
+  notes = this.getService(NotesService)!;
+  nav = useNavigation();
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  }
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  override onConfig() {
+    const wide = globalThis.matchMedia?.(&quot;(min-width: 40rem)&quot;).matches ?? false;
+    const first = this.notes.list(this.folder)[0];
+    if (wide &amp;&amp; first) this.context.navigate(`/${this.folder}/${first.id}`, { replace: true });
+  }
+
+  override view() {
+    return motifComponent(&quot;div&quot;, (pane: ComponentBase) =&gt; {
+      pane.class.add(&quot;pane&quot;);
+      const toolbar = motifComponent(&quot;div&quot;, (bar: ComponentBase) =&gt; {
+        bar.class.add(&quot;toolbar&quot;);
+        bar.controls.add(motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.class.add(&quot;toolbar__spacer&quot;)));
+      });
+      const placeholder = motifComponent(&quot;div&quot;, (box: ComponentBase) =&gt; {
+        box.class.add(&quot;placeholder&quot;);
+        const message = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+          p.bindings.text(() =&gt; (this.notes.count(this.folder) ? &quot;Bir not seçin ya da yenisini yazın.&quot; : FOLDERS[this.folder].empty));
+        });
+        const newNote = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+          button.attr.add({ type: &quot;button&quot; });
+          button.class.add(&quot;accent&quot;);
+          button.motif.on(&quot;click&quot;, () =&gt; this.create());
+          button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Yeni not&quot;)));
+        });
+        box.controls.add(message, newNote);
+      });
+      pane.controls.add(toolbar, placeholder);
+    });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NoteEmptyPage.jsx"><code>import { Component, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default class NoteEmptyPage extends Component {
+  notes = this.getService(NotesService);
+  nav = useNavigation();
+
+  get folder() {
+    return this.nav.meta.folder;
+  }
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  onConfig() {
+    const wide = globalThis.matchMedia?.(&quot;(min-width: 40rem)&quot;).matches ?? false;
+    const first = this.notes.list(this.folder)[0];
+    if (wide &amp;&amp; first) this.context.navigate(`/${this.folder}/${first.id}`, { replace: true });
+  }
+
+  view() {
+    return (
+      &lt;div class=&quot;pane&quot;&gt;
+        &lt;div class=&quot;toolbar&quot;&gt;
+          &lt;span class=&quot;toolbar__spacer&quot;&gt;&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;placeholder&quot;&gt;
+          &lt;p&gt;{() =&gt; (this.notes.count(this.folder) ? &quot;Bir not seçin ya da yenisini yazın.&quot; : FOLDERS[this.folder].empty)}&lt;/p&gt;
+          &lt;button type=&quot;button&quot; class=&quot;accent&quot; onclick={() =&gt; this.create()}&gt;
+            Yeni not
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NoteEmptyPage.js"><code>import { Component, motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default class NoteEmptyPage extends Component {
+  notes = this.getService(NotesService);
+  nav = useNavigation();
+
+  get folder() {
+    return this.nav.meta.folder;
+  }
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  onConfig() {
+    const wide = globalThis.matchMedia?.(&quot;(min-width: 40rem)&quot;).matches ?? false;
+    const first = this.notes.list(this.folder)[0];
+    if (wide &amp;&amp; first) this.context.navigate(`/${this.folder}/${first.id}`, { replace: true });
+  }
+
+  view() {
+    return motifComponent(&quot;div&quot;, (pane) =&gt; {
+      pane.class.add(&quot;pane&quot;);
+      const toolbar = motifComponent(&quot;div&quot;, (bar) =&gt; {
+        bar.class.add(&quot;toolbar&quot;);
+        bar.controls.add(motifComponent(&quot;span&quot;, (span) =&gt; span.class.add(&quot;toolbar__spacer&quot;)));
+      });
+      const placeholder = motifComponent(&quot;div&quot;, (box) =&gt; {
+        box.class.add(&quot;placeholder&quot;);
+        const message = motifComponent(&quot;p&quot;, (p) =&gt; {
+          p.bindings.text(() =&gt; (this.notes.count(this.folder) ? &quot;Bir not seçin ya da yenisini yazın.&quot; : FOLDERS[this.folder].empty));
+        });
+        const newNote = motifComponent(&quot;button&quot;, (button) =&gt; {
+          button.attr.add({ type: &quot;button&quot; });
+          button.class.add(&quot;accent&quot;);
+          button.motif.on(&quot;click&quot;, () =&gt; this.create());
+          button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Yeni not&quot;)));
+        });
+        box.controls.add(message, newNote);
+      });
+      pane.controls.add(toolbar, placeholder);
+    });
+  }
+}</code></pre>
+</div>
+<p>Sınıf bileşeni JSX'te etiketle (<code>&lt;NoteEmptyPage /&gt;</code>), JSX'siz <code>new NoteEmptyPage()</code> ya da <code>motifComponent(NoteEmptyPage)</code> ile kurulur.</p>
+<h3 id="root-element">Kök eleman</h3>
+<p><code>super(...)</code>'a geçtiğiniz değer bileşenin <strong>kendi elemanını</strong> (<code>this.element</code>) belirler:</p>
+<ul>
+<li><code>super('div')</code> → bileşenin elemanı bir <code>&lt;div&gt;</code> olur. SVG elemanı için <code>super('svg', { options: { isSvg: true } })</code> yazılır; eleman SVG ad alanında üretilir.</li>
+<li><code>super(node)</code> → elinizdeki bir DOM düğümü (<code>document.createElement('canvas')</code>, sayfadaki mevcut bir eleman) bileşenin elemanı olur; bileşen onu yaratmaz, sahiplenir (bkz. <a href="/tr/docs/wrapping-libraries">Üçüncü parti sarmalama</a>).</li>
+<li>Argüman vermezseniz (<code>super()</code>), bileşenin <strong>kendi elemanı yoktur</strong> (fragment): <code>this.element</code> bir yorum işaretçisidir, <code>view()</code>'in döndürdüğü içerik açılış/kapanış işaretçilerinin (<code>&lt;!--[--&gt;</code> … <code>&lt;!--]--&gt;</code>) arasına yerleşir. Elemansız bileşende <code>props</code> ilk argüman olarak da verilebilir: <code>super(props)</code> ile <code>super(undefined, props)</code> aynıdır; yapıcı yazmayan bir sınıfta <code>new Bileşen(props)</code> da böyle çalışır.</li>
+<li><code>Component&lt;HTMLDivElement&gt;</code> gibi bir eleman generic'i verdiyseniz <code>@motifx/compiler</code> sınıfa <code>static elementTag = 'div'</code> ekler; bu durumda <code>super()</code> fragment değil, o türde gerçek bir eleman üretir (bkz. <a href="/tr/docs/wrapping-libraries#root-element">Kök element</a>). <code>Component&lt;SVGSVGElement&gt;</code> gibi SVG generic'lerinde derleyici ayrıca <code>static elementNamespace = 'http://www.w3.org/2000/svg'</code> ekler; eleman SVG ad alanında üretilir. İki statik alanı elle de yazabilirsiniz; yazılmışsa derleyici dokunmaz. Vite eklentisi bunu <code>.ts</code>, <code>.mts</code> ve <code>.cts</code> dosyalarında da yapar; JSX'siz sınıfta da eleman türü generic'ten gelir. Eklentinin işlemediği bir dosyada (örneğin yalnız <code>tsc</code> ile derlenen bir kütüphanede) <code>static elementTag = 'ul'</code> yazın ya da <code>super('ul')</code> çağırın. JavaScript'te generic olmadığından eleman her zaman <code>static elementTag</code> ya da <code>super('ul')</code> ile bildirilir.</li>
+</ul>
+<p>Yapıcıya hazır bir bileşen örneği verilirse (<code>new Component(örnek)</code>) yeni bileşen oluşturulmaz, o örnek döner.</p>
+<p><code>view()</code> içeriği döndürür, bileşenin elemanını değil. <code>NoteEmptyPage</code> gibi eleman bildirmeyen sınıfta (<code>extends Component</code>, generic yok) <code>view()</code>'in döndürdüğü <code>&lt;div class=&quot;pane&quot;&gt;</code> bileşenin elemanı değil, içeriğin ilk ve tek çocuğudur. Bu yüzden etikete yazılan <code>class</code> ve <code>id</code> ile sınıf içindeki <code>this.class.add</code> ve <code>this.attr.add</code> hiçbir elemana ulaşmaz; etikete yazılan <code>onclick</code> ve sınıf içindeki <code>this.motif.on</code> ise içeriğin üst düzey elemanlarını dinler (bkz. <a href="/tr/docs/events">Olaylar</a>); <code>x-display</code> ve <code>this.motif.hide()</code> işaretçiler arasındaki içeriği gizler. Sınıf ve öznitelik doğrudan <code>div</code>'e yazılır. Bileşenin kendisine eleman vermek için somut bir etiket bildirin (<code>Component&lt;HTMLUListElement&gt;</code> generic'i, <code>static elementTag</code> ya da <code>super('ul')</code>): etikete yazılan ortak öznitelikler (<code>class</code>, <code>id</code>, <code>style</code>, <code>role</code>, <code>aria-*</code>, <code>data-*</code> …; bkz. <a href="/tr/docs/jsx#attribute-fallthrough">ortak öznitelikler</a>), DOM olayları (<code>onclick</code> …) ve <code>this.class</code> bu elemana uygulanır; <code>title</code> gibi diğer prop'lar yalnız <code>this.props</code>'ta kalır. <code>view()</code> yalnız içeriği döndürür; aşağıdaki <code>ActivityLog</code> böyledir. <code>Component&lt;HTMLDivElement&gt;</code> ile <code>view()</code>'de ayrıca bir <code>&lt;div&gt;</code> döndürmek iç içe iki <code>div</code> üretir.</p>
+<h3 id="view-or-controls"><code>view()</code> mi, yoksa doğrudan <code>controls</code> mü?</h3>
+<p>İçerik iki yolla gelir:</p>
+<ul>
+<li><strong><code>view()</code> döndür:</strong> Bileşen build edilirken <code>view()</code> bir kez çağrılır ve sonucu alt kontrol olarak eklenir.</li>
+<li><strong><code>controls.add(...)</code> çağır:</strong> Kurulmuş bir bileşende çocuk o anda kurulup yerine konur; henüz kurulmamış bir bileşende sahibiyle birlikte kurulur. İkisi birlikte de kullanılır: <code>view()</code> iskeleti kurar, sonradan gelen içerik <code>controls.add</code> ile eklenir.</li>
+</ul>
+<p><code>ActivityLog</code> elemanı <code>&lt;ul&gt;</code> olan bir bileşendir; <code>view()</code> yazmaz, her <code>noteSaved</code> uygulama olayında (verisi kaydedilen notun başlığı) listeye bir satır ekler. <code>this.context.on</code> aboneliği bileşen serbest bırakılınca kendiliğinden kalkar (bkz. <a href="/tr/docs/component-state#context">Bağlam</a>):</p>
+<div class="doc-code" data-file="src/parts/ActivityLog.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/ActivityLog.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class ActivityLog extends Component&lt;HTMLUListElement&gt; {
+  override onConfigured() {
+    this.class.add(&quot;log&quot;);
+  }
+
+  override onBuilt() {
+    this.context.on(&quot;noteSaved&quot;, (title?: string) =&gt; {
+      this.controls.add(&lt;li&gt;{title?.trim() || &quot;Adsız&quot;} kaydedildi&lt;/li&gt;);
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/ActivityLog.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+
+export class ActivityLog extends Component&lt;HTMLUListElement&gt; {
+  static override elementTag = &quot;ul&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;log&quot;);
+  }
+
+  override onBuilt() {
+    this.context.on(&quot;noteSaved&quot;, (title?: string) =&gt; {
+      const row = motifComponent(&quot;li&quot;, (li: ComponentBase) =&gt; {
+        li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(`${title?.trim() || &quot;Adsız&quot;} kaydedildi`)));
+      });
+      this.controls.add(row);
+    });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/ActivityLog.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class ActivityLog extends Component {
+  static elementTag = &quot;ul&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;log&quot;);
+  }
+
+  onBuilt() {
+    this.context.on(&quot;noteSaved&quot;, (title) =&gt; {
+      this.controls.add(&lt;li&gt;{title?.trim() || &quot;Adsız&quot;} kaydedildi&lt;/li&gt;);
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/ActivityLog.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+
+export class ActivityLog extends Component {
+  static elementTag = &quot;ul&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;log&quot;);
+  }
+
+  onBuilt() {
+    this.context.on(&quot;noteSaved&quot;, (title) =&gt; {
+      const row = motifComponent(&quot;li&quot;, (li) =&gt; {
+        li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(`${title?.trim() || &quot;Adsız&quot;} kaydedildi`)));
+      });
+      this.controls.add(row);
+    });
+  }
+}</code></pre>
+</div>
+<h3 id="member-names">Sınıf üyelerinin adları</h3>
+<p><code>ComponentBase</code>'in üyeleri sınıf bileşeninde aynı adla tanımlanmaz; tanımlanırsa MotifJS'in kullandığı üye gizlenir. Ayrılmış adlar:</p>
+<ul>
+<li><strong>Metotlar ve erişiciler:</strong> <code>build</code>, <code>dispose</code>, <code>disposeAsync</code>, <code>style</code>, <code>setText</code>, <code>setState</code>, <code>reState</code>, <code>using</code>, <code>doWork</code>, <code>getService</code>, <code>useModel</code>, <code>$</code>, <code>context</code>, <code>siblings</code>, <code>serviceProvider</code>, <code>isWait</code>.</li>
+<li><strong>MotifJS'in kurduğu nesneler ve durum alanları:</strong> <code>element</code>, <code>props</code>, <code>controls</code>, <code>class</code>, <code>attr</code>, <code>bindings</code>, <code>motif</code>, <code>parent</code>, <code>childs</code>, <code>isBuilt</code>, <code>isInitialized</code>, <code>isDisposed</code>, <code>isConfigured</code>, <code>isVisible</code>.</li>
+</ul>
+<p><code>view()</code>, yaşam döngüsü kancaları (<code>onBuilt</code>, <code>onDisposing</code> …), <code>initializeComponent</code> ve <code>onElementCreating</code> sınıfta yazılmak için vardır. <code>build</code>, <code>dispose</code> ya da <code>style</code> gibi bir metodu genişletmek gerekiyorsa override <code>super.build(...)</code>, <code>super.dispose(...)</code> … çağırır. Ezilmiş <code>dispose()</code> yalnız bileşenin kendi <code>dispose()</code>'u çağrıldığında çalışır (elle ya da <code>controls.remove</code>/<code>clear</code> ile). Bir üst bileşenle birlikte serbest bırakılan bileşende çerçeve çocuğun <code>dispose()</code>'unu çağırmaz, kendi iç yolunu kullanır; bu durumda yalnız <code>onDisposing</code>/<code>onDisposed</code> kancaları ve <code>setDisposable</code> kayıtları çalışır. Serbest bırakılırken yapılacak işi bu yüzden kancalara ya da <code>this.motif.setDisposable(...)</code>'a yazın. Çerçeve işlemleri (<code>show</code>, <code>hide</code>, <code>on</code>, <code>off</code>, <code>trigger</code>, <code>setDisposable</code> …) <code>this.motif</code> altındadır; bu adlar sınıfta serbestçe kullanılır.</p>
+<p>TypeScript tipi açıkça uyumsuz olan çakışmayı derlemede bildirir (<code>style = 'red'</code> → TS2416). Erişici olan adlarla — <code>motif</code>, <code>controls</code>, <code>class</code>, <code>attr</code>, <code>bindings</code>, <code>context</code>, <code>siblings</code>, <code>serviceProvider</code>, <code>isWait</code> ve durum alanları (<code>isVisible</code> …) — alan tanımlamak, tipi ne olursa olsun (<code>any</code> ya da <code>declare</code> ile de) TS2610 hatası verir. Metot adlarında ise <code>any</code> tipli alanı ve uyumlu imzalı metodu (<code>build() {}</code>, parametresiz <code>style()</code>) bildirmez. <code>@motifx/compiler</code> derleme sırasında <code>super</code>'a her yolda ulaşmayan override'ı <code>MJX015</code> uyarısıyla bildirir: hiç çağırmayan, erken <code>return</code>, tek dallı <code>if</code>, döngü ya da <code>catch</code> yüzünden bir yolda atlayan üye (<a href="/tr/docs/jsx#compile-time-diagnostics">derleme uyarıları</a>; <code>motif-lint</code> de aynı kuralı çalıştırır). Geliştirme modunda (<code>app.useDevelopment()</code>) MotifJS bileşen yerleştirilirken bu çakışmaları sınıf başına bir kez <code>MJX128</code> uyarısıyla bildirir: <code>super</code> çağırmayan override, metodu ya da erişiciyi gizleyen örnek alanı, <code>controls</code> / <code>attr</code> / <code>class</code> / <code>bindings</code> / <code>motif</code> / <code>element</code> / <code>parent</code> yerine konan başka bir değer. Durum alanları (<code>isVisible</code> …) ve <code>props</code> çalışma anında denetlenmez.</p>
+<h2 id="function-components">2. Fonksiyon bileşenleri</h2>
+<p>Bir fonksiyon, tek bir bileşen döndürür. State ve olay yakalayıcıları closure ile tutulur. <code>NoteRow</code> listedeki bir satırdır: notu ve klasörü <code>props</code> ile alır, açık notu router'ın parametresinden okur.</p>
+<div class="doc-code" data-file="src/parts/NoteRow.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteRow.tsx"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export function NoteRow(props: { note: Note; folder: Folder }) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+  return (
+    &lt;a
+      rel=&quot;router&quot;
+      href={`/${folder}/${note.id}`}
+      class={() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`}
+      aria-current={() =&gt; (open() ? &quot;page&quot; : null)}
+    &gt;
+      &lt;b&gt;
+        &lt;i class=&quot;pin&quot; aria-label=&quot;Sabitlendi&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+        &lt;span&gt;{() =&gt; note.title.trim() || &quot;Adsız&quot;}&lt;/span&gt;
+      &lt;/b&gt;
+      &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+      &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;Metin yok&quot;}&lt;/p&gt;
+    &lt;/a&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteRow.ts"><code>import { ComponentBase, motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export function NoteRow(props: { note: Note; folder: Folder }) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+
+  return motifComponent(&quot;a&quot;, (row: ComponentBase) =&gt; {
+    row.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (open() ? &quot;page&quot; : null) });
+    row.class.add(() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+
+    const title = motifComponent(&quot;b&quot;, (b: ComponentBase) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i: ComponentBase) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Sabitlendi&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Adsız&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time: ComponentBase) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;Metin yok&quot;));
+
+    row.controls.add(title, when, preview);
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteRow.jsx"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+
+export function NoteRow(props) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+  return (
+    &lt;a
+      rel=&quot;router&quot;
+      href={`/${folder}/${note.id}`}
+      class={() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`}
+      aria-current={() =&gt; (open() ? &quot;page&quot; : null)}
+    &gt;
+      &lt;b&gt;
+        &lt;i class=&quot;pin&quot; aria-label=&quot;Sabitlendi&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+        &lt;span&gt;{() =&gt; note.title.trim() || &quot;Adsız&quot;}&lt;/span&gt;
+      &lt;/b&gt;
+      &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+      &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;Metin yok&quot;}&lt;/p&gt;
+    &lt;/a&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteRow.js"><code>import { motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+
+export function NoteRow(props) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+
+  return motifComponent(&quot;a&quot;, (row) =&gt; {
+    row.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (open() ? &quot;page&quot; : null) });
+    row.class.add(() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+
+    const title = motifComponent(&quot;b&quot;, (b) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Sabitlendi&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Adsız&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;Metin yok&quot;));
+
+    row.controls.add(title, when, preview);
+  });
+}</code></pre>
+</div>
+<p>Fonksiyon bileşeni JSX'te sınıflarla aynı şekilde, etiket olarak kullanılır; JSX'siz yazımda etiketin karşılığı <code>motifComponent(NoteRow, props)</code>'tur. Fonksiyon doğrudan da çağrılabilir; bu sıradan bir fonksiyon çağrısıdır ve yalnız fonksiyonun kendi okuduğu prop'larda (<code>note</code>, <code>folder</code>) aynı sonucu verir: <code>ref</code>, ortak öznitelikler (<code>class</code>, <code>id</code> …) ve <code>options</code> gibi çerçeve prop'larını köke yalnız <code>motifComponent</code> uygular (etikete yazılan direktifler ve kancalar için bkz. <a href="#function-tag-directives">aşağısı</a>):</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;NoteRow note={note} folder={this.folder} /&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;NoteRow note={note} folder={folder()} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>motifComponent(NoteRow, { note, folder: this.folder });
+NoteRow({ note, folder: this.folder });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>motifComponent(NoteRow, { note, folder: folder() });
+NoteRow({ note, folder: folder() });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;NoteRow note={note} folder={this.folder} /&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;NoteRow note={note} folder={folder()} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>motifComponent(NoteRow, { note, folder: this.folder });
+NoteRow({ note, folder: this.folder });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>motifComponent(NoteRow, { note, folder: folder() });
+NoteRow({ note, folder: folder() });</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>folder()</code> klasörü döndüren yerel fonksiyondur.</p>
+</div>
+<h3 id="function-root">Kök bileşen</h3>
+<p>Fonksiyon bileşeninde <code>this</code> yoktur. Sınıfta <code>this.motif</code>, <code>this.context</code>, <code>this.class</code> ya da <code>this.bindings</code> ile yapılan işler fonksiyon bileşeninde kök bileşen üzerinden yapılır. Kök bileşen, fonksiyonun döndürdüğü kök elemanın bileşenidir; o da bir <code>Component</code>'tir. Ona kök elemana yazılan bir kancanın aldığı ilk argümanla (<code>onConfig={(root) =&gt; …}</code>, <code>initializeComponent</code>, <code>onBuilt</code>) ya da kök elemana yazılan <code>ref</code> ile ulaşılır; döndürülen JSX ifadesi bir değişkene atanırsa (<code>const root = &lt;section&gt;…&lt;/section&gt;</code>) o değişken de kök bileşendir. JSX'siz yazımda kök, <code>motifComponent(etiket, …)</code> çağrısının döndürdüğü bileşendir ve kancalar aynı çağrının nesne biçimine yazılır.</p>
+<h3 id="function-lifecycle">Yaşam döngüsüne bağlanma</h3>
+<p>Fonksiyon bileşenlerinde yaşam döngüsü kancalarına, döndürülen kök elemana <strong>prop</strong> olarak bağlanabilirsiniz (bkz. <a href="/tr/docs/lifecycle">Yaşam Döngüsü</a>). JSX'siz yazımda kancalar <code>motifComponent</code>'in nesne biçimine yazılır. <code>SearchField</code> DOM'a girince odağı alır; <code>oninput</code> işleyicisi iki parametreli yazıldığı için ilk parametresi alanın bileşenidir:</p>
+<div class="doc-code" data-file="src/parts/SearchField.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/SearchField.tsx"><code>export function SearchField(props: { onQueryChange: (query: string) =&gt; void }) {
+  return (
+    &lt;input
+      type=&quot;search&quot;
+      placeholder=&quot;Notlarda ara&quot;
+      onMounted={(field) =&gt; field.element.focus()}
+      oninput={(field, e) =&gt; props.onQueryChange(field.element.value)}
+    /&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/SearchField.ts"><code>import { ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+
+export function SearchField(props: { onQueryChange: (query: string) =&gt; void }) {
+  return motifComponent(&quot;input&quot;, {
+    onMounted: (field: ComponentBase) =&gt; field.element.focus(),
+    initializeComponent: (field: ComponentBase) =&gt; {
+      field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; });
+      field.motif.on(&quot;input&quot;, (sender: ComponentBase, e: Event) =&gt; props.onQueryChange(sender.element.value));
+    },
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/SearchField.jsx"><code>export function SearchField(props) {
+  return (
+    &lt;input
+      type=&quot;search&quot;
+      placeholder=&quot;Notlarda ara&quot;
+      onMounted={(field) =&gt; field.element.focus()}
+      oninput={(field, e) =&gt; props.onQueryChange(field.element.value)}
+    /&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/SearchField.js"><code>import { motifComponent } from &quot;@motifx/core&quot;;
+
+export function SearchField(props) {
+  return motifComponent(&quot;input&quot;, {
+    onMounted: (field) =&gt; field.element.focus(),
+    initializeComponent: (field) =&gt; {
+      field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; });
+      field.motif.on(&quot;input&quot;, (sender, e) =&gt; props.onQueryChange(sender.element.value));
+    },
+  });
+}</code></pre>
+</div>
+<h3 id="function-tag-directives">Etikete yazılan direktifler ve kancalar</h3>
+<p>Fonksiyon bileşeninin <strong>etiketine</strong> yazdığınız çerçeve prop'ları — <code>x-display</code>, <code>x-wait</code> gibi
+direktifler, <code>onConfig</code>/<code>onBuilt</code>/<code>x-mounted</code>/<code>x-initializing</code> gibi yaşam döngüsü kancaları (<code>x-</code> ve <code>x:</code> yazımlarıyla),
+<code>initializeComponent</code> ve <code>ref</code> — fonksiyonun döndürdüğü köke uygulanır. JSX'siz yazımda aynı anahtarlar <code>motifComponent</code>'e verilen nesneye yazılır; <code>x-display</code> ve <code>x-wait</code> yerine <code>preconfig</code> içinde <code>bindings.display</code> / <code>bindings.wait</code> de kullanılabilir. Bu anahtarlar ve <code>ref</code> fonksiyona giden <code>props</code>'ta yer almaz, sınıfın <code>this.props</code>'unda da yer almaz:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;NoteRow x-display={() =&gt; !note.archived} note={note} folder={this.folder} /&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;NoteRow x-display={() =&gt; !note.archived} note={note} folder={folder()} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>motifComponent(NoteRow, {
+  note,
+  folder: this.folder,
+  preconfig: (row: ComponentBase) =&gt; row.bindings.display(() =&gt; !note.archived),
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>motifComponent(NoteRow, {
+  note,
+  folder: folder(),
+  preconfig: (row: ComponentBase) =&gt; row.bindings.display(() =&gt; !note.archived),
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;NoteRow x-display={() =&gt; !note.archived} note={note} folder={this.folder} /&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;NoteRow x-display={() =&gt; !note.archived} note={note} folder={folder()} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>motifComponent(NoteRow, {
+  note,
+  folder: this.folder,
+  preconfig: (row) =&gt; row.bindings.display(() =&gt; !note.archived),
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>motifComponent(NoteRow, {
+  note,
+  folder: folder(),
+  preconfig: (row) =&gt; row.bindings.display(() =&gt; !note.archived),
+});</code></pre>
+</div>
+<p>Fonksiyonun bunun için hiçbir şey yapması gerekmez; prop'ları köküne aktarması da
+gerekmez. (Fonksiyon prop'ları köküne zaten aktarıyorsa — <code>motifComponent('div', props)</code>
+— çerçeve prop'ları ikinci kez uygulanmaz.) Sınıf bileşenlerinde aynı prop'lar yapıcıya geçer.</p>
+<h2 id="options-components">3. Options API bileşenleri</h2>
+<p><code>motifOptions</code> ile sarılmış bir nesne döndürürsünüz: <code>el</code>, <code>data</code>, <code>view</code> ve isteğe bağlı <code>ctor</code>. <code>motifOptions</code> nesneyi olduğu gibi döndürür; yalnız TypeScript'e metotların içindeki <code>this</code>'in bileşen olduğunu söyler, böylece <code>this.class</code>, <code>this.motif</code>, <code>this.props</code> strict kipte derlenir ve editör tamamlar. Nesneyi döndüren fonksiyon bir bileşen gibi kullanılır: JSX'te (<code>&lt;NoteFilter /&gt;</code>), JSX'siz <code>motifComponent(NoteFilter, props)</code> ile, rota <code>control</code>'ü olarak ve <code>Lazy</code> ile yüklenen <code>default</code> olarak. <code>NoteFilter</code> bir arama kutusudur; başlangıç sorgusunu <code>ctor</code> içinde fabrikanın <code>props</code> parametresinden alır. Fabrikanın parametresi etiketin prop tipini de bildirir (<code>&lt;NoteFilter initial=&quot;…&quot; /&gt;</code>):</p>
+<div class="doc-code" data-file="src/parts/NoteFilter.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteFilter.tsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const NoteFilter = (props?: { initial?: string }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ query: &quot;&quot; }),
+
+  view() {
+    this.class.add(&quot;search&quot;);
+    return (
+      &lt;&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; x-model={() =&gt; this.data.query} /&gt;
+        &lt;button type=&quot;button&quot; x-display={() =&gt; this.data.query !== &quot;&quot;} onclick={() =&gt; (this.data.query = &quot;&quot;)}&gt;Temizle&lt;/button&gt;
+      &lt;/&gt;
+    );
+  },
+
+  ctor() {
+    if (props?.initial) this.data.query = props.initial;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteFilter.ts"><code>import { ComponentBase, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const NoteFilter = (props?: { initial?: string }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ query: &quot;&quot; }),
+
+  view() {
+    this.class.add(&quot;search&quot;);
+    const field = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+      input.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; });
+      input.bindings.model(() =&gt; this.data.query, (value: string) =&gt; (this.data.query = value));
+    });
+    const clear = motifComponent(&quot;button&quot;, {
+      preconfig: (button: ComponentBase) =&gt; button.bindings.display(() =&gt; this.data.query !== &quot;&quot;),
+      initializeComponent: (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.motif.on(&quot;click&quot;, () =&gt; (this.data.query = &quot;&quot;));
+        button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Temizle&quot;)));
+      },
+    });
+    return [field, clear];
+  },
+
+  ctor() {
+    if (props?.initial) this.data.query = props.initial;
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteFilter.jsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const NoteFilter = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ query: &quot;&quot; }),
+
+  view() {
+    this.class.add(&quot;search&quot;);
+    return (
+      &lt;&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; x-model={() =&gt; this.data.query} /&gt;
+        &lt;button type=&quot;button&quot; x-display={() =&gt; this.data.query !== &quot;&quot;} onclick={() =&gt; (this.data.query = &quot;&quot;)}&gt;Temizle&lt;/button&gt;
+      &lt;/&gt;
+    );
+  },
+
+  ctor() {
+    if (props?.initial) this.data.query = props.initial;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteFilter.js"><code>import { motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const NoteFilter = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ query: &quot;&quot; }),
+
+  view() {
+    this.class.add(&quot;search&quot;);
+    const field = motifComponent(&quot;input&quot;, (input) =&gt; {
+      input.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; });
+      input.bindings.model(() =&gt; this.data.query, (value) =&gt; (this.data.query = value));
+    });
+    const clear = motifComponent(&quot;button&quot;, {
+      preconfig: (button) =&gt; button.bindings.display(() =&gt; this.data.query !== &quot;&quot;),
+      initializeComponent: (button) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.motif.on(&quot;click&quot;, () =&gt; (this.data.query = &quot;&quot;));
+        button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Temizle&quot;)));
+      },
+    });
+    return [field, clear];
+  },
+
+  ctor() {
+    if (props?.initial) this.data.query = props.initial;
+  },
+});</code></pre>
+</div>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;NoteFilter initial=&quot;toplantı&quot; /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/NotesLayout.ts"><code>motifComponent(NoteFilter, { initial: &quot;toplantı&quot; });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;NoteFilter initial=&quot;toplantı&quot; /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/NotesLayout.js"><code>motifComponent(NoteFilter, { initial: &quot;toplantı&quot; });</code></pre>
+</div>
+<p>Nesnenin <code>el</code> dışındaki tüm alanları bileşene kopyalanır; <code>ctor</code> kopyalanmaz, bileşen oluşturulduktan hemen sonra (<code>build()</code>/<code>view()</code>'den önce) <strong>bir kez</strong> çağrılır: <code>this</code> bileşendir, tek argümanı etikete yazılan <code>props</code>'tur. İçinde fırlatılan hata bileşen oluşturmayı bozmaz, merkezî hata yöneticisine <code>MJX122</code> olarak raporlanır. Etikete yazılan <code>props</code> ayrıca <code>this.props</code> olarak da erişilebilir. <code>el</code> bir etiket adı (<code>'div'</code>), bir DOM düğümü ya da başka bir bileşen (sınıf, fonksiyon, Options nesnesi) olabilir; bileşen verilirse onun kökü kullanılır.</p>
+<p><code>el</code> bileşenin kendi elemanıdır, <code>view()</code> içeriği döndürür: JSX'te bir fragment (<code>&lt;&gt;…&lt;/&gt;</code>), JSX'siz bir dizi. Köke sınıf vermek için <code>view()</code> içinde (ya da <code>ctor</code>/<code>onConfigured</code>'da) <code>this.class.add(...)</code>, öznitelik vermek için <code>this.attr.add({ ... })</code> yazılır. <code>view()</code>'de <code>el</code> ile aynı etikette bir sarmalayıcı döndürmek iç içe iki eleman üretir.</p>
+<p>Nesnedeki <code>get</code>/<code>set</code> erişicileri bileşene erişici olarak taşınır: kopyalama sırasında çalışmaz, her okumada <code>this</code> bileşen olarak yeniden çalışır. Türetilmiş değeri bir erişiciyle (<code>get visible() { … }</code>) ya da bir metotla (<code>visible() { … }</code>) yazabilirsiniz. Nesneye yazılan yaşam döngüsü metotlarından <code>onConfigured</code>, <code>onBuilding</code>, <code>initializeComponent</code>, <code>onBuilt</code>, <code>onMounted</code>, <code>onVisibilityChanged</code>, <code>onActivated</code>, <code>onDeactivated</code>, <code>onDisposing</code>, <code>onDisposed</code> çalışır. <code>onInitializing</code> ve <code>onInitialized</code> çalışmaz: bu iki evre <code>el</code> yaratılırken, alanlar nesneden kopyalanmadan önce biter. Nesneye yazılan <code>onConfig</code> yalnız <code>el</code> bir sınıf bileşeniyse çalışır (sınıf bileşeninin yapılandırma evresi <code>build()</code> başına, <code>onConfigured</code>'dan hemen öncesine ertelenir); <code>el</code> bir etiket adı, DOM düğümü ya da düz eleman döndüren bir fonksiyonsa bu evre de eleman yaratılırken biter ve nesnedeki <code>onConfig</code> çalışmaz. Etikete yazılan <code>onConfig={…}</code> prop'u çalışır, ama <code>el</code> etiket adıysa kök yaratılırken: o anda nesnenin üyeleri (<code>data</code>, <code>view</code>, metotlar) henüz kopyalanmamıştır, <code>ctor</code> çalışmamıştır ve <code>parent</code> <code>null</code>'dır. Üyelere dokunan kurulum kodunu <code>ctor</code> ya da <code>onConfigured</code> içine yazın.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Bileşeni kodla yaratmanın yolları için <a href="/tr/docs/component-creation">Bileşen Oluşturma</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

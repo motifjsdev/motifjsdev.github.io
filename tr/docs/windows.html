@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Bir bileşeni yeni bir pencerede ya da hep üstte duran Picture-in-Picture penceresinde açmak, geri almak; pencere yöneticisinin kuralları, stil aynalama, Electron.">
+    <title>Pencereler — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/windows">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/windows">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/windows">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/windows">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/windows">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Pencereler">
+    <meta property="og:description" content="Bir bileşeni yeni bir pencerede ya da hep üstte duran Picture-in-Picture penceresinde açmak, geri almak; pencere yöneticisinin kuralları, stil aynalama, Electron.">
+    <script type="application/json" id="doc-data">{"slug":"windows","locale":"tr","title":"Pencereler","description":"Bir bileşeni yeni bir pencerede ya da hep üstte duran Picture-in-Picture penceresinde açmak, geri almak; pencere yöneticisinin kuralları, stil aynalama, Electron.","category":{"id":"3","title":"Uygulama yapısı"},"html":"\u003Cp\u003EBir MotifJS bileşeni yeniden kurulmadan başka bir pencereye taşınabilir: \u003Ccode\u003Ewindow.open\u003C/code\u003E ile açılan bir pencereye, tarayıcının hep üstte tuttuğu Picture-in-Picture penceresine ya da Electron\u0027un açtığı çocuk pencereye. Bileşen nesnesi, durumu, bağları, servisleri ve olayları sayfanın JavaScript dünyasında kalır; öbür pencereye yalnız elemanlar gider. Bunu yöneten \u003Ccode\u003Eapp.windows\u003C/code\u003E\u0027tur; bileşenden \u003Ccode\u003Ethis.context.windows\u003C/code\u003E, fonksiyon bileşeninde \u003Ccode\u003EuseApplication().windows\u003C/code\u003E, dışarıdan \u003Ccode\u003EApplication.main.windows\u003C/code\u003E ile erişilir.\u003C/p\u003E\n\u003Ch2 id=\u0022open\u0022\u003EPencere açmak\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.windows.open(bileşen, seçenekler)\u003C/code\u003E pencereyi açar, bileşeni oraya taşır ve bir handle döndürür. Tarayıcı çağrısı kullanıcı hareketinin içinde yapılır; bu yüzden \u003Ccode\u003Eopen\u003C/code\u003E bir tıklama işleyicisinden çağrılır. Dönen söz içerik yerleşince çözülür. Açık notun düzenleyicisini pencerede ya da hep üstte açan araç çubuğu:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component\u0026lt;HTMLDivElement\u0026gt; {\n  editor!: NoteEditor;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  override view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; })}\u0026gt;Pencerede aç\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Hep üstte\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteTools.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component\u0026lt;HTMLDivElement\u0026gt; {\n  editor = new NoteEditor();\n\n  override onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  override initializeComponent() {\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Pencerede aç\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Hep üstte\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    this.controls.add(popup, pip, this.editor);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  let editor!: NoteEditor;\n\n  return (\n    \u0026lt;div class=\u0026quot;tools\u0026quot;\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; })}\u0026gt;Pencerede aç\u0026lt;/button\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Hep üstte\u0026lt;/button\u0026gt;\n      \u0026lt;NoteEditor ref={(field) =\u0026gt; (editor = field)} /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteTools.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  const editor = new NoteEditor();\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n    root.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Pencerede aç\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Hep üstte\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    root.controls.add(popup, pip, editor);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: null as NoteEditor | null },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor!, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; })}\u0026gt;Pencerede aç\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor!, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Hep üstte\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.data.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteTools.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: new NoteEditor() },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Pencerede aç\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Hep üstte\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    return [popup, pip, this.data.editor];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteTools.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  editor;\n\n  onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; })}\u0026gt;Pencerede aç\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Hep üstte\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteTools.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  editor = new NoteEditor();\n\n  onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  initializeComponent() {\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Pencerede aç\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Hep üstte\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    this.controls.add(popup, pip, this.editor);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteTools.jsx\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  let editor;\n\n  return (\n    \u0026lt;div class=\u0026quot;tools\u0026quot;\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; })}\u0026gt;Pencerede aç\u0026lt;/button\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Hep üstte\u0026lt;/button\u0026gt;\n      \u0026lt;NoteEditor ref={(field) =\u0026gt; (editor = field)} /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteTools.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  const editor = new NoteEditor();\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n    root.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Pencerede aç\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Hep üstte\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    root.controls.add(popup, pip, editor);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteTools.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: null },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; })}\u0026gt;Pencerede aç\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Hep üstte\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.data.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteTools.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: new NoteEditor() },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Pencerede aç\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: \u0026quot;Not\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Hep üstte\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    return [popup, pip, this.data.editor];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBoş pencere \u003Ccode\u003Eapp.windows.create(seçenekler)\u003C/code\u003E ile açılır, içerik sonra \u003Ccode\u003Ewin.add\u003C/code\u003E ile verilir; \u003Ccode\u003Eopen\u003C/code\u003E bu ikisinin kısa yoludur. Elinizdeki hazır bir pencere, bir \u003Ccode\u003E\u0026lt;iframe\u0026gt;\u003C/code\u003E\u0027in \u003Ccode\u003EcontentWindow\u003C/code\u003E\u0027u ya da kendi açtığınız bir pencere \u003Ccode\u003Eapp.windows.attach(pencere, seçenekler)\u003C/code\u003E ile yönetilen pencere olur.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESeçenek\u003C/th\u003E\n\u003Cth\u003EAnlamı\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekind\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E varsayılan, \u003Ccode\u003E\u0026quot;pip\u0026quot;\u003C/code\u003E hep üstte duran Picture-in-Picture penceresi.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efallback\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026quot;pip\u0026quot;\u003C/code\u003E tarayıcıda yoksa ya da istek reddedilirse ne olacağı: \u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E varsayılan, \u003Ccode\u003E\u0026quot;none\u0026quot;\u003C/code\u003E ile söz \u003Ccode\u003EMJX419\u003C/code\u003E ile reddedilir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewidth\u003C/code\u003E, \u003Ccode\u003Eheight\u003C/code\u003E, \u003Ccode\u003Eleft\u003C/code\u003E, \u003Ccode\u003Etop\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencerenin boyutu ve yeri.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewindow.open\u003C/code\u003E adı; verilmezse her pencere kendi adını alır. Electron\u0027da ana sürecin gördüğü \u003Ccode\u003EframeName\u003C/code\u003E budur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efeatures\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewindow.open\u003C/code\u003E özellik dizesine eklenecek parçalar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etitle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencerenin başlığı; verilmezse sayfanın başlığı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyles\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EStil ve tema aynalama: \u003Ccode\u003E\u0026quot;live\u0026quot;\u003C/code\u003E varsayılan, \u003Ccode\u003E\u0026quot;once\u0026quot;\u003C/code\u003E, \u003Ccode\u003E\u0026quot;none\u0026quot;\u003C/code\u003E ya da pencerenin belgesini alan bir fonksiyon.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eorphans\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKapanışta kökeni kalmamış içerik: \u003Ccode\u003E\u0026quot;dispose\u0026quot;\u003C/code\u003E varsayılan, \u003Ccode\u003E\u0026quot;keep\u0026quot;\u003C/code\u003E kopuk bırakır. Yalnız \u003Ccode\u003Ewin.add\u003C/code\u003E ile verilen bileşenler için geçerlidir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcloseWhenEmpty\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESon içerik serbest bırakılınca pencere kapanır; varsayılan \u003Ccode\u003Etrue\u003C/code\u003E. Yalnız \u003Ccode\u003Ewin.add\u003C/code\u003E ile verilen bileşenler sayılır; \u003Ccode\u003Ehost\u003C/code\u003E\u0027a doğrudan konan içerik pencereyi açık tutmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcloseOnNavigate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERota değişince pencere kapanır; varsayılan \u003Ccode\u003Efalse\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EreturnOnClose\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKapanışta içerik kökenine döner; varsayılan \u003Ccode\u003Etrue\u003C/code\u003E. \u003Ccode\u003Efalse\u003C/code\u003E ile kökeni olan bileşen de \u003Ccode\u003Eorphans\u003C/code\u003E kuralına girer.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eowner\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencere bu bileşenin serbest bırakma katmanına bağlanır; bileşen gidince pencere kapanır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonClosing\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencere kapanmadan hemen önce, içerik hâlâ penceredeyken çağrılır; \u003Ccode\u003E{ window, components, reason }\u003C/code\u003E alır. Bkz. \u003Ca href=\u0022#closing\u0022\u003EKapanış kuralları\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022handle\u0022\u003EHandle\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eopen\u003C/code\u003E, \u003Ccode\u003Ecreate\u003C/code\u003E ve \u003Ccode\u003Eattach\u003C/code\u003E bir \u003Ccode\u003EAppWindow\u003C/code\u003E döndürür.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EÜye\u003C/th\u003E\n\u003Cth\u003EAnlamı\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewindow\u003C/code\u003E, \u003Ccode\u003Edocument\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencerenin kendisi ve belgesi.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ehost\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencerenin gövdesini saran bileşen; içerik onun çocuğudur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekind\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGerçekte açılan tür: \u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E, \u003Ccode\u003E\u0026quot;pip\u0026quot;\u003C/code\u003E ya da \u003Ccode\u003Eattach\u003C/code\u003E ile gelen için \u003Ccode\u003E\u0026quot;attached\u0026quot;\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecomponents\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPenceredeki bileşenler, ekleniş sırasıyla.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisOpen\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencere açık mı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eadd(...bileşenler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşenleri pencereye taşır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Erelease(bileşen)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşeni kökenine geri koyar, pencere açık kalır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efocus()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencereyi öne getirir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclose()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencereyi kapatır; sonucu \u003Ccode\u003E{ returned, disposed, kept }\u003C/code\u003E olarak döndürür.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclosed\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPencere nasıl kapanırsa kapansın aynı sonuçla çözülen söz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsyncStyles()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EStil sayfalarını elle yeniler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EPenceredeki bir bileşenin açtığı bildirim ya da iletişim kutusu da o pencerede görünmelidir. \u003Ccode\u003Eapp.layerOf(bileşen)\u003C/code\u003E bileşenin belgesine bakar: bileşen bu yöneticinin bir penceresindeyse pencerenin \u003Ccode\u003Ehost\u003C/code\u003E\u0027unu, sayfadaysa \u003Ccode\u003Eapp.layer\u003C/code\u003E\u0027ı döndürür ve ardından verilen bileşenleri oraya ekler (bkz. \u003Ca href=\u0022/docs/component-tree#layer\u0022\u003ESayfa katmanı\u003C/a\u003E). Böyle doğrudan \u003Ccode\u003Ehost\u003C/code\u003E\u0027a konan içerik pencerenin \u003Ccode\u003Ecomponents\u003C/code\u003E listesine girmez; \u003Ccode\u003Eorphans\u003C/code\u003E ve \u003Ccode\u003EreturnOnClose\u003C/code\u003E ona bakmaz, \u003Ccode\u003EcloseWhenEmpty\u003C/code\u003E onu saymaz (\u003Ccode\u003Ewin.add\u003C/code\u003E ile verilen son bileşen gidince pencere, \u003Ccode\u003Ehost\u003C/code\u003E\u0027ta hâlâ bir iletişim kutusu olsa da kapanır), pencere kapanınca \u003Ccode\u003Ehost\u003C/code\u003E ile birlikte serbest bırakılır ve \u003Ccode\u003Eclosed\u003C/code\u003E sonucunun hiçbir listesinde yer almaz. Pencereyle kalkmaması gereken içerik \u003Ccode\u003Ewin.add\u003C/code\u003E ile verilir ya da bir \u003Ccode\u003ETransport\u003C/code\u003E yuvasına yazılır.\u003C/p\u003E\n\u003Ch2 id=\u0022origin\u0022\u003Eİçerik, köken ve geri dönüş\u003C/h2\u003E\n\u003Cp\u003EBir bileşen pencereye ilk alındığında yönetici sayfadaki ebeveynini ve o anki sonraki kardeşini not eder. Bileşen eski ebeveyninden ayrılır, \u003Ccode\u003EonDeactivated\u003C/code\u003E alır, pencerenin gövdesine \u003Ccode\u003Econtrols.add\u003C/code\u003E ile girer ve \u003Ccode\u003EonActivated\u003C/code\u003E alır; \u003Ccode\u003EonMounted\u003C/code\u003E daha önce çalıştıysa bir daha çalışmaz, ilk kez orada yerleşiyorsa o pencerenin sırasında çalışır. Aynı pencereye \u003Ccode\u003Ewin.add\u003C/code\u003E ile başka bileşenler de konur; bileşen bir pencereden ötekine taşınırsa köken değişmez. Köken yalnız \u003Ccode\u003Eopen\u003C/code\u003E ya da \u003Ccode\u003Eadd\u003C/code\u003E ile verilen bileşen için tutulur: uygulamanın \u003Ccode\u003Eattach\u003C/code\u003E ile bağladığı pencereye kendi taşıdığı bileşenleri yönetici tanımaz, kapanışta onlar için hiçbir şey geri dönmez ve \u003Ccode\u003Ecomponents\u003C/code\u003E listesinde görünmezler.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Ewin.release(bileşen)\u003C/code\u003E ve pencerenin kapanışı bileşeni kökenine, eski sırasına koyar: hatırlanan kardeş hâlâ oradaysa onun önüne, o da penceredeyse onun kardeşinin önüne, kimse yoksa sona. Aynı ebeveynden pencereye alınan birden çok bileşen geri döndüğünde \u003Ccode\u003Econtrols\u003C/code\u003E içindeki eski sırasını bulur. \u003Ccode\u003EreturnOnClose: false\u003C/code\u003E bu dönüşü kapatır; kökeni olan bileşen de kökensiz sayılır, \u003Ccode\u003Erelease\u003C/code\u003E ise yine kökene koyar. Kökeni kalmamışsa, örneğin rota değişip ebeveyn serbest bırakıldıysa, \u003Ccode\u003Eorphans\u003C/code\u003E karar verir: varsayılan serbest bırakmak, \u003Ccode\u003E\u0026quot;keep\u0026quot;\u003C/code\u003E ile bileşen ebeveynsiz ama sağ kalır ve \u003Ccode\u003Eclosed\u003C/code\u003E sonucunun \u003Ccode\u003Ekept\u003C/code\u003E listesinde gelir. Köken yokken içeriği korumak isteyen uygulama kapanmadan önce \u003Ccode\u003Ewin.release\u003C/code\u003E ya da başka bir ebeveyne \u003Ccode\u003Econtrols.add\u003C/code\u003E ile alır.\u003C/p\u003E\n\u003Cp\u003EPenceredeki bir bileşen gizlenip gösterilince pencerede kalır: iz pencerede bırakılır, \u003Ccode\u003Emotif.show()\u003C/code\u003E bileşeni oraya koyar. Bu, uygulamanın elemanını başka bir belgeye kendi taşıdığı bileşen için de geçerlidir. İz oynatılmış ya da tutucusu belgeden çıkmışsa bileşen ebeveyninin altında yeniden kurulur ve \u003Ccode\u003EMJX106\u003C/code\u003E uyarısı verilir.\u003C/p\u003E\n\u003Ch2 id=\u0022closing\u0022\u003EKapanış kuralları\u003C/h2\u003E\n\u003Cp\u003EPencere kullanıcı tarafından kapatıldığında, \u003Ccode\u003Ewin.close()\u003C/code\u003E çağrıldığında ya da penceresi \u003Ccode\u003Epagehide\u003C/code\u003E aldığında içerik kökenine döner ve \u003Ccode\u003Eclosed\u003C/code\u003E çözülür. Penceredeki bir bileşen uygulama tarafından serbest bırakılırsa listeden düşer; son bileşen de giderse pencere kapanır, \u003Ccode\u003EcloseWhenEmpty: false\u003C/code\u003E açık tutar. \u003Ccode\u003Eowner\u003C/code\u003E verilmişse sahip bileşen serbest bırakılınca pencere kapanır; \u003Ccode\u003EcloseOnNavigate\u003C/code\u003E rota değişince kapatır. \u003Ccode\u003Eapp.dispose()\u003C/code\u003E ve sayfanın kendi \u003Ccode\u003Epagehide\u003C/code\u003E\u0027ı bütün pencereleri kapatır, içlerindeki içerik serbest bırakılır; arkada boş pencere kalmaz. \u003Ccode\u003Eapp.windows.closeAll()\u003C/code\u003E aynı işi istek üzerine yapar.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EonClosing\u003C/code\u003E verilmişse yönetici içeriğe dokunmadan önce onu çağırır; kullanıcı kapatışında bu pencerenin \u003Ccode\u003Epagehide\u003C/code\u003E anıdır ve belge hâlâ ayaktadır. O anda pencere kapalı sayılır: \u003Ccode\u003EisOpen\u003C/code\u003E \u003Ccode\u003Efalse\u003C/code\u003E, \u003Ccode\u003Eadd\u003C/code\u003E MJX420 fırlatır. Kanca \u003Ccode\u003E{ window, components, reason }\u003C/code\u003E alır. \u003Ccode\u003Ecomponents\u003C/code\u003E o anda penceredeki bileşenlerin kopyasıdır; \u003Ccode\u003Ereason\u003C/code\u003E kapanışın nedenidir: \u003Ccode\u003E\u0026quot;user\u0026quot;\u003C/code\u003E kullanıcı kapattı ya da pencere \u003Ccode\u003Epagehide\u003C/code\u003E aldı, \u003Ccode\u003E\u0026quot;code\u0026quot;\u003C/code\u003E \u003Ccode\u003Ewin.close()\u003C/code\u003E ve \u003Ccode\u003EcloseAll\u003C/code\u003E, \u003Ccode\u003E\u0026quot;owner\u0026quot;\u003C/code\u003E sahip bileşen serbest bırakıldı, \u003Ccode\u003E\u0026quot;empty\u0026quot;\u003C/code\u003E son bileşen gitti, \u003Ccode\u003E\u0026quot;navigate\u0026quot;\u003C/code\u003E rota değişti, \u003Ccode\u003E\u0026quot;page\u0026quot;\u003C/code\u003E sayfa kapanıyor ya da \u003Ccode\u003Eapp.dispose()\u003C/code\u003E çağrıldı. Kancada başka bir ebeveyne \u003Ccode\u003Econtrols.add\u003C/code\u003E ile alınan bileşen ne geri döner ne serbest bırakılır; kökeni unutulur ve \u003Ccode\u003Eclosed\u003C/code\u003E sonucunda görünmez. \u003Ccode\u003Ewin.release\u003C/code\u003E de çağrılabilir. Kanca fırlatırsa hata MJX423 ile raporlanır ve kapanış sürer.\u003C/p\u003E\n\u003Ch2 id=\u0022styles\u0022\u003EStil ve tema\u003C/h2\u003E\n\u003Cp\u003EYeni belgede stil sayfası yoktur. Açılışta sayfadaki her \u003Ccode\u003E\u0026lt;link rel=\u0026quot;stylesheet\u0026quot;\u0026gt;\u003C/code\u003E ve \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E, nerede olursa olsun, pencerenin \u003Ccode\u003Ehead\u003C/code\u003E\u0027ine kopyalanır; \u003Ccode\u003EadoptedStyleSheets\u003C/code\u003E ile kurulanlar başka belgeye verilemediği için kurallarının metninden tek bir \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E olarak yeniden kurulur. \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E ve \u003Ccode\u003E\u0026lt;body\u0026gt;\u003C/code\u003E\u0027nin \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Elang\u003C/code\u003E, \u003Ccode\u003Edir\u003C/code\u003E ve \u003Ccode\u003Edata-*\u003C/code\u003E öznitelikleri de pencerenin köküne aynalanır; tema bir \u003Ccode\u003Edata-theme\u003C/code\u003E ya da kök sınıfıyla kuruluyorsa pencerede de kurulur.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Estyles: \u0026quot;live\u0026quot;\u003C/code\u003E varsayılanıyla bu açılıştan sonra da sürer: sayfaya eklenen, değişen ya da kaldırılan stil sayfası ve kök özniteliklerindeki her değişiklik açık pencerelere yansır. Bedeli, en az bir pencere açıkken sayfada iki \u003Ccode\u003EMutationObserver\u003C/code\u003E; pencere kalmayınca bırakılır. \u003Ccode\u003EadoptedStyleSheets\u003C/code\u003E\u0027e sonradan eklenen kural gözlenemez; onu \u003Ccode\u003Ewin.syncStyles()\u003C/code\u003E ile yenilersiniz. \u003Ccode\u003E\u0026quot;once\u0026quot;\u003C/code\u003E yalnız açılışta kopyalar, \u003Ccode\u003E\u0026quot;none\u0026quot;\u003C/code\u003E hiç dokunmaz, fonksiyon verirseniz pencerenin belgesiyle çağrılır ve gerisi sizindir.\u003C/p\u003E\n\u003Ch2 id=\u0022kinds\u0022\u003ETürler\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Epopup\u003C/code\u003E \u003Ccode\u003Ewindow.open(\u0026quot;\u0026quot;, ad, özellikler)\u003C/code\u003E ile açılır; tarayıcı açmazsa, popup engeli ya da kullanıcı hareketi yoksa söz \u003Ccode\u003EMJX418\u003C/code\u003E ile reddedilir. \u003Ccode\u003Epip\u003C/code\u003E tarayıcının \u003Ccode\u003EdocumentPictureInPicture.requestWindow\u003C/code\u003E penceresidir: kullanıcı hareketi ister, sayfa başına tek pencere açar ve bugün yalnız Chromium tabanlı tarayıcılarda vardır; Firefox ve Safari\u0027de yalnız video için Picture-in-Picture bulunur. \u003Ccode\u003Eapp.windows.supports(\u0026quot;pip\u0026quot;)\u003C/code\u003E önceden söyler; \u003Ccode\u003Efallback\u003C/code\u003E varsayılanı \u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E olduğu için tek satırlık çağrı her tarayıcıda çalışır, \u003Ccode\u003Ewin.kind\u003C/code\u003E gerçekte açılanı verir.\u003C/p\u003E\n\u003Cp\u003EAna pencere küçültülse de hep üstte pencere görünür kalır. O sırada uygulamanızın kendi \u003Ccode\u003EsetTimeout\u003C/code\u003E ve \u003Ccode\u003ErequestAnimationFrame\u003C/code\u003E çağrılarını tarayıcı kısabilir; çekirdeğin geçişleri ve \u003Ccode\u003EonMounted\u003C/code\u003E sırası elemanın penceresinden çalıştığı için kısılmaz.\u003C/p\u003E\n\u003Cp\u003EElectron\u0027da \u003Ccode\u003Ewindow.open\u003C/code\u003E isteğine ana süreç karar verir; pencerenin adı \u003Ccode\u003EframeName\u003C/code\u003E olarak gelir ve pencere seçenekleri orada verilir. Hep üstte pencere Picture-in-Picture\u0027a gerek bırakmaz, \u003Ccode\u003EalwaysOnTop\u003C/code\u003E ile alınır; Electron\u0027un Chromium\u0027u \u003Ccode\u003EdocumentPictureInPicture\u003C/code\u003E\u0027ı tanısa da isteği reddeder, \u003Ccode\u003Efallback\u003C/code\u003E burada da popup\u0027a düşer. Aynı origin\u0027li çocuk pencere açıcıyla aynı renderer sürecinde yaşar; \u003Ccode\u003Efile://\u003C/code\u003E ile yüklenen uygulamada da böyledir.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022electron/main.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022electron/main.ts\u0022\u003E\u003Ccode\u003Ewin.webContents.setWindowOpenHandler(({ url, frameName }) =\u0026gt; {\n  if (frameName === \u0026quot;motif-popup\u0026quot;) {\n    return { action: \u0026quot;allow\u0026quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };\n  }\n  if (/^https?:\\/\\//.test(url)) void shell.openExternal(url);\n  return { action: \u0026quot;deny\u0026quot; };\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022electron/main.js\u0022\u003E\u003Ccode\u003Ewin.webContents.setWindowOpenHandler(({ url, frameName }) =\u0026gt; {\n  if (frameName === \u0026quot;motif-popup\u0026quot;) {\n    return { action: \u0026quot;allow\u0026quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };\n  }\n  if (/^https?:\\/\\//.test(url)) void shell.openExternal(url);\n  return { action: \u0026quot;deny\u0026quot; };\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ERenderer tarafında pencere adı seçenekle verilir: \u003Ccode\u003Eapp.windows.open(editor, { name: \u0026quot;motif-popup\u0026quot; })\u003C/code\u003E. Ana süreçten \u003Ccode\u003Enew BrowserWindow\u003C/code\u003E ile açılan pencere ayrı bir renderer sürecidir; oraya bileşen taşınamaz, iki pencere IPC ya da \u003Ccode\u003EMessagePort\u003C/code\u003E ile konuşur.\u003C/p\u003E\n\u003Ch2 id=\u0022events\u0022\u003EListe ve olaylar\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.windows.list\u003C/code\u003E açık pencerelerin reaktif listesidir; bir bağda okunursa pencere açılıp kapandıkça yenilenir. \u003Ccode\u003Eapp.windows.of(bileşen)\u003C/code\u003E bileşenin penceresini ya da \u003Ccode\u003Enull\u003C/code\u003E verir. Uygulama olayları \u003Ccode\u003Ewindow-opened\u003C/code\u003E ve \u003Ccode\u003Ewindow-closed\u003C/code\u003E handle\u0027ı taşır: \u003Ccode\u003Ethis.context.on(\u0026quot;window-closed\u0026quot;, (e) =\u0026gt; …)\u003C/code\u003E. Pencereye taşınan bileşen router\u0027ı, servisleri ve uygulama olaylarını olduğu gibi görür; penceredeki \u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E bağlantısı sayfanın router\u0027ını gezdirir, pencereyi yeniden yüklemez.\u003C/p\u003E\n\u003Ch2 id=\u0022errors\u0022\u003EHata kodları\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EKod\u003C/th\u003E\n\u003Cth\u003ENe zaman\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX418\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETarayıcı pencereyi açmadı; popup engeli ya da kullanıcı hareketi yok.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX419\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Efallback: \u0026quot;none\u0026quot;\u003C/code\u003E iken Picture-in-Picture yok ya da istek reddedildi.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX420\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKapalı handle\u0027da \u003Ccode\u003Eadd\u003C/code\u003E ya da \u003Ccode\u003Efocus\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX421\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eattach\u003C/code\u003E\u0027e pencere olmayan bir değer verildi ya da pencere başka bir origin\u0027e ait.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX422\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESerbest bırakılmış bir bileşen pencereye konmak istendi.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX423\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonClosing\u003C/code\u003E fırlattı; raporlanır, kapanış sürer.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EKodların tamamı \u003Ca href=\u0022/docs/error-codes\u0022\u003EHata ve Uyarı Kodları\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBileşen ağacını ve içeriği yuvalara taşımayı \u003Ca href=\u0022/docs/component-tree\u0022\u003Econtrols ve Bileşen Ağacı\u003C/a\u003E anlatır; pencere açmadan başka bir belgeyi uygulamaya bağlamak için \u003Ccode\u003Eapp.connectDocument\u003C/code\u003E \u003Ca href=\u0022/docs/api-reference#application\u0022\u003EAPI Referansı\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n","headings":[{"id":"open","text":"Pencere açmak","level":2},{"id":"handle","text":"Handle","level":2},{"id":"origin","text":"İçerik, köken ve geri dönüş","level":2},{"id":"closing","text":"Kapanış kuralları","level":2},{"id":"styles","text":"Stil ve tema","level":2},{"id":"kinds","text":"Türler","level":2},{"id":"events","text":"Liste ve olaylar","level":2},{"id":"errors","text":"Hata kodları","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"resilience","title":"Dayanıklılık (Resilience)"},"next":{"slug":"routing","title":"Yönlendirmeye Giriş"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Uygulama yapısı</p>
+        <h1>Pencereler</h1>
+        <p>Bir bileşeni yeni bir pencerede ya da hep üstte duran Picture-in-Picture penceresinde açmak, geri almak; pencere yöneticisinin kuralları, stil aynalama, Electron.</p>
+<p>Bir MotifJS bileşeni yeniden kurulmadan başka bir pencereye taşınabilir: <code>window.open</code> ile açılan bir pencereye, tarayıcının hep üstte tuttuğu Picture-in-Picture penceresine ya da Electron'un açtığı çocuk pencereye. Bileşen nesnesi, durumu, bağları, servisleri ve olayları sayfanın JavaScript dünyasında kalır; öbür pencereye yalnız elemanlar gider. Bunu yöneten <code>app.windows</code>'tur; bileşenden <code>this.context.windows</code>, fonksiyon bileşeninde <code>useApplication().windows</code>, dışarıdan <code>Application.main.windows</code> ile erişilir.</p>
+<h2 id="open">Pencere açmak</h2>
+<p><code>app.windows.open(bileşen, seçenekler)</code> pencereyi açar, bileşeni oraya taşır ve bir handle döndürür. Tarayıcı çağrısı kullanıcı hareketinin içinde yapılır; bu yüzden <code>open</code> bir tıklama işleyicisinden çağrılır. Dönen söz içerik yerleşince çözülür. Açık notun düzenleyicisini pencerede ya da hep üstte açan araç çubuğu:</p>
+<div class="doc-code" data-file="src/parts/NoteTools.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteTools.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component&lt;HTMLDivElement&gt; {
+  editor!: NoteEditor;
+
+  override onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  override view() {
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Not&quot; })}&gt;Pencerede aç&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Hep üstte&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteTools.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component&lt;HTMLDivElement&gt; {
+  editor = new NoteEditor();
+
+  override onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  override initializeComponent() {
+    const popup = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Pencerede aç&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Not&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Hep üstte&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    this.controls.add(popup, pip, this.editor);
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteTools.tsx"><code>import { useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  let editor!: NoteEditor;
+
+  return (
+    &lt;div class=&quot;tools&quot;&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Not&quot; })}&gt;Pencerede aç&lt;/button&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Hep üstte&lt;/button&gt;
+      &lt;NoteEditor ref={(field) =&gt; (editor = field)} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteTools.ts"><code>import { ComponentBase, motifComponent, useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  const editor = new NoteEditor();
+
+  return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+    root.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Pencerede aç&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Not&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Hep üstte&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    root.controls.add(popup, pip, editor);
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteTools.tsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: null as NoteEditor | null },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor!, { width: 720, height: 560, title: &quot;Not&quot; })}&gt;Pencerede aç&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor!, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Hep üstte&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.data.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteTools.ts"><code>import { ComponentBase, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: new NoteEditor() },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Pencerede aç&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: &quot;Not&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Hep üstte&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    return [popup, pip, this.data.editor];
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteTools.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component {
+  static elementTag = &quot;div&quot;;
+  editor;
+
+  onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Not&quot; })}&gt;Pencerede aç&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Hep üstte&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteTools.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component {
+  static elementTag = &quot;div&quot;;
+  editor = new NoteEditor();
+
+  onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  initializeComponent() {
+    const popup = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Pencerede aç&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Not&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Hep üstte&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    this.controls.add(popup, pip, this.editor);
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteTools.jsx"><code>import { useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  let editor;
+
+  return (
+    &lt;div class=&quot;tools&quot;&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Not&quot; })}&gt;Pencerede aç&lt;/button&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Hep üstte&lt;/button&gt;
+      &lt;NoteEditor ref={(field) =&gt; (editor = field)} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteTools.js"><code>import { motifComponent, useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  const editor = new NoteEditor();
+
+  return motifComponent(&quot;div&quot;, (root) =&gt; {
+    root.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Pencerede aç&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Not&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Hep üstte&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    root.controls.add(popup, pip, editor);
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteTools.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: null },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: &quot;Not&quot; })}&gt;Pencerede aç&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Hep üstte&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.data.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteTools.js"><code>import { motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: new NoteEditor() },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Pencerede aç&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: &quot;Not&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Hep üstte&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    return [popup, pip, this.data.editor];
+  },
+});</code></pre>
+</div>
+<p>Boş pencere <code>app.windows.create(seçenekler)</code> ile açılır, içerik sonra <code>win.add</code> ile verilir; <code>open</code> bu ikisinin kısa yoludur. Elinizdeki hazır bir pencere, bir <code>&lt;iframe&gt;</code>'in <code>contentWindow</code>'u ya da kendi açtığınız bir pencere <code>app.windows.attach(pencere, seçenekler)</code> ile yönetilen pencere olur.</p>
+<table>
+<thead>
+<tr>
+<th>Seçenek</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kind</code></td>
+<td><code>&quot;popup&quot;</code> varsayılan, <code>&quot;pip&quot;</code> hep üstte duran Picture-in-Picture penceresi.</td>
+</tr>
+<tr>
+<td><code>fallback</code></td>
+<td><code>&quot;pip&quot;</code> tarayıcıda yoksa ya da istek reddedilirse ne olacağı: <code>&quot;popup&quot;</code> varsayılan, <code>&quot;none&quot;</code> ile söz <code>MJX419</code> ile reddedilir.</td>
+</tr>
+<tr>
+<td><code>width</code>, <code>height</code>, <code>left</code>, <code>top</code></td>
+<td>Pencerenin boyutu ve yeri.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>window.open</code> adı; verilmezse her pencere kendi adını alır. Electron'da ana sürecin gördüğü <code>frameName</code> budur.</td>
+</tr>
+<tr>
+<td><code>features</code></td>
+<td><code>window.open</code> özellik dizesine eklenecek parçalar.</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>Pencerenin başlığı; verilmezse sayfanın başlığı.</td>
+</tr>
+<tr>
+<td><code>styles</code></td>
+<td>Stil ve tema aynalama: <code>&quot;live&quot;</code> varsayılan, <code>&quot;once&quot;</code>, <code>&quot;none&quot;</code> ya da pencerenin belgesini alan bir fonksiyon.</td>
+</tr>
+<tr>
+<td><code>orphans</code></td>
+<td>Kapanışta kökeni kalmamış içerik: <code>&quot;dispose&quot;</code> varsayılan, <code>&quot;keep&quot;</code> kopuk bırakır. Yalnız <code>win.add</code> ile verilen bileşenler için geçerlidir.</td>
+</tr>
+<tr>
+<td><code>closeWhenEmpty</code></td>
+<td>Son içerik serbest bırakılınca pencere kapanır; varsayılan <code>true</code>. Yalnız <code>win.add</code> ile verilen bileşenler sayılır; <code>host</code>'a doğrudan konan içerik pencereyi açık tutmaz.</td>
+</tr>
+<tr>
+<td><code>closeOnNavigate</code></td>
+<td>Rota değişince pencere kapanır; varsayılan <code>false</code>.</td>
+</tr>
+<tr>
+<td><code>returnOnClose</code></td>
+<td>Kapanışta içerik kökenine döner; varsayılan <code>true</code>. <code>false</code> ile kökeni olan bileşen de <code>orphans</code> kuralına girer.</td>
+</tr>
+<tr>
+<td><code>owner</code></td>
+<td>Pencere bu bileşenin serbest bırakma katmanına bağlanır; bileşen gidince pencere kapanır.</td>
+</tr>
+<tr>
+<td><code>onClosing</code></td>
+<td>Pencere kapanmadan hemen önce, içerik hâlâ penceredeyken çağrılır; <code>{ window, components, reason }</code> alır. Bkz. <a href="#closing">Kapanış kuralları</a>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="handle">Handle</h2>
+<p><code>open</code>, <code>create</code> ve <code>attach</code> bir <code>AppWindow</code> döndürür.</p>
+<table>
+<thead>
+<tr>
+<th>Üye</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>window</code>, <code>document</code></td>
+<td>Pencerenin kendisi ve belgesi.</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td>Pencerenin gövdesini saran bileşen; içerik onun çocuğudur.</td>
+</tr>
+<tr>
+<td><code>kind</code></td>
+<td>Gerçekte açılan tür: <code>&quot;popup&quot;</code>, <code>&quot;pip&quot;</code> ya da <code>attach</code> ile gelen için <code>&quot;attached&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>components</code></td>
+<td>Penceredeki bileşenler, ekleniş sırasıyla.</td>
+</tr>
+<tr>
+<td><code>isOpen</code></td>
+<td>Pencere açık mı.</td>
+</tr>
+<tr>
+<td><code>add(...bileşenler)</code></td>
+<td>Bileşenleri pencereye taşır.</td>
+</tr>
+<tr>
+<td><code>release(bileşen)</code></td>
+<td>Bileşeni kökenine geri koyar, pencere açık kalır.</td>
+</tr>
+<tr>
+<td><code>focus()</code></td>
+<td>Pencereyi öne getirir.</td>
+</tr>
+<tr>
+<td><code>close()</code></td>
+<td>Pencereyi kapatır; sonucu <code>{ returned, disposed, kept }</code> olarak döndürür.</td>
+</tr>
+<tr>
+<td><code>closed</code></td>
+<td>Pencere nasıl kapanırsa kapansın aynı sonuçla çözülen söz.</td>
+</tr>
+<tr>
+<td><code>syncStyles()</code></td>
+<td>Stil sayfalarını elle yeniler.</td>
+</tr>
+</tbody>
+</table>
+<p>Penceredeki bir bileşenin açtığı bildirim ya da iletişim kutusu da o pencerede görünmelidir. <code>app.layerOf(bileşen)</code> bileşenin belgesine bakar: bileşen bu yöneticinin bir penceresindeyse pencerenin <code>host</code>'unu, sayfadaysa <code>app.layer</code>'ı döndürür ve ardından verilen bileşenleri oraya ekler (bkz. <a href="/tr/docs/component-tree#layer">Sayfa katmanı</a>). Böyle doğrudan <code>host</code>'a konan içerik pencerenin <code>components</code> listesine girmez; <code>orphans</code> ve <code>returnOnClose</code> ona bakmaz, <code>closeWhenEmpty</code> onu saymaz (<code>win.add</code> ile verilen son bileşen gidince pencere, <code>host</code>'ta hâlâ bir iletişim kutusu olsa da kapanır), pencere kapanınca <code>host</code> ile birlikte serbest bırakılır ve <code>closed</code> sonucunun hiçbir listesinde yer almaz. Pencereyle kalkmaması gereken içerik <code>win.add</code> ile verilir ya da bir <code>Transport</code> yuvasına yazılır.</p>
+<h2 id="origin">İçerik, köken ve geri dönüş</h2>
+<p>Bir bileşen pencereye ilk alındığında yönetici sayfadaki ebeveynini ve o anki sonraki kardeşini not eder. Bileşen eski ebeveyninden ayrılır, <code>onDeactivated</code> alır, pencerenin gövdesine <code>controls.add</code> ile girer ve <code>onActivated</code> alır; <code>onMounted</code> daha önce çalıştıysa bir daha çalışmaz, ilk kez orada yerleşiyorsa o pencerenin sırasında çalışır. Aynı pencereye <code>win.add</code> ile başka bileşenler de konur; bileşen bir pencereden ötekine taşınırsa köken değişmez. Köken yalnız <code>open</code> ya da <code>add</code> ile verilen bileşen için tutulur: uygulamanın <code>attach</code> ile bağladığı pencereye kendi taşıdığı bileşenleri yönetici tanımaz, kapanışta onlar için hiçbir şey geri dönmez ve <code>components</code> listesinde görünmezler.</p>
+<p><code>win.release(bileşen)</code> ve pencerenin kapanışı bileşeni kökenine, eski sırasına koyar: hatırlanan kardeş hâlâ oradaysa onun önüne, o da penceredeyse onun kardeşinin önüne, kimse yoksa sona. Aynı ebeveynden pencereye alınan birden çok bileşen geri döndüğünde <code>controls</code> içindeki eski sırasını bulur. <code>returnOnClose: false</code> bu dönüşü kapatır; kökeni olan bileşen de kökensiz sayılır, <code>release</code> ise yine kökene koyar. Kökeni kalmamışsa, örneğin rota değişip ebeveyn serbest bırakıldıysa, <code>orphans</code> karar verir: varsayılan serbest bırakmak, <code>&quot;keep&quot;</code> ile bileşen ebeveynsiz ama sağ kalır ve <code>closed</code> sonucunun <code>kept</code> listesinde gelir. Köken yokken içeriği korumak isteyen uygulama kapanmadan önce <code>win.release</code> ya da başka bir ebeveyne <code>controls.add</code> ile alır.</p>
+<p>Penceredeki bir bileşen gizlenip gösterilince pencerede kalır: iz pencerede bırakılır, <code>motif.show()</code> bileşeni oraya koyar. Bu, uygulamanın elemanını başka bir belgeye kendi taşıdığı bileşen için de geçerlidir. İz oynatılmış ya da tutucusu belgeden çıkmışsa bileşen ebeveyninin altında yeniden kurulur ve <code>MJX106</code> uyarısı verilir.</p>
+<h2 id="closing">Kapanış kuralları</h2>
+<p>Pencere kullanıcı tarafından kapatıldığında, <code>win.close()</code> çağrıldığında ya da penceresi <code>pagehide</code> aldığında içerik kökenine döner ve <code>closed</code> çözülür. Penceredeki bir bileşen uygulama tarafından serbest bırakılırsa listeden düşer; son bileşen de giderse pencere kapanır, <code>closeWhenEmpty: false</code> açık tutar. <code>owner</code> verilmişse sahip bileşen serbest bırakılınca pencere kapanır; <code>closeOnNavigate</code> rota değişince kapatır. <code>app.dispose()</code> ve sayfanın kendi <code>pagehide</code>'ı bütün pencereleri kapatır, içlerindeki içerik serbest bırakılır; arkada boş pencere kalmaz. <code>app.windows.closeAll()</code> aynı işi istek üzerine yapar.</p>
+<p><code>onClosing</code> verilmişse yönetici içeriğe dokunmadan önce onu çağırır; kullanıcı kapatışında bu pencerenin <code>pagehide</code> anıdır ve belge hâlâ ayaktadır. O anda pencere kapalı sayılır: <code>isOpen</code> <code>false</code>, <code>add</code> MJX420 fırlatır. Kanca <code>{ window, components, reason }</code> alır. <code>components</code> o anda penceredeki bileşenlerin kopyasıdır; <code>reason</code> kapanışın nedenidir: <code>&quot;user&quot;</code> kullanıcı kapattı ya da pencere <code>pagehide</code> aldı, <code>&quot;code&quot;</code> <code>win.close()</code> ve <code>closeAll</code>, <code>&quot;owner&quot;</code> sahip bileşen serbest bırakıldı, <code>&quot;empty&quot;</code> son bileşen gitti, <code>&quot;navigate&quot;</code> rota değişti, <code>&quot;page&quot;</code> sayfa kapanıyor ya da <code>app.dispose()</code> çağrıldı. Kancada başka bir ebeveyne <code>controls.add</code> ile alınan bileşen ne geri döner ne serbest bırakılır; kökeni unutulur ve <code>closed</code> sonucunda görünmez. <code>win.release</code> de çağrılabilir. Kanca fırlatırsa hata MJX423 ile raporlanır ve kapanış sürer.</p>
+<h2 id="styles">Stil ve tema</h2>
+<p>Yeni belgede stil sayfası yoktur. Açılışta sayfadaki her <code>&lt;link rel=&quot;stylesheet&quot;&gt;</code> ve <code>&lt;style&gt;</code>, nerede olursa olsun, pencerenin <code>head</code>'ine kopyalanır; <code>adoptedStyleSheets</code> ile kurulanlar başka belgeye verilemediği için kurallarının metninden tek bir <code>&lt;style&gt;</code> olarak yeniden kurulur. <code>&lt;html&gt;</code> ve <code>&lt;body&gt;</code>'nin <code>class</code>, <code>lang</code>, <code>dir</code> ve <code>data-*</code> öznitelikleri de pencerenin köküne aynalanır; tema bir <code>data-theme</code> ya da kök sınıfıyla kuruluyorsa pencerede de kurulur.</p>
+<p><code>styles: &quot;live&quot;</code> varsayılanıyla bu açılıştan sonra da sürer: sayfaya eklenen, değişen ya da kaldırılan stil sayfası ve kök özniteliklerindeki her değişiklik açık pencerelere yansır. Bedeli, en az bir pencere açıkken sayfada iki <code>MutationObserver</code>; pencere kalmayınca bırakılır. <code>adoptedStyleSheets</code>'e sonradan eklenen kural gözlenemez; onu <code>win.syncStyles()</code> ile yenilersiniz. <code>&quot;once&quot;</code> yalnız açılışta kopyalar, <code>&quot;none&quot;</code> hiç dokunmaz, fonksiyon verirseniz pencerenin belgesiyle çağrılır ve gerisi sizindir.</p>
+<h2 id="kinds">Türler</h2>
+<p><code>popup</code> <code>window.open(&quot;&quot;, ad, özellikler)</code> ile açılır; tarayıcı açmazsa, popup engeli ya da kullanıcı hareketi yoksa söz <code>MJX418</code> ile reddedilir. <code>pip</code> tarayıcının <code>documentPictureInPicture.requestWindow</code> penceresidir: kullanıcı hareketi ister, sayfa başına tek pencere açar ve bugün yalnız Chromium tabanlı tarayıcılarda vardır; Firefox ve Safari'de yalnız video için Picture-in-Picture bulunur. <code>app.windows.supports(&quot;pip&quot;)</code> önceden söyler; <code>fallback</code> varsayılanı <code>&quot;popup&quot;</code> olduğu için tek satırlık çağrı her tarayıcıda çalışır, <code>win.kind</code> gerçekte açılanı verir.</p>
+<p>Ana pencere küçültülse de hep üstte pencere görünür kalır. O sırada uygulamanızın kendi <code>setTimeout</code> ve <code>requestAnimationFrame</code> çağrılarını tarayıcı kısabilir; çekirdeğin geçişleri ve <code>onMounted</code> sırası elemanın penceresinden çalıştığı için kısılmaz.</p>
+<p>Electron'da <code>window.open</code> isteğine ana süreç karar verir; pencerenin adı <code>frameName</code> olarak gelir ve pencere seçenekleri orada verilir. Hep üstte pencere Picture-in-Picture'a gerek bırakmaz, <code>alwaysOnTop</code> ile alınır; Electron'un Chromium'u <code>documentPictureInPicture</code>'ı tanısa da isteği reddeder, <code>fallback</code> burada da popup'a düşer. Aynı origin'li çocuk pencere açıcıyla aynı renderer sürecinde yaşar; <code>file://</code> ile yüklenen uygulamada da böyledir.</p>
+<div class="doc-code" data-file="electron/main.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="electron/main.ts"><code>win.webContents.setWindowOpenHandler(({ url, frameName }) =&gt; {
+  if (frameName === &quot;motif-popup&quot;) {
+    return { action: &quot;allow&quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };
+  }
+  if (/^https?:\/\//.test(url)) void shell.openExternal(url);
+  return { action: &quot;deny&quot; };
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="electron/main.js"><code>win.webContents.setWindowOpenHandler(({ url, frameName }) =&gt; {
+  if (frameName === &quot;motif-popup&quot;) {
+    return { action: &quot;allow&quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };
+  }
+  if (/^https?:\/\//.test(url)) void shell.openExternal(url);
+  return { action: &quot;deny&quot; };
+});</code></pre>
+</div>
+<p>Renderer tarafında pencere adı seçenekle verilir: <code>app.windows.open(editor, { name: &quot;motif-popup&quot; })</code>. Ana süreçten <code>new BrowserWindow</code> ile açılan pencere ayrı bir renderer sürecidir; oraya bileşen taşınamaz, iki pencere IPC ya da <code>MessagePort</code> ile konuşur.</p>
+<h2 id="events">Liste ve olaylar</h2>
+<p><code>app.windows.list</code> açık pencerelerin reaktif listesidir; bir bağda okunursa pencere açılıp kapandıkça yenilenir. <code>app.windows.of(bileşen)</code> bileşenin penceresini ya da <code>null</code> verir. Uygulama olayları <code>window-opened</code> ve <code>window-closed</code> handle'ı taşır: <code>this.context.on(&quot;window-closed&quot;, (e) =&gt; …)</code>. Pencereye taşınan bileşen router'ı, servisleri ve uygulama olaylarını olduğu gibi görür; penceredeki <code>rel=&quot;router&quot;</code> bağlantısı sayfanın router'ını gezdirir, pencereyi yeniden yüklemez.</p>
+<h2 id="errors">Hata kodları</h2>
+<table>
+<thead>
+<tr>
+<th>Kod</th>
+<th>Ne zaman</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MJX418</code></td>
+<td>Tarayıcı pencereyi açmadı; popup engeli ya da kullanıcı hareketi yok.</td>
+</tr>
+<tr>
+<td><code>MJX419</code></td>
+<td><code>fallback: &quot;none&quot;</code> iken Picture-in-Picture yok ya da istek reddedildi.</td>
+</tr>
+<tr>
+<td><code>MJX420</code></td>
+<td>Kapalı handle'da <code>add</code> ya da <code>focus</code>.</td>
+</tr>
+<tr>
+<td><code>MJX421</code></td>
+<td><code>attach</code>'e pencere olmayan bir değer verildi ya da pencere başka bir origin'e ait.</td>
+</tr>
+<tr>
+<td><code>MJX422</code></td>
+<td>Serbest bırakılmış bir bileşen pencereye konmak istendi.</td>
+</tr>
+<tr>
+<td><code>MJX423</code></td>
+<td><code>onClosing</code> fırlattı; raporlanır, kapanış sürer.</td>
+</tr>
+</tbody>
+</table>
+<p>Kodların tamamı <a href="/tr/docs/error-codes">Hata ve Uyarı Kodları</a> sayfasındadır.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Bileşen ağacını ve içeriği yuvalara taşımayı <a href="/tr/docs/component-tree">controls ve Bileşen Ağacı</a> anlatır; pencere açmadan başka bir belgeyi uygulamaya bağlamak için <code>app.connectDocument</code> <a href="/tr/docs/api-reference#application">API Referansı</a> sayfasındadır.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

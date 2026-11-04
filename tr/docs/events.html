@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="DOM olayları ve değiştiriciler, motif.on/off/trigger bileşen olayları, yaşam döngüsü olayları, uygulama olay veriyolu ve Emitter ile servis olayları; JSX ile ve JSX&#x27;siz.">
+    <title>Olaylar — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/events">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/events">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/events">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/events">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/events">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Olaylar">
+    <meta property="og:description" content="DOM olayları ve değiştiriciler, motif.on/off/trigger bileşen olayları, yaşam döngüsü olayları, uygulama olay veriyolu ve Emitter ile servis olayları; JSX ile ve JSX&#x27;siz.">
+    <script type="application/json" id="doc-data">{"slug":"events","locale":"tr","title":"Olaylar","description":"DOM olayları ve değiştiriciler, motif.on/off/trigger bileşen olayları, yaşam döngüsü olayları, uygulama olay veriyolu ve Emitter ile servis olayları; JSX ile ve JSX\u0027siz.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Cp\u003EMotifJS\u0027te üç olay katmanı vardır:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Cstrong\u003EDOM olayları\u003C/strong\u003E — bir elemana \u003Ccode\u003Eonclick\u003C/code\u003E, \u003Ccode\u003Eoninput\u003C/code\u003E gibi prop\u0027larla, JSX\u0027siz yazımda \u003Ccode\u003Emotif.on\u003C/code\u003E ile bağlanır.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EBileşen olayları\u003C/strong\u003E — \u003Ccode\u003Ecomponent.motif.on/trigger/off\u003C/code\u003E ile bileşenler arası iletişim.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EUygulama olayları\u003C/strong\u003E — \u003Ccode\u003Econtext.on/fire\u003C/code\u003E ile uygulama genelinde yayın.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EÖrnekler başlangıç şablonundaki not uygulamasının kesitleridir: not listesi (\u003Ccode\u003ENotesLayout\u003C/code\u003E) ve düzenleyici (\u003Ccode\u003ENotePage\u003C/code\u003E). \u003Ccode\u003ENote\u003C/code\u003E ve \u003Ccode\u003ENotesService\u003C/code\u003E \u003Ca href=\u0022/docs/components\u0022\u003EBileşenler\u003C/a\u003E sayfasındaki \u003Ccode\u003Esrc/services/notes.ts\u003C/code\u003E dosyasındakilerdir.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Ethis.state\u003C/code\u003E bileşenin kendi durumudur; \u003Ccode\u003Ethis.remove\u003C/code\u003E ve \u003Ccode\u003Ethis.close\u003C/code\u003E bileşenin metotlarıdır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Estate\u003C/code\u003E bileşenin \u003Ccode\u003Ereactive\u003C/code\u003E ile kurduğu yerel durumdur; \u003Ccode\u003Eremove\u003C/code\u003E ve \u003Ccode\u003Eclose\u003C/code\u003E bileşen fonksiyonunun içindeki yerel fonksiyonlardır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022dom-events\u0022\u003EDOM olayları\u003C/h2\u003E\n\u003Cp\u003EJSX\u0027te \u003Ccode\u003Eon...\u003C/code\u003E prop\u0027ları DOM olaylarına bağlanır; olay adları küçük harfle yazılır. JSX\u0027siz yazımda aynı bağ \u003Ccode\u003Emotif.on(ad, işleyici)\u003C/code\u003E çağrısıdır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Sabitle\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (this.state.query = (e.target as HTMLInputElement).value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Arşiv\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Sabitle\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (state.query = (e.target as HTMLInputElement).value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Arşiv\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Sabitle\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (this.state.query = (e.target as HTMLInputElement).value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link: ComponentBase) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Arşiv\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Sabitle\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (state.query = (e.target as HTMLInputElement).value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link: ComponentBase) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Arşiv\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Sabitle\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (this.state.query = e.target.value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Arşiv\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;Sabitle\u0026lt;/button\u0026gt;\n\u0026lt;input type=\u0026quot;search\u0026quot; oninput={(e) =\u0026gt; (state.query = e.target.value)} /\u0026gt;\n\u0026lt;form onsubmit={(sender, e) =\u0026gt; { e.preventDefault(); notes.create(); }}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;a href=\u0026quot;/archive\u0026quot; onclick:prevent={(sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;)}\u0026gt;Arşiv\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Sabitle\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (this.state.query = e.target.value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender, e) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Arşiv\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Sabitle\u0026quot;)));\n});\nconst search = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;search\u0026quot; });\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (state.query = e.target.value));\n});\nconst form = motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.motif.on(\u0026quot;submit\u0026quot;, (_sender, e) =\u0026gt; { e.preventDefault(); notes.create(); });\n});\nconst archive = motifComponent(\u0026quot;a\u0026quot;, (link) =\u0026gt; {\n  link.attr.add({ href: \u0026quot;/archive\u0026quot; });\n  link.motif.on(\u0026quot;click:prevent\u0026quot;, (sender, _e) =\u0026gt; sender.context.navigate(\u0026quot;/archive\u0026quot;));\n  link.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Arşiv\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EDüz etikette her DOM olayı bu yazımla bağlanır (\u003Ccode\u003Eonpointerdown\u003C/code\u003E, \u003Ccode\u003Eonmouseenter\u003C/code\u003E, \u003Ccode\u003Eonanimationend\u003C/code\u003E dahil); \u003Ccode\u003EonClick\u003C/code\u003E gibi camelCase yazım da aynı olayı bağlar.\u003C/p\u003E\n\u003Cp\u003EBir bileşen etiketinde DOM olay adı taşıyan prop (\u003Ccode\u003Eonchange\u003C/code\u003E/\u003Ccode\u003EonChange\u003C/code\u003E, \u003Ccode\u003EonCopy\u003C/code\u003E, \u003Ccode\u003EonResize\u003C/code\u003E, \u003Ccode\u003EonSelect\u003C/code\u003E, \u003Ccode\u003EonReset\u003C/code\u003E, \u003Ccode\u003EonContextMenu\u003C/code\u003E …) bileşenin elemanına DOM dinleyicisi olarak bağlanır ve bileşenin props\u0027una ulaşmaz; camelCase yazımda derleyici \u003Ccode\u003EMJX002\u003C/code\u003E uyarısı verir. Geri çağrı prop\u0027u için DOM olayıyla çakışmayan bir ad seçin (\u003Ccode\u003EonValueChange\u003C/code\u003E, \u003Ccode\u003EonConfirm\u003C/code\u003E). Elemanı olmayan (fragment) bileşende böyle bir dinleyicinin bağlanacağı eleman yoktur (bkz. \u003Ca href=\u0022/docs/components#root-element\u0022\u003EKök eleman\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022handler-signatures\u0022\u003Eİşleyici imzaları\u003C/h3\u003E\n\u003Cp\u003Eİşleyici iki biçimden biriyle yazılır; MotifJS parametre sayısına göre doğru olanı çağırır. Kural \u003Ccode\u003Emotif.on\u003C/code\u003E için de aynıdır: tek parametreli işleyici olayı alır, göndereni değil:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;text\u0026quot; onkeydown={(e) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create()} /\u0026gt;          {/* yalnız olay */}\n\u0026lt;li onclick={(sender, e) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;)}\u0026gt;…\u0026lt;/li\u0026gt;                       {/* gönderen \u002B olay */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst field = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.motif.on(\u0026quot;keydown\u0026quot;, (_sender: ComponentBase, e: KeyboardEvent) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create());\n});\nconst row = motifComponent(\u0026quot;li\u0026quot;, (li: ComponentBase) =\u0026gt; {\n  li.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;text\u0026quot; onkeydown={(e) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create()} /\u0026gt;          {/* yalnız olay */}\n\u0026lt;li onclick={(sender, e) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;)}\u0026gt;…\u0026lt;/li\u0026gt;                       {/* gönderen \u002B olay */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst field = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.motif.on(\u0026quot;keydown\u0026quot;, (_sender, e) =\u0026gt; e.key === \u0026quot;Enter\u0026quot; \u0026amp;\u0026amp; notes.create());\n});\nconst row = motifComponent(\u0026quot;li\u0026quot;, (li) =\u0026gt; {\n  li.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; sender.class.add(\u0026quot;selected\u0026quot;));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Esender\u003C/code\u003E — olayı tetikleyen \u003Ccode\u003EComponentBase\u003C/code\u003E örneğidir; \u003Ccode\u003Esender.element\u003C/code\u003E, \u003Ccode\u003Esender.context\u003C/code\u003E, \u003Ccode\u003Esender.motif\u003C/code\u003E gibi üyelere erişebilirsiniz.\u003C/li\u003E\n\u003Cli\u003Eİşleyici \u003Ccode\u003E{ cancel: true }\u003C/code\u003E döndürürse MotifJS \u003Ccode\u003EpreventDefault()\u003C/code\u003E ve \u003Ccode\u003EstopPropagation()\u003C/code\u003E çağırır. \u003Ccode\u003Efalse\u003C/code\u003E dahil diğer dönüş değerleri yok sayılır; bu yüzden yukarıdaki \u003Ccode\u003Eonkeydown\u003C/code\u003E kısa gövdesi diğer tuşları iptal etmez. Bu metotlar yalnızca olay nesnesinde varsa çağrılır; \u003Ccode\u003Emotif.trigger(\u0026quot;ad\u0026quot;, { … })\u003C/code\u003E ile düz bir veri nesnesi geçildiğinde hiçbiri çağrılmaz ve hata oluşmaz. \u003Ccode\u003E:prevent\u003C/code\u003E / \u003Ccode\u003E:stop\u003C/code\u003E değiştiricileri de aynı kurala uyar.\u003C/li\u003E\n\u003Cli\u003EParametre sayısı fonksiyonun \u003Ccode\u003Elength\u003C/code\u003E değeridir: bildirilen parametre sayısı ≤ 1 ise \u003Ccode\u003Efn(event)\u003C/code\u003E, 2 ve üzeri ise \u003Ccode\u003Efn(sender, event)\u003C/code\u003E çağrılır. Varsayılan değerli ya da rest parametre ve ondan sonrakiler sayılmaz; bu yüzden \u003Ccode\u003E(...a) =\u0026gt; …\u003C/code\u003E 0 sayılır ve yalnızca \u003Ccode\u003Eevent\u003C/code\u003E alır, \u003Ccode\u003E(s = null, e) =\u0026gt; …\u003C/code\u003E de 0 sayılır.\u003C/li\u003E\n\u003Cli\u003ETypeScript\u0027te iki biçim de, düz etikette ve bileşen etiketinde, elemanın olayından tiplenir: \u003Ccode\u003Eonkeydown={(e) =\u0026gt; e.key}\u003C/code\u003E yazınca \u003Ccode\u003Ee\u003C/code\u003E \u003Ccode\u003EKeyboardEvent\u003C/code\u003E olur, \u003Ccode\u003E(s, e) =\u0026gt; …\u003C/code\u003E biçiminde de \u003Ccode\u003Ee\u003C/code\u003E aynı tipi alır. İlk parametrenin anlamı parametre sayısına bağlı olduğu için olay ve bileşen birlikte tiplenir (\u003Ccode\u003EKeyboardEvent \u0026amp; ComponentBase\u003C/code\u003E); \u003Ccode\u003E(e) =\u0026gt; …\u003C/code\u003E içinde olayın, \u003Ccode\u003E(s, e) =\u0026gt; …\u003C/code\u003E içinde bileşenin üyelerini kullanın. \u003Ccode\u003Emotif.on\u003C/code\u003E\u0027un tipi \u003Ccode\u003E(sender, e)\u003C/code\u003E imzasıdır; olayı kullanacaksanız iki parametre yazın.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022handler-errors\u0022\u003Eİşleyici hataları\u003C/h3\u003E\n\u003Cp\u003Eİşleyici hata fırlatırsa ya da \u003Ccode\u003Easync\u003C/code\u003E işleyicinin döndürdüğü promise reddedilirse hata \u003Ccode\u003EMJX123\u003C/code\u003E (\u003Ccode\u003EThe \u0027\u0026lt;olay\u0026gt;\u0027 event handler threw.\u003C/code\u003E) koduyla bir \u003Ccode\u003EMotifError\u003C/code\u003E olarak \u003Ccode\u003EerrorHandler\u003C/code\u003E\u0027a raporlanır; asıl hata \u003Ccode\u003Ecause\u003C/code\u003E alanındadır. Rapor üretim kipinde de konsola yazılır (\u003Ccode\u003Eapp.useLogging(false)\u003C/code\u003E kapatır) ve \u003Ccode\u003EerrorHandler.addListener(fn)\u003C/code\u003E dinleyicilerine ulaşır. Aynı olayın diğer dinleyicileri çalışmaya devam eder.\u003C/p\u003E\n\u003Ch3 id=\u0022context-events\u0022\u003E\u003Ccode\u003Eon:ad\u003C/code\u003E / \u003Ccode\u003Eon-ad\u003C/code\u003E / \u003Ccode\u003Eon_ad\u003C/code\u003E yazımı\u003C/h3\u003E\n\u003Cp\u003EBu yazım işleyiciyi olduğu gibi etiketin bileşenine bağlar: \u003Ccode\u003E\u0026lt;X on:saved={fn}/\u0026gt;\u003C/code\u003E, \u003Ccode\u003Esender.motif.on(\u0026quot;saved\u0026quot;, fn)\u003C/code\u003E demektir. Olay adı, önek (\u003Ccode\u003Eon:\u003C/code\u003E, \u003Ccode\u003Eon-\u003C/code\u003E, \u003Ccode\u003Eon_\u003C/code\u003E) atıldıktan sonra kalan kısmın tamamıdır: \u003Ccode\u003Eon-my-event\u003C/code\u003E → \u003Ccode\u003Emy-event\u003C/code\u003E, \u003Ccode\u003Eon_my_event\u003C/code\u003E → \u003Ccode\u003Emy_event\u003C/code\u003E. Hem DOM olayları hem de \u003Ccode\u003Emotif.trigger\u003C/code\u003E ile tetiklenen özel olaylar için kullanılır ve yukarıdaki parametre sayısı kuralı aynen geçerlidir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target: Note) =\u0026gt; this.remove(target)} /\u0026gt;   {/* tek parametre: trigger\u0027a verilen veri */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* iki parametre: gönderen \u002B olay */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={this.close}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* metot başvurusu olduğu gibi geçer */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target: Note) =\u0026gt; remove(target)} /\u0026gt;   {/* tek parametre: trigger\u0027a verilen veri */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* iki parametre: gönderen \u002B olay */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={close}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* fonksiyon başvurusu olduğu gibi geçer */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm: ComponentBase, target: Note) =\u0026gt; this.remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, this.close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm: ComponentBase, target: Note) =\u0026gt; remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target) =\u0026gt; this.remove(target)} /\u0026gt;   {/* tek parametre: trigger\u0027a verilen veri */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* iki parametre: gönderen \u002B olay */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={this.close}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* metot başvurusu olduğu gibi geçer */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;DeleteConfirm note={note} on:confirm={(target) =\u0026gt; remove(target)} /\u0026gt;   {/* tek parametre: trigger\u0027a verilen veri */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on-click={(sender, _e) =\u0026gt; sender.motif.hide()}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* iki parametre: gönderen \u002B olay */}\n\u0026lt;button type=\u0026quot;button\u0026quot; on_click={close}\u0026gt;Kapat\u0026lt;/button\u0026gt;   {/* fonksiyon başvurusu olduğu gibi geçer */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm, target) =\u0026gt; this.remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, this.close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =\u0026gt; confirm.motif.on(\u0026quot;confirm\u0026quot;, (_confirm, target) =\u0026gt; remove(target)) });\nconst close = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; sender.motif.hide());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\nconst closeByMethod = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, close);\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Kapat\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ESilme onayı \u003Ccode\u003EDeleteConfirm\u003C/code\u003E, \u0026quot;Sil\u0026quot; düğmesine basılınca kendi bileşeninde \u003Ccode\u003Emotif.trigger(\u0026quot;confirm\u0026quot;, note)\u003C/code\u003E çağırır (sınıfta ve Options\u0027ta \u003Ccode\u003Ethis.motif.trigger\u003C/code\u003E, fonksiyon bileşeninde döndürdüğü kökün \u003Ccode\u003Emotif.trigger\u003C/code\u003E\u0027ı) ve ilk işleyici notu alır. JSX\u0027siz yazımda dinleyici \u003Ccode\u003EinitializeComponent\u003C/code\u003E anahtarında kurulur; sınıf, fonksiyon ve Options bileşeninde aynıdır. Olay adı serbest olduğu için \u003Ccode\u003Eon:\u003C/code\u003E/\u003Ccode\u003Eon-\u003C/code\u003E/\u003Ccode\u003Eon_\u003C/code\u003E prop\u0027larının parametreleri \u003Ccode\u003Eany\u003C/code\u003E tiplidir; veriye kendi tipini parametrede verirsiniz (\u003Ccode\u003E(target: Note) =\u0026gt; …\u003C/code\u003E). \u003Ccode\u003Emotif.on\u003C/code\u003E\u0027un tipi \u003Ccode\u003E(sender, e)\u003C/code\u003E olduğundan JSX\u0027siz yazımda veri ikinci parametredir.\u003C/p\u003E\n\u003Ch2 id=\u0022modifiers\u0022\u003EOlay değiştiricileri (modifiers)\u003C/h2\u003E\n\u003Cp\u003EOlay adına iki nokta ile eklenen değiştiriciler davranışı ayarlar. Bunlar \u003Ccode\u003Ecomponent.motif.on\u003C/code\u003E API\u0027sinde ve tip sisteminde tanımlıdır:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EDeğiştirici\u003C/th\u003E\n\u003Cth\u003EEtki\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:once\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBir kez çalışır, sonra kendini kaldırır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:passive\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EaddEventListener\u003C/code\u003E için \u003Ccode\u003Epassive: true\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:capture\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYakalama (capture) fazında dinler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:prevent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİşleyici sonrası \u003Ccode\u003EpreventDefault()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:stop\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİşleyici sonrası \u003Ccode\u003EstopPropagation()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:self\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYalnızca olay hedefi elemanın kendisiyse çalışır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E:trusted\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYalnızca \u003Ccode\u003EisTrusted\u003C/code\u003E olaylarda çalışır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EJSX\u0027te öznitelik adı tek bir \u003Ccode\u003E:\u003C/code\u003E alabildiği için etikette öznitelik başına bir değiştirici yazılır; \u003Ccode\u003Emotif.on\u003C/code\u003E ile zincir kurulur. Değiştiricili prop da değiştiricisiz hâliyle aynı tipi alır; \u003Ccode\u003Eonkeydown:once={(e) =\u0026gt; e.key}\u003C/code\u003E içinde \u003Ccode\u003Ee\u003C/code\u003E \u003Ccode\u003EKeyboardEvent\u003C/code\u003E olur:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;form onsubmit:prevent={() =\u0026gt; notes.create()}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;button type=\u0026quot;button\u0026quot; onclick:once={() =\u0026gt; notes.create()}\u0026gt;İlk notu oluştur\u0026lt;/button\u0026gt;\n\u0026lt;div class=\u0026quot;list\u0026quot; onscroll:passive={() =\u0026gt; rememberScroll()}\u0026gt;…\u0026lt;/div\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst form = motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; notes.create());\n});\nconst first = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click:once\u0026quot;, () =\u0026gt; notes.create());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;İlk notu oluştur\u0026quot;)));\n});\nconst list = motifComponent(\u0026quot;div\u0026quot;, (list: ComponentBase) =\u0026gt; {\n  list.class.add(\u0026quot;list\u0026quot;);\n  list.motif.on(\u0026quot;scroll:passive\u0026quot;, () =\u0026gt; rememberScroll());\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;form onsubmit:prevent={() =\u0026gt; notes.create()}\u0026gt;…\u0026lt;/form\u0026gt;\n\u0026lt;button type=\u0026quot;button\u0026quot; onclick:once={() =\u0026gt; notes.create()}\u0026gt;İlk notu oluştur\u0026lt;/button\u0026gt;\n\u0026lt;div class=\u0026quot;list\u0026quot; onscroll:passive={() =\u0026gt; rememberScroll()}\u0026gt;…\u0026lt;/div\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst form = motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; notes.create());\n});\nconst first = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click:once\u0026quot;, () =\u0026gt; notes.create());\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;İlk notu oluştur\u0026quot;)));\n});\nconst list = motifComponent(\u0026quot;div\u0026quot;, (list) =\u0026gt; {\n  list.class.add(\u0026quot;list\u0026quot;);\n  list.motif.on(\u0026quot;scroll:passive\u0026quot;, () =\u0026gt; rememberScroll());\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022component-events\u0022\u003EBileşen olay API\u0027si: \u003Ccode\u003Emotif.on\u003C/code\u003E / \u003Ccode\u003Emotif.off\u003C/code\u003E / \u003Ccode\u003Emotif.trigger\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EHer bileşende programatik olay yönetimi \u003Ccode\u003Emotif\u003C/code\u003E ad alanındadır. Örnekte satır tıklanınca bileşen kendi \u003Ccode\u003Esaved\u003C/code\u003E olayını tetikler; o olayın işleyicisi yalnız dahili olarak kaydedilmiştir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Econst onSaved = (sender: ComponentBase, saved: Note) =\u0026gt; notes.touch(saved);\n\nthis.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.motif.trigger(\u0026quot;saved\u0026quot;, note));\nthis.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nthis.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Econst onSaved = (sender: ComponentBase, saved: Note) =\u0026gt; notes.touch(saved);\n\nrow.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; row.motif.trigger(\u0026quot;saved\u0026quot;, note));\nrow.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nrow.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Econst onSaved = (sender, saved) =\u0026gt; notes.touch(saved);\n\nthis.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.motif.trigger(\u0026quot;saved\u0026quot;, note));\nthis.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nthis.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Econst onSaved = (sender, saved) =\u0026gt; notes.touch(saved);\n\nrow.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; row.motif.trigger(\u0026quot;saved\u0026quot;, note));\nrow.motif.on(\u0026quot;saved\u0026quot;, onSaved, false);\nrow.motif.off(\u0026quot;saved\u0026quot;, onSaved);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde bu çağrılar bileşenin kendisi üzerindedir (örnekte \u003Ccode\u003Erow\u003C/code\u003E): JSX\u0027te kökün \u003Ccode\u003EonConfig\u003C/code\u003E kancasına ya da \u003Ccode\u003Eref\u003C/code\u003E\u0027ine gelen bileşen, JSX\u0027siz yazımda kökü kuran \u003Ccode\u003EmotifComponent\u003C/code\u003E fonksiyonunun aldığı bileşen.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.on\u003C/code\u003E ile eklenen dinleyiciler, bileşen serbest bırakıldığında \u003Cstrong\u003Eotomatik olarak temizlenir\u003C/strong\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.on\u003C/code\u003E\u0027un üçüncü argümanı \u003Ccode\u003EdomEvent\u003C/code\u003E (varsayılan \u003Ccode\u003Etrue\u003C/code\u003E)\u0027dur. \u003Ccode\u003Efalse\u003C/code\u003E verirseniz DOM\u0027a \u003Ccode\u003EaddEventListener\u003C/code\u003E yapılmaz; yalnızca dahili (özel) olay olarak tutulur ve \u003Ccode\u003Emotif.trigger\u003C/code\u003E ile tetiklenir.\u003C/li\u003E\n\u003Cli\u003EElemansız (fragment) bileşende DOM dinleyicisi bileşenin \u003Cstrong\u003Eiçeriğini\u003C/strong\u003E dinler: üst düzey eleman çocuklarının her biri, iç içe fragment\u0027lar dâhil. Sonradan eklenen çocuk kapsanır, ayrılan çocuk bırakılır; \u003Ccode\u003E:self\u003C/code\u003E hedefin bu elemanlardan biri olması demektir; \u003Ccode\u003E:once\u003C/code\u003E ve \u003Ccode\u003Emotif.off\u003C/code\u003E hepsinde birden işler.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.trigger(\u0026quot;ad\u0026quot;, veri)\u003C/code\u003E yalnız \u003Cstrong\u003Etam o adla\u003C/strong\u003E (değiştiricisiz, büyük/küçük harf duyarsız) kaydedilmiş işleyicileri çağırır; \u003Ccode\u003E\u0026quot;click:once\u0026quot;\u003C/code\u003E ile kaydedilen işleyiciyi \u003Ccode\u003Etrigger(\u0026quot;click\u0026quot;)\u003C/code\u003E çağırmaz. İşleyiciler \u003Ccode\u003Everi\u003C/code\u003E\u0027yi olay nesnesi olarak alır; DOM\u0027a olay gönderilmez. \u003Ccode\u003E:once\u003C/code\u003E işleyicisini ona ilk ulaşan yol tüketir: \u003Ccode\u003Etrigger(\u0026quot;click:once\u0026quot;, veri)\u003C/code\u003E onu bir kez koşturup kaldırır, tıpkı bir DOM tıklaması gibi; ardından \u003Ccode\u003Emotif.options.hasEvent(\u0026quot;click:once\u0026quot;)\u003C/code\u003E \u003Ccode\u003Efalse\u003C/code\u003E döner.\u003C/li\u003E\n\u003Cli\u003EDOM olaylarında \u003Ccode\u003Emotif.off(ad, fn)\u003C/code\u003E aynı işleyicinin \u003Cstrong\u003Ebir\u003C/strong\u003E kaydını kaldırır; aynı işleyici birden çok kez eklendiyse her biri için çağrılır. Olay adı kayıttaki yazımla (değiştiriciler dâhil) verilir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.addHandler(ad, fn)\u003C/code\u003E, \u003Ccode\u003Emotif.on(ad, fn)\u003C/code\u003E ile aynıdır (dönüş değeri yok). \u003Ccode\u003Emotif.toggle()\u003C/code\u003E görünürse gizler, değilse gösterir.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022x-mounted\u0022\u003E\u003Ccode\u003Ex:mounted\u003C/code\u003E — DOM\u0027a bağlanma anı\u003C/h3\u003E\n\u003Cp\u003EEleman gerçekten DOM\u0027a eklendiğinde çalışacak bir kanca; başlık alanına odak vermek gibi işler için:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; this.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Etitle.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; title.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; this.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Etitle.motif.on(\u0026quot;x:mounted\u0026quot;, () =\u0026gt; title.element.focus());\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Etitle\u003C/code\u003E başlık alanının bileşenidir: JSX\u0027te \u003Ccode\u003Eref\u003C/code\u003E ile alınır, JSX\u0027siz yazımda \u003Ccode\u003EmotifComponent\u003C/code\u003E ile kurulan değişkendir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EHer abonelik \u003Cstrong\u003Ebir kez\u003C/strong\u003E, eleman \u003Ccode\u003Edocument\u003C/code\u003E\u0027a bağlandıktan sonraki görevde çalışır; eleman zaten \u003Ccode\u003Edocument\u003C/code\u003E içindeyse aboneliği izleyen görevde. Bileşen sökülüp yeniden yerleştiğinde (taşıma, \u003Ccode\u003Emotif.hide\u003C/code\u003E/\u003Ccode\u003Emotif.show\u003C/code\u003E, keepAlive) \u003Ccode\u003Ex:mounted\u003C/code\u003E tekrar fırlamaz; o an için \u003Ccode\u003Ex:activated\u003C/code\u003E kullanın (\u003Ca href=\u0022/docs/lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E). Henüz çalışmamış bir aboneliği \u003Ccode\u003Emotif.off(\u0026quot;x:mounted\u0026quot;, işleyici)\u003C/code\u003E iptal eder. İşleyicinin fırlattığı hata \u003Ccode\u003EMJX122\u003C/code\u003E olarak raporlanır.\u003C/p\u003E\n\u003Ch2 id=\u0022lifecycle-events\u0022\u003EYaşam döngüsü olayları\u003C/h2\u003E\n\u003Cp\u003EBileşen yaşam döngüsü olaylarını da \u003Ccode\u003Emotif.on\u003C/code\u003E ile dinleyebilirsiniz. \u003Ccode\u003Ex:\u003C/code\u003E öneki bu olayları DOM\u0027a değil bileşenin kendi yayıcısına bağlar; işleyici \u003Ccode\u003E(sender, e)\u003C/code\u003E imzasıyla çağrılır (\u003Ccode\u003Ee\u003C/code\u003E: \u003Ccode\u003E{ cancel }\u003C/code\u003E), tek parametreli işleyici yalnızca \u003Ccode\u003Ee\u003C/code\u003E alır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nthis.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Erow.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nrow.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Ethis.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nthis.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Erow.motif.on(\u0026quot;x:built\u0026quot;, (sender) =\u0026gt; sender.class.add(\u0026quot;ready\u0026quot;));\nrow.motif.on(\u0026quot;x:disposed\u0026quot;, () =\u0026gt; clearInterval(timer));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ETanınan adlar: \u003Ccode\u003Ex:initializing\u003C/code\u003E, \u003Ccode\u003Ex:initialized\u003C/code\u003E, \u003Ccode\u003Ex:config\u003C/code\u003E, \u003Ccode\u003Ex:configured\u003C/code\u003E, \u003Ccode\u003Ex:building\u003C/code\u003E, \u003Ccode\u003Ex:built\u003C/code\u003E, \u003Ccode\u003Ex:mounted\u003C/code\u003E, \u003Ccode\u003Ex:visibilityChanged\u003C/code\u003E, \u003Ccode\u003Ex:activated\u003C/code\u003E, \u003Ccode\u003Ex:deactivated\u003C/code\u003E, \u003Ccode\u003Ex:disposing\u003C/code\u003E, \u003Ccode\u003Ex:disposed\u003C/code\u003E. Abonelik bileşenle birlikte temizlenir; \u003Ccode\u003Emotif.off\u003C/code\u003E ile elle de kaldırılır. Aynı işleyici birden çok kez abone olduysa \u003Ccode\u003Emotif.off\u003C/code\u003E hepsini kaldırır. \u003Ccode\u003Ex:initializing\u003C/code\u003E ve \u003Ccode\u003Ex:initialized\u003C/code\u003E bileşenin yapıcısında biter; kurulmuş bir bileşene sonradan abone olunursa işleyici abone olunduğu anda bir kez çalışır.\u003C/p\u003E\n\u003Cp\u003EBu dinleyicilerden biri hata fırlatırsa hata, kanca sınıf metodu ya da prop olarak yazılmış gibi \u003Ccode\u003EMJX122\u003C/code\u003E (ör. \u003Ccode\u003EThe component x:built hook threw.\u003C/code\u003E) koduyla \u003Ccode\u003EerrorHandler\u003C/code\u003E\u0027a raporlanır; bileşen kurulmaya devam eder.\u003C/p\u003E\n\u003Cblockquote\u003E\n\u003Cp\u003EZamanlama notu: düz \u003Ccode\u003Enew Component(\u0026quot;div\u0026quot;, …)\u003C/code\u003E örneklerinde \u003Ccode\u003Ex:config\u003C/code\u003E yapıcıda fırlar; yapıcı döndükten sonra abone olmak için geç kalınmış olur. Alt sınıflarda (\u003Ccode\u003Eclass X extends Component\u003C/code\u003E) \u003Ccode\u003EonConfig\u003C/code\u003E \u003Ccode\u003Ebuild()\u003C/code\u003E başında çalıştığı için yapıcıdan sonra abone olmak yeterlidir. Ayrıntı: \u003Ca href=\u0022/docs/lifecycle\u0022\u003EYaşam Döngüsü\u003C/a\u003E.\u003C/p\u003E\n\u003C/blockquote\u003E\n\u003Ch2 id=\u0022app-events\u0022\u003EUygulama olayları — \u003Ccode\u003Econtext.on\u003C/code\u003E / \u003Ccode\u003Econtext.fire\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EBileşenler arasında (ebeveyn-çocuk ilişkisi olmadan) haberleşmek için uygulama olay veriyolu kullanılır. Bileşenin \u003Ccode\u003Econtext\u003C/code\u003E\u0027i çalışan \u003Ccode\u003EApplication\u003C/code\u003E\u0027dır (sınıfta ve Options\u0027ta \u003Ccode\u003Ethis.context\u003C/code\u003E, fonksiyon bileşeninde \u003Ca href=\u0022/docs/components#function-root\u0022\u003Ekök bileşenin\u003C/a\u003E \u003Ccode\u003Econtext\u003C/code\u003E\u0027i); dinleyici bileşen serbest bırakılınca abonelik kendiliğinden kalkar. \u003Ccode\u003EArchiveCounter\u003C/code\u003E arşivlenen notları sayar: sınıfta \u003Ccode\u003EonConfig\u003C/code\u003E içinde \u003Ccode\u003Ethis.context.on\u003C/code\u003E, fonksiyonda köke yazılan \u003Ccode\u003EonConfig\u003C/code\u003E prop\u0027u, Options\u0027ta \u003Ccode\u003EonConfigured\u003C/code\u003E; JSX\u0027siz yazımda hepsi aynı \u003Ccode\u003Econtext.on\u003C/code\u003E çağrısıdır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  override onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  override view() {\n    return \u0026lt;span class=\u0026quot;archived\u0026quot;\u0026gt;{() =\u0026gt; \u0060${this.state.count} arşivlendi\u0060}\u0026lt;/span\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return (\n    \u0026lt;span class=\u0026quot;archived\u0026quot; onConfig={(counter) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B)}\u0026gt;\n      {() =\u0026gt; \u0060${state.count} arşivlendi\u0060}\n    \u0026lt;/span\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; \u0060${this.data.count} arşivlendi\u0060}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  override onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${this.state.count} arşivlendi\u0060);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return motifComponent(\u0026quot;span\u0026quot;, {\n    onConfig: (counter: ComponentBase) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B),\n    initializeComponent: (span: ComponentBase) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${state.count} arşivlendi\u0060);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/ArchiveCounter.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; \u0060${this.data.count} arşivlendi\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  view() {\n    return \u0026lt;span class=\u0026quot;archived\u0026quot;\u0026gt;{() =\u0026gt; \u0060${this.state.count} arşivlendi\u0060}\u0026lt;/span\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.jsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return (\n    \u0026lt;span class=\u0026quot;archived\u0026quot; onConfig={(counter) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B)}\u0026gt;\n      {() =\u0026gt; \u0060${state.count} arşivlendi\u0060}\n    \u0026lt;/span\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; \u0060${this.data.count} arşivlendi\u0060}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ArchiveCounter extends Component {\n  state = reactive({ count: 0 });\n\n  onConfig() {\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.state.count\u002B\u002B);\n  }\n\n  view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${this.state.count} arşivlendi\u0060);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ArchiveCounter() {\n  const state = reactive({ count: 0 });\n  return motifComponent(\u0026quot;span\u0026quot;, {\n    onConfig: (counter) =\u0026gt; counter.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; state.count\u002B\u002B),\n    initializeComponent: (span) =\u0026gt; {\n      span.class.add(\u0026quot;archived\u0026quot;);\n      span.bindings.text(() =\u0026gt; \u0060${state.count} arşivlendi\u0060);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/ArchiveCounter.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ArchiveCounter = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n  data: reactive({ count: 0 }),\n\n  onConfigured() {\n    this.class.add(\u0026quot;archived\u0026quot;);\n    this.context.on(\u0026quot;noteArchived\u0026quot;, () =\u0026gt; this.data.count\u002B\u002B);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; \u0060${this.data.count} arşivlendi\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EYayıncı, olayı gönderen bileşenin \u003Ccode\u003Econtext\u003C/code\u003E\u0027i üzerinden yayınlar; \u003Ccode\u003Efire\u003C/code\u003E\u0027ın ikinci argümanı dinleyicilere veri olarak gider:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={(sender, e) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); }}\u0026gt;Arşivle\u0026lt;/button\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst archive = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender: ComponentBase, _e: Event) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); });\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Arşivle\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;button type=\u0026quot;button\u0026quot; onclick={(sender, e) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); }}\u0026gt;Arşivle\u0026lt;/button\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst archive = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;button\u0026quot; });\n  button.motif.on(\u0026quot;click\u0026quot;, (sender, _e) =\u0026gt; { notes.archive(note); sender.context.fire(\u0026quot;noteArchived\u0026quot;, note); });\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Arşivle\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EApplication\u003C/code\u003E olay API\u0027si:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMetot\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.on(event, handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDinler; abonelikten çıkmak için bir fonksiyon döndürür. İşleyicinin parametresi \u003Ccode\u003Efire\u003C/code\u003E\u0027a verilen veridir (\u003Ccode\u003E(note?: Note) =\u0026gt; …\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.fire(event, args?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOlayı tetikler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.off(event, handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDinleyiciyi kaldırır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.onRouterChanged(handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHer navigasyonda (açılış ve 404 dâhil) çalışacak kanca; abonelikten çıkmak için bir fonksiyon döndürür.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.onLifecycle(handler)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESekme/uygulama görünürlüğü ve bağlantı değişimleri; bkz. \u003Ca href=\u0022/docs/lifecycle#app-lifecycle\u0022\u003EUygulama yaşam döngüsü\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EOlay adı dizge ya da \u003Ccode\u003ESymbol\u003C/code\u003E olabilir; \u003Ccode\u003Efire\u003C/code\u003E dinleyicileri ekleniş sırasıyla, senkron çağırır.\u003C/p\u003E\n\u003Cp\u003EUygulama olayı dinleyicisinin fırlattığı hata \u003Ccode\u003EMJX123\u003C/code\u003E (\u003Ccode\u003EThe \u0027\u0026lt;olay\u0026gt;\u0027 event handler threw.\u003C/code\u003E) koduyla raporlanır ve olayın diğer dinleyicileri çalışır. \u003Ccode\u003EonRouterChanged\u003C/code\u003E işleyicileri de böyledir (\u003Ccode\u003EThe \u0027motifjs-router-navigated\u0027 event handler threw.\u003C/code\u003E); gezinme yine tamamlanır.\u003C/p\u003E\n\u003Cp\u003EBir bileşenin \u003Ccode\u003Econtext\u003C/code\u003E\u0027i uygulamanın bileşene bağlı bir görünümüdür: onun üzerinden açılan \u003Ccode\u003Eon\u003C/code\u003E ve \u003Ccode\u003EonRouterChanged\u003C/code\u003E abonelikleri bileşen serbest bırakılınca kendiliğinden kaldırılır (\u003Ccode\u003EonLifecycle\u003C/code\u003E bu kapsama girmez). \u003Ccode\u003EApplication.main\u003C/code\u003E, elde tutulan \u003Ccode\u003Eapp\u003C/code\u003E örneği ya da \u003Ccode\u003EuseApplication().application\u003C/code\u003E üzerinden açılan abonelikler hiçbir bileşene bağlı değildir; döndürülen fonksiyonu kendiniz çağırın ya da bir bileşene \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E ile kaydedin (\u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Econst unsubscribe = app.on\u0026lt;Note\u0026gt;(\u0026quot;noteArchived\u0026quot;, (note) =\u0026gt; {\n  if (note) document.title = \u0060${note.title} arşivlendi\u0060;\n});\n\nunsubscribe();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Econst unsubscribe = app.on(\u0026quot;noteArchived\u0026quot;, (note) =\u0026gt; {\n  if (note) document.title = \u0060${note.title} arşivlendi\u0060;\n});\n\nunsubscribe();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022emitter\u0022\u003EServis olayları — \u003Ccode\u003EEmitter\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EUygulama olayları adla çalışır ve uygulamanın tamamına açıktır. Bir servisin kendi olayını tipiyle birlikte yayması için \u003Ccode\u003EEmitter\u0026lt;T\u0026gt;\u003C/code\u003E kullanılır; bileşenden bağımsız, tek tip taşıyan küçük bir yayıcıdır. Örnekteki servis silinen notu bildirir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\u003Ccode\u003Eimport { Emitter, Injectable, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface Note {\n  id: number;\n  title: string;\n  body: string;\n  pinned: boolean;\n  archived: boolean;\n  createdAt: number;\n  updatedAt: number;\n}\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  readonly state = reactive({ items: [] as Note[] });\n  private readonly removed = new Emitter\u0026lt;Note\u0026gt;();\n  readonly onRemoved = this.removed.event;\n\n  remove(id: number): boolean {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    const [note] = this.state.items.splice(index, 1);\n    this.removed.fire(note);\n    return true;\n  }\n\n  dispose() {\n    this.removed.dispose();\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/notes.js\u0022\u003E\u003Ccode\u003Eimport { Emitter, Injectable, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  state = reactive({ items: [] });\n  removed = new Emitter();\n  onRemoved = this.removed.event;\n\n  remove(id) {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    const [note] = this.state.items.splice(index, 1);\n    this.removed.fire(note);\n    return true;\n  }\n\n  dispose() {\n    this.removed.dispose();\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBir bileşen aboneliği kendi ömrüne \u003Ccode\u003Emotif.register\u003C/code\u003E ile bağlar; bileşen serbest bırakılınca abonelik kalkar:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Ethis.motif.register(this.notes.onRemoved((note) =\u0026gt; (this.state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Elist.motif.register(notes.onRemoved((note) =\u0026gt; (state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Ethis.motif.register(this.notes.onRemoved((note) =\u0026gt; (this.state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Elist.motif.register(notes.onRemoved((note) =\u0026gt; (state.removed = note.title)));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Elist\u003C/code\u003E, aboneliği taşıyan bileşendir: JSX\u0027te kökün \u003Ccode\u003EonConfig\u003C/code\u003E kancasına ya da \u003Ccode\u003Eref\u003C/code\u003E\u0027ine gelen bileşen, JSX\u0027siz yazımda kökü kuran \u003Ccode\u003EmotifComponent\u003C/code\u003E fonksiyonunun aldığı bileşen.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eevent(listener, thisArgs?, disposables?)\u003C/code\u003E abone olur ve bir \u003Ccode\u003EIDisposable\u003C/code\u003E döndürür; \u003Ccode\u003Edisposables\u003C/code\u003E bir \u003Ccode\u003EDisposableStore\u003C/code\u003E ya da \u003Ccode\u003EIDisposable[]\u003C/code\u003E ise abonelik oraya da eklenir (\u003Ccode\u003Enotes.onRemoved(fn, undefined, store)\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Efire(value)\u003C/code\u003E dinleyicileri ekleniş sırasıyla, senkron çağırır. Dağıtım sırasında eklenen dinleyici o dağıtımı almaz; kaldırılan dinleyici bir daha çağrılmaz.\u003C/li\u003E\n\u003Cli\u003EDinleyicinin fırlattığı hata diğerlerini durdurmaz; beklenmeyen hata yoluna gider (bkz. \u003Ca href=\u0022/docs/error-handling#unexpected-errors\u0022\u003EBeklenmeyen hatalar\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Edispose()\u003C/code\u003E bütün abonelikleri geçersiz kılar; sonraki \u003Ccode\u003Eevent(...)\u003C/code\u003E çağrıları boş bir \u003Ccode\u003EIDisposable\u003C/code\u003E döndürür. Servisin \u003Ccode\u003Edispose()\u003C/code\u003E metodunu sağlayıcı çağırır; singleton için bu \u003Ccode\u003Eapp.dispose()\u003C/code\u003E anıdır (bkz. \u003Ca href=\u0022/docs/service-disposal\u0022\u003EServislerin Serbest Bırakılması\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EForm girdilerini ve iki yönlü bağlamayı öğrenmek için \u003Ca href=\u0022/docs/forms\u0022\u003EFormlar ve İki Yönlü Bağlama\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"dom-events","text":"DOM olayları","level":2},{"id":"handler-signatures","text":"İşleyici imzaları","level":3},{"id":"handler-errors","text":"İşleyici hataları","level":3},{"id":"context-events","text":"on:ad / on-ad / on_ad yazımı","level":3},{"id":"modifiers","text":"Olay değiştiricileri (modifiers)","level":2},{"id":"component-events","text":"Bileşen olay API\u0027si: motif.on / motif.off / motif.trigger","level":2},{"id":"x-mounted","text":"x:mounted — DOM\u0027a bağlanma anı","level":3},{"id":"lifecycle-events","text":"Yaşam döngüsü olayları","level":2},{"id":"app-events","text":"Uygulama olayları — context.on / context.fire","level":2},{"id":"emitter","text":"Servis olayları — Emitter\u003CT\u003E","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"conditionals-and-lists","title":"Koşullu Gösterim ve Listeler"},"next":{"slug":"forms","title":"Formlar ve İki Yönlü Bağlama"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>Olaylar</h1>
+        <p>DOM olayları ve değiştiriciler, motif.on/off/trigger bileşen olayları, yaşam döngüsü olayları, uygulama olay veriyolu ve Emitter ile servis olayları; JSX ile ve JSX&#x27;siz.</p>
+<p>MotifJS'te üç olay katmanı vardır:</p>
+<ol>
+<li><strong>DOM olayları</strong> — bir elemana <code>onclick</code>, <code>oninput</code> gibi prop'larla, JSX'siz yazımda <code>motif.on</code> ile bağlanır.</li>
+<li><strong>Bileşen olayları</strong> — <code>component.motif.on/trigger/off</code> ile bileşenler arası iletişim.</li>
+<li><strong>Uygulama olayları</strong> — <code>context.on/fire</code> ile uygulama genelinde yayın.</li>
+</ol>
+<p>Örnekler başlangıç şablonundaki not uygulamasının kesitleridir: not listesi (<code>NotesLayout</code>) ve düzenleyici (<code>NotePage</code>). <code>Note</code> ve <code>NotesService</code> <a href="/tr/docs/components">Bileşenler</a> sayfasındaki <code>src/services/notes.ts</code> dosyasındakilerdir.</p>
+<div class="doc-variant" data-variant="class,options">
+<p><code>this.state</code> bileşenin kendi durumudur; <code>this.remove</code> ve <code>this.close</code> bileşenin metotlarıdır.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p><code>state</code> bileşenin <code>reactive</code> ile kurduğu yerel durumdur; <code>remove</code> ve <code>close</code> bileşen fonksiyonunun içindeki yerel fonksiyonlardır.</p>
+</div>
+<h2 id="dom-events">DOM olayları</h2>
+<p>JSX'te <code>on...</code> prop'ları DOM olaylarına bağlanır; olay adları küçük harfle yazılır. JSX'siz yazımda aynı bağ <code>motif.on(ad, işleyici)</code> çağrısıdır:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Sabitle&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (this.state.query = (e.target as HTMLInputElement).value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Arşiv&lt;/a&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Sabitle&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (state.query = (e.target as HTMLInputElement).value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Arşiv&lt;/a&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Sabitle&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (this.state.query = (e.target as HTMLInputElement).value));
+});
+const form = motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender: ComponentBase, e: Event) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link: ComponentBase) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Arşiv&quot;)));
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Sabitle&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (state.query = (e.target as HTMLInputElement).value));
+});
+const form = motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender: ComponentBase, e: Event) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link: ComponentBase) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Arşiv&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Sabitle&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (this.state.query = e.target.value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Arşiv&lt;/a&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(note)}&gt;Sabitle&lt;/button&gt;
+&lt;input type=&quot;search&quot; oninput={(e) =&gt; (state.query = e.target.value)} /&gt;
+&lt;form onsubmit={(sender, e) =&gt; { e.preventDefault(); notes.create(); }}&gt;…&lt;/form&gt;
+&lt;a href=&quot;/archive&quot; onclick:prevent={(sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;)}&gt;Arşiv&lt;/a&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Sabitle&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender, e) =&gt; (this.state.query = e.target.value));
+});
+const form = motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender, e) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Arşiv&quot;)));
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Sabitle&quot;)));
+});
+const search = motifComponent(&quot;input&quot;, (field) =&gt; {
+  field.attr.add({ type: &quot;search&quot; });
+  field.motif.on(&quot;input&quot;, (_sender, e) =&gt; (state.query = e.target.value));
+});
+const form = motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.motif.on(&quot;submit&quot;, (_sender, e) =&gt; { e.preventDefault(); notes.create(); });
+});
+const archive = motifComponent(&quot;a&quot;, (link) =&gt; {
+  link.attr.add({ href: &quot;/archive&quot; });
+  link.motif.on(&quot;click:prevent&quot;, (sender, _e) =&gt; sender.context.navigate(&quot;/archive&quot;));
+  link.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Arşiv&quot;)));
+});</code></pre>
+</div>
+<p>Düz etikette her DOM olayı bu yazımla bağlanır (<code>onpointerdown</code>, <code>onmouseenter</code>, <code>onanimationend</code> dahil); <code>onClick</code> gibi camelCase yazım da aynı olayı bağlar.</p>
+<p>Bir bileşen etiketinde DOM olay adı taşıyan prop (<code>onchange</code>/<code>onChange</code>, <code>onCopy</code>, <code>onResize</code>, <code>onSelect</code>, <code>onReset</code>, <code>onContextMenu</code> …) bileşenin elemanına DOM dinleyicisi olarak bağlanır ve bileşenin props'una ulaşmaz; camelCase yazımda derleyici <code>MJX002</code> uyarısı verir. Geri çağrı prop'u için DOM olayıyla çakışmayan bir ad seçin (<code>onValueChange</code>, <code>onConfirm</code>). Elemanı olmayan (fragment) bileşende böyle bir dinleyicinin bağlanacağı eleman yoktur (bkz. <a href="/tr/docs/components#root-element">Kök eleman</a>).</p>
+<h3 id="handler-signatures">İşleyici imzaları</h3>
+<p>İşleyici iki biçimden biriyle yazılır; MotifJS parametre sayısına göre doğru olanı çağırır. Kural <code>motif.on</code> için de aynıdır: tek parametreli işleyici olayı alır, göndereni değil:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;input type=&quot;text&quot; onkeydown={(e) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create()} /&gt;          {/* yalnız olay */}
+&lt;li onclick={(sender, e) =&gt; sender.class.add(&quot;selected&quot;)}&gt;…&lt;/li&gt;                       {/* gönderen + olay */}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/NotesLayout.ts"><code>const field = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.motif.on(&quot;keydown&quot;, (_sender: ComponentBase, e: KeyboardEvent) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create());
+});
+const row = motifComponent(&quot;li&quot;, (li: ComponentBase) =&gt; {
+  li.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.class.add(&quot;selected&quot;));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;input type=&quot;text&quot; onkeydown={(e) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create()} /&gt;          {/* yalnız olay */}
+&lt;li onclick={(sender, e) =&gt; sender.class.add(&quot;selected&quot;)}&gt;…&lt;/li&gt;                       {/* gönderen + olay */}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/NotesLayout.js"><code>const field = motifComponent(&quot;input&quot;, (input) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.motif.on(&quot;keydown&quot;, (_sender, e) =&gt; e.key === &quot;Enter&quot; &amp;&amp; notes.create());
+});
+const row = motifComponent(&quot;li&quot;, (li) =&gt; {
+  li.motif.on(&quot;click&quot;, (sender, _e) =&gt; sender.class.add(&quot;selected&quot;));
+});</code></pre>
+</div>
+<ul>
+<li><code>sender</code> — olayı tetikleyen <code>ComponentBase</code> örneğidir; <code>sender.element</code>, <code>sender.context</code>, <code>sender.motif</code> gibi üyelere erişebilirsiniz.</li>
+<li>İşleyici <code>{ cancel: true }</code> döndürürse MotifJS <code>preventDefault()</code> ve <code>stopPropagation()</code> çağırır. <code>false</code> dahil diğer dönüş değerleri yok sayılır; bu yüzden yukarıdaki <code>onkeydown</code> kısa gövdesi diğer tuşları iptal etmez. Bu metotlar yalnızca olay nesnesinde varsa çağrılır; <code>motif.trigger(&quot;ad&quot;, { … })</code> ile düz bir veri nesnesi geçildiğinde hiçbiri çağrılmaz ve hata oluşmaz. <code>:prevent</code> / <code>:stop</code> değiştiricileri de aynı kurala uyar.</li>
+<li>Parametre sayısı fonksiyonun <code>length</code> değeridir: bildirilen parametre sayısı ≤ 1 ise <code>fn(event)</code>, 2 ve üzeri ise <code>fn(sender, event)</code> çağrılır. Varsayılan değerli ya da rest parametre ve ondan sonrakiler sayılmaz; bu yüzden <code>(...a) =&gt; …</code> 0 sayılır ve yalnızca <code>event</code> alır, <code>(s = null, e) =&gt; …</code> de 0 sayılır.</li>
+<li>TypeScript'te iki biçim de, düz etikette ve bileşen etiketinde, elemanın olayından tiplenir: <code>onkeydown={(e) =&gt; e.key}</code> yazınca <code>e</code> <code>KeyboardEvent</code> olur, <code>(s, e) =&gt; …</code> biçiminde de <code>e</code> aynı tipi alır. İlk parametrenin anlamı parametre sayısına bağlı olduğu için olay ve bileşen birlikte tiplenir (<code>KeyboardEvent &amp; ComponentBase</code>); <code>(e) =&gt; …</code> içinde olayın, <code>(s, e) =&gt; …</code> içinde bileşenin üyelerini kullanın. <code>motif.on</code>'un tipi <code>(sender, e)</code> imzasıdır; olayı kullanacaksanız iki parametre yazın.</li>
+</ul>
+<h3 id="handler-errors">İşleyici hataları</h3>
+<p>İşleyici hata fırlatırsa ya da <code>async</code> işleyicinin döndürdüğü promise reddedilirse hata <code>MJX123</code> (<code>The '&lt;olay&gt;' event handler threw.</code>) koduyla bir <code>MotifError</code> olarak <code>errorHandler</code>'a raporlanır; asıl hata <code>cause</code> alanındadır. Rapor üretim kipinde de konsola yazılır (<code>app.useLogging(false)</code> kapatır) ve <code>errorHandler.addListener(fn)</code> dinleyicilerine ulaşır. Aynı olayın diğer dinleyicileri çalışmaya devam eder.</p>
+<h3 id="context-events"><code>on:ad</code> / <code>on-ad</code> / <code>on_ad</code> yazımı</h3>
+<p>Bu yazım işleyiciyi olduğu gibi etiketin bileşenine bağlar: <code>&lt;X on:saved={fn}/&gt;</code>, <code>sender.motif.on(&quot;saved&quot;, fn)</code> demektir. Olay adı, önek (<code>on:</code>, <code>on-</code>, <code>on_</code>) atıldıktan sonra kalan kısmın tamamıdır: <code>on-my-event</code> → <code>my-event</code>, <code>on_my_event</code> → <code>my_event</code>. Hem DOM olayları hem de <code>motif.trigger</code> ile tetiklenen özel olaylar için kullanılır ve yukarıdaki parametre sayısı kuralı aynen geçerlidir:</p>
+<div class="doc-code" data-file="src/pages/NotePage.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target: Note) =&gt; this.remove(target)} /&gt;   {/* tek parametre: trigger'a verilen veri */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Kapat&lt;/button&gt;   {/* iki parametre: gönderen + olay */}
+&lt;button type=&quot;button&quot; on_click={this.close}&gt;Kapat&lt;/button&gt;   {/* metot başvurusu olduğu gibi geçer */}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target: Note) =&gt; remove(target)} /&gt;   {/* tek parametre: trigger'a verilen veri */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Kapat&lt;/button&gt;   {/* iki parametre: gönderen + olay */}
+&lt;button type=&quot;button&quot; on_click={close}&gt;Kapat&lt;/button&gt;   {/* fonksiyon başvurusu olduğu gibi geçer */}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/pages/NotePage.ts"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm: ComponentBase, target: Note) =&gt; this.remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Kapat&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, this.close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Kapat&quot;)));
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/NotePage.ts"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm: ComponentBase) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm: ComponentBase, target: Note) =&gt; remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Kapat&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Kapat&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target) =&gt; this.remove(target)} /&gt;   {/* tek parametre: trigger'a verilen veri */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Kapat&lt;/button&gt;   {/* iki parametre: gönderen + olay */}
+&lt;button type=&quot;button&quot; on_click={this.close}&gt;Kapat&lt;/button&gt;   {/* metot başvurusu olduğu gibi geçer */}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;DeleteConfirm note={note} on:confirm={(target) =&gt; remove(target)} /&gt;   {/* tek parametre: trigger'a verilen veri */}
+&lt;button type=&quot;button&quot; on-click={(sender, _e) =&gt; sender.motif.hide()}&gt;Kapat&lt;/button&gt;   {/* iki parametre: gönderen + olay */}
+&lt;button type=&quot;button&quot; on_click={close}&gt;Kapat&lt;/button&gt;   {/* fonksiyon başvurusu olduğu gibi geçer */}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/pages/NotePage.js"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm, target) =&gt; this.remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender, _e) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Kapat&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, this.close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Kapat&quot;)));
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/NotePage.js"><code>const confirm = motifComponent(DeleteConfirm, { note, initializeComponent: (confirm) =&gt; confirm.motif.on(&quot;confirm&quot;, (_confirm, target) =&gt; remove(target)) });
+const close = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender, _e) =&gt; sender.motif.hide());
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Kapat&quot;)));
+});
+const closeByMethod = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, close);
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Kapat&quot;)));
+});</code></pre>
+</div>
+<p>Silme onayı <code>DeleteConfirm</code>, &quot;Sil&quot; düğmesine basılınca kendi bileşeninde <code>motif.trigger(&quot;confirm&quot;, note)</code> çağırır (sınıfta ve Options'ta <code>this.motif.trigger</code>, fonksiyon bileşeninde döndürdüğü kökün <code>motif.trigger</code>'ı) ve ilk işleyici notu alır. JSX'siz yazımda dinleyici <code>initializeComponent</code> anahtarında kurulur; sınıf, fonksiyon ve Options bileşeninde aynıdır. Olay adı serbest olduğu için <code>on:</code>/<code>on-</code>/<code>on_</code> prop'larının parametreleri <code>any</code> tiplidir; veriye kendi tipini parametrede verirsiniz (<code>(target: Note) =&gt; …</code>). <code>motif.on</code>'un tipi <code>(sender, e)</code> olduğundan JSX'siz yazımda veri ikinci parametredir.</p>
+<h2 id="modifiers">Olay değiştiricileri (modifiers)</h2>
+<p>Olay adına iki nokta ile eklenen değiştiriciler davranışı ayarlar. Bunlar <code>component.motif.on</code> API'sinde ve tip sisteminde tanımlıdır:</p>
+<table>
+<thead>
+<tr>
+<th>Değiştirici</th>
+<th>Etki</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>:once</code></td>
+<td>Bir kez çalışır, sonra kendini kaldırır.</td>
+</tr>
+<tr>
+<td><code>:passive</code></td>
+<td><code>addEventListener</code> için <code>passive: true</code>.</td>
+</tr>
+<tr>
+<td><code>:capture</code></td>
+<td>Yakalama (capture) fazında dinler.</td>
+</tr>
+<tr>
+<td><code>:prevent</code></td>
+<td>İşleyici sonrası <code>preventDefault()</code>.</td>
+</tr>
+<tr>
+<td><code>:stop</code></td>
+<td>İşleyici sonrası <code>stopPropagation()</code>.</td>
+</tr>
+<tr>
+<td><code>:self</code></td>
+<td>Yalnızca olay hedefi elemanın kendisiyse çalışır.</td>
+</tr>
+<tr>
+<td><code>:trusted</code></td>
+<td>Yalnızca <code>isTrusted</code> olaylarda çalışır.</td>
+</tr>
+</tbody>
+</table>
+<p>JSX'te öznitelik adı tek bir <code>:</code> alabildiği için etikette öznitelik başına bir değiştirici yazılır; <code>motif.on</code> ile zincir kurulur. Değiştiricili prop da değiştiricisiz hâliyle aynı tipi alır; <code>onkeydown:once={(e) =&gt; e.key}</code> içinde <code>e</code> <code>KeyboardEvent</code> olur:</p>
+<div class="doc-code" data-file="src/pages/NotePage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;form onsubmit:prevent={() =&gt; notes.create()}&gt;…&lt;/form&gt;
+&lt;button type=&quot;button&quot; onclick:once={() =&gt; notes.create()}&gt;İlk notu oluştur&lt;/button&gt;
+&lt;div class=&quot;list&quot; onscroll:passive={() =&gt; rememberScroll()}&gt;…&lt;/div&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NotePage.ts"><code>const form = motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.motif.on(&quot;submit:prevent&quot;, () =&gt; notes.create());
+});
+const first = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click:once&quot;, () =&gt; notes.create());
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;İlk notu oluştur&quot;)));
+});
+const list = motifComponent(&quot;div&quot;, (list: ComponentBase) =&gt; {
+  list.class.add(&quot;list&quot;);
+  list.motif.on(&quot;scroll:passive&quot;, () =&gt; rememberScroll());
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;form onsubmit:prevent={() =&gt; notes.create()}&gt;…&lt;/form&gt;
+&lt;button type=&quot;button&quot; onclick:once={() =&gt; notes.create()}&gt;İlk notu oluştur&lt;/button&gt;
+&lt;div class=&quot;list&quot; onscroll:passive={() =&gt; rememberScroll()}&gt;…&lt;/div&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NotePage.js"><code>const form = motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.motif.on(&quot;submit:prevent&quot;, () =&gt; notes.create());
+});
+const first = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click:once&quot;, () =&gt; notes.create());
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;İlk notu oluştur&quot;)));
+});
+const list = motifComponent(&quot;div&quot;, (list) =&gt; {
+  list.class.add(&quot;list&quot;);
+  list.motif.on(&quot;scroll:passive&quot;, () =&gt; rememberScroll());
+});</code></pre>
+</div>
+<h2 id="component-events">Bileşen olay API'si: <code>motif.on</code> / <code>motif.off</code> / <code>motif.trigger</code></h2>
+<p>Her bileşende programatik olay yönetimi <code>motif</code> ad alanındadır. Örnekte satır tıklanınca bileşen kendi <code>saved</code> olayını tetikler; o olayın işleyicisi yalnız dahili olarak kaydedilmiştir:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NoteRow.ts"><code>const onSaved = (sender: ComponentBase, saved: Note) =&gt; notes.touch(saved);
+
+this.motif.on(&quot;click&quot;, () =&gt; this.motif.trigger(&quot;saved&quot;, note));
+this.motif.on(&quot;saved&quot;, onSaved, false);
+this.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NoteRow.ts"><code>const onSaved = (sender: ComponentBase, saved: Note) =&gt; notes.touch(saved);
+
+row.motif.on(&quot;click&quot;, () =&gt; row.motif.trigger(&quot;saved&quot;, note));
+row.motif.on(&quot;saved&quot;, onSaved, false);
+row.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NoteRow.js"><code>const onSaved = (sender, saved) =&gt; notes.touch(saved);
+
+this.motif.on(&quot;click&quot;, () =&gt; this.motif.trigger(&quot;saved&quot;, note));
+this.motif.on(&quot;saved&quot;, onSaved, false);
+this.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NoteRow.js"><code>const onSaved = (sender, saved) =&gt; notes.touch(saved);
+
+row.motif.on(&quot;click&quot;, () =&gt; row.motif.trigger(&quot;saved&quot;, note));
+row.motif.on(&quot;saved&quot;, onSaved, false);
+row.motif.off(&quot;saved&quot;, onSaved);</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde bu çağrılar bileşenin kendisi üzerindedir (örnekte <code>row</code>): JSX'te kökün <code>onConfig</code> kancasına ya da <code>ref</code>'ine gelen bileşen, JSX'siz yazımda kökü kuran <code>motifComponent</code> fonksiyonunun aldığı bileşen.</p>
+</div>
+<ul>
+<li><code>motif.on</code> ile eklenen dinleyiciler, bileşen serbest bırakıldığında <strong>otomatik olarak temizlenir</strong>.</li>
+<li><code>motif.on</code>'un üçüncü argümanı <code>domEvent</code> (varsayılan <code>true</code>)'dur. <code>false</code> verirseniz DOM'a <code>addEventListener</code> yapılmaz; yalnızca dahili (özel) olay olarak tutulur ve <code>motif.trigger</code> ile tetiklenir.</li>
+<li>Elemansız (fragment) bileşende DOM dinleyicisi bileşenin <strong>içeriğini</strong> dinler: üst düzey eleman çocuklarının her biri, iç içe fragment'lar dâhil. Sonradan eklenen çocuk kapsanır, ayrılan çocuk bırakılır; <code>:self</code> hedefin bu elemanlardan biri olması demektir; <code>:once</code> ve <code>motif.off</code> hepsinde birden işler.</li>
+<li><code>motif.trigger(&quot;ad&quot;, veri)</code> yalnız <strong>tam o adla</strong> (değiştiricisiz, büyük/küçük harf duyarsız) kaydedilmiş işleyicileri çağırır; <code>&quot;click:once&quot;</code> ile kaydedilen işleyiciyi <code>trigger(&quot;click&quot;)</code> çağırmaz. İşleyiciler <code>veri</code>'yi olay nesnesi olarak alır; DOM'a olay gönderilmez. <code>:once</code> işleyicisini ona ilk ulaşan yol tüketir: <code>trigger(&quot;click:once&quot;, veri)</code> onu bir kez koşturup kaldırır, tıpkı bir DOM tıklaması gibi; ardından <code>motif.options.hasEvent(&quot;click:once&quot;)</code> <code>false</code> döner.</li>
+<li>DOM olaylarında <code>motif.off(ad, fn)</code> aynı işleyicinin <strong>bir</strong> kaydını kaldırır; aynı işleyici birden çok kez eklendiyse her biri için çağrılır. Olay adı kayıttaki yazımla (değiştiriciler dâhil) verilir.</li>
+<li><code>motif.addHandler(ad, fn)</code>, <code>motif.on(ad, fn)</code> ile aynıdır (dönüş değeri yok). <code>motif.toggle()</code> görünürse gizler, değilse gösterir.</li>
+</ul>
+<h3 id="x-mounted"><code>x:mounted</code> — DOM'a bağlanma anı</h3>
+<p>Eleman gerçekten DOM'a eklendiğinde çalışacak bir kanca; başlık alanına odak vermek gibi işler için:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NoteFields.ts"><code>this.motif.on(&quot;x:mounted&quot;, () =&gt; this.element.focus());</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NoteFields.ts"><code>title.motif.on(&quot;x:mounted&quot;, () =&gt; title.element.focus());</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NoteFields.js"><code>this.motif.on(&quot;x:mounted&quot;, () =&gt; this.element.focus());</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NoteFields.js"><code>title.motif.on(&quot;x:mounted&quot;, () =&gt; title.element.focus());</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>title</code> başlık alanının bileşenidir: JSX'te <code>ref</code> ile alınır, JSX'siz yazımda <code>motifComponent</code> ile kurulan değişkendir.</p>
+</div>
+<p>Her abonelik <strong>bir kez</strong>, eleman <code>document</code>'a bağlandıktan sonraki görevde çalışır; eleman zaten <code>document</code> içindeyse aboneliği izleyen görevde. Bileşen sökülüp yeniden yerleştiğinde (taşıma, <code>motif.hide</code>/<code>motif.show</code>, keepAlive) <code>x:mounted</code> tekrar fırlamaz; o an için <code>x:activated</code> kullanın (<a href="/tr/docs/lifecycle">Yaşam Döngüsü</a>). Henüz çalışmamış bir aboneliği <code>motif.off(&quot;x:mounted&quot;, işleyici)</code> iptal eder. İşleyicinin fırlattığı hata <code>MJX122</code> olarak raporlanır.</p>
+<h2 id="lifecycle-events">Yaşam döngüsü olayları</h2>
+<p>Bileşen yaşam döngüsü olaylarını da <code>motif.on</code> ile dinleyebilirsiniz. <code>x:</code> öneki bu olayları DOM'a değil bileşenin kendi yayıcısına bağlar; işleyici <code>(sender, e)</code> imzasıyla çağrılır (<code>e</code>: <code>{ cancel }</code>), tek parametreli işleyici yalnızca <code>e</code> alır:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NoteRow.ts"><code>this.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+this.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NoteRow.ts"><code>row.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+row.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NoteRow.js"><code>this.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+this.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NoteRow.js"><code>row.motif.on(&quot;x:built&quot;, (sender) =&gt; sender.class.add(&quot;ready&quot;));
+row.motif.on(&quot;x:disposed&quot;, () =&gt; clearInterval(timer));</code></pre>
+</div>
+<p>Tanınan adlar: <code>x:initializing</code>, <code>x:initialized</code>, <code>x:config</code>, <code>x:configured</code>, <code>x:building</code>, <code>x:built</code>, <code>x:mounted</code>, <code>x:visibilityChanged</code>, <code>x:activated</code>, <code>x:deactivated</code>, <code>x:disposing</code>, <code>x:disposed</code>. Abonelik bileşenle birlikte temizlenir; <code>motif.off</code> ile elle de kaldırılır. Aynı işleyici birden çok kez abone olduysa <code>motif.off</code> hepsini kaldırır. <code>x:initializing</code> ve <code>x:initialized</code> bileşenin yapıcısında biter; kurulmuş bir bileşene sonradan abone olunursa işleyici abone olunduğu anda bir kez çalışır.</p>
+<p>Bu dinleyicilerden biri hata fırlatırsa hata, kanca sınıf metodu ya da prop olarak yazılmış gibi <code>MJX122</code> (ör. <code>The component x:built hook threw.</code>) koduyla <code>errorHandler</code>'a raporlanır; bileşen kurulmaya devam eder.</p>
+<blockquote>
+<p>Zamanlama notu: düz <code>new Component(&quot;div&quot;, …)</code> örneklerinde <code>x:config</code> yapıcıda fırlar; yapıcı döndükten sonra abone olmak için geç kalınmış olur. Alt sınıflarda (<code>class X extends Component</code>) <code>onConfig</code> <code>build()</code> başında çalıştığı için yapıcıdan sonra abone olmak yeterlidir. Ayrıntı: <a href="/tr/docs/lifecycle">Yaşam Döngüsü</a>.</p>
+</blockquote>
+<h2 id="app-events">Uygulama olayları — <code>context.on</code> / <code>context.fire</code></h2>
+<p>Bileşenler arasında (ebeveyn-çocuk ilişkisi olmadan) haberleşmek için uygulama olay veriyolu kullanılır. Bileşenin <code>context</code>'i çalışan <code>Application</code>'dır (sınıfta ve Options'ta <code>this.context</code>, fonksiyon bileşeninde <a href="/tr/docs/components#function-root">kök bileşenin</a> <code>context</code>'i); dinleyici bileşen serbest bırakılınca abonelik kendiliğinden kalkar. <code>ArchiveCounter</code> arşivlenen notları sayar: sınıfta <code>onConfig</code> içinde <code>this.context.on</code>, fonksiyonda köke yazılan <code>onConfig</code> prop'u, Options'ta <code>onConfigured</code>; JSX'siz yazımda hepsi aynı <code>context.on</code> çağrısıdır:</p>
+<div class="doc-code" data-file="src/parts/ArchiveCounter.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/ArchiveCounter.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  override onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  override view() {
+    return &lt;span class=&quot;archived&quot;&gt;{() =&gt; `${this.state.count} arşivlendi`}&lt;/span&gt;;
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/ArchiveCounter.tsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return (
+    &lt;span class=&quot;archived&quot; onConfig={(counter) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++)}&gt;
+      {() =&gt; `${state.count} arşivlendi`}
+    &lt;/span&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/ArchiveCounter.tsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; `${this.data.count} arşivlendi`}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/ArchiveCounter.ts"><code>import { Component, ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  override onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  override view() {
+    return motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${this.state.count} arşivlendi`);
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/ArchiveCounter.ts"><code>import { ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return motifComponent(&quot;span&quot;, {
+    onConfig: (counter: ComponentBase) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++),
+    initializeComponent: (span: ComponentBase) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${state.count} arşivlendi`);
+    },
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/ArchiveCounter.ts"><code>import { ComponentBase, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; `${this.data.count} arşivlendi`));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/ArchiveCounter.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  view() {
+    return &lt;span class=&quot;archived&quot;&gt;{() =&gt; `${this.state.count} arşivlendi`}&lt;/span&gt;;
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/ArchiveCounter.jsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return (
+    &lt;span class=&quot;archived&quot; onConfig={(counter) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++)}&gt;
+      {() =&gt; `${state.count} arşivlendi`}
+    &lt;/span&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/ArchiveCounter.jsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; `${this.data.count} arşivlendi`}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/ArchiveCounter.js"><code>import { Component, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export class ArchiveCounter extends Component {
+  state = reactive({ count: 0 });
+
+  onConfig() {
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.state.count++);
+  }
+
+  view() {
+    return motifComponent(&quot;span&quot;, (span) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${this.state.count} arşivlendi`);
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/ArchiveCounter.js"><code>import { motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export function ArchiveCounter() {
+  const state = reactive({ count: 0 });
+  return motifComponent(&quot;span&quot;, {
+    onConfig: (counter) =&gt; counter.context.on(&quot;noteArchived&quot;, () =&gt; state.count++),
+    initializeComponent: (span) =&gt; {
+      span.class.add(&quot;archived&quot;);
+      span.bindings.text(() =&gt; `${state.count} arşivlendi`);
+    },
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/ArchiveCounter.js"><code>import { motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ArchiveCounter = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+  data: reactive({ count: 0 }),
+
+  onConfigured() {
+    this.class.add(&quot;archived&quot;);
+    this.context.on(&quot;noteArchived&quot;, () =&gt; this.data.count++);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; `${this.data.count} arşivlendi`));
+  },
+});</code></pre>
+</div>
+<p>Yayıncı, olayı gönderen bileşenin <code>context</code>'i üzerinden yayınlar; <code>fire</code>'ın ikinci argümanı dinleyicilere veri olarak gider:</p>
+<div class="doc-code" data-file="src/pages/NotePage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;button type=&quot;button&quot; onclick={(sender, e) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); }}&gt;Arşivle&lt;/button&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NotePage.ts"><code>const archive = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender: ComponentBase, _e: Event) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); });
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Arşivle&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;button type=&quot;button&quot; onclick={(sender, e) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); }}&gt;Arşivle&lt;/button&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NotePage.js"><code>const archive = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;button&quot; });
+  button.motif.on(&quot;click&quot;, (sender, _e) =&gt; { notes.archive(note); sender.context.fire(&quot;noteArchived&quot;, note); });
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Arşivle&quot;)));
+});</code></pre>
+</div>
+<p><code>Application</code> olay API'si:</p>
+<table>
+<thead>
+<tr>
+<th>Metot</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app.on(event, handler)</code></td>
+<td>Dinler; abonelikten çıkmak için bir fonksiyon döndürür. İşleyicinin parametresi <code>fire</code>'a verilen veridir (<code>(note?: Note) =&gt; …</code>).</td>
+</tr>
+<tr>
+<td><code>app.fire(event, args?)</code></td>
+<td>Olayı tetikler.</td>
+</tr>
+<tr>
+<td><code>app.off(event, handler)</code></td>
+<td>Dinleyiciyi kaldırır.</td>
+</tr>
+<tr>
+<td><code>app.onRouterChanged(handler)</code></td>
+<td>Her navigasyonda (açılış ve 404 dâhil) çalışacak kanca; abonelikten çıkmak için bir fonksiyon döndürür.</td>
+</tr>
+<tr>
+<td><code>app.onLifecycle(handler)</code></td>
+<td>Sekme/uygulama görünürlüğü ve bağlantı değişimleri; bkz. <a href="/tr/docs/lifecycle#app-lifecycle">Uygulama yaşam döngüsü</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>Olay adı dizge ya da <code>Symbol</code> olabilir; <code>fire</code> dinleyicileri ekleniş sırasıyla, senkron çağırır.</p>
+<p>Uygulama olayı dinleyicisinin fırlattığı hata <code>MJX123</code> (<code>The '&lt;olay&gt;' event handler threw.</code>) koduyla raporlanır ve olayın diğer dinleyicileri çalışır. <code>onRouterChanged</code> işleyicileri de böyledir (<code>The 'motifjs-router-navigated' event handler threw.</code>); gezinme yine tamamlanır.</p>
+<p>Bir bileşenin <code>context</code>'i uygulamanın bileşene bağlı bir görünümüdür: onun üzerinden açılan <code>on</code> ve <code>onRouterChanged</code> abonelikleri bileşen serbest bırakılınca kendiliğinden kaldırılır (<code>onLifecycle</code> bu kapsama girmez). <code>Application.main</code>, elde tutulan <code>app</code> örneği ya da <code>useApplication().application</code> üzerinden açılan abonelikler hiçbir bileşene bağlı değildir; döndürülen fonksiyonu kendiniz çağırın ya da bir bileşene <code>motif.setDisposable</code> ile kaydedin (<a href="/tr/docs/memory-and-dispose">Bellek Yönetimi ve Serbest Bırakma</a>):</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>const unsubscribe = app.on&lt;Note&gt;(&quot;noteArchived&quot;, (note) =&gt; {
+  if (note) document.title = `${note.title} arşivlendi`;
+});
+
+unsubscribe();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>const unsubscribe = app.on(&quot;noteArchived&quot;, (note) =&gt; {
+  if (note) document.title = `${note.title} arşivlendi`;
+});
+
+unsubscribe();</code></pre>
+</div>
+<h2 id="emitter">Servis olayları — <code>Emitter&lt;T&gt;</code></h2>
+<p>Uygulama olayları adla çalışır ve uygulamanın tamamına açıktır. Bir servisin kendi olayını tipiyle birlikte yayması için <code>Emitter&lt;T&gt;</code> kullanılır; bileşenden bağımsız, tek tip taşıyan küçük bir yayıcıdır. Örnekteki servis silinen notu bildirir:</p>
+<div class="doc-code" data-file="src/services/notes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/notes.ts"><code>import { Emitter, Injectable, reactive } from &quot;@motifx/core&quot;;
+
+export interface Note {
+  id: number;
+  title: string;
+  body: string;
+  pinned: boolean;
+  archived: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  readonly state = reactive({ items: [] as Note[] });
+  private readonly removed = new Emitter&lt;Note&gt;();
+  readonly onRemoved = this.removed.event;
+
+  remove(id: number): boolean {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    const [note] = this.state.items.splice(index, 1);
+    this.removed.fire(note);
+    return true;
+  }
+
+  dispose() {
+    this.removed.dispose();
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/notes.js"><code>import { Emitter, Injectable, reactive } from &quot;@motifx/core&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  state = reactive({ items: [] });
+  removed = new Emitter();
+  onRemoved = this.removed.event;
+
+  remove(id) {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    const [note] = this.state.items.splice(index, 1);
+    this.removed.fire(note);
+    return true;
+  }
+
+  dispose() {
+    this.removed.dispose();
+  }
+}</code></pre>
+</div>
+<p>Bir bileşen aboneliği kendi ömrüne <code>motif.register</code> ile bağlar; bileşen serbest bırakılınca abonelik kalkar:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>this.motif.register(this.notes.onRemoved((note) =&gt; (this.state.removed = note.title)));</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>list.motif.register(notes.onRemoved((note) =&gt; (state.removed = note.title)));</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>this.motif.register(this.notes.onRemoved((note) =&gt; (this.state.removed = note.title)));</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>list.motif.register(notes.onRemoved((note) =&gt; (state.removed = note.title)));</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>list</code>, aboneliği taşıyan bileşendir: JSX'te kökün <code>onConfig</code> kancasına ya da <code>ref</code>'ine gelen bileşen, JSX'siz yazımda kökü kuran <code>motifComponent</code> fonksiyonunun aldığı bileşen.</p>
+</div>
+<ul>
+<li><code>event(listener, thisArgs?, disposables?)</code> abone olur ve bir <code>IDisposable</code> döndürür; <code>disposables</code> bir <code>DisposableStore</code> ya da <code>IDisposable[]</code> ise abonelik oraya da eklenir (<code>notes.onRemoved(fn, undefined, store)</code>).</li>
+<li><code>fire(value)</code> dinleyicileri ekleniş sırasıyla, senkron çağırır. Dağıtım sırasında eklenen dinleyici o dağıtımı almaz; kaldırılan dinleyici bir daha çağrılmaz.</li>
+<li>Dinleyicinin fırlattığı hata diğerlerini durdurmaz; beklenmeyen hata yoluna gider (bkz. <a href="/tr/docs/error-handling#unexpected-errors">Beklenmeyen hatalar</a>).</li>
+<li><code>dispose()</code> bütün abonelikleri geçersiz kılar; sonraki <code>event(...)</code> çağrıları boş bir <code>IDisposable</code> döndürür. Servisin <code>dispose()</code> metodunu sağlayıcı çağırır; singleton için bu <code>app.dispose()</code> anıdır (bkz. <a href="/tr/docs/service-disposal">Servislerin Serbest Bırakılması</a>).</li>
+</ul>
+<h2 id="next">Sonraki adım</h2>
+<p>Form girdilerini ve iki yönlü bağlamayı öğrenmek için <a href="/tr/docs/forms">Formlar ve İki Yönlü Bağlama</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

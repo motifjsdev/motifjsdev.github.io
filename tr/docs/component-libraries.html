@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Uygulamaların kullandığı bir bileşen kütüphanesinin kuralları; prop&#x27;ların tek bir bağla izlenmesi, geliştiricinin verisinin olduğu gibi kullanılması, bileşenin içinde hiçbir şeyin izlenmemesi, elle çizilen parçalar, değişince yazma, ömür tuzakları ve ölçme.">
+    <title>Bileşen Kütüphanesi Yazmak — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/component-libraries">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-libraries">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-libraries">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-libraries">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/component-libraries">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Bileşen Kütüphanesi Yazmak">
+    <meta property="og:description" content="Uygulamaların kullandığı bir bileşen kütüphanesinin kuralları; prop&#x27;ların tek bir bağla izlenmesi, geliştiricinin verisinin olduğu gibi kullanılması, bileşenin içinde hiçbir şeyin izlenmemesi, elle çizilen parçalar, değişince yazma, ömür tuzakları ve ölçme.">
+    <script type="application/json" id="doc-data">{"slug":"component-libraries","locale":"tr","title":"Bileşen Kütüphanesi Yazmak","description":"Uygulamaların kullandığı bir bileşen kütüphanesinin kuralları; prop\u0027ların tek bir bağla izlenmesi, geliştiricinin verisinin olduğu gibi kullanılması, bileşenin içinde hiçbir şeyin izlenmemesi, elle çizilen parçalar, değişince yazma, ömür tuzakları ve ölçme.","category":{"id":"6","title":"Rehberler"},"html":"\u003Cp\u003EBir bileşen kütüphanesi (kontroller, bir veri ızgarası, bir planlayıcı), tanımadığı uygulamalarda ve çoğu zaman bir\nsayfada binlerce parçasıyla kullanılır. Uygulama kodu reaktiviteye yaslanabilir; kütüphane kodu yaslanmamalıdır. Bu\nsayfadaki kurallar eksiksiz bir kit yazılıp ölçülerek çıkarıldı. Önce \u003Ca href=\u0022/docs/component-creation\u0022\u003EBileşen Oluşturma\u003C/a\u003E ve\n\u003Ca href=\u0022/docs/component-bindings\u0022\u003EBileşen Bağları\u003C/a\u003E sayfalarını okuyun.\u003C/p\u003E\n\u003Ch2 id=\u0022three-ways-in\u0022\u003EÜç giriş\u003C/h2\u003E\n\u003Cp\u003EBir kütüphane bileşeni yalnızca üç şeyi dinler:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Cstrong\u003EProp\u0027ları:\u003C/strong\u003E her biri bir değer ya da bir fonksiyon (\u003Ccode\u003EBind\u0026lt;T\u0026gt;\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EGeliştiricinin verisi:\u003C/strong\u003E olduğu gibi kullanılır. Aynı nesneler tutulur ve geri verilir; \u003Ccode\u003Ereactive()\u003C/code\u003E ile sarılmaz,\nkopyalanmaz, dönüştürülmez. Yerinde yapılan bir değişiklik \u003Ccode\u003EreState()\u003C/code\u003E ya da açık bir \u003Ccode\u003Erefresh()\u003C/code\u003E ile yeniden\nokunur.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EGeliştiricinin \u003Ccode\u003EreState()\u003C/code\u003E çağrısı.\u003C/strong\u003E\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EGeri kalan her şey bileşenin kendi durumudur ve bileşen onu elle çizer.\u003C/p\u003E\n\u003Ch2 id=\u0022props\u0022\u003EProp\u0027lar: değer ya da fonksiyon, tek bir bağla izlenir\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EHer prop ve her özellik setter\u0027ı bir değer ya da bir fonksiyon alır. Fonksiyon, bileşenin \u003Cstrong\u003Etek\u003C/strong\u003E bir bağıyla\nizlenir. Bu bağ \u003Ccode\u003Ebindings.add(binding)\u003C/code\u003E ile kaydedilir (\u003Ccode\u003EIBaseBinding\u003C/code\u003E biçimi, bkz.\n\u003Ca href=\u0022/docs/component-bindings#component-property\u0022\u003EBileşenin özelliğine bağ\u003C/a\u003E). Bileşenin bağ kaydında olduğu için\ngeliştiricinin \u003Ccode\u003EreState()\u003C/code\u003E çağrısı ona ulaşır; düz veri de reaktif veri kadar çalışır.\u003C/li\u003E\n\u003Cli\u003EDeğer, son okunandan farklıysa (\u003Ccode\u003EObject.is\u003C/code\u003E) iletilir. Aynı değeri bulan bir \u003Ccode\u003EreState()\u003C/code\u003E, kullanıcının o arada\nyaptığını (yazdığı metni, geçtiği günü) bozmaz.\u003C/li\u003E\n\u003Cli\u003EKoddan atanan bir özellik, fonksiyonunu izlemeyi bırakır.\u003C/li\u003E\n\u003Cli\u003EBir özelliği çizmek için effect değil, bir uygulayıcı listesi kullanılır: değer şimdi ve her değişimde, izlenmeden\nuygulanır. Düz değer olarak verilen bir özellik için hiç effect oluşmaz.\u003C/li\u003E\n\u003Cli\u003EAlanları fonksiyon olabilen veri nesneleri (menü öğeleri, araç çubuğu öğeleri, özet öğeleri): bir kaynağın bütün\nalanları \u003Cstrong\u003Etek\u003C/strong\u003E bir bağla okunur, okunan değerler saklanır ve çizim onlardan yapılır. Çizerken geliştiricinin\nfonksiyonu yeniden çağrılmaz; yeni bir düğüm döndüren bir fonksiyon her çizimde yeni bir düğüm üretir.\u003C/li\u003E\n\u003Cli\u003EKullanıcının da değiştirdiği bir değer (metin kutusu, liste, onay kutusu) kontrole yalnızca kaynağı değiştiğinde\nverilir, her çizimde değil; yoksa kullanıcının yazdığı ezilir:\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022\u003E\u003Ccode\u003Econst handed = new WeakMap\u0026lt;object, { value: unknown }\u0026gt;();\nexport function handOver\u0026lt;V\u0026gt;(control: { value: V }, value: V) {\n  const last = handed.get(control);\n  if (last \u0026amp;\u0026amp; Object.is(last.value, value)) return;\n  handed.set(control, { value });\n  control.value = value;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022nothing-followed-inside\u0022\u003Eİçeride hiçbir şey izlenmez\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EDeğişiklik, yapıldığı yerde söylenir.\u003C/strong\u003E Bileşenin durumunun her parçası \u003Ccode\u003Etell(ad)\u003C/code\u003E çağırır. Adlar toplanır ve\nturda bir kez duyurulur; her görünüm, söylenen adların ilgilendirdiği parçaları yeniden çizer. Durumu izleyen bir şey\nyoktur.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EBileşenin bir değişikliğe verdiği karşılık görünümlerden önce çalışır.\u003C/strong\u003E Yeniden yükleme, yeniden yerleşim, bir\ndüzenleyiciyi kapatma önce çalışır; onların söyledikleri aynı tura katılır ve görünümler bir kez çizer.\n\u003Cul\u003E\n\u003Cli\u003EBöyle bir karşılık, okuduğu değerler son okuduklarından farklı olduğunda çalışır.\u003C/li\u003E\n\u003Cli\u003EKararlı değerler karşılaştırılır: her okumada yeniden kurulan nesneler ve \u003Ccode\u003EMap\u003C/code\u003E\u0027ler hiçbir zaman eşit çıkmaz;\nonlar JSON olarak anahtarlanır.\u003C/li\u003E\n\u003Cli\u003E\u0026quot;Yeniden oku\u0026quot; sayacı gibi sayaçlar da anahtara girer.\u003C/li\u003E\n\u003C/ul\u003E\n\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EYalnızca gerçek bir değişiklik söylenir.\u003C/strong\u003E Her çizimde söylenen bir bildirim bir döngüdür (çiz, söyle, çiz) ve bir\ntarayıcı sekmesini kilitleyebilir.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EElle çizilen parçalar kodla kurulan bileşenlerdir.\u003C/strong\u003E Orada JSX kullanılmaz: derleyici, bir değişken okuyan her\nifadeyi, bir özniteliği bile, bir bağa çevirir. \u003Ccode\u003Ebindings.watch\u003C/code\u003E ve serbest \u003Ccode\u003Eeffect()\u003C/code\u003E da yoktur. Bir veri ızgarası\nsayfasında:\n\u003Cul\u003E\n\u003Cli\u003Ebağlar 1.306\u0027dan 87\u0027ye indi;\u003C/li\u003E\n\u003Cli\u003Eaçılışta çalışan effect\u0027ler 2.478\u0027den 346\u0027ya indi;\u003C/li\u003E\n\u003Cli\u003Ebir sıralama artık hiç effect çalıştırmıyor (önceden 140).\u003C/li\u003E\n\u003C/ul\u003E\n\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EReaktif durum uygulama için kalabilir.\u003C/strong\u003E \u0026quot;Reaktif\u0026quot; diye belgelenen bir API (bir toplam, seçili satır sayısı),\nuygulamanın kendi bağları için deposunu tutabilir; bileşen onu hiçbir zaman izleyerek okumaz.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EDil ya da yerel ayar değişimi bir olaydır\u003C/strong\u003E, sinyal değil. Her kontrol bir kez abone olur, metinlerini ve\nbiçimlerini şimdi ve her değişimde çizer; abonelik kontrolle birlikte gider:\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022\u003E\u003Ccode\u003Eexport function onLanguage(component: ComponentBase, draw: () =\u0026gt; void) {\n  untracked(draw);\n  const changed = uiLocale.onChanged(() =\u0026gt; !component.isDisposed \u0026amp;\u0026amp; untracked(draw));\n  component.motif.setDisposable(() =\u0026gt; changed.dispose());\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EDeğişmeyen içerik bir kez kurulur.\u003C/strong\u003E \u003Ccode\u003E{cond \u0026amp;\u0026amp; \u0026lt;X/\u0026gt;}\u003C/code\u003E ve \u003Ccode\u003Ekey\u003C/code\u003E verilen \u003Ccode\u003E.map\u003C/code\u003E satırları öğe başına bağ açar.\nDeğişmeyen içerik \u003Ccode\u003EonConfig\u003C/code\u003E ya da \u003Ccode\u003EinitializeComponent\u003C/code\u003E içinde \u003Ccode\u003Econtrols.add\u003C/code\u003E ile bir kez kurulabilir. Bir doküman\nsayfasında bu, sayfanın effect sayısını 16 binden 10 bine indirdi.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022component-tree\u0022\u003EBileşenin ağacı\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eview()\u003C/code\u003E tek bir \u003Ccode\u003EComponentBase\u003C/code\u003E döndürür. Birden çok parça \u003Ccode\u003EmotifFragment()\u003C/code\u003E içine konur; \u003Ccode\u003E\u0026lt;\u0026gt;…\u0026lt;/\u0026gt;\u003C/code\u003E de buna\nderlenir.\u003C/li\u003E\n\u003Cli\u003EElemanın doğrudan çocuğu olması gereken parçalar (başlık hücreleri, taşınan satırlar), \u003Ccode\u003Eview()\u003C/code\u003E\u0027den döndürülmez;\n\u003Ccode\u003EinitializeComponent\u003C/code\u003E (bir override) içinde eklenir.\u003C/li\u003E\n\u003Cli\u003EAnahtarlı parçalar elle eşlenir. Zaten yerinde olan bir düğüm hiçbir zaman taşınmaz: odaktaki elemanı taşımak\nodağını alır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Econtrols.remove(parça)\u003C/code\u003E parçayı hemen çıkarır. \u003Ccode\u003Eparça.dispose()\u003C/code\u003E elemanını bir tur sonra kaldırır; hemen ardından\nyapılan bir çizim elemanı hâlâ bulur.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ex-display\u003C/code\u003E gibi yerinde gösterilip gizlenen bir parça, bir yorum yer tutucusuyla yer değiştirir ve oraya geri konur.\nYer tutucu için bir ebeveyn gerekir; bu yüzden en üst düzeydeki parçalar ilk kez \u003Ccode\u003EonBuilt\u003C/code\u003E içinde çizilir.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022change-checked-writes\u0022\u003EDeğişince yazma\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EBir öznitelik, stil ya da metni aynı değerle yeniden yazmak bile tarayıcıya stilleri yeniden hesaplatır. Her çizimde\ndeğişmemiş öznitelikleri yeniden yazan elle çizim kodu, yerini aldığı reaktif kodun beş katı stil hesaplaması\nyaptı. Bir değer yalnızca değiştiğinde yazılır.\u003C/li\u003E\n\u003Cli\u003EBir constructable stylesheet\u0027i (\u003Ccode\u003EreplaceSync\u003C/code\u003E) aynı metinle değiştirmek, bütün belgenin stillerini geçersiz kılar.\nBir sütun genişletilirken her adımda sütun stil sayfasını yeniden yazan bir ızgara, adım başına 60–110 ms harcadı.\nSayfa yalnızca metni değiştiğinde yazılınca uzun görevler kalktı.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022lifetime\u0022\u003EÖmür\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EBir bileşeni serbest bırakmak, kendi alanlarını \u003Ccode\u003Eundefined\u003C/code\u003E yapar. Sonradan gelen geri çağrılar (zamanlayıcılar,\npromise\u0027ler, gözlemciler, ertelenmiş bir çizim) önce \u003Ccode\u003EisDisposed\u003C/code\u003E\u0027a bakar.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EonDisposing\u003C/code\u003E, eleman DOM\u0027dan çıkmadan önce çalışır ve odaktaki bir elemanı kaldırmak \u003Ccode\u003Efocusout\u003C/code\u003E tetikler. Bu yüzden\nbir \u003Ccode\u003Efocusout\u003C/code\u003E işleyicisi, serbest bırakılmakta olan bir bileşende çalışabilir.\u003C/li\u003E\n\u003Cli\u003EOdak gizlenen ya da pasifleşen bir kontrolden taşınacaksa sonraki kontrol \u003Ccode\u003Efocus({ preventScroll: true })\u003C/code\u003E ile\nodaklanır; yoksa sayfa ona kayar.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref\u003C/code\u003E geri çağrıları, alt sınıfın alan başlatıcılarından önce, temel yapıcının içinde çalışır. Bir \u003Ccode\u003Eref\u003C/code\u003E\u0027in\ndokunabileceği durum sınıf alanlarında değil, gerektiğinde oluşturulan, sembol anahtarlı bir nesnede tutulur.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022long-work\u0022\u003EUzun işler\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003EPromise.then\u003C/code\u003E ve \u003Ccode\u003EqueueMicrotask\u003C/code\u003E tarayıcının çizmesine izin vermez; bir mikro görev zinciri yine tek bir uzun\ngörevdir. Uzun işler makro görevlerle (\u003Ccode\u003EsetTimeout\u003C/code\u003E, \u003Ccode\u003EMessageChannel\u003C/code\u003E) parçalara bölünür. Ölçüm:\n\u003Cul\u003E\n\u003Cli\u003Emikro görevlerle tek bir 300 ms\u0027lik uzun görev;\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EsetTimeout\u003C/code\u003E parçalarıyla hiç uzun görev olmadan, 18 çizilmiş kare.\u003C/li\u003E\n\u003C/ul\u003E\n\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022checking\u0022\u003Eİşi doğrulamak\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EBağlar bileşen türü başına, bileşen ağacında dolaşılarak sayılır (\u003Ca href=\u0022/docs/devtools\u0022\u003EDevTools\u003C/a\u003E \u003Ccode\u003Einspect(path).bindings\u003C/code\u003E);\nyalnızca canlı effect\u0027ler sayılmaz. Bir prop\u0027u izleyen bağın effect sahibi yoktur ve effect sayısında görünmez.\u003C/li\u003E\n\u003Cli\u003EBir görünüm yeniden yazılırken o görünümün her sayfasında eski ve yeni hâl piksel piksel karşılaştırılır. Her\nadımda testler ve e2e denetimleri yeşil tutulur; effect sayısının düştüğü kanıtlanır.\u003C/li\u003E\n\u003Cli\u003ESayfayı \u003Ccode\u003Eload\u003C/code\u003E\u0027dan hemen sonra okuyan bir e2e denetimi önce içeriği bekler: sayfalar bölümlerini \u003Ccode\u003Eload\u003C/code\u003E\u0027dan sonra\nçizer.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EKütüphaneyi yayımlamak için \u003Ca href=\u0022/docs/publishing-libraries\u0022\u003EMotifJS için npm Kütüphanesi Yayımlama\u003C/a\u003E sayfasına geçin.\u003C/p\u003E\n","headings":[{"id":"three-ways-in","text":"Üç giriş","level":2},{"id":"props","text":"Prop\u0027lar: değer ya da fonksiyon, tek bir bağla izlenir","level":2},{"id":"nothing-followed-inside","text":"İçeride hiçbir şey izlenmez","level":2},{"id":"component-tree","text":"Bileşenin ağacı","level":2},{"id":"change-checked-writes","text":"Değişince yazma","level":2},{"id":"lifetime","text":"Ömür","level":2},{"id":"long-work","text":"Uzun işler","level":2},{"id":"checking","text":"İşi doğrulamak","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"devtools-packages","title":"Paketler için DevTools"},"next":{"slug":"api-reference","title":"API Referansı"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Rehberler</p>
+        <h1>Bileşen Kütüphanesi Yazmak</h1>
+        <p>Uygulamaların kullandığı bir bileşen kütüphanesinin kuralları; prop&#x27;ların tek bir bağla izlenmesi, geliştiricinin verisinin olduğu gibi kullanılması, bileşenin içinde hiçbir şeyin izlenmemesi, elle çizilen parçalar, değişince yazma, ömür tuzakları ve ölçme.</p>
+<p>Bir bileşen kütüphanesi (kontroller, bir veri ızgarası, bir planlayıcı), tanımadığı uygulamalarda ve çoğu zaman bir
+sayfada binlerce parçasıyla kullanılır. Uygulama kodu reaktiviteye yaslanabilir; kütüphane kodu yaslanmamalıdır. Bu
+sayfadaki kurallar eksiksiz bir kit yazılıp ölçülerek çıkarıldı. Önce <a href="/tr/docs/component-creation">Bileşen Oluşturma</a> ve
+<a href="/tr/docs/component-bindings">Bileşen Bağları</a> sayfalarını okuyun.</p>
+<h2 id="three-ways-in">Üç giriş</h2>
+<p>Bir kütüphane bileşeni yalnızca üç şeyi dinler:</p>
+<ol>
+<li><strong>Prop'ları:</strong> her biri bir değer ya da bir fonksiyon (<code>Bind&lt;T&gt;</code>).</li>
+<li><strong>Geliştiricinin verisi:</strong> olduğu gibi kullanılır. Aynı nesneler tutulur ve geri verilir; <code>reactive()</code> ile sarılmaz,
+kopyalanmaz, dönüştürülmez. Yerinde yapılan bir değişiklik <code>reState()</code> ya da açık bir <code>refresh()</code> ile yeniden
+okunur.</li>
+<li><strong>Geliştiricinin <code>reState()</code> çağrısı.</strong></li>
+</ol>
+<p>Geri kalan her şey bileşenin kendi durumudur ve bileşen onu elle çizer.</p>
+<h2 id="props">Prop'lar: değer ya da fonksiyon, tek bir bağla izlenir</h2>
+<ul>
+<li>Her prop ve her özellik setter'ı bir değer ya da bir fonksiyon alır. Fonksiyon, bileşenin <strong>tek</strong> bir bağıyla
+izlenir. Bu bağ <code>bindings.add(binding)</code> ile kaydedilir (<code>IBaseBinding</code> biçimi, bkz.
+<a href="/tr/docs/component-bindings#component-property">Bileşenin özelliğine bağ</a>). Bileşenin bağ kaydında olduğu için
+geliştiricinin <code>reState()</code> çağrısı ona ulaşır; düz veri de reaktif veri kadar çalışır.</li>
+<li>Değer, son okunandan farklıysa (<code>Object.is</code>) iletilir. Aynı değeri bulan bir <code>reState()</code>, kullanıcının o arada
+yaptığını (yazdığı metni, geçtiği günü) bozmaz.</li>
+<li>Koddan atanan bir özellik, fonksiyonunu izlemeyi bırakır.</li>
+<li>Bir özelliği çizmek için effect değil, bir uygulayıcı listesi kullanılır: değer şimdi ve her değişimde, izlenmeden
+uygulanır. Düz değer olarak verilen bir özellik için hiç effect oluşmaz.</li>
+<li>Alanları fonksiyon olabilen veri nesneleri (menü öğeleri, araç çubuğu öğeleri, özet öğeleri): bir kaynağın bütün
+alanları <strong>tek</strong> bir bağla okunur, okunan değerler saklanır ve çizim onlardan yapılır. Çizerken geliştiricinin
+fonksiyonu yeniden çağrılmaz; yeni bir düğüm döndüren bir fonksiyon her çizimde yeni bir düğüm üretir.</li>
+<li>Kullanıcının da değiştirdiği bir değer (metin kutusu, liste, onay kutusu) kontrole yalnızca kaynağı değiştiğinde
+verilir, her çizimde değil; yoksa kullanıcının yazdığı ezilir:</li>
+</ul>
+<div class="doc-code">
+<pre data-lang="ts"><code>const handed = new WeakMap&lt;object, { value: unknown }&gt;();
+export function handOver&lt;V&gt;(control: { value: V }, value: V) {
+  const last = handed.get(control);
+  if (last &amp;&amp; Object.is(last.value, value)) return;
+  handed.set(control, { value });
+  control.value = value;
+}</code></pre>
+</div>
+<h2 id="nothing-followed-inside">İçeride hiçbir şey izlenmez</h2>
+<ul>
+<li><strong>Değişiklik, yapıldığı yerde söylenir.</strong> Bileşenin durumunun her parçası <code>tell(ad)</code> çağırır. Adlar toplanır ve
+turda bir kez duyurulur; her görünüm, söylenen adların ilgilendirdiği parçaları yeniden çizer. Durumu izleyen bir şey
+yoktur.</li>
+<li><strong>Bileşenin bir değişikliğe verdiği karşılık görünümlerden önce çalışır.</strong> Yeniden yükleme, yeniden yerleşim, bir
+düzenleyiciyi kapatma önce çalışır; onların söyledikleri aynı tura katılır ve görünümler bir kez çizer.
+<ul>
+<li>Böyle bir karşılık, okuduğu değerler son okuduklarından farklı olduğunda çalışır.</li>
+<li>Kararlı değerler karşılaştırılır: her okumada yeniden kurulan nesneler ve <code>Map</code>'ler hiçbir zaman eşit çıkmaz;
+onlar JSON olarak anahtarlanır.</li>
+<li>&quot;Yeniden oku&quot; sayacı gibi sayaçlar da anahtara girer.</li>
+</ul>
+</li>
+<li><strong>Yalnızca gerçek bir değişiklik söylenir.</strong> Her çizimde söylenen bir bildirim bir döngüdür (çiz, söyle, çiz) ve bir
+tarayıcı sekmesini kilitleyebilir.</li>
+<li><strong>Elle çizilen parçalar kodla kurulan bileşenlerdir.</strong> Orada JSX kullanılmaz: derleyici, bir değişken okuyan her
+ifadeyi, bir özniteliği bile, bir bağa çevirir. <code>bindings.watch</code> ve serbest <code>effect()</code> da yoktur. Bir veri ızgarası
+sayfasında:
+<ul>
+<li>bağlar 1.306'dan 87'ye indi;</li>
+<li>açılışta çalışan effect'ler 2.478'den 346'ya indi;</li>
+<li>bir sıralama artık hiç effect çalıştırmıyor (önceden 140).</li>
+</ul>
+</li>
+<li><strong>Reaktif durum uygulama için kalabilir.</strong> &quot;Reaktif&quot; diye belgelenen bir API (bir toplam, seçili satır sayısı),
+uygulamanın kendi bağları için deposunu tutabilir; bileşen onu hiçbir zaman izleyerek okumaz.</li>
+<li><strong>Dil ya da yerel ayar değişimi bir olaydır</strong>, sinyal değil. Her kontrol bir kez abone olur, metinlerini ve
+biçimlerini şimdi ve her değişimde çizer; abonelik kontrolle birlikte gider:</li>
+</ul>
+<div class="doc-code">
+<pre data-lang="ts"><code>export function onLanguage(component: ComponentBase, draw: () =&gt; void) {
+  untracked(draw);
+  const changed = uiLocale.onChanged(() =&gt; !component.isDisposed &amp;&amp; untracked(draw));
+  component.motif.setDisposable(() =&gt; changed.dispose());
+}</code></pre>
+</div>
+<ul>
+<li><strong>Değişmeyen içerik bir kez kurulur.</strong> <code>{cond &amp;&amp; &lt;X/&gt;}</code> ve <code>key</code> verilen <code>.map</code> satırları öğe başına bağ açar.
+Değişmeyen içerik <code>onConfig</code> ya da <code>initializeComponent</code> içinde <code>controls.add</code> ile bir kez kurulabilir. Bir doküman
+sayfasında bu, sayfanın effect sayısını 16 binden 10 bine indirdi.</li>
+</ul>
+<h2 id="component-tree">Bileşenin ağacı</h2>
+<ul>
+<li><code>view()</code> tek bir <code>ComponentBase</code> döndürür. Birden çok parça <code>motifFragment()</code> içine konur; <code>&lt;&gt;…&lt;/&gt;</code> de buna
+derlenir.</li>
+<li>Elemanın doğrudan çocuğu olması gereken parçalar (başlık hücreleri, taşınan satırlar), <code>view()</code>'den döndürülmez;
+<code>initializeComponent</code> (bir override) içinde eklenir.</li>
+<li>Anahtarlı parçalar elle eşlenir. Zaten yerinde olan bir düğüm hiçbir zaman taşınmaz: odaktaki elemanı taşımak
+odağını alır.</li>
+<li><code>controls.remove(parça)</code> parçayı hemen çıkarır. <code>parça.dispose()</code> elemanını bir tur sonra kaldırır; hemen ardından
+yapılan bir çizim elemanı hâlâ bulur.</li>
+<li><code>x-display</code> gibi yerinde gösterilip gizlenen bir parça, bir yorum yer tutucusuyla yer değiştirir ve oraya geri konur.
+Yer tutucu için bir ebeveyn gerekir; bu yüzden en üst düzeydeki parçalar ilk kez <code>onBuilt</code> içinde çizilir.</li>
+</ul>
+<h2 id="change-checked-writes">Değişince yazma</h2>
+<ul>
+<li>Bir öznitelik, stil ya da metni aynı değerle yeniden yazmak bile tarayıcıya stilleri yeniden hesaplatır. Her çizimde
+değişmemiş öznitelikleri yeniden yazan elle çizim kodu, yerini aldığı reaktif kodun beş katı stil hesaplaması
+yaptı. Bir değer yalnızca değiştiğinde yazılır.</li>
+<li>Bir constructable stylesheet'i (<code>replaceSync</code>) aynı metinle değiştirmek, bütün belgenin stillerini geçersiz kılar.
+Bir sütun genişletilirken her adımda sütun stil sayfasını yeniden yazan bir ızgara, adım başına 60–110 ms harcadı.
+Sayfa yalnızca metni değiştiğinde yazılınca uzun görevler kalktı.</li>
+</ul>
+<h2 id="lifetime">Ömür</h2>
+<ul>
+<li>Bir bileşeni serbest bırakmak, kendi alanlarını <code>undefined</code> yapar. Sonradan gelen geri çağrılar (zamanlayıcılar,
+promise'ler, gözlemciler, ertelenmiş bir çizim) önce <code>isDisposed</code>'a bakar.</li>
+<li><code>onDisposing</code>, eleman DOM'dan çıkmadan önce çalışır ve odaktaki bir elemanı kaldırmak <code>focusout</code> tetikler. Bu yüzden
+bir <code>focusout</code> işleyicisi, serbest bırakılmakta olan bir bileşende çalışabilir.</li>
+<li>Odak gizlenen ya da pasifleşen bir kontrolden taşınacaksa sonraki kontrol <code>focus({ preventScroll: true })</code> ile
+odaklanır; yoksa sayfa ona kayar.</li>
+<li><code>ref</code> geri çağrıları, alt sınıfın alan başlatıcılarından önce, temel yapıcının içinde çalışır. Bir <code>ref</code>'in
+dokunabileceği durum sınıf alanlarında değil, gerektiğinde oluşturulan, sembol anahtarlı bir nesnede tutulur.</li>
+</ul>
+<h2 id="long-work">Uzun işler</h2>
+<ul>
+<li><code>Promise.then</code> ve <code>queueMicrotask</code> tarayıcının çizmesine izin vermez; bir mikro görev zinciri yine tek bir uzun
+görevdir. Uzun işler makro görevlerle (<code>setTimeout</code>, <code>MessageChannel</code>) parçalara bölünür. Ölçüm:
+<ul>
+<li>mikro görevlerle tek bir 300 ms'lik uzun görev;</li>
+<li><code>setTimeout</code> parçalarıyla hiç uzun görev olmadan, 18 çizilmiş kare.</li>
+</ul>
+</li>
+</ul>
+<h2 id="checking">İşi doğrulamak</h2>
+<ul>
+<li>Bağlar bileşen türü başına, bileşen ağacında dolaşılarak sayılır (<a href="/tr/docs/devtools">DevTools</a> <code>inspect(path).bindings</code>);
+yalnızca canlı effect'ler sayılmaz. Bir prop'u izleyen bağın effect sahibi yoktur ve effect sayısında görünmez.</li>
+<li>Bir görünüm yeniden yazılırken o görünümün her sayfasında eski ve yeni hâl piksel piksel karşılaştırılır. Her
+adımda testler ve e2e denetimleri yeşil tutulur; effect sayısının düştüğü kanıtlanır.</li>
+<li>Sayfayı <code>load</code>'dan hemen sonra okuyan bir e2e denetimi önce içeriği bekler: sayfalar bölümlerini <code>load</code>'dan sonra
+çizer.</li>
+</ul>
+<h2 id="next">Sonraki adım</h2>
+<p>Kütüphaneyi yayımlamak için <a href="/tr/docs/publishing-libraries">MotifJS için npm Kütüphanesi Yayımlama</a> sayfasına geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

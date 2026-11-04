@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Showing content in a slot outside its own tree; the Transport slot, the TransportTo sender, the replace/merge modes and Transporter for moving content in code.">
+    <title>Transport and TransportTo — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/transport">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/transport">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/transport">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/transport">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/transport">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Transport and TransportTo">
+    <meta property="og:description" content="Showing content in a slot outside its own tree; the Transport slot, the TransportTo sender, the replace/merge modes and Transporter for moving content in code.">
+    <script type="application/json" id="doc-data">{"slug":"transport","locale":"en","title":"Transport and TransportTo","description":"Showing content in a slot outside its own tree; the Transport slot, the TransportTo sender, the replace/merge modes and Transporter for moving content in code.","category":{"id":"8","title":"Advanced"},"html":"\u003Cp\u003EUsed to show a component\u0027s content somewhere outside its own tree. The typical example: page-specific command buttons appearing in the layout\u0027s top bar. It is made of two parts:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003ETransport\u003C/code\u003E\u003C/strong\u003E — the target \u003Cstrong\u003Eslot\u003C/strong\u003E. It is put in the layout (or anywhere the content should appear).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003ETransportTo\u003C/code\u003E\u003C/strong\u003E — the \u003Cstrong\u003Esender\u003C/strong\u003E. Content written between its tags is moved to the slot of the same name.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022usage\u0022\u003EUsage\u003C/h2\u003E\n\u003Cp\u003EIn the example the top bar carries a slot, and the pin button of the open note is sent to that slot from the note page. The slot:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/PageBar.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/layouts/PageBar.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, Transport } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PageBar extends Component\u0026lt;HTMLElement\u0026gt; {\n  static override elementTag = \u0026quot;header\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  }\n\n  override view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h1\u0026gt;Notes\u0026lt;/h1\u0026gt;\n        \u0026lt;Transport name=\u0026quot;page-actions\u0026quot; /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/PageBar.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, Transport, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PageBar extends Component\u0026lt;HTMLElement\u0026gt; {\n  static override elementTag = \u0026quot;header\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  }\n\n  override view() {\n    const title = motifComponent(\u0026quot;h1\u0026quot;, (h1: ComponentBase) =\u0026gt; h1.setText(\u0026quot;Notes\u0026quot;));\n    return motifFragment({ childs: [title, new Transport({ name: \u0026quot;page-actions\u0026quot; })] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/PageBar.tsx\u0022\u003E\u003Ccode\u003Eimport { Transport } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PageBar() {\n  return (\n    \u0026lt;header class=\u0026quot;pagebar\u0026quot;\u0026gt;\n      \u0026lt;h1\u0026gt;Notes\u0026lt;/h1\u0026gt;\n      \u0026lt;Transport name=\u0026quot;page-actions\u0026quot; /\u0026gt;\n    \u0026lt;/header\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/PageBar.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, Transport, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PageBar() {\n  return motifComponent(\u0026quot;header\u0026quot;, (header: ComponentBase) =\u0026gt; {\n    header.class.add(\u0026quot;pagebar\u0026quot;);\n    const title = motifComponent(\u0026quot;h1\u0026quot;, (h1: ComponentBase) =\u0026gt; h1.setText(\u0026quot;Notes\u0026quot;));\n    header.controls.add(title, new Transport({ name: \u0026quot;page-actions\u0026quot; }));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/layouts/PageBar.tsx\u0022\u003E\u003Ccode\u003Eimport { Transport, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PageBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;header\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h1\u0026gt;Notes\u0026lt;/h1\u0026gt;\n        \u0026lt;Transport name=\u0026quot;page-actions\u0026quot; /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/PageBar.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, Transport, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PageBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;header\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  },\n\n  view() {\n    const title = motifComponent(\u0026quot;h1\u0026quot;, (h1: ComponentBase) =\u0026gt; h1.setText(\u0026quot;Notes\u0026quot;));\n    return motifFragment({ childs: [title, new Transport({ name: \u0026quot;page-actions\u0026quot; })] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/layouts/PageBar.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, Transport } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PageBar extends Component {\n  static elementTag = \u0026quot;header\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  }\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h1\u0026gt;Notes\u0026lt;/h1\u0026gt;\n        \u0026lt;Transport name=\u0026quot;page-actions\u0026quot; /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/PageBar.js\u0022\u003E\u003Ccode\u003Eimport { Component, Transport, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PageBar extends Component {\n  static elementTag = \u0026quot;header\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  }\n\n  view() {\n    const title = motifComponent(\u0026quot;h1\u0026quot;, (h1) =\u0026gt; h1.setText(\u0026quot;Notes\u0026quot;));\n    return motifFragment({ childs: [title, new Transport({ name: \u0026quot;page-actions\u0026quot; })] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/PageBar.jsx\u0022\u003E\u003Ccode\u003Eimport { Transport } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PageBar() {\n  return (\n    \u0026lt;header class=\u0026quot;pagebar\u0026quot;\u0026gt;\n      \u0026lt;h1\u0026gt;Notes\u0026lt;/h1\u0026gt;\n      \u0026lt;Transport name=\u0026quot;page-actions\u0026quot; /\u0026gt;\n    \u0026lt;/header\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/PageBar.js\u0022\u003E\u003Ccode\u003Eimport { Transport, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PageBar() {\n  return motifComponent(\u0026quot;header\u0026quot;, (header) =\u0026gt; {\n    header.class.add(\u0026quot;pagebar\u0026quot;);\n    const title = motifComponent(\u0026quot;h1\u0026quot;, (h1) =\u0026gt; h1.setText(\u0026quot;Notes\u0026quot;));\n    header.controls.add(title, new Transport({ name: \u0026quot;page-actions\u0026quot; }));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/layouts/PageBar.jsx\u0022\u003E\u003Ccode\u003Eimport { Transport, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PageBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;header\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h1\u0026gt;Notes\u0026lt;/h1\u0026gt;\n        \u0026lt;Transport name=\u0026quot;page-actions\u0026quot; /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/PageBar.js\u0022\u003E\u003Ccode\u003Eimport { Transport, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PageBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;header\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;pagebar\u0026quot;);\n  },\n\n  view() {\n    const title = motifComponent(\u0026quot;h1\u0026quot;, (h1) =\u0026gt; h1.setText(\u0026quot;Notes\u0026quot;));\n    return motifFragment({ childs: [title, new Transport({ name: \u0026quot;page-actions\u0026quot; })] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe sender:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/PinAction.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/PinAction.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, TransportTo } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class PinAction extends Component\u0026lt;any, { note: Note }\u0026gt; {\n  notes = this.getService(NotesService)!;\n\n  override view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;TransportTo name=\u0026quot;page-actions\u0026quot;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm ghost\u0026quot; aria-pressed={() =\u0026gt; note.pinned} onclick={() =\u0026gt; this.notes.togglePin(note)}\u0026gt;\n          {() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;)}\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/TransportTo\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/PinAction.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, TransportTo, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class PinAction extends Component\u0026lt;any, { note: Note }\u0026gt; {\n  notes = this.getService(NotesService)!;\n\n  override view() {\n    const { note } = this.props;\n    const pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned });\n      button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.togglePin(note));\n      button.bindings.text(() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;));\n    });\n    return motifComponent(TransportTo, { name: \u0026quot;page-actions\u0026quot;, childs: [pin] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/PinAction.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, TransportTo } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function PinAction(props: { note: Note }) {\n  const notes = FromService(NotesService)!;\n  const { note } = props;\n\n  return (\n    \u0026lt;TransportTo name=\u0026quot;page-actions\u0026quot;\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm ghost\u0026quot; aria-pressed={() =\u0026gt; note.pinned} onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;\n        {() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;)}\n      \u0026lt;/button\u0026gt;\n    \u0026lt;/TransportTo\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/PinAction.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, TransportTo, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function PinAction(props: { note: Note }) {\n  const notes = FromService(NotesService)!;\n  const { note } = props;\n\n  const pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned });\n    button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n    button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n    button.bindings.text(() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;));\n  });\n  return motifComponent(TransportTo, { name: \u0026quot;page-actions\u0026quot;, childs: [pin] });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/PinAction.tsx\u0022\u003E\u003Ccode\u003Eimport { TransportTo, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const PinAction = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    const { note } = props;\n    return (\n      \u0026lt;TransportTo name=\u0026quot;page-actions\u0026quot;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm ghost\u0026quot; aria-pressed={() =\u0026gt; note.pinned} onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;\n          {() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;)}\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/TransportTo\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/PinAction.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, TransportTo, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const PinAction = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    const { note } = props;\n    const pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned });\n      button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n      button.bindings.text(() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;));\n    });\n    return motifComponent(TransportTo, { name: \u0026quot;page-actions\u0026quot;, childs: [pin] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/PinAction.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, TransportTo } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class PinAction extends Component {\n  notes = this.getService(NotesService);\n\n  view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;TransportTo name=\u0026quot;page-actions\u0026quot;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm ghost\u0026quot; aria-pressed={() =\u0026gt; note.pinned} onclick={() =\u0026gt; this.notes.togglePin(note)}\u0026gt;\n          {() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;)}\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/TransportTo\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/PinAction.js\u0022\u003E\u003Ccode\u003Eimport { Component, TransportTo, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class PinAction extends Component {\n  notes = this.getService(NotesService);\n\n  view() {\n    const { note } = this.props;\n    const pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned });\n      button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.togglePin(note));\n      button.bindings.text(() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;));\n    });\n    return motifComponent(TransportTo, { name: \u0026quot;page-actions\u0026quot;, childs: [pin] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/PinAction.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, TransportTo } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function PinAction(props) {\n  const notes = FromService(NotesService);\n  const { note } = props;\n\n  return (\n    \u0026lt;TransportTo name=\u0026quot;page-actions\u0026quot;\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm ghost\u0026quot; aria-pressed={() =\u0026gt; note.pinned} onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;\n        {() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;)}\n      \u0026lt;/button\u0026gt;\n    \u0026lt;/TransportTo\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/PinAction.js\u0022\u003E\u003Ccode\u003Eimport { FromService, TransportTo, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function PinAction(props) {\n  const notes = FromService(NotesService);\n  const { note } = props;\n\n  const pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned });\n    button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n    button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n    button.bindings.text(() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;));\n  });\n  return motifComponent(TransportTo, { name: \u0026quot;page-actions\u0026quot;, childs: [pin] });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/PinAction.jsx\u0022\u003E\u003Ccode\u003Eimport { TransportTo, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const PinAction = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    const { note } = props;\n    return (\n      \u0026lt;TransportTo name=\u0026quot;page-actions\u0026quot;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm ghost\u0026quot; aria-pressed={() =\u0026gt; note.pinned} onclick={() =\u0026gt; notes.togglePin(note)}\u0026gt;\n          {() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;)}\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/TransportTo\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/PinAction.js\u0022\u003E\u003Ccode\u003Eimport { TransportTo, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const PinAction = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    const { note } = props;\n    const pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned });\n      button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n      button.bindings.text(() =\u0026gt; (note.pinned ? \u0026quot;Pinned\u0026quot; : \u0026quot;Pin\u0026quot;));\n    });\n    return motifComponent(TransportTo, { name: \u0026quot;page-actions\u0026quot;, childs: [pin] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe layout places the bar with \u003Ccode\u003E\u0026lt;PageBar /\u0026gt;\u003C/code\u003E, and the note page places the button with \u003Ccode\u003E\u0026lt;PinAction note={note} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003EThe layout places the bar with \u003Ccode\u003Enew PageBar()\u003C/code\u003E, and the note page places the button with \u003Ccode\u003Enew PinAction({ note })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003EThe layout places the bar with \u003Ccode\u003EmotifComponent(PageBar)\u003C/code\u003E, and the note page places the button with \u003Ccode\u003EmotifComponent(PinAction, { note })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003ETransport\u003C/code\u003E and \u003Ccode\u003ETransportTo\u003C/code\u003E are classes of the core. Without JSX, the slot is built with \u003Ccode\u003Enew Transport({ name })\u003C/code\u003E, and the sender, as the compiler would produce it, with \u003Ccode\u003EmotifComponent(TransportTo, { name, childs })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022props\u0022\u003EProps\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EComponent\u003C/th\u003E\n\u003Cth\u003EProp\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransport\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe slot\u0027s name (required).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransport\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Emode\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027replace\u0027\u003C/code\u003E (the default) or \u003Ccode\u003E\u0027merge\u0027\u003C/code\u003E; see \u003Ca href=\u0022#mode\u0022\u003ESeveral senders in a slot\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ETransportTo\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe name of the slot the content is sent to.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022behavior\u0022\u003EBehaviour\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EOrder does not matter.\u003C/strong\u003E The slot can be created before or after; if a \u003Ccode\u003ETransportTo\u003C/code\u003E is set up while the slot does not exist yet, the content is moved the moment the slot registers.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe content stays tied to the sending component.\u003C/strong\u003E The bindings and event handlers on the moved elements keep working with the state of the component they were written in; in the example, when the note is pinned, the text of the button in the slot changes too.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe lifetime belongs to the sender.\u003C/strong\u003E When the \u003Ccode\u003ETransportTo\u003C/code\u003E is disposed, the content it carried is removed from the slot and disposed. When leaving a route page, the content leaves the slot right away, without waiting for the page to be disposed (see \u003Ca href=\u0022/docs/router-view#leaving-page\u0022\u003EThe page that leaves\u003C/a\u003E); in uses such as a command bar, the content swaps places with the new page\u0027s on its own.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EIf the slot is removed, the content goes too.\u003C/strong\u003E When the slot is disposed, the moved content inside it is disposed as well; even if a slot with the same name is created again, the content does not come back.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EChildren added later are moved too.\u003C/strong\u003E A component added later to the \u003Ccode\u003Econtrols\u003C/code\u003E collection of the \u003Ccode\u003ETransportTo\u003C/code\u003E goes straight to the slot if the slot exists; it stays live like the first children, and goes away with them when the sender is disposed. The sender\u0027s \u003Ccode\u003Econtroladded\u003C/code\u003E event fires for each child.\u003C/li\u003E\n\u003Cli\u003EThe \u003Ccode\u003ETransport\u003C/code\u003E slot itself is a fragment (it adds no element to the DOM; the content sits where the slot is). \u003Ccode\u003ETransportTo\u003C/code\u003E leaves an empty \u003Ccode\u003E\u0026lt;div\u0026gt;\u003C/code\u003E where it is; the content appears in the slot, not there.\u003C/li\u003E\n\u003Cli\u003EBoth communicate through application events, so they must be used inside a running \u003Ccode\u003EApplication\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EIf a second \u003Ccode\u003ETransport\u003C/code\u003E with the same name is set up, the registration moves to the new one, and the senders move their content to the new slot.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022mode\u0022\u003ESeveral senders in a slot — \u003Ccode\u003Emode\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EWhen several \u003Ccode\u003ETransportTo\u003C/code\u003Es send content to the same slot, \u003Ccode\u003Emode\u003C/code\u003E decides. Whether the slot is set up before or after the senders does not change the result:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003E\u0027replace\u0027\u003C/code\u003E (the default): only the content of the sender set up last stays in the slot. The previous content in the slot is removed and disposed; it does not come back even if that sender closes.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003E\u0027merge\u0027\u003C/code\u003E: the content of all senders is added to the slot in the order they were set up; when each sender closes, only its own content goes away.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EIf you want an area that several blocks fill \u003Cstrong\u003Etogether\u003C/strong\u003E and that piles up in a body, \u003Ca href=\u0022/docs/content-body\u0022\u003EContentBody and ContentBlock\u003C/a\u003E are designed for that.\u003C/p\u003E\n\u003Ch2 id=\u0022transporter\u0022\u003EMoving in code — \u003Ccode\u003ETransporter\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EThe helper under the \u003Ccode\u003ETransport\u003C/code\u003E/\u003Ccode\u003ETransportTo\u003C/code\u003E pair is public; it is used to move a component to another parent without JSX:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eimport { Transporter } from \u0027@motifx/core\u0027;\n\nTransporter.transport(child, newParent);                 // append at the end\nTransporter.transport(child, newParent, { index: 0 });   // insert at the given index\nTransporter.transportMany([a, b], newParent);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Eimport { Transporter } from \u0027@motifx/core\u0027;\n\nTransporter.transport(child, newParent);                 // append at the end\nTransporter.transport(child, newParent, { index: 0 });   // insert at the given index\nTransporter.transportMany([a, b], newParent);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Etransport\u003C/code\u003E detaches the child from its old parent without playing a leave transition, adds it to the new parent\u0027s \u003Ccode\u003Econtrols\u003C/code\u003E and activates its bindings again (\u003Ccode\u003EreState\u003C/code\u003E). \u003Ccode\u003ETransportOptions\u003C/code\u003E: \u003Ccode\u003Eindex\u003C/code\u003E (the insertion index; \u003Ccode\u003EtransportMany\u003C/code\u003E places the children in the given order starting from this index), \u003Ccode\u003EkeepState: true\u003C/code\u003E (do not activate the bindings again), \u003Ccode\u003Eowner\u003C/code\u003E (writes the mover into \u003Ccode\u003Emotif.options.ownerTransporter\u003C/code\u003E). If the child is already in that parent, it does nothing.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003EFor a body that fills up by piling content from several sources, see \u003Ca href=\u0022/docs/content-body\u0022\u003EContentBody and ContentBlock\u003C/a\u003E; for the rest of the \u003Ccode\u003Econtrols\u003C/code\u003E collection, \u003Ca href=\u0022/docs/component-tree#controls\u0022\u003EComponents - controls\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"usage","text":"Usage","level":2},{"id":"props","text":"Props","level":2},{"id":"behavior","text":"Behaviour","level":2},{"id":"mode","text":"Several senders in a slot — mode","level":2},{"id":"transporter","text":"Moving in code — Transporter","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"lazy","title":"Lazy"},"next":{"slug":"content-body","title":"ContentBody and ContentBlock"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Advanced</p>
+        <h1>Transport and TransportTo</h1>
+        <p>Showing content in a slot outside its own tree; the Transport slot, the TransportTo sender, the replace/merge modes and Transporter for moving content in code.</p>
+<p>Used to show a component's content somewhere outside its own tree. The typical example: page-specific command buttons appearing in the layout's top bar. It is made of two parts:</p>
+<ul>
+<li><strong><code>Transport</code></strong> — the target <strong>slot</strong>. It is put in the layout (or anywhere the content should appear).</li>
+<li><strong><code>TransportTo</code></strong> — the <strong>sender</strong>. Content written between its tags is moved to the slot of the same name.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>In the example the top bar carries a slot, and the pin button of the open note is sent to that slot from the note page. The slot:</p>
+<div class="doc-code" data-file="src/layouts/PageBar.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/layouts/PageBar.tsx"><code>import { Component, Transport } from &quot;@motifx/core&quot;;
+
+export class PageBar extends Component&lt;HTMLElement&gt; {
+  static override elementTag = &quot;header&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  }
+
+  override view() {
+    return (
+      &lt;&gt;
+        &lt;h1&gt;Notes&lt;/h1&gt;
+        &lt;Transport name=&quot;page-actions&quot; /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/PageBar.ts"><code>import { Component, ComponentBase, Transport, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+
+export class PageBar extends Component&lt;HTMLElement&gt; {
+  static override elementTag = &quot;header&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  }
+
+  override view() {
+    const title = motifComponent(&quot;h1&quot;, (h1: ComponentBase) =&gt; h1.setText(&quot;Notes&quot;));
+    return motifFragment({ childs: [title, new Transport({ name: &quot;page-actions&quot; })] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/PageBar.tsx"><code>import { Transport } from &quot;@motifx/core&quot;;
+
+export function PageBar() {
+  return (
+    &lt;header class=&quot;pagebar&quot;&gt;
+      &lt;h1&gt;Notes&lt;/h1&gt;
+      &lt;Transport name=&quot;page-actions&quot; /&gt;
+    &lt;/header&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/PageBar.ts"><code>import { ComponentBase, Transport, motifComponent } from &quot;@motifx/core&quot;;
+
+export function PageBar() {
+  return motifComponent(&quot;header&quot;, (header: ComponentBase) =&gt; {
+    header.class.add(&quot;pagebar&quot;);
+    const title = motifComponent(&quot;h1&quot;, (h1: ComponentBase) =&gt; h1.setText(&quot;Notes&quot;));
+    header.controls.add(title, new Transport({ name: &quot;page-actions&quot; }));
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/layouts/PageBar.tsx"><code>import { Transport, motifOptions } from &quot;@motifx/core&quot;;
+
+export const PageBar = () =&gt; motifOptions({
+  el: &quot;header&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;h1&gt;Notes&lt;/h1&gt;
+        &lt;Transport name=&quot;page-actions&quot; /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/PageBar.ts"><code>import { ComponentBase, Transport, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+
+export const PageBar = () =&gt; motifOptions({
+  el: &quot;header&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  },
+
+  view() {
+    const title = motifComponent(&quot;h1&quot;, (h1: ComponentBase) =&gt; h1.setText(&quot;Notes&quot;));
+    return motifFragment({ childs: [title, new Transport({ name: &quot;page-actions&quot; })] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/layouts/PageBar.jsx"><code>import { Component, Transport } from &quot;@motifx/core&quot;;
+
+export class PageBar extends Component {
+  static elementTag = &quot;header&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  }
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;h1&gt;Notes&lt;/h1&gt;
+        &lt;Transport name=&quot;page-actions&quot; /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/PageBar.js"><code>import { Component, Transport, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+
+export class PageBar extends Component {
+  static elementTag = &quot;header&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  }
+
+  view() {
+    const title = motifComponent(&quot;h1&quot;, (h1) =&gt; h1.setText(&quot;Notes&quot;));
+    return motifFragment({ childs: [title, new Transport({ name: &quot;page-actions&quot; })] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/PageBar.jsx"><code>import { Transport } from &quot;@motifx/core&quot;;
+
+export function PageBar() {
+  return (
+    &lt;header class=&quot;pagebar&quot;&gt;
+      &lt;h1&gt;Notes&lt;/h1&gt;
+      &lt;Transport name=&quot;page-actions&quot; /&gt;
+    &lt;/header&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/PageBar.js"><code>import { Transport, motifComponent } from &quot;@motifx/core&quot;;
+
+export function PageBar() {
+  return motifComponent(&quot;header&quot;, (header) =&gt; {
+    header.class.add(&quot;pagebar&quot;);
+    const title = motifComponent(&quot;h1&quot;, (h1) =&gt; h1.setText(&quot;Notes&quot;));
+    header.controls.add(title, new Transport({ name: &quot;page-actions&quot; }));
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/layouts/PageBar.jsx"><code>import { Transport, motifOptions } from &quot;@motifx/core&quot;;
+
+export const PageBar = () =&gt; motifOptions({
+  el: &quot;header&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;h1&gt;Notes&lt;/h1&gt;
+        &lt;Transport name=&quot;page-actions&quot; /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/PageBar.js"><code>import { Transport, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+
+export const PageBar = () =&gt; motifOptions({
+  el: &quot;header&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;pagebar&quot;);
+  },
+
+  view() {
+    const title = motifComponent(&quot;h1&quot;, (h1) =&gt; h1.setText(&quot;Notes&quot;));
+    return motifFragment({ childs: [title, new Transport({ name: &quot;page-actions&quot; })] });
+  },
+});</code></pre>
+</div>
+<p>The sender:</p>
+<div class="doc-code" data-file="src/parts/PinAction.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/PinAction.tsx"><code>import { Component, TransportTo } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export class PinAction extends Component&lt;any, { note: Note }&gt; {
+  notes = this.getService(NotesService)!;
+
+  override view() {
+    const { note } = this.props;
+    return (
+      &lt;TransportTo name=&quot;page-actions&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm ghost&quot; aria-pressed={() =&gt; note.pinned} onclick={() =&gt; this.notes.togglePin(note)}&gt;
+          {() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;)}
+        &lt;/button&gt;
+      &lt;/TransportTo&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/PinAction.ts"><code>import { Component, ComponentBase, TransportTo, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export class PinAction extends Component&lt;any, { note: Note }&gt; {
+  notes = this.getService(NotesService)!;
+
+  override view() {
+    const { note } = this.props;
+    const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; note.pinned });
+      button.class.add(&quot;button--sm ghost&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.notes.togglePin(note));
+      button.bindings.text(() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;));
+    });
+    return motifComponent(TransportTo, { name: &quot;page-actions&quot;, childs: [pin] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/PinAction.tsx"><code>import { FromService, TransportTo } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export function PinAction(props: { note: Note }) {
+  const notes = FromService(NotesService)!;
+  const { note } = props;
+
+  return (
+    &lt;TransportTo name=&quot;page-actions&quot;&gt;
+      &lt;button type=&quot;button&quot; class=&quot;button--sm ghost&quot; aria-pressed={() =&gt; note.pinned} onclick={() =&gt; notes.togglePin(note)}&gt;
+        {() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;)}
+      &lt;/button&gt;
+    &lt;/TransportTo&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/PinAction.ts"><code>import { ComponentBase, FromService, TransportTo, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export function PinAction(props: { note: Note }) {
+  const notes = FromService(NotesService)!;
+  const { note } = props;
+
+  const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; note.pinned });
+    button.class.add(&quot;button--sm ghost&quot;);
+    button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+    button.bindings.text(() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;));
+  });
+  return motifComponent(TransportTo, { name: &quot;page-actions&quot;, childs: [pin] });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/PinAction.tsx"><code>import { TransportTo, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export const PinAction = (props: { note: Note }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    const { note } = props;
+    return (
+      &lt;TransportTo name=&quot;page-actions&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm ghost&quot; aria-pressed={() =&gt; note.pinned} onclick={() =&gt; notes.togglePin(note)}&gt;
+          {() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;)}
+        &lt;/button&gt;
+      &lt;/TransportTo&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/PinAction.ts"><code>import { ComponentBase, TransportTo, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export const PinAction = (props: { note: Note }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    const { note } = props;
+    const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; note.pinned });
+      button.class.add(&quot;button--sm ghost&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+      button.bindings.text(() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;));
+    });
+    return motifComponent(TransportTo, { name: &quot;page-actions&quot;, childs: [pin] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/PinAction.jsx"><code>import { Component, TransportTo } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class PinAction extends Component {
+  notes = this.getService(NotesService);
+
+  view() {
+    const { note } = this.props;
+    return (
+      &lt;TransportTo name=&quot;page-actions&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm ghost&quot; aria-pressed={() =&gt; note.pinned} onclick={() =&gt; this.notes.togglePin(note)}&gt;
+          {() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;)}
+        &lt;/button&gt;
+      &lt;/TransportTo&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/PinAction.js"><code>import { Component, TransportTo, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class PinAction extends Component {
+  notes = this.getService(NotesService);
+
+  view() {
+    const { note } = this.props;
+    const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; note.pinned });
+      button.class.add(&quot;button--sm ghost&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.notes.togglePin(note));
+      button.bindings.text(() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;));
+    });
+    return motifComponent(TransportTo, { name: &quot;page-actions&quot;, childs: [pin] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/PinAction.jsx"><code>import { FromService, TransportTo } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function PinAction(props) {
+  const notes = FromService(NotesService);
+  const { note } = props;
+
+  return (
+    &lt;TransportTo name=&quot;page-actions&quot;&gt;
+      &lt;button type=&quot;button&quot; class=&quot;button--sm ghost&quot; aria-pressed={() =&gt; note.pinned} onclick={() =&gt; notes.togglePin(note)}&gt;
+        {() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;)}
+      &lt;/button&gt;
+    &lt;/TransportTo&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/PinAction.js"><code>import { FromService, TransportTo, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function PinAction(props) {
+  const notes = FromService(NotesService);
+  const { note } = props;
+
+  const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; note.pinned });
+    button.class.add(&quot;button--sm ghost&quot;);
+    button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+    button.bindings.text(() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;));
+  });
+  return motifComponent(TransportTo, { name: &quot;page-actions&quot;, childs: [pin] });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/PinAction.jsx"><code>import { TransportTo, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const PinAction = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    const { note } = props;
+    return (
+      &lt;TransportTo name=&quot;page-actions&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm ghost&quot; aria-pressed={() =&gt; note.pinned} onclick={() =&gt; notes.togglePin(note)}&gt;
+          {() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;)}
+        &lt;/button&gt;
+      &lt;/TransportTo&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/PinAction.js"><code>import { TransportTo, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const PinAction = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    const { note } = props;
+    const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; note.pinned });
+      button.class.add(&quot;button--sm ghost&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+      button.bindings.text(() =&gt; (note.pinned ? &quot;Pinned&quot; : &quot;Pin&quot;));
+    });
+    return motifComponent(TransportTo, { name: &quot;page-actions&quot;, childs: [pin] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>The layout places the bar with <code>&lt;PageBar /&gt;</code>, and the note page places the button with <code>&lt;PinAction note={note} /&gt;</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>The layout places the bar with <code>new PageBar()</code>, and the note page places the button with <code>new PinAction({ note })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>The layout places the bar with <code>motifComponent(PageBar)</code>, and the note page places the button with <code>motifComponent(PinAction, { note })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p><code>Transport</code> and <code>TransportTo</code> are classes of the core. Without JSX, the slot is built with <code>new Transport({ name })</code>, and the sender, as the compiler would produce it, with <code>motifComponent(TransportTo, { name, childs })</code>.</p>
+</div>
+<h2 id="props">Props</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Prop</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Transport</code></td>
+<td><code>name</code></td>
+<td>The slot's name (required).</td>
+</tr>
+<tr>
+<td><code>Transport</code></td>
+<td><code>mode</code></td>
+<td><code>'replace'</code> (the default) or <code>'merge'</code>; see <a href="#mode">Several senders in a slot</a>.</td>
+</tr>
+<tr>
+<td><code>TransportTo</code></td>
+<td><code>name</code></td>
+<td>The name of the slot the content is sent to.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="behavior">Behaviour</h2>
+<ul>
+<li><strong>Order does not matter.</strong> The slot can be created before or after; if a <code>TransportTo</code> is set up while the slot does not exist yet, the content is moved the moment the slot registers.</li>
+<li><strong>The content stays tied to the sending component.</strong> The bindings and event handlers on the moved elements keep working with the state of the component they were written in; in the example, when the note is pinned, the text of the button in the slot changes too.</li>
+<li><strong>The lifetime belongs to the sender.</strong> When the <code>TransportTo</code> is disposed, the content it carried is removed from the slot and disposed. When leaving a route page, the content leaves the slot right away, without waiting for the page to be disposed (see <a href="/docs/router-view#leaving-page">The page that leaves</a>); in uses such as a command bar, the content swaps places with the new page's on its own.</li>
+<li><strong>If the slot is removed, the content goes too.</strong> When the slot is disposed, the moved content inside it is disposed as well; even if a slot with the same name is created again, the content does not come back.</li>
+<li><strong>Children added later are moved too.</strong> A component added later to the <code>controls</code> collection of the <code>TransportTo</code> goes straight to the slot if the slot exists; it stays live like the first children, and goes away with them when the sender is disposed. The sender's <code>controladded</code> event fires for each child.</li>
+<li>The <code>Transport</code> slot itself is a fragment (it adds no element to the DOM; the content sits where the slot is). <code>TransportTo</code> leaves an empty <code>&lt;div&gt;</code> where it is; the content appears in the slot, not there.</li>
+<li>Both communicate through application events, so they must be used inside a running <code>Application</code>.</li>
+<li>If a second <code>Transport</code> with the same name is set up, the registration moves to the new one, and the senders move their content to the new slot.</li>
+</ul>
+<h2 id="mode">Several senders in a slot — <code>mode</code></h2>
+<p>When several <code>TransportTo</code>s send content to the same slot, <code>mode</code> decides. Whether the slot is set up before or after the senders does not change the result:</p>
+<ul>
+<li><code>'replace'</code> (the default): only the content of the sender set up last stays in the slot. The previous content in the slot is removed and disposed; it does not come back even if that sender closes.</li>
+<li><code>'merge'</code>: the content of all senders is added to the slot in the order they were set up; when each sender closes, only its own content goes away.</li>
+</ul>
+<p>If you want an area that several blocks fill <strong>together</strong> and that piles up in a body, <a href="/docs/content-body">ContentBody and ContentBlock</a> are designed for that.</p>
+<h2 id="transporter">Moving in code — <code>Transporter</code></h2>
+<p>The helper under the <code>Transport</code>/<code>TransportTo</code> pair is public; it is used to move a component to another parent without JSX:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/layouts/MainLayout.ts"><code>import { Transporter } from '@motifx/core';
+
+Transporter.transport(child, newParent);                 // append at the end
+Transporter.transport(child, newParent, { index: 0 });   // insert at the given index
+Transporter.transportMany([a, b], newParent);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/layouts/MainLayout.js"><code>import { Transporter } from '@motifx/core';
+
+Transporter.transport(child, newParent);                 // append at the end
+Transporter.transport(child, newParent, { index: 0 });   // insert at the given index
+Transporter.transportMany([a, b], newParent);</code></pre>
+</div>
+<p><code>transport</code> detaches the child from its old parent without playing a leave transition, adds it to the new parent's <code>controls</code> and activates its bindings again (<code>reState</code>). <code>TransportOptions</code>: <code>index</code> (the insertion index; <code>transportMany</code> places the children in the given order starting from this index), <code>keepState: true</code> (do not activate the bindings again), <code>owner</code> (writes the mover into <code>motif.options.ownerTransporter</code>). If the child is already in that parent, it does nothing.</p>
+<h2 id="next">Next step</h2>
+<p>For a body that fills up by piling content from several sources, see <a href="/docs/content-body">ContentBody and ContentBlock</a>; for the rest of the <code>controls</code> collection, <a href="/docs/component-tree#controls">Components - controls</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

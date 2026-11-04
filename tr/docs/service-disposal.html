@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="app.dispose ve provider.dispose ile servis temizliği, gezinme kapsamının kapanması, transient örneklerin izlenmesi.">
+    <title>Servislerin Serbest Bırakılması — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/service-disposal">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-disposal">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-disposal">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-disposal">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/service-disposal">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Servislerin Serbest Bırakılması">
+    <meta property="og:description" content="app.dispose ve provider.dispose ile servis temizliği, gezinme kapsamının kapanması, transient örneklerin izlenmesi.">
+    <script type="application/json" id="doc-data">{"slug":"service-disposal","locale":"tr","title":"Servislerin Serbest Bırakılması","description":"app.dispose ve provider.dispose ile servis temizliği, gezinme kapsamının kapanması, transient örneklerin izlenmesi.","category":{"id":"5","title":"Bağımlılık Enjeksiyonu"},"html":"\u003Ch2 id=\u0022service-disposal\u0022\u003EServislerin Serbest Bırakılması\u003C/h2\u003E\n\u003Cp\u003ESağlayıcı kurduğu örnekleri kendisi serbest bırakır. Bir servis zamanlayıcı, dinleyici ya da bağlantı gibi bir kaynak tutuyorsa onu bırakan bir \u003Ccode\u003Edispose()\u003C/code\u003E metodu yazılır; çağırmak sağlayıcının işidir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class SyncService {\n  private timer = setInterval(() =\u0026gt; this.pull(), 60_000);\n\n  async pull() {\n    const response = await fetch(\u0026quot;/api/notes\u0026quot;);\n    return response.json();\n  }\n\n  dispose() {\n    clearInterval(this.timer);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/sync.js\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class SyncService {\n  timer = setInterval(() =\u0026gt; this.pull(), 60_000);\n\n  async pull() {\n    const response = await fetch(\u0026quot;/api/notes\u0026quot;);\n    return response.json();\n  }\n\n  dispose() {\n    clearInterval(this.timer);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Cstrong\u003ENe zaman serbest bırakılır:\u003C/strong\u003E\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eapp.dispose()\u003C/code\u003E servisleri bileşen ağacı (leave animasyonları dahil) söküldükten sonra serbest bırakır; o ana kadar her bileşenin \u003Ccode\u003EonDisposing\u003C/code\u003E / \u003Ccode\u003EonDisposed\u003C/code\u003E\u0027u aynı servisleri görür ve \u003Ccode\u003Eawait app.dispose()\u003C/code\u003E async \u003Ccode\u003Edispose\u003C/code\u003E\u0027ları da bekler.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eapp.dispose()\u003C/code\u003E ve \u003Ccode\u003Eprovider.dispose()\u003C/code\u003E sağlayıcının kurduğu örnekleri serbest bırakır: singleton önbelleği, kapsamların \u003Ccode\u003Escoped\u003C/code\u003E örnekleri ve gezinme kapsamları.\u003C/li\u003E\n\u003Cli\u003EGezinme kapsamı, yerini yeni bir gezinme aldığında ya da gezinme iptal edildiğinde kapanır ve \u003Ccode\u003Escoped\u003C/code\u003E örnekleri serbest bırakılır. Kapsama bağlı bir sayfa hâlâ yaşıyorsa (serbest bırakılması süren ayrılan sayfa, \u003Ccode\u003EkeepAlive\u003C/code\u003E önbelleğindeki ya da yığında tutulan sayfa) kapsam, o sayfa serbest bırakılana ya da yeniden gösterilene kadar açık kalır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003E\u003Cstrong\u003ENasıl:\u003C/strong\u003E her örnekte varsa sırayla \u003Ccode\u003Edispose()\u003C/code\u003E, \u003Ccode\u003Eclose()\u003C/code\u003E, \u003Ccode\u003E[Symbol.dispose]()\u003C/code\u003E ve \u003Ccode\u003E[Symbol.asyncDispose]()\u003C/code\u003E çağrılır; birinin fırlattığı hata diğerlerini durdurmaz.\u003C/p\u003E\n\u003Cp\u003EYalnız kurulmuş örnekler serbest bırakılır: hiç istenmemiş bir singleton kurulmadığı için serbest de bırakılmaz; \u003Ccode\u003EuseValue\u003C/code\u003E ile verilen değer de ancak bir kez çözülmüşse bu işlemden geçer.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Etransient\u003C/code\u003E örnekler varsayılan olarak izlenmez; \u003Ccode\u003Eprovider.enableAutoDisposeTransients()\u003C/code\u003E açıldığında bir alt kapsamda (\u003Ccode\u003EcreateScope\u003C/code\u003E, gezinme kapsamı) üretilen transient örnekler o kapsamla birlikte serbest bırakılır. Kök sağlayıcıdan çözülen transient\u0027lar yine izlenmez.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eprovider.getAllServices()\u003C/code\u003E sağlayıcının kullandığı \u003Ccode\u003EServiceCollection\u003C/code\u003E\u0027ı verir.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EMotifJS üstüne paket yazmanın dayandığı mekanizmalar için \u003Ca href=\u0022/docs/package-authoring\u0022\u003EMotif Üstüne Paket Yazmak\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"service-disposal","text":"Servislerin Serbest Bırakılması","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"service-resolution","title":"Servis Çözümleme"},"next":{"slug":"package-authoring","title":"Motif Üstüne Paket Yazmak"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Bağımlılık Enjeksiyonu</p>
+        <h1>Servislerin Serbest Bırakılması</h1>
+        <p>app.dispose ve provider.dispose ile servis temizliği, gezinme kapsamının kapanması, transient örneklerin izlenmesi.</p>
+<h2 id="service-disposal">Servislerin Serbest Bırakılması</h2>
+<p>Sağlayıcı kurduğu örnekleri kendisi serbest bırakır. Bir servis zamanlayıcı, dinleyici ya da bağlantı gibi bir kaynak tutuyorsa onu bırakan bir <code>dispose()</code> metodu yazılır; çağırmak sağlayıcının işidir:</p>
+<div class="doc-code" data-file="src/services/sync.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/sync.ts"><code>@Injectable({ lifetime: &quot;singleton&quot; })
+export class SyncService {
+  private timer = setInterval(() =&gt; this.pull(), 60_000);
+
+  async pull() {
+    const response = await fetch(&quot;/api/notes&quot;);
+    return response.json();
+  }
+
+  dispose() {
+    clearInterval(this.timer);
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/sync.js"><code>@Injectable({ lifetime: &quot;singleton&quot; })
+export class SyncService {
+  timer = setInterval(() =&gt; this.pull(), 60_000);
+
+  async pull() {
+    const response = await fetch(&quot;/api/notes&quot;);
+    return response.json();
+  }
+
+  dispose() {
+    clearInterval(this.timer);
+  }
+}</code></pre>
+</div>
+<p><strong>Ne zaman serbest bırakılır:</strong></p>
+<ul>
+<li><code>app.dispose()</code> servisleri bileşen ağacı (leave animasyonları dahil) söküldükten sonra serbest bırakır; o ana kadar her bileşenin <code>onDisposing</code> / <code>onDisposed</code>'u aynı servisleri görür ve <code>await app.dispose()</code> async <code>dispose</code>'ları da bekler.</li>
+<li><code>app.dispose()</code> ve <code>provider.dispose()</code> sağlayıcının kurduğu örnekleri serbest bırakır: singleton önbelleği, kapsamların <code>scoped</code> örnekleri ve gezinme kapsamları.</li>
+<li>Gezinme kapsamı, yerini yeni bir gezinme aldığında ya da gezinme iptal edildiğinde kapanır ve <code>scoped</code> örnekleri serbest bırakılır. Kapsama bağlı bir sayfa hâlâ yaşıyorsa (serbest bırakılması süren ayrılan sayfa, <code>keepAlive</code> önbelleğindeki ya da yığında tutulan sayfa) kapsam, o sayfa serbest bırakılana ya da yeniden gösterilene kadar açık kalır.</li>
+</ul>
+<p><strong>Nasıl:</strong> her örnekte varsa sırayla <code>dispose()</code>, <code>close()</code>, <code>[Symbol.dispose]()</code> ve <code>[Symbol.asyncDispose]()</code> çağrılır; birinin fırlattığı hata diğerlerini durdurmaz.</p>
+<p>Yalnız kurulmuş örnekler serbest bırakılır: hiç istenmemiş bir singleton kurulmadığı için serbest de bırakılmaz; <code>useValue</code> ile verilen değer de ancak bir kez çözülmüşse bu işlemden geçer.</p>
+<p><code>transient</code> örnekler varsayılan olarak izlenmez; <code>provider.enableAutoDisposeTransients()</code> açıldığında bir alt kapsamda (<code>createScope</code>, gezinme kapsamı) üretilen transient örnekler o kapsamla birlikte serbest bırakılır. Kök sağlayıcıdan çözülen transient'lar yine izlenmez.</p>
+<p><code>provider.getAllServices()</code> sağlayıcının kullandığı <code>ServiceCollection</code>'ı verir.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>MotifJS üstüne paket yazmanın dayandığı mekanizmalar için <a href="/tr/docs/package-authoring">Motif Üstüne Paket Yazmak</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

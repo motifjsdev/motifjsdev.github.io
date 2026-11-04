@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Kendi DOM&#x27;unu yöneten kütüphaneleri bileşene dönüştürme kuralları; onBuilt kurulumu, setDisposable temizliği, untracked yazma, DOM sahipliği çakışması, kök element ve tek kopya kuralı.">
+    <title>Üçüncü Parti Kütüphane Sarmalama — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/wrapping-libraries">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/wrapping-libraries">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/wrapping-libraries">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/wrapping-libraries">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/wrapping-libraries">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Üçüncü Parti Kütüphane Sarmalama">
+    <meta property="og:description" content="Kendi DOM&#x27;unu yöneten kütüphaneleri bileşene dönüştürme kuralları; onBuilt kurulumu, setDisposable temizliği, untracked yazma, DOM sahipliği çakışması, kök element ve tek kopya kuralı.">
+    <script type="application/json" id="doc-data">{"slug":"wrapping-libraries","locale":"tr","title":"Üçüncü Parti Kütüphane Sarmalama","description":"Kendi DOM\u0027unu yöneten kütüphaneleri bileşene dönüştürme kuralları; onBuilt kurulumu, setDisposable temizliği, untracked yazma, DOM sahipliği çakışması, kök element ve tek kopya kuralı.","category":{"id":"6","title":"Rehberler"},"html":"\u003Cp\u003EGerçek uygulamalarda her şey MotifJS ile yazılmaz. Grafik, zengin metin editörü, harita, sürükle-bırak gibi işler kendi DOM\u0027unu yöneten olgun kütüphanelere bırakılır. Bu bölüm o kütüphaneleri MotifJS bileşenine dönüştürmenin kurallarını anlatır; örneklerde Chart.js ve SortableJS kullanılır.\u003C/p\u003E\n\u003Ch2 id=\u0022should-you-wrap\u0022\u003EÖnce karar: sarmalamak gerekiyor mu?\u003C/h2\u003E\n\u003Cp\u003ESarmalayın:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EKütüphane kendi DOM\u0027unu üretiyorsa (\u003Ccode\u003Ecanvas\u003C/code\u003E çiziyor, ağaç kuruyor, düğüm taşıyor).\u003C/li\u003E\n\u003Cli\u003Eİmperatif bir yaşam döngüsü varsa (\u003Ccode\u003Enew X()\u003C/code\u003E / \u003Ccode\u003Ex.destroy()\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003Eİşi MotifJS\u0027in ince taneli bağlarıyla yapmak mantıksızsa (grafik çizimi, metin editörü).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003ESarmalamayın:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003ESaf hesaplama yapan kütüphaneler (tarih, para, doğrulama). Onları doğrudan çağırın.\u003C/li\u003E\n\u003Cli\u003EBaşka bir arayüz çerçevesinin bileşen ağacına bağlı paketler. MotifJS\u0027te çalışmazlar; çerçeveden bağımsız (headless) bir sürüm arayın.\u003C/li\u003E\n\u003Cli\u003EMotifJS\u0027in zaten yaptığı işler (liste çizimi, koşullu gösterim, sanallaştırma).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022four-rules\u0022\u003EDört kural\u003C/h2\u003E\n\u003Cp\u003EKurallar aynı örnek üzerinde anlatılır: klasörlerdeki not sayılarını Chart.js ile çizen bir grafik.\u003C/p\u003E\n\u003Ch3 id=\u0022setup-on-built\u0022\u003E1. Kurulum \u003Ccode\u003EonBuilt\u003C/code\u003E ya da \u003Ccode\u003EinitializeComponent\u003C/code\u003E içinde\u003C/h3\u003E\n\u003Cp\u003EKütüphane örneği eleman oluşturulduğu anda kurulur: \u003Ccode\u003EonBuilt\u003C/code\u003E ya da \u003Ccode\u003EinitializeComponent\u003C/code\u003E kancasında. Eleman o anda bileşende vardır; belgeye bağlı olması gerekmez. \u003Ccode\u003EonMounted\u003C/code\u003E yalnız kütüphanenin elemanı belgede istediği durumlar içindir: ölçü alan, yerleşim okuyan ya da canlı DOM isteyen kütüphaneler. \u003Ccode\u003EonBuilt\u003C/code\u003E element hâlâ kopuk bir parça içindeyken tetiklenebilir (üçlü operatör ve liste dalları detached fragment\u0027ta kurulur); bu kütüphaneler orada yanlış sonuç üretir. \u003Ccode\u003EonMounted\u003C/code\u003E element \u003Ccode\u003Edocument\u003C/code\u003E\u0027a bağlandıktan sonraki görevde \u003Cstrong\u003Ebir kez\u003C/strong\u003E çalışır; birden çok sarmalayıcının kurulumu dilimlere bölünür ve sayfayı kilitlemez.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/FolderChart.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript\u0022 data-file=\u0022src/parts/FolderChart.ts\u0022\u003E\u003Ccode\u003Eimport { Component, untracked } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS) as Folder[];\n\nexport class FolderChart extends Component\u0026lt;HTMLCanvasElement\u0026gt; {\n  static override elementTag = \u0026quot;canvas\u0026quot;;\n  notes = this.getService(NotesService)!;\n\n  override onBuilt() {\n    const chart = new Chart(this.element, {\n      type: \u0026quot;bar\u0026quot;,\n      data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] as number[] }] },\n    });\n    this.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n    this.bindings.watch(() =\u0026gt; {\n      const counts = folders.map((folder) =\u0026gt; this.notes.count(folder));\n      untracked(() =\u0026gt; {\n        chart.data.datasets[0].data = counts;\n        chart.update();\n      });\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/FolderChart.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, untracked, type Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS) as Folder[];\n\nexport function FolderChart() {\n  const notes = FromService(NotesService)!;\n\n  const setup = (canvas: Component\u0026lt;HTMLCanvasElement\u0026gt;) =\u0026gt; {\n    const chart = new Chart(canvas.element, {\n      type: \u0026quot;bar\u0026quot;,\n      data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] as number[] }] },\n    });\n    canvas.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n    canvas.bindings.watch(() =\u0026gt; {\n      const counts = folders.map((folder) =\u0026gt; notes.count(folder));\n      untracked(() =\u0026gt; {\n        chart.data.datasets[0].data = counts;\n        chart.update();\n      });\n    });\n  };\n\n  return \u0026lt;canvas onBuilt={setup} /\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/FolderChart.ts\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, untracked, type Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS) as Folder[];\n\nexport function FolderChart() {\n  const notes = FromService(NotesService)!;\n\n  return motifComponent(\u0026quot;canvas\u0026quot;, {\n    onBuilt: (canvas: Component\u0026lt;HTMLCanvasElement\u0026gt;) =\u0026gt; {\n      const chart = new Chart(canvas.element, {\n        type: \u0026quot;bar\u0026quot;,\n        data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] as number[] }] },\n      });\n      canvas.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n      canvas.bindings.watch(() =\u0026gt; {\n        const counts = folders.map((folder) =\u0026gt; notes.count(folder));\n        untracked(() =\u0026gt; {\n          chart.data.datasets[0].data = counts;\n          chart.update();\n        });\n      });\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022options/typescript\u0022 data-file=\u0022src/parts/FolderChart.ts\u0022\u003E\u003Ccode\u003Eimport { motifOptions, untracked } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS) as Folder[];\n\nexport const FolderChart = () =\u0026gt; motifOptions({\n  el: \u0026quot;canvas\u0026quot;,\n\n  onBuilt() {\n    const notes = this.getService(NotesService)!;\n    const chart = new Chart(this.element as HTMLCanvasElement, {\n      type: \u0026quot;bar\u0026quot;,\n      data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] as number[] }] },\n    });\n    this.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n    this.bindings.watch(() =\u0026gt; {\n      const counts = folders.map((folder) =\u0026gt; notes.count(folder));\n      untracked(() =\u0026gt; {\n        chart.data.datasets[0].data = counts;\n        chart.update();\n      });\n    });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript\u0022 data-file=\u0022src/parts/FolderChart.js\u0022\u003E\u003Ccode\u003Eimport { Component, untracked } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS);\n\nexport class FolderChart extends Component {\n  static elementTag = \u0026quot;canvas\u0026quot;;\n  notes = this.getService(NotesService);\n\n  onBuilt() {\n    const chart = new Chart(this.element, {\n      type: \u0026quot;bar\u0026quot;,\n      data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] }] },\n    });\n    this.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n    this.bindings.watch(() =\u0026gt; {\n      const counts = folders.map((folder) =\u0026gt; this.notes.count(folder));\n      untracked(() =\u0026gt; {\n        chart.data.datasets[0].data = counts;\n        chart.update();\n      });\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/FolderChart.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, untracked } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS);\n\nexport function FolderChart() {\n  const notes = FromService(NotesService);\n\n  const setup = (canvas) =\u0026gt; {\n    const chart = new Chart(canvas.element, {\n      type: \u0026quot;bar\u0026quot;,\n      data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] }] },\n    });\n    canvas.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n    canvas.bindings.watch(() =\u0026gt; {\n      const counts = folders.map((folder) =\u0026gt; notes.count(folder));\n      untracked(() =\u0026gt; {\n        chart.data.datasets[0].data = counts;\n        chart.update();\n      });\n    });\n  };\n\n  return \u0026lt;canvas onBuilt={setup} /\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/FolderChart.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, untracked } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS);\n\nexport function FolderChart() {\n  const notes = FromService(NotesService);\n\n  return motifComponent(\u0026quot;canvas\u0026quot;, {\n    onBuilt: (canvas) =\u0026gt; {\n      const chart = new Chart(canvas.element, {\n        type: \u0026quot;bar\u0026quot;,\n        data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] }] },\n      });\n      canvas.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n      canvas.bindings.watch(() =\u0026gt; {\n        const counts = folders.map((folder) =\u0026gt; notes.count(folder));\n        untracked(() =\u0026gt; {\n          chart.data.datasets[0].data = counts;\n          chart.update();\n        });\n      });\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022options/javascript\u0022 data-file=\u0022src/parts/FolderChart.js\u0022\u003E\u003Ccode\u003Eimport { motifOptions, untracked } from \u0026quot;@motifx/core\u0026quot;;\nimport { Chart } from \u0026quot;chart.js/auto\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst folders = Object.keys(FOLDERS);\n\nexport const FolderChart = () =\u0026gt; motifOptions({\n  el: \u0026quot;canvas\u0026quot;,\n\n  onBuilt() {\n    const notes = this.getService(NotesService);\n    const chart = new Chart(this.element, {\n      type: \u0026quot;bar\u0026quot;,\n      data: { labels: folders.map((folder) =\u0026gt; FOLDERS[folder].title), datasets: [{ label: \u0026quot;Not\u0026quot;, data: [] }] },\n    });\n    this.motif.setDisposable(() =\u0026gt; chart.destroy());\n\n    this.bindings.watch(() =\u0026gt; {\n      const counts = folders.map((folder) =\u0026gt; notes.count(folder));\n      untracked(() =\u0026gt; {\n        chart.data.datasets[0].data = counts;\n        chart.update();\n      });\n    });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EGrafik \u003Ccode\u003E\u0026lt;FolderChart /\u0026gt;\u003C/code\u003E ile yerleşir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003EGrafik \u003Ccode\u003Enew FolderChart()\u003C/code\u003E ile yerleşir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003EGrafik \u003Ccode\u003EmotifComponent(FolderChart)\u003C/code\u003E ile yerleşir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022cleanup-set-disposable\u0022\u003E2. Temizlik \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E ile\u003C/h3\u003E\n\u003Cp\u003EKütüphanenin \u003Ccode\u003Edestroy()\u003C/code\u003E / \u003Ccode\u003Edisconnect()\u003C/code\u003E çağrısı bileşenin ömrüne bağlanır; örnekte \u003Ccode\u003Echart.destroy()\u003C/code\u003E böyle bağlanmıştır. Bileşen serbest bırakılınca kütüphane de gider, ayrıca bir şey çağrılmaz. Zamanlayıcı, \u003Ccode\u003EResizeObserver\u003C/code\u003E, \u003Ccode\u003EWebSocket\u003C/code\u003E gibi yan kaynaklar da aynı yere kaydedilir (bkz. \u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022tracked-read-untracked-write\u0022\u003E3. Okuma izlenir, yazma \u003Ccode\u003Euntracked\u003C/code\u003E içinde olur\u003C/h3\u003E\n\u003Cp\u003EReaktif veriyi kütüphaneye aktarırken iki tuzak var:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EVeriyi doğrudan kütüphaneye verirseniz, kütüphane kendi güncellemesi sırasında o nesneyi \u003Cstrong\u003Eokur\u003C/strong\u003E. Bu okuma izlenen bir bölgedeyse effect kendi kendini tetikler ve döngü oluşur.\u003C/li\u003E\n\u003Cli\u003EOkumayı tümüyle \u003Ccode\u003Euntracked\u003C/code\u003E içine alırsanız bu kez iç alanlar hiç izlenmez ve veri değişince güncelleme olmaz.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EDoğru biçim örnekteki gibidir: \u003Ccode\u003Ebindings.watch\u003C/code\u003E içinde, izlenen bölgede \u003Cstrong\u003Edüz bir kopya\u003C/strong\u003E çıkarılır (\u003Ccode\u003Ecounts\u003C/code\u003E), kütüphaneye yazma \u003Ccode\u003Euntracked\u003C/code\u003E içinde yapılır. Kopya derin değişiklikleri de yakalar: bir not sabitlenince \u003Ccode\u003Ecount(\u0026quot;pinned\u0026quot;)\u003C/code\u003E notların \u003Ccode\u003Epinned\u003C/code\u003E alanını okuduğu için effect yeniden çalışır ve grafik güncellenir.\u003C/p\u003E\n\u003Ch3 id=\u0022setup-errors\u0022\u003E4. Kurulum hatası raporlanır\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EonBuilt\u003C/code\u003E içinden fırlatılan istisna (ya da \u003Ccode\u003Easync\u003C/code\u003E \u003Ccode\u003EonBuilt\u003C/code\u003E\u0027ın reddedilen promise\u0027i) yutulmaz: MotifJS onu \u003Ccode\u003EMJX122\u003C/code\u003E (\u003Ccode\u003EThe component onBuilt hook threw.\u003C/code\u003E) koduyla bir \u003Ccode\u003EMotifError\u003C/code\u003E olarak \u003Ccode\u003EerrorHandler\u003C/code\u003E\u0027a raporlar, asıl hata \u003Ccode\u003Ecause\u003C/code\u003E alanındadır. Rapor üretim kipinde de konsola yazılır (\u003Ccode\u003Eapp.useLogging(false)\u003C/code\u003E kapatır) ve \u003Ccode\u003EerrorHandler.addListener(fn)\u003C/code\u003E dinleyicilerine ulaşır. Aynı rapor \u003Ccode\u003EonMounted\u003C/code\u003E dahil diğer yaşam döngüsü kancaları için de üretilir. Sarmalayıcının ayrıca \u003Ccode\u003Econsole.error\u003C/code\u003E yazması gerekmez.\u003C/p\u003E\n\u003Cp\u003EKurulum hatasında bileşeni tutarlı bir durumda bırakmak (yarım kalan örneği yıkmak, yedek görünüm vermek) sarmalayıcının işidir; bunun için hata yakalanıp işlendikten sonra yeniden fırlatılır, rapor yine oluşur. \u003Ccode\u003Econfig\u003C/code\u003E grafiğin ayar nesnesidir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/FolderChart.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/FolderChart.ts\u0022\u003E\u003Ccode\u003Elet chart: Chart;\ntry {\n  chart = new Chart(this.element as HTMLCanvasElement, config);\n} catch (error) {\n  this.class.add(\u0026quot;chart--failed\u0026quot;);\n  throw error;\n}\nthis.motif.setDisposable(() =\u0026gt; chart.destroy());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/FolderChart.ts\u0022\u003E\u003Ccode\u003Elet chart: Chart;\ntry {\n  chart = new Chart(canvas.element, config);\n} catch (error) {\n  canvas.class.add(\u0026quot;chart--failed\u0026quot;);\n  throw error;\n}\ncanvas.motif.setDisposable(() =\u0026gt; chart.destroy());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/FolderChart.js\u0022\u003E\u003Ccode\u003Elet chart;\ntry {\n  chart = new Chart(this.element, config);\n} catch (error) {\n  this.class.add(\u0026quot;chart--failed\u0026quot;);\n  throw error;\n}\nthis.motif.setDisposable(() =\u0026gt; chart.destroy());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/FolderChart.js\u0022\u003E\u003Ccode\u003Elet chart;\ntry {\n  chart = new Chart(canvas.element, config);\n} catch (error) {\n  canvas.class.add(\u0026quot;chart--failed\u0026quot;);\n  throw error;\n}\ncanvas.motif.setDisposable(() =\u0026gt; chart.destroy());\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022dom-ownership\u0022\u003EDOM sahipliği çakışması\u003C/h2\u003E\n\u003Cp\u003EEn zor durum, kütüphanenin MotifJS\u0027in çizdiği düğümleri \u003Cstrong\u003Etaşıdığı\u003C/strong\u003E hâldir. Sürükle-bırak kütüphaneleri tam olarak bunu yapar: bırakma anında DOM\u0027u kendisi yeniden sıralar. Oysa o düğümlerin sahibi liste bağıdır; iki sahip çakışırsa bağ bir daha doğru hesap yapamaz.\u003C/p\u003E\n\u003Cp\u003EÇözüm şablonu:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003EKütüphanenin DOM değişikliğini \u003Cstrong\u003Egeri alın\u003C/strong\u003E.\u003C/li\u003E\n\u003Cli\u003EAynı değişikliği \u003Cstrong\u003Emodele\u003C/strong\u003E uygulayın.\u003C/li\u003E\n\u003Cli\u003EDOM\u0027u yeniden MotifJS çizsin.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EEffect kuyruğu mikro-görevde boşaldığı için geri alma ile yeniden çizim aynı karede tamamlanır; ekranda titreme olmaz.\u003C/p\u003E\n\u003Cp\u003ESortableJS ile tek listelik, en sade hâli:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/SortableList.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript\u0022 data-file=\u0022src/parts/SortableList.ts\u0022\u003E\u003Ccode\u003Eimport { Component, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport class SortableList\u0026lt;T\u0026gt; extends Component\u0026lt;HTMLDivElement, { list: Bind\u0026lt;T[]\u0026gt; }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n\n  override onBuilt() {\n    const sortable = Sortable.create(this.element, { animation: 150, onEnd: (evt) =\u0026gt; this.dropped(evt) });\n    this.motif.setDisposable(() =\u0026gt; sortable.destroy());\n  }\n\n  private dropped(evt: Sortable.SortableEvent) {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(this.props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/SortableList.tsx\u0022\u003E\u003Ccode\u003Eimport { read, type Bind, type Component, type ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport function SortableList\u0026lt;T\u0026gt;(props: { list: Bind\u0026lt;T[]\u0026gt;; childs?: ComponentBase[] }) {\n  const dropped = (evt: Sortable.SortableEvent) =\u0026gt; {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  };\n\n  const setup = (box: Component\u0026lt;HTMLDivElement\u0026gt;) =\u0026gt; {\n    const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });\n    box.motif.setDisposable(() =\u0026gt; sortable.destroy());\n  };\n\n  return \u0026lt;div onBuilt={setup}\u0026gt;{props.childs}\u0026lt;/div\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/SortableList.ts\u0022\u003E\u003Ccode\u003Eimport { motifComponent, read, type Bind, type Component, type ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport function SortableList\u0026lt;T\u0026gt;(props: { list: Bind\u0026lt;T[]\u0026gt;; childs?: ComponentBase[] }) {\n  const dropped = (evt: Sortable.SortableEvent) =\u0026gt; {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    initializeComponent: (box: ComponentBase) =\u0026gt; box.controls.add(...(props.childs ?? [])),\n    onBuilt: (box: Component\u0026lt;HTMLDivElement\u0026gt;) =\u0026gt; {\n      const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });\n      box.motif.setDisposable(() =\u0026gt; sortable.destroy());\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022options/typescript\u0022 data-file=\u0022src/parts/SortableList.ts\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport const SortableList = \u0026lt;T\u0026gt;(props: { list: Bind\u0026lt;T[]\u0026gt; }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onBuilt() {\n    const sortable = Sortable.create(this.element as HTMLElement, { animation: 150, onEnd: (evt) =\u0026gt; this.dropped(evt) });\n    this.motif.setDisposable(() =\u0026gt; sortable.destroy());\n  },\n\n  dropped(evt: Sortable.SortableEvent) {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript\u0022 data-file=\u0022src/parts/SortableList.js\u0022\u003E\u003Ccode\u003Eimport { Component, read } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport class SortableList extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n\n  onBuilt() {\n    const sortable = Sortable.create(this.element, { animation: 150, onEnd: (evt) =\u0026gt; this.dropped(evt) });\n    this.motif.setDisposable(() =\u0026gt; sortable.destroy());\n  }\n\n  dropped(evt) {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(this.props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/SortableList.jsx\u0022\u003E\u003Ccode\u003Eimport { read } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport function SortableList(props) {\n  const dropped = (evt) =\u0026gt; {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  };\n\n  const setup = (box) =\u0026gt; {\n    const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });\n    box.motif.setDisposable(() =\u0026gt; sortable.destroy());\n  };\n\n  return \u0026lt;div onBuilt={setup}\u0026gt;{props.childs}\u0026lt;/div\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/SortableList.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport function SortableList(props) {\n  const dropped = (evt) =\u0026gt; {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    initializeComponent: (box) =\u0026gt; box.controls.add(...(props.childs ?? [])),\n    onBuilt: (box) =\u0026gt; {\n      const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });\n      box.motif.setDisposable(() =\u0026gt; sortable.destroy());\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022options/javascript\u0022 data-file=\u0022src/parts/SortableList.js\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\nimport Sortable from \u0026quot;sortablejs\u0026quot;;\n\nexport const SortableList = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onBuilt() {\n    const sortable = Sortable.create(this.element, { animation: 150, onEnd: (evt) =\u0026gt; this.dropped(evt) });\n    this.motif.setDisposable(() =\u0026gt; sortable.destroy());\n  },\n\n  dropped(evt) {\n    const { item, from, oldIndex, newIndex } = evt;\n    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;\n\n    // 1. SortableJS\u0027in taşımasını geri al\n    item.remove();\n    const last = from.lastElementChild;\n    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);\n    from.insertBefore(item, ref);\n\n    // 2. Aynı taşımayı modele uygula; 3. DOM\u0027u liste bağı yeniden sıralar\n    const list = read(props.list);\n    const [moved] = list.splice(oldIndex, 1);\n    list.splice(newIndex, 0, moved);\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EKullanımda \u003Ccode\u003Elist\u003C/code\u003E\u0027e, satırları çizilen reaktif dizinin \u003Cstrong\u003Ekendisi\u003C/strong\u003E verilir ve her satır \u003Ccode\u003Ekey\u003C/code\u003E taşır. Örnekte sıralanan dizi, klasörlerin kenar çubuğundaki sırasını tutan yerel bir reaktif nesnededir: \u003Ccode\u003Econst order = reactive({ folders: [\u0026quot;notes\u0026quot;, \u0026quot;pinned\u0026quot;, \u0026quot;archive\u0026quot;] as Folder[] })\u003C/code\u003E.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;SortableList list={order.folders}\u0026gt;\n  {order.folders.map((folder) =\u0026gt; \u0026lt;div key={folder} class=\u0026quot;row\u0026quot;\u0026gt;{FOLDERS[folder].title}\u0026lt;/div\u0026gt;)}\n\u0026lt;/SortableList\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst rows = motifComponent({\n  initializeComponent: (holder: ComponentBase) =\u0026gt;\n    holder.bindings.list(() =\u0026gt; order.folders, (folder: Folder) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, {\n      indexkey: () =\u0026gt; folder,\n      initializeComponent: (row: ComponentBase) =\u0026gt; {\n        row.class.add(\u0026quot;row\u0026quot;);\n        row.setText(FOLDERS[folder].title);\n      },\n    })),\n});\nconst folderList = new SortableList({ list: order.folders, childs: [rows] });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript,imperative/options/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst rows = motifComponent({\n  initializeComponent: (holder: ComponentBase) =\u0026gt;\n    holder.bindings.list(() =\u0026gt; order.folders, (folder: Folder) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, {\n      indexkey: () =\u0026gt; folder,\n      initializeComponent: (row: ComponentBase) =\u0026gt; {\n        row.class.add(\u0026quot;row\u0026quot;);\n        row.setText(FOLDERS[folder].title);\n      },\n    })),\n});\nconst folderList = motifComponent(SortableList, { list: order.folders, childs: [rows] });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;SortableList list={order.folders}\u0026gt;\n  {order.folders.map((folder) =\u0026gt; \u0026lt;div key={folder} class=\u0026quot;row\u0026quot;\u0026gt;{FOLDERS[folder].title}\u0026lt;/div\u0026gt;)}\n\u0026lt;/SortableList\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst rows = motifComponent({\n  initializeComponent: (holder) =\u0026gt;\n    holder.bindings.list(() =\u0026gt; order.folders, (folder) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, {\n      indexkey: () =\u0026gt; folder,\n      initializeComponent: (row) =\u0026gt; {\n        row.class.add(\u0026quot;row\u0026quot;);\n        row.setText(FOLDERS[folder].title);\n      },\n    })),\n});\nconst folderList = new SortableList({ list: order.folders, childs: [rows] });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript,imperative/options/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst rows = motifComponent({\n  initializeComponent: (holder) =\u0026gt;\n    holder.bindings.list(() =\u0026gt; order.folders, (folder) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, {\n      indexkey: () =\u0026gt; folder,\n      initializeComponent: (row) =\u0026gt; {\n        row.class.add(\u0026quot;row\u0026quot;);\n        row.setText(FOLDERS[folder].title);\n      },\n    })),\n});\nconst folderList = motifComponent(SortableList, { list: order.folders, childs: [rows] });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EGeri almadaki \u003Ccode\u003Eref\u003C/code\u003E hesabı bilinçli olarak \u003Ccode\u003Efrom.children[oldIndex] ?? null\u003C/code\u003E değildir. MotifJS listeyi bir parça içinde çizer; kapsayıcının son çocuğu genellikle listenin \u003Cstrong\u003Ekapanış işaretçisi\u003C/strong\u003E olan bir yorum düğümüdür. Öğe sondan sürüklendiyse \u003Ccode\u003EinsertBefore(item, null)\u003C/code\u003E onu o işaretçinin dışına, yani listenin dışına koyar ve liste bağı bir sonraki güncellemede öğeyi bulamaz. Son elementin \u003Ccode\u003EnextSibling\u003C/code\u003E\u0027i ise işaretçinin önünü verir; öğe listenin içinde kalır.\u003C/p\u003E\n\u003Cp\u003EBu sade hâl tek liste içindir. Kütüphane kendi kapsayıcısının içini tamamen yönetiyorsa (grafik, editör) çakışma yoktur: bileşen yalnızca boş bir kapsayıcı verir, içine MotifJS hiçbir şey çizmez.\u003C/p\u003E\n\u003Ch2 id=\u0022root-element\u0022\u003EKök element\u003C/h2\u003E\n\u003Cp\u003EKütüphanelerin çoğu gerçek bir element ister (\u003Ccode\u003Ecanvas\u003C/code\u003E, \u003Ccode\u003Ediv\u003C/code\u003E).\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class\u0022\u003E\n\u003Cp\u003ESınıfta kök element \u003Ccode\u003Eview()\u003C/code\u003E ile değil, sınıfın kendisiyle belirlenir. TypeScript\u0027te \u003Ccode\u003EComponent\u0026lt;HTMLCanvasElement\u0026gt;\u003C/code\u003E yazıldığında \u003Ccode\u003E@motifx/compiler\u003C/code\u003E element türünü generic\u0027ten çıkarır ve kök \u003Ccode\u003E\u0026lt;canvas\u0026gt;\u003C/code\u003E olarak kendiliğinden oluşur. JavaScript\u0027te ve derleyiciden geçmeyen dosyada \u003Ccode\u003Estatic elementTag = \u0026quot;canvas\u0026quot;\u003C/code\u003E yazılır. Kurucudaki \u003Ccode\u003Esuper\u003C/code\u003E çağrısının ilk parametresine etiket adı ya da hazır bir element de verilebilir: \u003Ccode\u003Esuper(\u0026quot;canvas\u0026quot;, props)\u003C/code\u003E, \u003Ccode\u003Esuper(document.createElement(\u0026quot;canvas\u0026quot;), props)\u003C/code\u003E; bu biçim generic\u0027e bağlı olmadığı için \u003Ccode\u003E@motifx/compiler\u003C/code\u003E ile derlenmeyen bir pakette de çalışır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde kök, döndürülen elemandır: JSX\u0027te \u003Ccode\u003E\u0026lt;canvas … /\u0026gt;\u003C/code\u003E, JSX\u0027siz yazımda \u003Ccode\u003EmotifComponent(\u0026quot;canvas\u0026quot;, …)\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022options\u0022\u003E\n\u003Cp\u003EOptions\u0027ta kök \u003Ccode\u003Eel\u003C/code\u003E alanıdır: \u003Ccode\u003Eel: \u0026quot;canvas\u0026quot;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EKök element bildirilmezse kök bir \u003Cstrong\u003Efragment\u003C/strong\u003E (yorum düğümü) olur ve içerik bu fragmentin yerine yerleşir. Fragment gerçek bir element olmadığı için bir kütüphaneye kapsayıcı olarak verilemez; sarmalayıcıda kök elementi mutlaka bildirin.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Eview()\u003C/code\u003E yazılmayan bir bileşende çocuklar kök elemanın içine eklenir: sınıfta kök generic ya da \u003Ccode\u003Estatic elementTag\u003C/code\u003E ile bildirildiyse, Options\u0027ta \u003Ccode\u003Eel\u003C/code\u003E ile. \u003Ccode\u003ESortableList\u003C/code\u003E satırlarını bu yüzden kendi elemanının içinde taşır. Kökü \u003Ccode\u003Esuper(\u0026quot;div\u0026quot;, props)\u003C/code\u003E ile kuran sınıfta çocukları siz yerleştirirsiniz.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022prop-names\u0022\u003EProp adlarında dikkat\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eoptions\u003C/code\u003E prop\u0027u çerçevenindir: bileşenin \u003Cstrong\u003Ekendi\u003C/strong\u003E ayar nesnesidir, yapıcıda okunur ve tanınan anahtarlar \u003Ccode\u003Emotif.options\u003C/code\u003E\u0027a kopyalanır: \u003Ccode\u003EhideStrategy\u003C/code\u003E, \u003Ccode\u003EdisableDisposal\u003C/code\u003E (bkz. \u003Ca href=\u0022/docs/lifecycle#hide-strategy\u0022\u003EGizleme stratejisi\u003C/a\u003E) ve kök elementi SVG ad alanında oluşturan \u003Ccode\u003EisSvg\u003C/code\u003E. Kütüphane seçenekleri bu prop\u0027la geçilmez; \u003Ccode\u003EchartOptions\u003C/code\u003E, \u003Ccode\u003EsortableOptions\u003C/code\u003E gibi açık bir ad seçilir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;FolderChart chartOptions={{ responsive: true, animation: false }} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst chart = new FolderChart({ chartOptions: { responsive: true, animation: false } });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript,imperative/options/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst chart = motifComponent(FolderChart, { chartOptions: { responsive: true, animation: false } });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;FolderChart chartOptions={{ responsive: true, animation: false }} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst chart = new FolderChart({ chartOptions: { responsive: true, animation: false } });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript,imperative/options/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst chart = motifComponent(FolderChart, { chartOptions: { responsive: true, animation: false } });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBileşen bu değeri kurulumda prop\u0027larından okuyup Chart.js\u0027e verir: \u003Ccode\u003Enew Chart(canvas, { type: \u0026quot;bar\u0026quot;, data, options: chartOptions })\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eon\u003C/code\u003E ile başlayan prop\u0027lar prop\u0027larda kalır ve geri çağrı olarak kullanılabilir; DOM olay adı taşıyanlar bunun dışındadır. \u003Ccode\u003EonChange\u003C/code\u003E, \u003Ccode\u003EonCopy\u003C/code\u003E, \u003Ccode\u003EonResize\u003C/code\u003E, \u003Ccode\u003EonSelect\u003C/code\u003E, \u003Ccode\u003EonReset\u003C/code\u003E, \u003Ccode\u003EonContextMenu\u003C/code\u003E gibi bir prop bileşen etiketinde kök elemana DOM dinleyicisi olarak bağlanır ve prop\u0027lara hiç ulaşmaz; derleyici camelCase yazımda \u003Ccode\u003EMJX002\u003C/code\u003E uyarısı verir. Alan adını belirginleştirin (\u003Ccode\u003EonChartUpdate\u003C/code\u003E, \u003Ccode\u003EonCodeCopy\u003C/code\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022single-copy\u0022\u003ETek kopya kuralı\u003C/h2\u003E\n\u003Cp\u003ESarmalayıcı ayrı bir paketse, sarmalanan kütüphane ve \u003Ccode\u003E@motifx/core\u003C/code\u003E uygulamada \u003Cstrong\u003Etek kopya\u003C/strong\u003E olmalıdır. İki kopya olursa:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EKütüphanenin genel kayıt defteri (örneğin \u003Ccode\u003EChart.registry\u003C/code\u003E) ikiye ayrılır; sizin kaydınız paketin gördüğü kopyaya işlemez.\u003C/li\u003E\n\u003Cli\u003Eİki ayrı reaktivite motoru oluşur; \u003Ccode\u003Euntracked\u003C/code\u003E karşı taraftaki effect\u0027i tanımaz.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EHer iki hata da \u003Cstrong\u003Esessizdir\u003C/strong\u003E. Vite\u0027ta çözüm tek satır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022vite.config.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022vite.config.ts\u0022\u003E\u003Ccode\u003Eresolve: { dedupe: [\u0027@motifx/core\u0027, \u0027chart.js\u0027, \u0027sortablejs\u0027] }\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022vite.config.js\u0022\u003E\u003Ccode\u003Eresolve: { dedupe: [\u0027@motifx/core\u0027, \u0027chart.js\u0027, \u0027sortablejs\u0027] }\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022prove-cleanup\u0022\u003ETemizliği kanıtlayın\u003C/h2\u003E\n\u003Cp\u003ESarmalayıcının doğruluğu \u0026quot;çalışıyor görünüyor\u0026quot; ile ölçülmez. Bileşeni defalarca kurup söken bir tur testi yazın: tur sonunda canlı bileşen sayısı ve canlı dış örnek sayısı başladığı değere dönmelidir. Ölçüm kancaları için \u003Ca href=\u0022/docs/memory-and-dispose#disposable-tracker\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E bölümündeki \u003Ccode\u003EdisposableTracker\u003C/code\u003E bölümüne bakın.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003ESarmalayıcıyı ya da bir bileşen setini npm\u0027de yayımlamak için \u003Ca href=\u0022/docs/publishing-libraries\u0022\u003EMotifJS için npm Kütüphanesi Yayımlama\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"should-you-wrap","text":"Önce karar: sarmalamak gerekiyor mu?","level":2},{"id":"four-rules","text":"Dört kural","level":2},{"id":"setup-on-built","text":"1. Kurulum onBuilt ya da initializeComponent içinde","level":3},{"id":"cleanup-set-disposable","text":"2. Temizlik motif.setDisposable ile","level":3},{"id":"tracked-read-untracked-write","text":"3. Okuma izlenir, yazma untracked içinde olur","level":3},{"id":"setup-errors","text":"4. Kurulum hatası raporlanır","level":3},{"id":"dom-ownership","text":"DOM sahipliği çakışması","level":2},{"id":"root-element","text":"Kök element","level":2},{"id":"prop-names","text":"Prop adlarında dikkat","level":2},{"id":"single-copy","text":"Tek kopya kuralı","level":2},{"id":"prove-cleanup","text":"Temizliği kanıtlayın","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"package-authoring","title":"Motif Üstüne Paket Yazmak"},"next":{"slug":"publishing-libraries","title":"MotifJS için npm Kütüphanesi Yayımlama"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Rehberler</p>
+        <h1>Üçüncü Parti Kütüphane Sarmalama</h1>
+        <p>Kendi DOM&#x27;unu yöneten kütüphaneleri bileşene dönüştürme kuralları; onBuilt kurulumu, setDisposable temizliği, untracked yazma, DOM sahipliği çakışması, kök element ve tek kopya kuralı.</p>
+<p>Gerçek uygulamalarda her şey MotifJS ile yazılmaz. Grafik, zengin metin editörü, harita, sürükle-bırak gibi işler kendi DOM'unu yöneten olgun kütüphanelere bırakılır. Bu bölüm o kütüphaneleri MotifJS bileşenine dönüştürmenin kurallarını anlatır; örneklerde Chart.js ve SortableJS kullanılır.</p>
+<h2 id="should-you-wrap">Önce karar: sarmalamak gerekiyor mu?</h2>
+<p>Sarmalayın:</p>
+<ul>
+<li>Kütüphane kendi DOM'unu üretiyorsa (<code>canvas</code> çiziyor, ağaç kuruyor, düğüm taşıyor).</li>
+<li>İmperatif bir yaşam döngüsü varsa (<code>new X()</code> / <code>x.destroy()</code>).</li>
+<li>İşi MotifJS'in ince taneli bağlarıyla yapmak mantıksızsa (grafik çizimi, metin editörü).</li>
+</ul>
+<p>Sarmalamayın:</p>
+<ul>
+<li>Saf hesaplama yapan kütüphaneler (tarih, para, doğrulama). Onları doğrudan çağırın.</li>
+<li>Başka bir arayüz çerçevesinin bileşen ağacına bağlı paketler. MotifJS'te çalışmazlar; çerçeveden bağımsız (headless) bir sürüm arayın.</li>
+<li>MotifJS'in zaten yaptığı işler (liste çizimi, koşullu gösterim, sanallaştırma).</li>
+</ul>
+<h2 id="four-rules">Dört kural</h2>
+<p>Kurallar aynı örnek üzerinde anlatılır: klasörlerdeki not sayılarını Chart.js ile çizen bir grafik.</p>
+<h3 id="setup-on-built">1. Kurulum <code>onBuilt</code> ya da <code>initializeComponent</code> içinde</h3>
+<p>Kütüphane örneği eleman oluşturulduğu anda kurulur: <code>onBuilt</code> ya da <code>initializeComponent</code> kancasında. Eleman o anda bileşende vardır; belgeye bağlı olması gerekmez. <code>onMounted</code> yalnız kütüphanenin elemanı belgede istediği durumlar içindir: ölçü alan, yerleşim okuyan ya da canlı DOM isteyen kütüphaneler. <code>onBuilt</code> element hâlâ kopuk bir parça içindeyken tetiklenebilir (üçlü operatör ve liste dalları detached fragment'ta kurulur); bu kütüphaneler orada yanlış sonuç üretir. <code>onMounted</code> element <code>document</code>'a bağlandıktan sonraki görevde <strong>bir kez</strong> çalışır; birden çok sarmalayıcının kurulumu dilimlere bölünür ve sayfayı kilitlemez.</p>
+<div class="doc-code" data-file="src/parts/FolderChart.ts">
+<pre data-lang="ts" data-variant="class/typescript" data-file="src/parts/FolderChart.ts"><code>import { Component, untracked } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS) as Folder[];
+
+export class FolderChart extends Component&lt;HTMLCanvasElement&gt; {
+  static override elementTag = &quot;canvas&quot;;
+  notes = this.getService(NotesService)!;
+
+  override onBuilt() {
+    const chart = new Chart(this.element, {
+      type: &quot;bar&quot;,
+      data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] as number[] }] },
+    });
+    this.motif.setDisposable(() =&gt; chart.destroy());
+
+    this.bindings.watch(() =&gt; {
+      const counts = folders.map((folder) =&gt; this.notes.count(folder));
+      untracked(() =&gt; {
+        chart.data.datasets[0].data = counts;
+        chart.update();
+      });
+    });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/FolderChart.tsx"><code>import { FromService, untracked, type Component } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS) as Folder[];
+
+export function FolderChart() {
+  const notes = FromService(NotesService)!;
+
+  const setup = (canvas: Component&lt;HTMLCanvasElement&gt;) =&gt; {
+    const chart = new Chart(canvas.element, {
+      type: &quot;bar&quot;,
+      data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] as number[] }] },
+    });
+    canvas.motif.setDisposable(() =&gt; chart.destroy());
+
+    canvas.bindings.watch(() =&gt; {
+      const counts = folders.map((folder) =&gt; notes.count(folder));
+      untracked(() =&gt; {
+        chart.data.datasets[0].data = counts;
+        chart.update();
+      });
+    });
+  };
+
+  return &lt;canvas onBuilt={setup} /&gt;;
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/FolderChart.ts"><code>import { FromService, motifComponent, untracked, type Component } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS) as Folder[];
+
+export function FolderChart() {
+  const notes = FromService(NotesService)!;
+
+  return motifComponent(&quot;canvas&quot;, {
+    onBuilt: (canvas: Component&lt;HTMLCanvasElement&gt;) =&gt; {
+      const chart = new Chart(canvas.element, {
+        type: &quot;bar&quot;,
+        data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] as number[] }] },
+      });
+      canvas.motif.setDisposable(() =&gt; chart.destroy());
+
+      canvas.bindings.watch(() =&gt; {
+        const counts = folders.map((folder) =&gt; notes.count(folder));
+        untracked(() =&gt; {
+          chart.data.datasets[0].data = counts;
+          chart.update();
+        });
+      });
+    },
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="options/typescript" data-file="src/parts/FolderChart.ts"><code>import { motifOptions, untracked } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS) as Folder[];
+
+export const FolderChart = () =&gt; motifOptions({
+  el: &quot;canvas&quot;,
+
+  onBuilt() {
+    const notes = this.getService(NotesService)!;
+    const chart = new Chart(this.element as HTMLCanvasElement, {
+      type: &quot;bar&quot;,
+      data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] as number[] }] },
+    });
+    this.motif.setDisposable(() =&gt; chart.destroy());
+
+    this.bindings.watch(() =&gt; {
+      const counts = folders.map((folder) =&gt; notes.count(folder));
+      untracked(() =&gt; {
+        chart.data.datasets[0].data = counts;
+        chart.update();
+      });
+    });
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="class/javascript" data-file="src/parts/FolderChart.js"><code>import { Component, untracked } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS);
+
+export class FolderChart extends Component {
+  static elementTag = &quot;canvas&quot;;
+  notes = this.getService(NotesService);
+
+  onBuilt() {
+    const chart = new Chart(this.element, {
+      type: &quot;bar&quot;,
+      data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] }] },
+    });
+    this.motif.setDisposable(() =&gt; chart.destroy());
+
+    this.bindings.watch(() =&gt; {
+      const counts = folders.map((folder) =&gt; this.notes.count(folder));
+      untracked(() =&gt; {
+        chart.data.datasets[0].data = counts;
+        chart.update();
+      });
+    });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/FolderChart.jsx"><code>import { FromService, untracked } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS);
+
+export function FolderChart() {
+  const notes = FromService(NotesService);
+
+  const setup = (canvas) =&gt; {
+    const chart = new Chart(canvas.element, {
+      type: &quot;bar&quot;,
+      data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] }] },
+    });
+    canvas.motif.setDisposable(() =&gt; chart.destroy());
+
+    canvas.bindings.watch(() =&gt; {
+      const counts = folders.map((folder) =&gt; notes.count(folder));
+      untracked(() =&gt; {
+        chart.data.datasets[0].data = counts;
+        chart.update();
+      });
+    });
+  };
+
+  return &lt;canvas onBuilt={setup} /&gt;;
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/FolderChart.js"><code>import { FromService, motifComponent, untracked } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS);
+
+export function FolderChart() {
+  const notes = FromService(NotesService);
+
+  return motifComponent(&quot;canvas&quot;, {
+    onBuilt: (canvas) =&gt; {
+      const chart = new Chart(canvas.element, {
+        type: &quot;bar&quot;,
+        data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] }] },
+      });
+      canvas.motif.setDisposable(() =&gt; chart.destroy());
+
+      canvas.bindings.watch(() =&gt; {
+        const counts = folders.map((folder) =&gt; notes.count(folder));
+        untracked(() =&gt; {
+          chart.data.datasets[0].data = counts;
+          chart.update();
+        });
+      });
+    },
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="options/javascript" data-file="src/parts/FolderChart.js"><code>import { motifOptions, untracked } from &quot;@motifx/core&quot;;
+import { Chart } from &quot;chart.js/auto&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const folders = Object.keys(FOLDERS);
+
+export const FolderChart = () =&gt; motifOptions({
+  el: &quot;canvas&quot;,
+
+  onBuilt() {
+    const notes = this.getService(NotesService);
+    const chart = new Chart(this.element, {
+      type: &quot;bar&quot;,
+      data: { labels: folders.map((folder) =&gt; FOLDERS[folder].title), datasets: [{ label: &quot;Not&quot;, data: [] }] },
+    });
+    this.motif.setDisposable(() =&gt; chart.destroy());
+
+    this.bindings.watch(() =&gt; {
+      const counts = folders.map((folder) =&gt; notes.count(folder));
+      untracked(() =&gt; {
+        chart.data.datasets[0].data = counts;
+        chart.update();
+      });
+    });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Grafik <code>&lt;FolderChart /&gt;</code> ile yerleşir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Grafik <code>new FolderChart()</code> ile yerleşir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Grafik <code>motifComponent(FolderChart)</code> ile yerleşir.</p>
+</div>
+<h3 id="cleanup-set-disposable">2. Temizlik <code>motif.setDisposable</code> ile</h3>
+<p>Kütüphanenin <code>destroy()</code> / <code>disconnect()</code> çağrısı bileşenin ömrüne bağlanır; örnekte <code>chart.destroy()</code> böyle bağlanmıştır. Bileşen serbest bırakılınca kütüphane de gider, ayrıca bir şey çağrılmaz. Zamanlayıcı, <code>ResizeObserver</code>, <code>WebSocket</code> gibi yan kaynaklar da aynı yere kaydedilir (bkz. <a href="/tr/docs/memory-and-dispose">Bellek Yönetimi ve Serbest Bırakma</a>).</p>
+<h3 id="tracked-read-untracked-write">3. Okuma izlenir, yazma <code>untracked</code> içinde olur</h3>
+<p>Reaktif veriyi kütüphaneye aktarırken iki tuzak var:</p>
+<ul>
+<li>Veriyi doğrudan kütüphaneye verirseniz, kütüphane kendi güncellemesi sırasında o nesneyi <strong>okur</strong>. Bu okuma izlenen bir bölgedeyse effect kendi kendini tetikler ve döngü oluşur.</li>
+<li>Okumayı tümüyle <code>untracked</code> içine alırsanız bu kez iç alanlar hiç izlenmez ve veri değişince güncelleme olmaz.</li>
+</ul>
+<p>Doğru biçim örnekteki gibidir: <code>bindings.watch</code> içinde, izlenen bölgede <strong>düz bir kopya</strong> çıkarılır (<code>counts</code>), kütüphaneye yazma <code>untracked</code> içinde yapılır. Kopya derin değişiklikleri de yakalar: bir not sabitlenince <code>count(&quot;pinned&quot;)</code> notların <code>pinned</code> alanını okuduğu için effect yeniden çalışır ve grafik güncellenir.</p>
+<h3 id="setup-errors">4. Kurulum hatası raporlanır</h3>
+<p><code>onBuilt</code> içinden fırlatılan istisna (ya da <code>async</code> <code>onBuilt</code>'ın reddedilen promise'i) yutulmaz: MotifJS onu <code>MJX122</code> (<code>The component onBuilt hook threw.</code>) koduyla bir <code>MotifError</code> olarak <code>errorHandler</code>'a raporlar, asıl hata <code>cause</code> alanındadır. Rapor üretim kipinde de konsola yazılır (<code>app.useLogging(false)</code> kapatır) ve <code>errorHandler.addListener(fn)</code> dinleyicilerine ulaşır. Aynı rapor <code>onMounted</code> dahil diğer yaşam döngüsü kancaları için de üretilir. Sarmalayıcının ayrıca <code>console.error</code> yazması gerekmez.</p>
+<p>Kurulum hatasında bileşeni tutarlı bir durumda bırakmak (yarım kalan örneği yıkmak, yedek görünüm vermek) sarmalayıcının işidir; bunun için hata yakalanıp işlendikten sonra yeniden fırlatılır, rapor yine oluşur. <code>config</code> grafiğin ayar nesnesidir:</p>
+<div class="doc-code" data-file="src/parts/FolderChart.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/FolderChart.ts"><code>let chart: Chart;
+try {
+  chart = new Chart(this.element as HTMLCanvasElement, config);
+} catch (error) {
+  this.class.add(&quot;chart--failed&quot;);
+  throw error;
+}
+this.motif.setDisposable(() =&gt; chart.destroy());</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/FolderChart.ts"><code>let chart: Chart;
+try {
+  chart = new Chart(canvas.element, config);
+} catch (error) {
+  canvas.class.add(&quot;chart--failed&quot;);
+  throw error;
+}
+canvas.motif.setDisposable(() =&gt; chart.destroy());</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/FolderChart.js"><code>let chart;
+try {
+  chart = new Chart(this.element, config);
+} catch (error) {
+  this.class.add(&quot;chart--failed&quot;);
+  throw error;
+}
+this.motif.setDisposable(() =&gt; chart.destroy());</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/FolderChart.js"><code>let chart;
+try {
+  chart = new Chart(canvas.element, config);
+} catch (error) {
+  canvas.class.add(&quot;chart--failed&quot;);
+  throw error;
+}
+canvas.motif.setDisposable(() =&gt; chart.destroy());</code></pre>
+</div>
+<h2 id="dom-ownership">DOM sahipliği çakışması</h2>
+<p>En zor durum, kütüphanenin MotifJS'in çizdiği düğümleri <strong>taşıdığı</strong> hâldir. Sürükle-bırak kütüphaneleri tam olarak bunu yapar: bırakma anında DOM'u kendisi yeniden sıralar. Oysa o düğümlerin sahibi liste bağıdır; iki sahip çakışırsa bağ bir daha doğru hesap yapamaz.</p>
+<p>Çözüm şablonu:</p>
+<ol>
+<li>Kütüphanenin DOM değişikliğini <strong>geri alın</strong>.</li>
+<li>Aynı değişikliği <strong>modele</strong> uygulayın.</li>
+<li>DOM'u yeniden MotifJS çizsin.</li>
+</ol>
+<p>Effect kuyruğu mikro-görevde boşaldığı için geri alma ile yeniden çizim aynı karede tamamlanır; ekranda titreme olmaz.</p>
+<p>SortableJS ile tek listelik, en sade hâli:</p>
+<div class="doc-code" data-file="src/parts/SortableList.ts">
+<pre data-lang="ts" data-variant="class/typescript" data-file="src/parts/SortableList.ts"><code>import { Component, read, type Bind } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export class SortableList&lt;T&gt; extends Component&lt;HTMLDivElement, { list: Bind&lt;T[]&gt; }&gt; {
+  static override elementTag = &quot;div&quot;;
+
+  override onBuilt() {
+    const sortable = Sortable.create(this.element, { animation: 150, onEnd: (evt) =&gt; this.dropped(evt) });
+    this.motif.setDisposable(() =&gt; sortable.destroy());
+  }
+
+  private dropped(evt: Sortable.SortableEvent) {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(this.props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/SortableList.tsx"><code>import { read, type Bind, type Component, type ComponentBase } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export function SortableList&lt;T&gt;(props: { list: Bind&lt;T[]&gt;; childs?: ComponentBase[] }) {
+  const dropped = (evt: Sortable.SortableEvent) =&gt; {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  };
+
+  const setup = (box: Component&lt;HTMLDivElement&gt;) =&gt; {
+    const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });
+    box.motif.setDisposable(() =&gt; sortable.destroy());
+  };
+
+  return &lt;div onBuilt={setup}&gt;{props.childs}&lt;/div&gt;;
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/SortableList.ts"><code>import { motifComponent, read, type Bind, type Component, type ComponentBase } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export function SortableList&lt;T&gt;(props: { list: Bind&lt;T[]&gt;; childs?: ComponentBase[] }) {
+  const dropped = (evt: Sortable.SortableEvent) =&gt; {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    initializeComponent: (box: ComponentBase) =&gt; box.controls.add(...(props.childs ?? [])),
+    onBuilt: (box: Component&lt;HTMLDivElement&gt;) =&gt; {
+      const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });
+      box.motif.setDisposable(() =&gt; sortable.destroy());
+    },
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="options/typescript" data-file="src/parts/SortableList.ts"><code>import { motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export const SortableList = &lt;T&gt;(props: { list: Bind&lt;T[]&gt; }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onBuilt() {
+    const sortable = Sortable.create(this.element as HTMLElement, { animation: 150, onEnd: (evt) =&gt; this.dropped(evt) });
+    this.motif.setDisposable(() =&gt; sortable.destroy());
+  },
+
+  dropped(evt: Sortable.SortableEvent) {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="class/javascript" data-file="src/parts/SortableList.js"><code>import { Component, read } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export class SortableList extends Component {
+  static elementTag = &quot;div&quot;;
+
+  onBuilt() {
+    const sortable = Sortable.create(this.element, { animation: 150, onEnd: (evt) =&gt; this.dropped(evt) });
+    this.motif.setDisposable(() =&gt; sortable.destroy());
+  }
+
+  dropped(evt) {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(this.props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/SortableList.jsx"><code>import { read } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export function SortableList(props) {
+  const dropped = (evt) =&gt; {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  };
+
+  const setup = (box) =&gt; {
+    const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });
+    box.motif.setDisposable(() =&gt; sortable.destroy());
+  };
+
+  return &lt;div onBuilt={setup}&gt;{props.childs}&lt;/div&gt;;
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/SortableList.js"><code>import { motifComponent, read } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export function SortableList(props) {
+  const dropped = (evt) =&gt; {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    initializeComponent: (box) =&gt; box.controls.add(...(props.childs ?? [])),
+    onBuilt: (box) =&gt; {
+      const sortable = Sortable.create(box.element, { animation: 150, onEnd: dropped });
+      box.motif.setDisposable(() =&gt; sortable.destroy());
+    },
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="options/javascript" data-file="src/parts/SortableList.js"><code>import { motifOptions, read } from &quot;@motifx/core&quot;;
+import Sortable from &quot;sortablejs&quot;;
+
+export const SortableList = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onBuilt() {
+    const sortable = Sortable.create(this.element, { animation: 150, onEnd: (evt) =&gt; this.dropped(evt) });
+    this.motif.setDisposable(() =&gt; sortable.destroy());
+  },
+
+  dropped(evt) {
+    const { item, from, oldIndex, newIndex } = evt;
+    if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return;
+
+    // 1. SortableJS'in taşımasını geri al
+    item.remove();
+    const last = from.lastElementChild;
+    const ref = from.children[oldIndex] ?? (last ? last.nextSibling : from.lastChild);
+    from.insertBefore(item, ref);
+
+    // 2. Aynı taşımayı modele uygula; 3. DOM'u liste bağı yeniden sıralar
+    const list = read(props.list);
+    const [moved] = list.splice(oldIndex, 1);
+    list.splice(newIndex, 0, moved);
+  },
+});</code></pre>
+</div>
+<p>Kullanımda <code>list</code>'e, satırları çizilen reaktif dizinin <strong>kendisi</strong> verilir ve her satır <code>key</code> taşır. Örnekte sıralanan dizi, klasörlerin kenar çubuğundaki sırasını tutan yerel bir reaktif nesnededir: <code>const order = reactive({ folders: [&quot;notes&quot;, &quot;pinned&quot;, &quot;archive&quot;] as Folder[] })</code>.</p>
+<div class="doc-code" data-file="src/pages/SettingsPage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/SettingsPage.tsx"><code>&lt;SortableList list={order.folders}&gt;
+  {order.folders.map((folder) =&gt; &lt;div key={folder} class=&quot;row&quot;&gt;{FOLDERS[folder].title}&lt;/div&gt;)}
+&lt;/SortableList&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/pages/SettingsPage.ts"><code>const rows = motifComponent({
+  initializeComponent: (holder: ComponentBase) =&gt;
+    holder.bindings.list(() =&gt; order.folders, (folder: Folder) =&gt; motifComponent(&quot;div&quot;, {
+      indexkey: () =&gt; folder,
+      initializeComponent: (row: ComponentBase) =&gt; {
+        row.class.add(&quot;row&quot;);
+        row.setText(FOLDERS[folder].title);
+      },
+    })),
+});
+const folderList = new SortableList({ list: order.folders, childs: [rows] });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript,imperative/options/typescript" data-file="src/pages/SettingsPage.ts"><code>const rows = motifComponent({
+  initializeComponent: (holder: ComponentBase) =&gt;
+    holder.bindings.list(() =&gt; order.folders, (folder: Folder) =&gt; motifComponent(&quot;div&quot;, {
+      indexkey: () =&gt; folder,
+      initializeComponent: (row: ComponentBase) =&gt; {
+        row.class.add(&quot;row&quot;);
+        row.setText(FOLDERS[folder].title);
+      },
+    })),
+});
+const folderList = motifComponent(SortableList, { list: order.folders, childs: [rows] });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/SettingsPage.jsx"><code>&lt;SortableList list={order.folders}&gt;
+  {order.folders.map((folder) =&gt; &lt;div key={folder} class=&quot;row&quot;&gt;{FOLDERS[folder].title}&lt;/div&gt;)}
+&lt;/SortableList&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/pages/SettingsPage.js"><code>const rows = motifComponent({
+  initializeComponent: (holder) =&gt;
+    holder.bindings.list(() =&gt; order.folders, (folder) =&gt; motifComponent(&quot;div&quot;, {
+      indexkey: () =&gt; folder,
+      initializeComponent: (row) =&gt; {
+        row.class.add(&quot;row&quot;);
+        row.setText(FOLDERS[folder].title);
+      },
+    })),
+});
+const folderList = new SortableList({ list: order.folders, childs: [rows] });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript,imperative/options/javascript" data-file="src/pages/SettingsPage.js"><code>const rows = motifComponent({
+  initializeComponent: (holder) =&gt;
+    holder.bindings.list(() =&gt; order.folders, (folder) =&gt; motifComponent(&quot;div&quot;, {
+      indexkey: () =&gt; folder,
+      initializeComponent: (row) =&gt; {
+        row.class.add(&quot;row&quot;);
+        row.setText(FOLDERS[folder].title);
+      },
+    })),
+});
+const folderList = motifComponent(SortableList, { list: order.folders, childs: [rows] });</code></pre>
+</div>
+<p>Geri almadaki <code>ref</code> hesabı bilinçli olarak <code>from.children[oldIndex] ?? null</code> değildir. MotifJS listeyi bir parça içinde çizer; kapsayıcının son çocuğu genellikle listenin <strong>kapanış işaretçisi</strong> olan bir yorum düğümüdür. Öğe sondan sürüklendiyse <code>insertBefore(item, null)</code> onu o işaretçinin dışına, yani listenin dışına koyar ve liste bağı bir sonraki güncellemede öğeyi bulamaz. Son elementin <code>nextSibling</code>'i ise işaretçinin önünü verir; öğe listenin içinde kalır.</p>
+<p>Bu sade hâl tek liste içindir. Kütüphane kendi kapsayıcısının içini tamamen yönetiyorsa (grafik, editör) çakışma yoktur: bileşen yalnızca boş bir kapsayıcı verir, içine MotifJS hiçbir şey çizmez.</p>
+<h2 id="root-element">Kök element</h2>
+<p>Kütüphanelerin çoğu gerçek bir element ister (<code>canvas</code>, <code>div</code>).</p>
+<div class="doc-variant" data-variant="class">
+<p>Sınıfta kök element <code>view()</code> ile değil, sınıfın kendisiyle belirlenir. TypeScript'te <code>Component&lt;HTMLCanvasElement&gt;</code> yazıldığında <code>@motifx/compiler</code> element türünü generic'ten çıkarır ve kök <code>&lt;canvas&gt;</code> olarak kendiliğinden oluşur. JavaScript'te ve derleyiciden geçmeyen dosyada <code>static elementTag = &quot;canvas&quot;</code> yazılır. Kurucudaki <code>super</code> çağrısının ilk parametresine etiket adı ya da hazır bir element de verilebilir: <code>super(&quot;canvas&quot;, props)</code>, <code>super(document.createElement(&quot;canvas&quot;), props)</code>; bu biçim generic'e bağlı olmadığı için <code>@motifx/compiler</code> ile derlenmeyen bir pakette de çalışır.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde kök, döndürülen elemandır: JSX'te <code>&lt;canvas … /&gt;</code>, JSX'siz yazımda <code>motifComponent(&quot;canvas&quot;, …)</code>.</p>
+</div>
+<div class="doc-variant" data-variant="options">
+<p>Options'ta kök <code>el</code> alanıdır: <code>el: &quot;canvas&quot;</code>.</p>
+</div>
+<p>Kök element bildirilmezse kök bir <strong>fragment</strong> (yorum düğümü) olur ve içerik bu fragmentin yerine yerleşir. Fragment gerçek bir element olmadığı için bir kütüphaneye kapsayıcı olarak verilemez; sarmalayıcıda kök elementi mutlaka bildirin.</p>
+<div class="doc-variant" data-variant="class,options">
+<p><code>view()</code> yazılmayan bir bileşende çocuklar kök elemanın içine eklenir: sınıfta kök generic ya da <code>static elementTag</code> ile bildirildiyse, Options'ta <code>el</code> ile. <code>SortableList</code> satırlarını bu yüzden kendi elemanının içinde taşır. Kökü <code>super(&quot;div&quot;, props)</code> ile kuran sınıfta çocukları siz yerleştirirsiniz.</p>
+</div>
+<h2 id="prop-names">Prop adlarında dikkat</h2>
+<p><code>options</code> prop'u çerçevenindir: bileşenin <strong>kendi</strong> ayar nesnesidir, yapıcıda okunur ve tanınan anahtarlar <code>motif.options</code>'a kopyalanır: <code>hideStrategy</code>, <code>disableDisposal</code> (bkz. <a href="/tr/docs/lifecycle#hide-strategy">Gizleme stratejisi</a>) ve kök elementi SVG ad alanında oluşturan <code>isSvg</code>. Kütüphane seçenekleri bu prop'la geçilmez; <code>chartOptions</code>, <code>sortableOptions</code> gibi açık bir ad seçilir:</p>
+<div class="doc-code" data-file="src/pages/SettingsPage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/SettingsPage.tsx"><code>&lt;FolderChart chartOptions={{ responsive: true, animation: false }} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/pages/SettingsPage.ts"><code>const chart = new FolderChart({ chartOptions: { responsive: true, animation: false } });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript,imperative/options/typescript" data-file="src/pages/SettingsPage.ts"><code>const chart = motifComponent(FolderChart, { chartOptions: { responsive: true, animation: false } });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/SettingsPage.jsx"><code>&lt;FolderChart chartOptions={{ responsive: true, animation: false }} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/pages/SettingsPage.js"><code>const chart = new FolderChart({ chartOptions: { responsive: true, animation: false } });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript,imperative/options/javascript" data-file="src/pages/SettingsPage.js"><code>const chart = motifComponent(FolderChart, { chartOptions: { responsive: true, animation: false } });</code></pre>
+</div>
+<p>Bileşen bu değeri kurulumda prop'larından okuyup Chart.js'e verir: <code>new Chart(canvas, { type: &quot;bar&quot;, data, options: chartOptions })</code>.</p>
+<p><code>on</code> ile başlayan prop'lar prop'larda kalır ve geri çağrı olarak kullanılabilir; DOM olay adı taşıyanlar bunun dışındadır. <code>onChange</code>, <code>onCopy</code>, <code>onResize</code>, <code>onSelect</code>, <code>onReset</code>, <code>onContextMenu</code> gibi bir prop bileşen etiketinde kök elemana DOM dinleyicisi olarak bağlanır ve prop'lara hiç ulaşmaz; derleyici camelCase yazımda <code>MJX002</code> uyarısı verir. Alan adını belirginleştirin (<code>onChartUpdate</code>, <code>onCodeCopy</code>).</p>
+<h2 id="single-copy">Tek kopya kuralı</h2>
+<p>Sarmalayıcı ayrı bir paketse, sarmalanan kütüphane ve <code>@motifx/core</code> uygulamada <strong>tek kopya</strong> olmalıdır. İki kopya olursa:</p>
+<ul>
+<li>Kütüphanenin genel kayıt defteri (örneğin <code>Chart.registry</code>) ikiye ayrılır; sizin kaydınız paketin gördüğü kopyaya işlemez.</li>
+<li>İki ayrı reaktivite motoru oluşur; <code>untracked</code> karşı taraftaki effect'i tanımaz.</li>
+</ul>
+<p>Her iki hata da <strong>sessizdir</strong>. Vite'ta çözüm tek satır:</p>
+<div class="doc-code" data-file="vite.config.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="vite.config.ts"><code>resolve: { dedupe: ['@motifx/core', 'chart.js', 'sortablejs'] }</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="vite.config.js"><code>resolve: { dedupe: ['@motifx/core', 'chart.js', 'sortablejs'] }</code></pre>
+</div>
+<h2 id="prove-cleanup">Temizliği kanıtlayın</h2>
+<p>Sarmalayıcının doğruluğu &quot;çalışıyor görünüyor&quot; ile ölçülmez. Bileşeni defalarca kurup söken bir tur testi yazın: tur sonunda canlı bileşen sayısı ve canlı dış örnek sayısı başladığı değere dönmelidir. Ölçüm kancaları için <a href="/tr/docs/memory-and-dispose#disposable-tracker">Bellek Yönetimi ve Serbest Bırakma</a> bölümündeki <code>disposableTracker</code> bölümüne bakın.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Sarmalayıcıyı ya da bir bileşen setini npm'de yayımlamak için <a href="/tr/docs/publishing-libraries">MotifJS için npm Kütüphanesi Yayımlama</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

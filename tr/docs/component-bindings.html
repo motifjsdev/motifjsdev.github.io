@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Bileşenin bağları: JSX&#x27;teki canlı ifadelerin karşılığı, `bindings` üyeleri, `watch` ve bağın ömrü.">
+    <title>bindings — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/component-bindings">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-bindings">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-bindings">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-bindings">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/component-bindings">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="bindings">
+    <meta property="og:description" content="Bileşenin bağları: JSX&#x27;teki canlı ifadelerin karşılığı, `bindings` üyeleri, `watch` ve bağın ömrü.">
+    <script type="application/json" id="doc-data">{"slug":"component-bindings","locale":"tr","title":"bindings","description":"Bileşenin bağları: JSX\u0027teki canlı ifadelerin karşılığı, \u0060bindings\u0060 üyeleri, \u0060watch\u0060 ve bağın ömrü.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Cp\u003EBir bağ, reaktif bir değeri bileşenin elemanına bağlar: metne, bir özniteliğe, alanın değerine, görünürlüğe ya da içeriğe. Değer değişince yalnız o bağ yeniden çalışır; bileşenin geri kalanı yeniden kurulmaz. Her bileşenin bağları \u003Ccode\u003Ebindings\u003C/code\u003E koleksiyonundadır. JSX\u0027te yazılan her canlı ifade, o etiketin bileşeninde bir bağ olur; JSX\u0027siz yazımda aynı bağ \u003Ccode\u003Ebindings\u003C/code\u003E üzerinden kurulur.\u003C/p\u003E\n\u003Ch2 id=\u0022jsx-forms\u0022\u003EJSX\u0027teki karşılıkları\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EJSX\u003C/th\u003E\n\u003Cth\u003EKurulan bağ\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() \\|\\| \u0026quot;Adsız\u0026quot;}\u0026lt;/span\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.method(fn)\u003C/code\u003E; sonuç metinse metin düğümü, bileşense içerik olur. Yalnız metin için \u003Ccode\u003Ebindings.text(fn)\u003C/code\u003E yazılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;span\u0026gt;{note.title}\u0026lt;/span\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)\u003C/code\u003E: tek alana tek yönlü bağ.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-text={() =\u0026gt; …}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.text(fn)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Evalue={() =\u0026gt; state.query}\u003C/code\u003E, \u003Ccode\u003Ex-value={() =\u0026gt; state.query}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.add(\u0026quot;value\u0026quot;, fn)\u003C/code\u003E ve \u003Ccode\u003Ebindings.value(fn)\u003C/code\u003E; ikisi aynı işi yapar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-model={() =\u0026gt; state.query}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.model(() =\u0026gt; state.query, (value) =\u0026gt; (state.query = value))\u003C/code\u003E: iki yönlü.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-display={() =\u0026gt; note.pinned}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.display(fn)\u003C/code\u003E, \u003Ccode\u003Epreconfig\u003C/code\u003E içinde.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-wait={() =\u0026gt; notes.loading}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.wait(fn)\u003C/code\u003E, \u003Ccode\u003Epreconfig\u003C/code\u003E içinde.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-html={() =\u0026gt; preview}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.html(fn)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{open \u0026amp;\u0026amp; \u0026lt;Panel /\u0026gt;}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.when(fn, render)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{open ? \u0026lt;A /\u0026gt; : \u0026lt;B /\u0026gt;}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.ternary(fn, a, b)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{notes.map((note) =\u0026gt; \u0026lt;NoteRow note={note} /\u0026gt;)}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.list(fn, render)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-watch={() =\u0026gt; …}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.watch(fn)\u003C/code\u003E, etiket kurulurken.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EÖznitelik ve sınıf bağları (\u003Ccode\u003Eclass={() =\u0026gt; …}\u003C/code\u003E, \u003Ccode\u003Edisabled={() =\u0026gt; …}\u003C/code\u003E) \u003Ccode\u003Ebindings\u003C/code\u003E\u0027te değil, \u003Ccode\u003Eclass.add\u003C/code\u003E ve \u003Ccode\u003Eattr.add\u003C/code\u003E ile kurulur (bkz. \u003Ca href=\u0022/docs/component-element#appearance\u0022\u003EGörünüş\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022members\u0022\u003EÜyeler\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EÜye\u003C/th\u003E\n\u003Cth\u003ENe yapar\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etext(fn)\u003C/code\u003E, \u003Ccode\u003Evalue(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EElemanın metnini ya da değerini fonksiyonun sonucuna bağlar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eadd(özellik, kaynak, alan?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EElemanın ya da bileşenin bir özelliğini bir nesnenin alanına ya da bir fonksiyona bağlar (bkz. \u003Ca href=\u0022#component-property\u0022\u003EBileşenin özelliğine bağ\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(getter, setter)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİki yönlü bağ: değer elemana yazılır, kullanıcının girdisi \u003Ccode\u003Esetter\u003C/code\u003E\u0027a gider. \u003Ccode\u003Einput\u003C/code\u003E, \u003Ccode\u003Eselect\u003C/code\u003E ve \u003Ccode\u003Etextarea\u003C/code\u003E\u0027da çalışır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edisplay(fn)\u003C/code\u003E, \u003Ccode\u003Ewait(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Edisplay\u003C/code\u003E fonksiyon \u003Ccode\u003Etrue\u003C/code\u003E iken gösterir; \u003Ccode\u003Ewait\u003C/code\u003E fonksiyon \u003Ccode\u003Etrue\u003C/code\u003E döndürdükçe bileşeni kurmadan bekletir (bkz. \u003Ca href=\u0022/docs/conditionals-and-lists#x-wait\u0022\u003E\u003Ccode\u003Ex-wait\u003C/code\u003E\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ehtml(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EElemanın \u003Ccode\u003EinnerHTML\u003C/code\u003E\u0027ini bağlar; içerik güvenilir olmalıdır (bkz. \u003Ca href=\u0022/docs/jsx#x-html\u0022\u003E\u003Ccode\u003Ex-html\u003C/code\u003E\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewhen(fn, render)\u003C/code\u003E, \u003Ccode\u003Eternary(fn, a, b)\u003C/code\u003E, \u003Ccode\u003EswitchCase(fn, durumlar, varsayılan?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKoşula göre içeriği değiştirir; dal değişmedikçe yeniden kurulmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Elist(fn, render)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDiziyi satırlara çevirir; satırlar öğe nesnesiyle eşleşir, sıra değişince taşınır. \u003Ccode\u003Eloop\u003C/code\u003E aynıdır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emethod(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESonucu metin ya da bileşen olabilen ifade; JSX\u0027teki \u003Ccode\u003E{() =\u0026gt; …}\u003C/code\u003E budur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewatch(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EElemana bir şey yazmayan bağ: \u003Ccode\u003Efn\u003C/code\u003E hemen bir kez, sonra okuduğu değerler değiştikçe çalışır (bkz. \u003Ca href=\u0022/docs/reactivity#watch\u0022\u003EBileşene bağlı izleyici\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eremove(bağ)\u003C/code\u003E, \u003Ccode\u003Eclear()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBir bağı ya da koleksiyondaki bütün bağları durdurup çıkarır. \u003Ccode\u003Ewatch\u003C/code\u003E, \u003Ccode\u003Ewhen\u003C/code\u003E, \u003Ccode\u003Eternary\u003C/code\u003E, \u003Ccode\u003EswitchCase\u003C/code\u003E ve \u003Ccode\u003Emethod\u003C/code\u003E koleksiyonda tutulmaz; onlar bileşenle birlikte durur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eitems\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKoleksiyondaki bağların kopyası.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Ewhen\u003C/code\u003E, \u003Ccode\u003Eternary\u003C/code\u003E, \u003Ccode\u003EswitchCase\u003C/code\u003E ve \u003Ccode\u003Elist\u003C/code\u003E\u0027in ayrıntıları \u003Ca href=\u0022/docs/conditionals-and-lists#binding-api\u0022\u003EKoşullu Gösterim ve Listeler\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n\u003Ch2 id=\u0022example\u0022\u003EBir örnek\u003C/h2\u003E\n\u003Cp\u003ENot sayfasının bilgi satırı notun ne zaman düzenlendiğini, adresini ve durumunu gösterir. Düzenlenme zamanı canlı metindir; adres not değişmediği için bir kez yazılır. \u0026quot;Sabitlendi\u0026quot;, \u0026quot;Arşivde\u0026quot; ve \u0026quot;Kaydedildi\u0026quot; görünürlük bağıdır. Satır ayrıca tarayıcı sekmesinin başlığını notun başlığına bağlar: \u003Ccode\u003Ebindings.watch\u003C/code\u003E elemana bir şey yazmaz, yalnız okuduğu başlık değişince yeniden çalışır ve bileşen kaldırılınca durur. \u003Ccode\u003Esaved\u003C/code\u003E ebeveynden canlı bir değer olarak gelir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteMeta.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteMeta.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteMeta extends Component\u0026lt;HTMLDivElement, { note: Note; saved: Bind\u0026lt;boolean\u0026gt; }\u0026gt; {\n  override onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  }\n\n  override onBuilt() {\n    const { note } = this.props;\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  }\n\n  override view() {\n    const { note, saved } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span\u0026gt;{\u0060/notes/${note.id}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.pinned}\u0026gt;Sabitlendi\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.archived}\u0026gt;Arşivde\u0026lt;/span\u0026gt;\n        \u0026lt;span class=\u0026quot;saved\u0026quot; x-display={() =\u0026gt; read(saved)}\u0026gt;Kaydedildi\u0026lt;/span\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteMeta.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteMeta extends Component\u0026lt;HTMLDivElement, { note: Note; saved: Bind\u0026lt;boolean\u0026gt; }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  }\n\n  override onBuilt() {\n    const { note } = this.props;\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  }\n\n  override view() {\n    const { note, saved } = this.props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    const address = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.setText(\u0060/notes/${note.id}\u0060));\n    const pinned = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; note.pinned),\n      initializeComponent: (span: ComponentBase) =\u0026gt; span.setText(\u0026quot;Sabitlendi\u0026quot;),\n    });\n    const archived = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; note.archived),\n      initializeComponent: (span: ComponentBase) =\u0026gt; span.setText(\u0026quot;Arşivde\u0026quot;),\n    });\n    const savedLabel = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; read(saved)),\n      initializeComponent: (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;saved\u0026quot;);\n        span.setText(\u0026quot;Kaydedildi\u0026quot;);\n      },\n    });\n    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteMeta.tsx\u0022\u003E\u003Ccode\u003Eimport { read, type Bind, type ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteMeta(props: { note: Note; saved: Bind\u0026lt;boolean\u0026gt; }) {\n  const { note, saved } = props;\n  const built = (meta: ComponentBase) =\u0026gt; {\n    meta.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;meta\u0026quot; onBuilt={built}\u0026gt;\n      \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;span\u0026gt;{\u0060/notes/${note.id}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;span x-display={() =\u0026gt; note.pinned}\u0026gt;Sabitlendi\u0026lt;/span\u0026gt;\n      \u0026lt;span x-display={() =\u0026gt; note.archived}\u0026gt;Arşivde\u0026lt;/span\u0026gt;\n      \u0026lt;span class=\u0026quot;saved\u0026quot; x-display={() =\u0026gt; read(saved)}\u0026gt;Kaydedildi\u0026lt;/span\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteMeta.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteMeta(props: { note: Note; saved: Bind\u0026lt;boolean\u0026gt; }) {\n  const { note, saved } = props;\n  const built = (meta: ComponentBase) =\u0026gt; {\n    meta.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;meta\u0026quot;,\n    onBuilt: built,\n    initializeComponent: (meta: ComponentBase) =\u0026gt; {\n      const edited = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n      const address = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.setText(\u0060/notes/${note.id}\u0060));\n      const pinned = motifComponent(\u0026quot;span\u0026quot;, {\n        preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; note.pinned),\n        initializeComponent: (span: ComponentBase) =\u0026gt; span.setText(\u0026quot;Sabitlendi\u0026quot;),\n      });\n      const archived = motifComponent(\u0026quot;span\u0026quot;, {\n        preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; note.archived),\n        initializeComponent: (span: ComponentBase) =\u0026gt; span.setText(\u0026quot;Arşivde\u0026quot;),\n      });\n      const savedLabel = motifComponent(\u0026quot;span\u0026quot;, {\n        preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; read(saved)),\n        initializeComponent: (span: ComponentBase) =\u0026gt; {\n          span.class.add(\u0026quot;saved\u0026quot;);\n          span.setText(\u0026quot;Kaydedildi\u0026quot;);\n        },\n      });\n      meta.controls.add(edited, address, pinned, archived, savedLabel);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteMeta.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteMeta = (props: { note: Note; saved: Bind\u0026lt;boolean\u0026gt; }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  },\n\n  onBuilt() {\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${props.note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  },\n\n  view() {\n    const { note, saved } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span\u0026gt;{\u0060/notes/${note.id}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.pinned}\u0026gt;Sabitlendi\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.archived}\u0026gt;Arşivde\u0026lt;/span\u0026gt;\n        \u0026lt;span class=\u0026quot;saved\u0026quot; x-display={() =\u0026gt; read(saved)}\u0026gt;Kaydedildi\u0026lt;/span\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteMeta.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifFragment, motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteMeta = (props: { note: Note; saved: Bind\u0026lt;boolean\u0026gt; }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  },\n\n  onBuilt() {\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${props.note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  },\n\n  view() {\n    const { note, saved } = props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    const address = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.setText(\u0060/notes/${note.id}\u0060));\n    const pinned = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; note.pinned),\n      initializeComponent: (span: ComponentBase) =\u0026gt; span.setText(\u0026quot;Sabitlendi\u0026quot;),\n    });\n    const archived = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; note.archived),\n      initializeComponent: (span: ComponentBase) =\u0026gt; span.setText(\u0026quot;Arşivde\u0026quot;),\n    });\n    const savedLabel = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span: ComponentBase) =\u0026gt; span.bindings.display(() =\u0026gt; read(saved)),\n      initializeComponent: (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;saved\u0026quot;);\n        span.setText(\u0026quot;Kaydedildi\u0026quot;);\n      },\n    });\n    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteMeta.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteMeta extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  }\n\n  onBuilt() {\n    const { note } = this.props;\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  }\n\n  view() {\n    const { note, saved } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span\u0026gt;{\u0060/notes/${note.id}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.pinned}\u0026gt;Sabitlendi\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.archived}\u0026gt;Arşivde\u0026lt;/span\u0026gt;\n        \u0026lt;span class=\u0026quot;saved\u0026quot; x-display={() =\u0026gt; read(saved)}\u0026gt;Kaydedildi\u0026lt;/span\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteMeta.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteMeta extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  }\n\n  onBuilt() {\n    const { note } = this.props;\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  }\n\n  view() {\n    const { note, saved } = this.props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    const address = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.setText(\u0060/notes/${note.id}\u0060));\n    const pinned = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; note.pinned),\n      initializeComponent: (span) =\u0026gt; span.setText(\u0026quot;Sabitlendi\u0026quot;),\n    });\n    const archived = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; note.archived),\n      initializeComponent: (span) =\u0026gt; span.setText(\u0026quot;Arşivde\u0026quot;),\n    });\n    const savedLabel = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; read(saved)),\n      initializeComponent: (span) =\u0026gt; {\n        span.class.add(\u0026quot;saved\u0026quot;);\n        span.setText(\u0026quot;Kaydedildi\u0026quot;);\n      },\n    });\n    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteMeta.jsx\u0022\u003E\u003Ccode\u003Eimport { read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteMeta(props) {\n  const { note, saved } = props;\n  const built = (meta) =\u0026gt; {\n    meta.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;meta\u0026quot; onBuilt={built}\u0026gt;\n      \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;span\u0026gt;{\u0060/notes/${note.id}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;span x-display={() =\u0026gt; note.pinned}\u0026gt;Sabitlendi\u0026lt;/span\u0026gt;\n      \u0026lt;span x-display={() =\u0026gt; note.archived}\u0026gt;Arşivde\u0026lt;/span\u0026gt;\n      \u0026lt;span class=\u0026quot;saved\u0026quot; x-display={() =\u0026gt; read(saved)}\u0026gt;Kaydedildi\u0026lt;/span\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteMeta.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteMeta(props) {\n  const { note, saved } = props;\n  const built = (meta) =\u0026gt; {\n    meta.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;meta\u0026quot;,\n    onBuilt: built,\n    initializeComponent: (meta) =\u0026gt; {\n      const edited = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n      const address = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.setText(\u0060/notes/${note.id}\u0060));\n      const pinned = motifComponent(\u0026quot;span\u0026quot;, {\n        preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; note.pinned),\n        initializeComponent: (span) =\u0026gt; span.setText(\u0026quot;Sabitlendi\u0026quot;),\n      });\n      const archived = motifComponent(\u0026quot;span\u0026quot;, {\n        preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; note.archived),\n        initializeComponent: (span) =\u0026gt; span.setText(\u0026quot;Arşivde\u0026quot;),\n      });\n      const savedLabel = motifComponent(\u0026quot;span\u0026quot;, {\n        preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; read(saved)),\n        initializeComponent: (span) =\u0026gt; {\n          span.class.add(\u0026quot;saved\u0026quot;);\n          span.setText(\u0026quot;Kaydedildi\u0026quot;);\n        },\n      });\n      meta.controls.add(edited, address, pinned, archived, savedLabel);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteMeta.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteMeta = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  },\n\n  onBuilt() {\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${props.note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  },\n\n  view() {\n    const { note, saved } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span\u0026gt;{\u0060/notes/${note.id}\u0060}\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.pinned}\u0026gt;Sabitlendi\u0026lt;/span\u0026gt;\n        \u0026lt;span x-display={() =\u0026gt; note.archived}\u0026gt;Arşivde\u0026lt;/span\u0026gt;\n        \u0026lt;span class=\u0026quot;saved\u0026quot; x-display={() =\u0026gt; read(saved)}\u0026gt;Kaydedildi\u0026lt;/span\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteMeta.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteMeta = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;meta\u0026quot;);\n  },\n\n  onBuilt() {\n    this.bindings.watch(() =\u0026gt; {\n      document.title = \u0060${props.note.title.trim() || \u0026quot;Adsız\u0026quot;} · Notlar\u0060;\n    });\n  },\n\n  view() {\n    const { note, saved } = props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    const address = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.setText(\u0060/notes/${note.id}\u0060));\n    const pinned = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; note.pinned),\n      initializeComponent: (span) =\u0026gt; span.setText(\u0026quot;Sabitlendi\u0026quot;),\n    });\n    const archived = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; note.archived),\n      initializeComponent: (span) =\u0026gt; span.setText(\u0026quot;Arşivde\u0026quot;),\n    });\n    const savedLabel = motifComponent(\u0026quot;span\u0026quot;, {\n      preconfig: (span) =\u0026gt; span.bindings.display(() =\u0026gt; read(saved)),\n      initializeComponent: (span) =\u0026gt; {\n        span.class.add(\u0026quot;saved\u0026quot;);\n        span.setText(\u0026quot;Kaydedildi\u0026quot;);\n      },\n    });\n    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003ENot sayfası satırı \u003Ccode\u003E\u0026lt;NoteMeta note={note} saved={() =\u0026gt; this.state.saved} /\u0026gt;\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003ENot sayfası satırı \u003Ccode\u003Enew NoteMeta({ note, saved: () =\u0026gt; this.state.saved })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003ENot sayfası satırı \u003Ccode\u003EmotifComponent(NoteMeta, { note, saved: () =\u0026gt; this.state.saved })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022component-property\u0022\u003EBileşenin özelliğine bağ\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eadd\u003C/code\u003E değeri yalnız elemana yazmaz. \u003Ccode\u003EtextContent\u003C/code\u003E, \u003Ccode\u003EinnerHTML\u003C/code\u003E, \u003Ccode\u003Ewait\u003C/code\u003E, \u003Ccode\u003Edisplay\u003C/code\u003E, \u003Ccode\u003Evisible\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E ve \u003Ccode\u003Emodel\u003C/code\u003E adları kendi işini yapar; başka bir adda değer şu sırayla bulunan yere yazılır:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003EAd \u003Ccode\u003Evalue\u003C/code\u003E ise ve bileşenin kendi \u003Ccode\u003Evalue\u003C/code\u003E özelliği varsa bileşene.\u003C/li\u003E\n\u003Cli\u003EElemanda bu adda bir özellik varsa elemana (\u003Ccode\u003Etitle\u003C/code\u003E, \u003Ccode\u003Ehidden\u003C/code\u003E, \u003Ccode\u003Edisabled\u003C/code\u003E, \u003Ccode\u003EtabIndex\u003C/code\u003E, \u003Ccode\u003Eplaceholder\u003C/code\u003E…).\u003C/li\u003E\n\u003Cli\u003EBileşende bu adda bir özellik varsa bileşene: setter\u0027ı çağrılır ya da alanı değişir.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EHiçbir yerde bulunmayan ad için bir şey yazılmaz. Nokta içeren ad ise bileşenin üzerinde bir yoldur ve doğrudan bileşenden başlar; özel adlara ve elemana bakılmaz. \u003Ccode\u003Ebindings.add(\u0026quot;options.locked\u0026quot;, props.locked)\u003C/code\u003E değeri bileşenin \u003Ccode\u003Eoptions\u003C/code\u003E nesnesinin \u003Ccode\u003Elocked\u003C/code\u003E alanına yazar, yol üzerindeki bir setter da çağrılır. Yolun bir adımı yoksa ya da nesne değilse bir şey yazılmaz. Böylece bir bileşen kendi özelliğini bir fonksiyona bağlayabilir. Prop\u0027u fonksiyon olarak alan bileşen, prop\u0027u bu yolla izler: veri reaktifse bağ kendiliğinden yeniden çalışır, düz veride \u003Ccode\u003EsetState()\u003C/code\u003E ya da \u003Ccode\u003EreState()\u003C/code\u003E bağı yeniden okutur.\u003C/p\u003E\n\u003Cp\u003ENot sayfasında arşivdeki notun gövdesi kilitli görünür. \u003Ccode\u003ENoteBody\u003C/code\u003E bileşeninin \u003Ccode\u003Elocked\u003C/code\u003E özelliği, prop olarak verilen fonksiyonu izler; bileşen \u003Ccode\u003EonConfigured\u003C/code\u003E\u0027da \u003Ccode\u003Ebindings.add(\u0026quot;locked\u0026quot;, props.locked)\u003C/code\u003E ile prop\u0027u kendi setter\u0027ına bağlar. Prop düz bir değer olarak da verilebilir, o zaman bir kez yazılır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteBody.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteBody.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteBody extends Component\u0026lt;HTMLDivElement, { note: Note; locked: Bind\u0026lt;boolean\u0026gt; }\u0026gt; {\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  }\n\n  set locked(value: boolean) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, this.props.locked);\n  }\n\n  override view() {\n    const { note } = this.props;\n    return \u0026lt;p\u0026gt;{note.body}\u0026lt;/p\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteBody.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteBody extends Component\u0026lt;HTMLDivElement, { note: Note; locked: Bind\u0026lt;boolean\u0026gt; }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  }\n\n  set locked(value: boolean) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, this.props.locked);\n  }\n\n  override view() {\n    const { note } = this.props;\n    return motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;body\u0026quot;));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteBody.tsx\u0022\u003E\u003Ccode\u003Eimport { read, type Bind, type ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteBody(props: { note: Note; locked: Bind\u0026lt;boolean\u0026gt; }) {\n  const { note, locked } = props;\n  const built = (body: ComponentBase) =\u0026gt; {\n    body.bindings.watch(() =\u0026gt; {\n      if (read(locked)) body.class.add(\u0026quot;locked\u0026quot;);\n      else body.class.remove(\u0026quot;locked\u0026quot;);\n    });\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;body\u0026quot; onBuilt={built}\u0026gt;\n      \u0026lt;p\u0026gt;{note.body}\u0026lt;/p\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteBody.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteBody(props: { note: Note; locked: Bind\u0026lt;boolean\u0026gt; }) {\n  const { note, locked } = props;\n  const built = (body: ComponentBase) =\u0026gt; {\n    body.bindings.watch(() =\u0026gt; {\n      if (read(locked)) body.class.add(\u0026quot;locked\u0026quot;);\n      else body.class.remove(\u0026quot;locked\u0026quot;);\n    });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;body\u0026quot;,\n    onBuilt: built,\n    initializeComponent: (body: ComponentBase) =\u0026gt; {\n      body.controls.add(motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;body\u0026quot;)));\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteBody.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteBody = (props: { note: Note; locked: Bind\u0026lt;boolean\u0026gt; }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  },\n\n  set locked(value: boolean) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, props.locked);\n  },\n\n  view() {\n    return \u0026lt;p\u0026gt;{props.note.body}\u0026lt;/p\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteBody.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, type Bind } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteBody = (props: { note: Note; locked: Bind\u0026lt;boolean\u0026gt; }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  },\n\n  set locked(value: boolean) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, props.locked);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.bindings.add(\u0026quot;textContent\u0026quot;, props.note, \u0026quot;body\u0026quot;));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteBody.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteBody extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  }\n\n  set locked(value) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, this.props.locked);\n  }\n\n  view() {\n    const { note } = this.props;\n    return \u0026lt;p\u0026gt;{note.body}\u0026lt;/p\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteBody.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteBody extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  }\n\n  set locked(value) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, this.props.locked);\n  }\n\n  view() {\n    const { note } = this.props;\n    return motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; p.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;body\u0026quot;));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteBody.jsx\u0022\u003E\u003Ccode\u003Eimport { read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteBody(props) {\n  const { note, locked } = props;\n  const built = (body) =\u0026gt; {\n    body.bindings.watch(() =\u0026gt; {\n      if (read(locked)) body.class.add(\u0026quot;locked\u0026quot;);\n      else body.class.remove(\u0026quot;locked\u0026quot;);\n    });\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;body\u0026quot; onBuilt={built}\u0026gt;\n      \u0026lt;p\u0026gt;{note.body}\u0026lt;/p\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteBody.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteBody(props) {\n  const { note, locked } = props;\n  const built = (body) =\u0026gt; {\n    body.bindings.watch(() =\u0026gt; {\n      if (read(locked)) body.class.add(\u0026quot;locked\u0026quot;);\n      else body.class.remove(\u0026quot;locked\u0026quot;);\n    });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;body\u0026quot;,\n    onBuilt: built,\n    initializeComponent: (body) =\u0026gt; {\n      body.controls.add(motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; p.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;body\u0026quot;)));\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteBody.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteBody = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  },\n\n  set locked(value) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, props.locked);\n  },\n\n  view() {\n    return \u0026lt;p\u0026gt;{props.note.body}\u0026lt;/p\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteBody.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteBody = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get locked() {\n    return this.class.has(\u0026quot;locked\u0026quot;);\n  },\n\n  set locked(value) {\n    if (value) this.class.add(\u0026quot;locked\u0026quot;);\n    else this.class.remove(\u0026quot;locked\u0026quot;);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;body\u0026quot;);\n    this.bindings.add(\u0026quot;locked\u0026quot;, props.locked);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; p.bindings.add(\u0026quot;textContent\u0026quot;, props.note, \u0026quot;body\u0026quot;));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninin kendine ait bir özelliği yoktur; aynı izlemeyi kök elemanda \u003Ccode\u003Ebindings.watch\u003C/code\u003E yapar. \u003Ccode\u003Ewatch\u003C/code\u003E da \u003Ccode\u003EsetState()\u003C/code\u003E ve \u003Ccode\u003EreState()\u003C/code\u003E ile yeniden çalışır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003ENot sayfası gövdeyi \u003Ccode\u003E\u0026lt;NoteBody note={note} locked={() =\u0026gt; note.archived} /\u0026gt;\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003ENot sayfası gövdeyi \u003Ccode\u003Enew NoteBody({ note, locked: () =\u0026gt; note.archived })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003ENot sayfası gövdeyi \u003Ccode\u003EmotifComponent(NoteBody, { note, locked: () =\u0026gt; note.archived })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003ENot \u003Ccode\u003Ereactive\u003C/code\u003E bir nesneyse arşivlemek gövdeyi kendiliğinden kilitler. Not düz bir nesneyse sayfa, \u003Ccode\u003Earchived\u003C/code\u003E alanını değiştirdikten sonra kendi \u003Ccode\u003EreState()\u003C/code\u003E\u0027ini çağırır; çağrı çocuklara iner ve \u003Ccode\u003Elocked\u003C/code\u003E bağı yeniden okunur.\u003C/p\u003E\n\u003Cp\u003EBu yolun sınırları:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EElemanda da bulunan bir ad bileşene ulaşmaz. \u003Ccode\u003Etitle\u003C/code\u003E, \u003Ccode\u003Ehidden\u003C/code\u003E ya da \u003Ccode\u003Edisabled\u003C/code\u003E adında bir bileşen özelliği bağlanamaz; değer elemanın aynı adlı özelliğine yazılır.\u003C/li\u003E\n\u003Cli\u003EBağ bir metodu çağırmaz, metodun yerine değeri yazar; metot adına kurulan bağ metodu bozar. Değer değiştikçe bir metodun çalışması gerekiyorsa metot \u003Ccode\u003Ebindings.watch\u003C/code\u003E içinden çağrılır ya da özellik bir setter olarak tanımlanır.\u003C/li\u003E\n\u003Cli\u003EBağ yazmadan önce fonksiyon olan değeri çağırır, sonuç yine fonksiyonsa onu da çağırır. Değeri kendisi fonksiyon olan bir özellik (bir biçimlendirici, bir karşılaştırma) bağla verilmez; fonksiyon özelliğe doğrudan atanır.\u003C/li\u003E\n\u003Cli\u003EBağlı bir özelliğe koddan yazılan değer kalıcı değildir: bir sonraki yeniden çalışmada (reaktif değişiklik, \u003Ccode\u003EsetState()\u003C/code\u003E, \u003Ccode\u003EreState()\u003C/code\u003E) bağ kendi değerini geri yazar. Değeri koda bırakmak için önce bağ \u003Ccode\u003Ebindings.remove(bağ)\u003C/code\u003E ile durdurulur; \u003Ccode\u003Eadd\u003C/code\u003E bağı döndürür.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022lifetime\u0022\u003EBağın ömrü\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eadd\u003C/code\u003E, \u003Ccode\u003Etext\u003C/code\u003E, \u003Ccode\u003Evalue\u003C/code\u003E, \u003Ccode\u003Emodel\u003C/code\u003E, \u003Ccode\u003Edisplay\u003C/code\u003E, \u003Ccode\u003Ewait\u003C/code\u003E, \u003Ccode\u003Ehtml\u003C/code\u003E ve \u003Ccode\u003Elist\u003C/code\u003E ile kurulan bağ, kurulmamış bir bileşende bileşen kurulunca, kurulmuş bir bileşende hemen etkinleşir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ewatch\u003C/code\u003E, \u003Ccode\u003Ewhen\u003C/code\u003E, \u003Ccode\u003Eternary\u003C/code\u003E, \u003Ccode\u003EswitchCase\u003C/code\u003E ve \u003Ccode\u003Emethod\u003C/code\u003E çağrıldıkları anda bir kez çalışır, sonra okudukları değerler değiştikçe yeniden çalışır.\u003C/li\u003E\n\u003Cli\u003EBağlar bileşene aittir: bileşen serbest bırakılınca hepsi durur, ayrıca kaldırmak gerekmez. Gizlenen bileşenin bağlarına ne olduğu \u003Ca href=\u0022/docs/lifecycle#visibility\u0022\u003EGörünürlük\u003C/a\u003E bölümünde anlatılır.\u003C/li\u003E\n\u003Cli\u003EBağı bileşenin ömründen önce durdurmak için \u003Ccode\u003Ebindings.remove(bağ)\u003C/code\u003E kullanılır; \u003Ccode\u003Eadd\u003C/code\u003E, \u003Ccode\u003Emodel\u003C/code\u003E, \u003Ccode\u003Edisplay\u003C/code\u003E, \u003Ccode\u003Ewait\u003C/code\u003E, \u003Ccode\u003Ehtml\u003C/code\u003E ve \u003Ccode\u003Elist\u003C/code\u003E bağı döndürür.\u003C/li\u003E\n\u003Cli\u003EBileşene bağlı olmayan bir izleme için çekirdeğin \u003Ccode\u003Eeffect\u003C/code\u003E fonksiyonu vardır (bkz. \u003Ca href=\u0022/docs/reactivity#effect\u0022\u003E\u003Ccode\u003Eeffect\u003C/code\u003E\u003C/a\u003E); onu bırakmak sizin işinizdir. Bileşenin içinde \u003Ccode\u003Ebindings.watch\u003C/code\u003E kullanılır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EUygulamaya ve servislere bileşenden ulaşmak için \u003Ca href=\u0022/docs/component-state\u0022\u003EDurum, Bağlam ve Servisler\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"jsx-forms","text":"JSX\u0027teki karşılıkları","level":2},{"id":"members","text":"Üyeler","level":2},{"id":"example","text":"Bir örnek","level":2},{"id":"component-property","text":"Bileşenin özelliğine bağ","level":2},{"id":"lifetime","text":"Bağın ömrü","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"component-motif","title":"motif Ad Alanı"},"next":{"slug":"component-state","title":"Durum, Bağlam ve Servisler"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>bindings</h1>
+        <p>Bileşenin bağları: JSX&#x27;teki canlı ifadelerin karşılığı, `bindings` üyeleri, `watch` ve bağın ömrü.</p>
+<p>Bir bağ, reaktif bir değeri bileşenin elemanına bağlar: metne, bir özniteliğe, alanın değerine, görünürlüğe ya da içeriğe. Değer değişince yalnız o bağ yeniden çalışır; bileşenin geri kalanı yeniden kurulmaz. Her bileşenin bağları <code>bindings</code> koleksiyonundadır. JSX'te yazılan her canlı ifade, o etiketin bileşeninde bir bağ olur; JSX'siz yazımda aynı bağ <code>bindings</code> üzerinden kurulur.</p>
+<h2 id="jsx-forms">JSX'teki karşılıkları</h2>
+<table>
+<thead>
+<tr>
+<th>JSX</th>
+<th>Kurulan bağ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;span&gt;{() =&gt; note.title.trim() \|\| &quot;Adsız&quot;}&lt;/span&gt;</code></td>
+<td><code>bindings.method(fn)</code>; sonuç metinse metin düğümü, bileşense içerik olur. Yalnız metin için <code>bindings.text(fn)</code> yazılır.</td>
+</tr>
+<tr>
+<td><code>&lt;span&gt;{note.title}&lt;/span&gt;</code></td>
+<td><code>bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)</code>: tek alana tek yönlü bağ.</td>
+</tr>
+<tr>
+<td><code>x-text={() =&gt; …}</code></td>
+<td><code>bindings.text(fn)</code>.</td>
+</tr>
+<tr>
+<td><code>value={() =&gt; state.query}</code>, <code>x-value={() =&gt; state.query}</code></td>
+<td><code>bindings.add(&quot;value&quot;, fn)</code> ve <code>bindings.value(fn)</code>; ikisi aynı işi yapar.</td>
+</tr>
+<tr>
+<td><code>x-model={() =&gt; state.query}</code></td>
+<td><code>bindings.model(() =&gt; state.query, (value) =&gt; (state.query = value))</code>: iki yönlü.</td>
+</tr>
+<tr>
+<td><code>x-display={() =&gt; note.pinned}</code></td>
+<td><code>bindings.display(fn)</code>, <code>preconfig</code> içinde.</td>
+</tr>
+<tr>
+<td><code>x-wait={() =&gt; notes.loading}</code></td>
+<td><code>bindings.wait(fn)</code>, <code>preconfig</code> içinde.</td>
+</tr>
+<tr>
+<td><code>x-html={() =&gt; preview}</code></td>
+<td><code>bindings.html(fn)</code>.</td>
+</tr>
+<tr>
+<td><code>{open &amp;&amp; &lt;Panel /&gt;}</code></td>
+<td><code>bindings.when(fn, render)</code>.</td>
+</tr>
+<tr>
+<td><code>{open ? &lt;A /&gt; : &lt;B /&gt;}</code></td>
+<td><code>bindings.ternary(fn, a, b)</code>.</td>
+</tr>
+<tr>
+<td><code>{notes.map((note) =&gt; &lt;NoteRow note={note} /&gt;)}</code></td>
+<td><code>bindings.list(fn, render)</code>.</td>
+</tr>
+<tr>
+<td><code>x-watch={() =&gt; …}</code></td>
+<td><code>bindings.watch(fn)</code>, etiket kurulurken.</td>
+</tr>
+</tbody>
+</table>
+<p>Öznitelik ve sınıf bağları (<code>class={() =&gt; …}</code>, <code>disabled={() =&gt; …}</code>) <code>bindings</code>'te değil, <code>class.add</code> ve <code>attr.add</code> ile kurulur (bkz. <a href="/tr/docs/component-element#appearance">Görünüş</a>).</p>
+<h2 id="members">Üyeler</h2>
+<table>
+<thead>
+<tr>
+<th>Üye</th>
+<th>Ne yapar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text(fn)</code>, <code>value(fn)</code></td>
+<td>Elemanın metnini ya da değerini fonksiyonun sonucuna bağlar.</td>
+</tr>
+<tr>
+<td><code>add(özellik, kaynak, alan?)</code></td>
+<td>Elemanın ya da bileşenin bir özelliğini bir nesnenin alanına ya da bir fonksiyona bağlar (bkz. <a href="#component-property">Bileşenin özelliğine bağ</a>).</td>
+</tr>
+<tr>
+<td><code>model(getter, setter)</code></td>
+<td>İki yönlü bağ: değer elemana yazılır, kullanıcının girdisi <code>setter</code>'a gider. <code>input</code>, <code>select</code> ve <code>textarea</code>'da çalışır.</td>
+</tr>
+<tr>
+<td><code>display(fn)</code>, <code>wait(fn)</code></td>
+<td><code>display</code> fonksiyon <code>true</code> iken gösterir; <code>wait</code> fonksiyon <code>true</code> döndürdükçe bileşeni kurmadan bekletir (bkz. <a href="/tr/docs/conditionals-and-lists#x-wait"><code>x-wait</code></a>).</td>
+</tr>
+<tr>
+<td><code>html(fn)</code></td>
+<td>Elemanın <code>innerHTML</code>'ini bağlar; içerik güvenilir olmalıdır (bkz. <a href="/tr/docs/jsx#x-html"><code>x-html</code></a>).</td>
+</tr>
+<tr>
+<td><code>when(fn, render)</code>, <code>ternary(fn, a, b)</code>, <code>switchCase(fn, durumlar, varsayılan?)</code></td>
+<td>Koşula göre içeriği değiştirir; dal değişmedikçe yeniden kurulmaz.</td>
+</tr>
+<tr>
+<td><code>list(fn, render)</code></td>
+<td>Diziyi satırlara çevirir; satırlar öğe nesnesiyle eşleşir, sıra değişince taşınır. <code>loop</code> aynıdır.</td>
+</tr>
+<tr>
+<td><code>method(fn)</code></td>
+<td>Sonucu metin ya da bileşen olabilen ifade; JSX'teki <code>{() =&gt; …}</code> budur.</td>
+</tr>
+<tr>
+<td><code>watch(fn)</code></td>
+<td>Elemana bir şey yazmayan bağ: <code>fn</code> hemen bir kez, sonra okuduğu değerler değiştikçe çalışır (bkz. <a href="/tr/docs/reactivity#watch">Bileşene bağlı izleyici</a>).</td>
+</tr>
+<tr>
+<td><code>remove(bağ)</code>, <code>clear()</code></td>
+<td>Bir bağı ya da koleksiyondaki bütün bağları durdurup çıkarır. <code>watch</code>, <code>when</code>, <code>ternary</code>, <code>switchCase</code> ve <code>method</code> koleksiyonda tutulmaz; onlar bileşenle birlikte durur.</td>
+</tr>
+<tr>
+<td><code>items</code></td>
+<td>Koleksiyondaki bağların kopyası.</td>
+</tr>
+</tbody>
+</table>
+<p><code>when</code>, <code>ternary</code>, <code>switchCase</code> ve <code>list</code>'in ayrıntıları <a href="/tr/docs/conditionals-and-lists#binding-api">Koşullu Gösterim ve Listeler</a> sayfasındadır.</p>
+<h2 id="example">Bir örnek</h2>
+<p>Not sayfasının bilgi satırı notun ne zaman düzenlendiğini, adresini ve durumunu gösterir. Düzenlenme zamanı canlı metindir; adres not değişmediği için bir kez yazılır. &quot;Sabitlendi&quot;, &quot;Arşivde&quot; ve &quot;Kaydedildi&quot; görünürlük bağıdır. Satır ayrıca tarayıcı sekmesinin başlığını notun başlığına bağlar: <code>bindings.watch</code> elemana bir şey yazmaz, yalnız okuduğu başlık değişince yeniden çalışır ve bileşen kaldırılınca durur. <code>saved</code> ebeveynden canlı bir değer olarak gelir:</p>
+<div class="doc-code" data-file="src/parts/NoteMeta.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteMeta.tsx"><code>import { Component, read, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteMeta extends Component&lt;HTMLDivElement, { note: Note; saved: Bind&lt;boolean&gt; }&gt; {
+  override onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  }
+
+  override onBuilt() {
+    const { note } = this.props;
+    this.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  }
+
+  override view() {
+    const { note, saved } = this.props;
+    return (
+      &lt;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+        &lt;span&gt;{`/notes/${note.id}`}&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.pinned}&gt;Sabitlendi&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.archived}&gt;Arşivde&lt;/span&gt;
+        &lt;span class=&quot;saved&quot; x-display={() =&gt; read(saved)}&gt;Kaydedildi&lt;/span&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteMeta.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment, read, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteMeta extends Component&lt;HTMLDivElement, { note: Note; saved: Bind&lt;boolean&gt; }&gt; {
+  static override elementTag = &quot;div&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  }
+
+  override onBuilt() {
+    const { note } = this.props;
+    this.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  }
+
+  override view() {
+    const { note, saved } = this.props;
+    const edited = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    const address = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.setText(`/notes/${note.id}`));
+    const pinned = motifComponent(&quot;span&quot;, {
+      preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; note.pinned),
+      initializeComponent: (span: ComponentBase) =&gt; span.setText(&quot;Sabitlendi&quot;),
+    });
+    const archived = motifComponent(&quot;span&quot;, {
+      preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; note.archived),
+      initializeComponent: (span: ComponentBase) =&gt; span.setText(&quot;Arşivde&quot;),
+    });
+    const savedLabel = motifComponent(&quot;span&quot;, {
+      preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; read(saved)),
+      initializeComponent: (span: ComponentBase) =&gt; {
+        span.class.add(&quot;saved&quot;);
+        span.setText(&quot;Kaydedildi&quot;);
+      },
+    });
+    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteMeta.tsx"><code>import { read, type Bind, type ComponentBase } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteMeta(props: { note: Note; saved: Bind&lt;boolean&gt; }) {
+  const { note, saved } = props;
+  const built = (meta: ComponentBase) =&gt; {
+    meta.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  };
+
+  return (
+    &lt;div class=&quot;meta&quot; onBuilt={built}&gt;
+      &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+      &lt;span&gt;{`/notes/${note.id}`}&lt;/span&gt;
+      &lt;span x-display={() =&gt; note.pinned}&gt;Sabitlendi&lt;/span&gt;
+      &lt;span x-display={() =&gt; note.archived}&gt;Arşivde&lt;/span&gt;
+      &lt;span class=&quot;saved&quot; x-display={() =&gt; read(saved)}&gt;Kaydedildi&lt;/span&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteMeta.ts"><code>import { ComponentBase, motifComponent, read, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteMeta(props: { note: Note; saved: Bind&lt;boolean&gt; }) {
+  const { note, saved } = props;
+  const built = (meta: ComponentBase) =&gt; {
+    meta.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;meta&quot;,
+    onBuilt: built,
+    initializeComponent: (meta: ComponentBase) =&gt; {
+      const edited = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+      const address = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.setText(`/notes/${note.id}`));
+      const pinned = motifComponent(&quot;span&quot;, {
+        preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; note.pinned),
+        initializeComponent: (span: ComponentBase) =&gt; span.setText(&quot;Sabitlendi&quot;),
+      });
+      const archived = motifComponent(&quot;span&quot;, {
+        preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; note.archived),
+        initializeComponent: (span: ComponentBase) =&gt; span.setText(&quot;Arşivde&quot;),
+      });
+      const savedLabel = motifComponent(&quot;span&quot;, {
+        preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; read(saved)),
+        initializeComponent: (span: ComponentBase) =&gt; {
+          span.class.add(&quot;saved&quot;);
+          span.setText(&quot;Kaydedildi&quot;);
+        },
+      });
+      meta.controls.add(edited, address, pinned, archived, savedLabel);
+    },
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteMeta.tsx"><code>import { motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteMeta = (props: { note: Note; saved: Bind&lt;boolean&gt; }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  },
+
+  onBuilt() {
+    this.bindings.watch(() =&gt; {
+      document.title = `${props.note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  },
+
+  view() {
+    const { note, saved } = props;
+    return (
+      &lt;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+        &lt;span&gt;{`/notes/${note.id}`}&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.pinned}&gt;Sabitlendi&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.archived}&gt;Arşivde&lt;/span&gt;
+        &lt;span class=&quot;saved&quot; x-display={() =&gt; read(saved)}&gt;Kaydedildi&lt;/span&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteMeta.ts"><code>import { ComponentBase, motifComponent, motifFragment, motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteMeta = (props: { note: Note; saved: Bind&lt;boolean&gt; }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  },
+
+  onBuilt() {
+    this.bindings.watch(() =&gt; {
+      document.title = `${props.note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  },
+
+  view() {
+    const { note, saved } = props;
+    const edited = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    const address = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.setText(`/notes/${note.id}`));
+    const pinned = motifComponent(&quot;span&quot;, {
+      preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; note.pinned),
+      initializeComponent: (span: ComponentBase) =&gt; span.setText(&quot;Sabitlendi&quot;),
+    });
+    const archived = motifComponent(&quot;span&quot;, {
+      preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; note.archived),
+      initializeComponent: (span: ComponentBase) =&gt; span.setText(&quot;Arşivde&quot;),
+    });
+    const savedLabel = motifComponent(&quot;span&quot;, {
+      preconfig: (span: ComponentBase) =&gt; span.bindings.display(() =&gt; read(saved)),
+      initializeComponent: (span: ComponentBase) =&gt; {
+        span.class.add(&quot;saved&quot;);
+        span.setText(&quot;Kaydedildi&quot;);
+      },
+    });
+    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteMeta.jsx"><code>import { Component, read } from &quot;@motifx/core&quot;;
+
+export class NoteMeta extends Component {
+  static elementTag = &quot;div&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  }
+
+  onBuilt() {
+    const { note } = this.props;
+    this.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  }
+
+  view() {
+    const { note, saved } = this.props;
+    return (
+      &lt;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+        &lt;span&gt;{`/notes/${note.id}`}&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.pinned}&gt;Sabitlendi&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.archived}&gt;Arşivde&lt;/span&gt;
+        &lt;span class=&quot;saved&quot; x-display={() =&gt; read(saved)}&gt;Kaydedildi&lt;/span&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteMeta.js"><code>import { Component, motifComponent, motifFragment, read } from &quot;@motifx/core&quot;;
+
+export class NoteMeta extends Component {
+  static elementTag = &quot;div&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  }
+
+  onBuilt() {
+    const { note } = this.props;
+    this.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  }
+
+  view() {
+    const { note, saved } = this.props;
+    const edited = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    const address = motifComponent(&quot;span&quot;, (span) =&gt; span.setText(`/notes/${note.id}`));
+    const pinned = motifComponent(&quot;span&quot;, {
+      preconfig: (span) =&gt; span.bindings.display(() =&gt; note.pinned),
+      initializeComponent: (span) =&gt; span.setText(&quot;Sabitlendi&quot;),
+    });
+    const archived = motifComponent(&quot;span&quot;, {
+      preconfig: (span) =&gt; span.bindings.display(() =&gt; note.archived),
+      initializeComponent: (span) =&gt; span.setText(&quot;Arşivde&quot;),
+    });
+    const savedLabel = motifComponent(&quot;span&quot;, {
+      preconfig: (span) =&gt; span.bindings.display(() =&gt; read(saved)),
+      initializeComponent: (span) =&gt; {
+        span.class.add(&quot;saved&quot;);
+        span.setText(&quot;Kaydedildi&quot;);
+      },
+    });
+    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteMeta.jsx"><code>import { read } from &quot;@motifx/core&quot;;
+
+export function NoteMeta(props) {
+  const { note, saved } = props;
+  const built = (meta) =&gt; {
+    meta.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  };
+
+  return (
+    &lt;div class=&quot;meta&quot; onBuilt={built}&gt;
+      &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+      &lt;span&gt;{`/notes/${note.id}`}&lt;/span&gt;
+      &lt;span x-display={() =&gt; note.pinned}&gt;Sabitlendi&lt;/span&gt;
+      &lt;span x-display={() =&gt; note.archived}&gt;Arşivde&lt;/span&gt;
+      &lt;span class=&quot;saved&quot; x-display={() =&gt; read(saved)}&gt;Kaydedildi&lt;/span&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteMeta.js"><code>import { motifComponent, read } from &quot;@motifx/core&quot;;
+
+export function NoteMeta(props) {
+  const { note, saved } = props;
+  const built = (meta) =&gt; {
+    meta.bindings.watch(() =&gt; {
+      document.title = `${note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;meta&quot;,
+    onBuilt: built,
+    initializeComponent: (meta) =&gt; {
+      const edited = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+      const address = motifComponent(&quot;span&quot;, (span) =&gt; span.setText(`/notes/${note.id}`));
+      const pinned = motifComponent(&quot;span&quot;, {
+        preconfig: (span) =&gt; span.bindings.display(() =&gt; note.pinned),
+        initializeComponent: (span) =&gt; span.setText(&quot;Sabitlendi&quot;),
+      });
+      const archived = motifComponent(&quot;span&quot;, {
+        preconfig: (span) =&gt; span.bindings.display(() =&gt; note.archived),
+        initializeComponent: (span) =&gt; span.setText(&quot;Arşivde&quot;),
+      });
+      const savedLabel = motifComponent(&quot;span&quot;, {
+        preconfig: (span) =&gt; span.bindings.display(() =&gt; read(saved)),
+        initializeComponent: (span) =&gt; {
+          span.class.add(&quot;saved&quot;);
+          span.setText(&quot;Kaydedildi&quot;);
+        },
+      });
+      meta.controls.add(edited, address, pinned, archived, savedLabel);
+    },
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteMeta.jsx"><code>import { motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const NoteMeta = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  },
+
+  onBuilt() {
+    this.bindings.watch(() =&gt; {
+      document.title = `${props.note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  },
+
+  view() {
+    const { note, saved } = props;
+    return (
+      &lt;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+        &lt;span&gt;{`/notes/${note.id}`}&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.pinned}&gt;Sabitlendi&lt;/span&gt;
+        &lt;span x-display={() =&gt; note.archived}&gt;Arşivde&lt;/span&gt;
+        &lt;span class=&quot;saved&quot; x-display={() =&gt; read(saved)}&gt;Kaydedildi&lt;/span&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteMeta.js"><code>import { motifComponent, motifFragment, motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const NoteMeta = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;meta&quot;);
+  },
+
+  onBuilt() {
+    this.bindings.watch(() =&gt; {
+      document.title = `${props.note.title.trim() || &quot;Adsız&quot;} · Notlar`;
+    });
+  },
+
+  view() {
+    const { note, saved } = props;
+    const edited = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    const address = motifComponent(&quot;span&quot;, (span) =&gt; span.setText(`/notes/${note.id}`));
+    const pinned = motifComponent(&quot;span&quot;, {
+      preconfig: (span) =&gt; span.bindings.display(() =&gt; note.pinned),
+      initializeComponent: (span) =&gt; span.setText(&quot;Sabitlendi&quot;),
+    });
+    const archived = motifComponent(&quot;span&quot;, {
+      preconfig: (span) =&gt; span.bindings.display(() =&gt; note.archived),
+      initializeComponent: (span) =&gt; span.setText(&quot;Arşivde&quot;),
+    });
+    const savedLabel = motifComponent(&quot;span&quot;, {
+      preconfig: (span) =&gt; span.bindings.display(() =&gt; read(saved)),
+      initializeComponent: (span) =&gt; {
+        span.class.add(&quot;saved&quot;);
+        span.setText(&quot;Kaydedildi&quot;);
+      },
+    });
+    return motifFragment({ childs: [edited, address, pinned, archived, savedLabel] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Not sayfası satırı <code>&lt;NoteMeta note={note} saved={() =&gt; this.state.saved} /&gt;</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Not sayfası satırı <code>new NoteMeta({ note, saved: () =&gt; this.state.saved })</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Not sayfası satırı <code>motifComponent(NoteMeta, { note, saved: () =&gt; this.state.saved })</code> ile yerleştirir.</p>
+</div>
+<h2 id="component-property">Bileşenin özelliğine bağ</h2>
+<p><code>add</code> değeri yalnız elemana yazmaz. <code>textContent</code>, <code>innerHTML</code>, <code>wait</code>, <code>display</code>, <code>visible</code>, <code>style</code> ve <code>model</code> adları kendi işini yapar; başka bir adda değer şu sırayla bulunan yere yazılır:</p>
+<ol>
+<li>Ad <code>value</code> ise ve bileşenin kendi <code>value</code> özelliği varsa bileşene.</li>
+<li>Elemanda bu adda bir özellik varsa elemana (<code>title</code>, <code>hidden</code>, <code>disabled</code>, <code>tabIndex</code>, <code>placeholder</code>…).</li>
+<li>Bileşende bu adda bir özellik varsa bileşene: setter'ı çağrılır ya da alanı değişir.</li>
+</ol>
+<p>Hiçbir yerde bulunmayan ad için bir şey yazılmaz. Nokta içeren ad ise bileşenin üzerinde bir yoldur ve doğrudan bileşenden başlar; özel adlara ve elemana bakılmaz. <code>bindings.add(&quot;options.locked&quot;, props.locked)</code> değeri bileşenin <code>options</code> nesnesinin <code>locked</code> alanına yazar, yol üzerindeki bir setter da çağrılır. Yolun bir adımı yoksa ya da nesne değilse bir şey yazılmaz. Böylece bir bileşen kendi özelliğini bir fonksiyona bağlayabilir. Prop'u fonksiyon olarak alan bileşen, prop'u bu yolla izler: veri reaktifse bağ kendiliğinden yeniden çalışır, düz veride <code>setState()</code> ya da <code>reState()</code> bağı yeniden okutur.</p>
+<p>Not sayfasında arşivdeki notun gövdesi kilitli görünür. <code>NoteBody</code> bileşeninin <code>locked</code> özelliği, prop olarak verilen fonksiyonu izler; bileşen <code>onConfigured</code>'da <code>bindings.add(&quot;locked&quot;, props.locked)</code> ile prop'u kendi setter'ına bağlar. Prop düz bir değer olarak da verilebilir, o zaman bir kez yazılır:</p>
+<div class="doc-code" data-file="src/parts/NoteBody.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteBody.tsx"><code>import { Component, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteBody extends Component&lt;HTMLDivElement, { note: Note; locked: Bind&lt;boolean&gt; }&gt; {
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  }
+
+  set locked(value: boolean) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, this.props.locked);
+  }
+
+  override view() {
+    const { note } = this.props;
+    return &lt;p&gt;{note.body}&lt;/p&gt;;
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteBody.ts"><code>import { Component, ComponentBase, motifComponent, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteBody extends Component&lt;HTMLDivElement, { note: Note; locked: Bind&lt;boolean&gt; }&gt; {
+  static override elementTag = &quot;div&quot;;
+
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  }
+
+  set locked(value: boolean) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, this.props.locked);
+  }
+
+  override view() {
+    const { note } = this.props;
+    return motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.bindings.add(&quot;textContent&quot;, note, &quot;body&quot;));
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteBody.tsx"><code>import { read, type Bind, type ComponentBase } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteBody(props: { note: Note; locked: Bind&lt;boolean&gt; }) {
+  const { note, locked } = props;
+  const built = (body: ComponentBase) =&gt; {
+    body.bindings.watch(() =&gt; {
+      if (read(locked)) body.class.add(&quot;locked&quot;);
+      else body.class.remove(&quot;locked&quot;);
+    });
+  };
+
+  return (
+    &lt;div class=&quot;body&quot; onBuilt={built}&gt;
+      &lt;p&gt;{note.body}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteBody.ts"><code>import { ComponentBase, motifComponent, read, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteBody(props: { note: Note; locked: Bind&lt;boolean&gt; }) {
+  const { note, locked } = props;
+  const built = (body: ComponentBase) =&gt; {
+    body.bindings.watch(() =&gt; {
+      if (read(locked)) body.class.add(&quot;locked&quot;);
+      else body.class.remove(&quot;locked&quot;);
+    });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;body&quot;,
+    onBuilt: built,
+    initializeComponent: (body: ComponentBase) =&gt; {
+      body.controls.add(motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.bindings.add(&quot;textContent&quot;, note, &quot;body&quot;)));
+    },
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteBody.tsx"><code>import { motifOptions, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteBody = (props: { note: Note; locked: Bind&lt;boolean&gt; }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  },
+
+  set locked(value: boolean) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, props.locked);
+  },
+
+  view() {
+    return &lt;p&gt;{props.note.body}&lt;/p&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteBody.ts"><code>import { ComponentBase, motifComponent, motifOptions, type Bind } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteBody = (props: { note: Note; locked: Bind&lt;boolean&gt; }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  },
+
+  set locked(value: boolean) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, props.locked);
+  },
+
+  view() {
+    return motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.bindings.add(&quot;textContent&quot;, props.note, &quot;body&quot;));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteBody.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class NoteBody extends Component {
+  static elementTag = &quot;div&quot;;
+
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  }
+
+  set locked(value) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  }
+
+  onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, this.props.locked);
+  }
+
+  view() {
+    const { note } = this.props;
+    return &lt;p&gt;{note.body}&lt;/p&gt;;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteBody.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+
+export class NoteBody extends Component {
+  static elementTag = &quot;div&quot;;
+
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  }
+
+  set locked(value) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  }
+
+  onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, this.props.locked);
+  }
+
+  view() {
+    const { note } = this.props;
+    return motifComponent(&quot;p&quot;, (p) =&gt; p.bindings.add(&quot;textContent&quot;, note, &quot;body&quot;));
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteBody.jsx"><code>import { read } from &quot;@motifx/core&quot;;
+
+export function NoteBody(props) {
+  const { note, locked } = props;
+  const built = (body) =&gt; {
+    body.bindings.watch(() =&gt; {
+      if (read(locked)) body.class.add(&quot;locked&quot;);
+      else body.class.remove(&quot;locked&quot;);
+    });
+  };
+
+  return (
+    &lt;div class=&quot;body&quot; onBuilt={built}&gt;
+      &lt;p&gt;{note.body}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteBody.js"><code>import { motifComponent, read } from &quot;@motifx/core&quot;;
+
+export function NoteBody(props) {
+  const { note, locked } = props;
+  const built = (body) =&gt; {
+    body.bindings.watch(() =&gt; {
+      if (read(locked)) body.class.add(&quot;locked&quot;);
+      else body.class.remove(&quot;locked&quot;);
+    });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;body&quot;,
+    onBuilt: built,
+    initializeComponent: (body) =&gt; {
+      body.controls.add(motifComponent(&quot;p&quot;, (p) =&gt; p.bindings.add(&quot;textContent&quot;, note, &quot;body&quot;)));
+    },
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteBody.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+
+export const NoteBody = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  },
+
+  set locked(value) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, props.locked);
+  },
+
+  view() {
+    return &lt;p&gt;{props.note.body}&lt;/p&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteBody.js"><code>import { motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+
+export const NoteBody = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get locked() {
+    return this.class.has(&quot;locked&quot;);
+  },
+
+  set locked(value) {
+    if (value) this.class.add(&quot;locked&quot;);
+    else this.class.remove(&quot;locked&quot;);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;body&quot;);
+    this.bindings.add(&quot;locked&quot;, props.locked);
+  },
+
+  view() {
+    return motifComponent(&quot;p&quot;, (p) =&gt; p.bindings.add(&quot;textContent&quot;, props.note, &quot;body&quot;));
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninin kendine ait bir özelliği yoktur; aynı izlemeyi kök elemanda <code>bindings.watch</code> yapar. <code>watch</code> da <code>setState()</code> ve <code>reState()</code> ile yeniden çalışır.</p>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Not sayfası gövdeyi <code>&lt;NoteBody note={note} locked={() =&gt; note.archived} /&gt;</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Not sayfası gövdeyi <code>new NoteBody({ note, locked: () =&gt; note.archived })</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Not sayfası gövdeyi <code>motifComponent(NoteBody, { note, locked: () =&gt; note.archived })</code> ile yerleştirir.</p>
+</div>
+<p>Not <code>reactive</code> bir nesneyse arşivlemek gövdeyi kendiliğinden kilitler. Not düz bir nesneyse sayfa, <code>archived</code> alanını değiştirdikten sonra kendi <code>reState()</code>'ini çağırır; çağrı çocuklara iner ve <code>locked</code> bağı yeniden okunur.</p>
+<p>Bu yolun sınırları:</p>
+<ul>
+<li>Elemanda da bulunan bir ad bileşene ulaşmaz. <code>title</code>, <code>hidden</code> ya da <code>disabled</code> adında bir bileşen özelliği bağlanamaz; değer elemanın aynı adlı özelliğine yazılır.</li>
+<li>Bağ bir metodu çağırmaz, metodun yerine değeri yazar; metot adına kurulan bağ metodu bozar. Değer değiştikçe bir metodun çalışması gerekiyorsa metot <code>bindings.watch</code> içinden çağrılır ya da özellik bir setter olarak tanımlanır.</li>
+<li>Bağ yazmadan önce fonksiyon olan değeri çağırır, sonuç yine fonksiyonsa onu da çağırır. Değeri kendisi fonksiyon olan bir özellik (bir biçimlendirici, bir karşılaştırma) bağla verilmez; fonksiyon özelliğe doğrudan atanır.</li>
+<li>Bağlı bir özelliğe koddan yazılan değer kalıcı değildir: bir sonraki yeniden çalışmada (reaktif değişiklik, <code>setState()</code>, <code>reState()</code>) bağ kendi değerini geri yazar. Değeri koda bırakmak için önce bağ <code>bindings.remove(bağ)</code> ile durdurulur; <code>add</code> bağı döndürür.</li>
+</ul>
+<h2 id="lifetime">Bağın ömrü</h2>
+<ul>
+<li><code>add</code>, <code>text</code>, <code>value</code>, <code>model</code>, <code>display</code>, <code>wait</code>, <code>html</code> ve <code>list</code> ile kurulan bağ, kurulmamış bir bileşende bileşen kurulunca, kurulmuş bir bileşende hemen etkinleşir.</li>
+<li><code>watch</code>, <code>when</code>, <code>ternary</code>, <code>switchCase</code> ve <code>method</code> çağrıldıkları anda bir kez çalışır, sonra okudukları değerler değiştikçe yeniden çalışır.</li>
+<li>Bağlar bileşene aittir: bileşen serbest bırakılınca hepsi durur, ayrıca kaldırmak gerekmez. Gizlenen bileşenin bağlarına ne olduğu <a href="/tr/docs/lifecycle#visibility">Görünürlük</a> bölümünde anlatılır.</li>
+<li>Bağı bileşenin ömründen önce durdurmak için <code>bindings.remove(bağ)</code> kullanılır; <code>add</code>, <code>model</code>, <code>display</code>, <code>wait</code>, <code>html</code> ve <code>list</code> bağı döndürür.</li>
+<li>Bileşene bağlı olmayan bir izleme için çekirdeğin <code>effect</code> fonksiyonu vardır (bkz. <a href="/tr/docs/reactivity#effect"><code>effect</code></a>); onu bırakmak sizin işinizdir. Bileşenin içinde <code>bindings.watch</code> kullanılır.</li>
+</ul>
+<h2 id="next">Sonraki adım</h2>
+<p>Uygulamaya ve servislere bileşenden ulaşmak için <a href="/tr/docs/component-state">Durum, Bağlam ve Servisler</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Retry, timeout, circuit breaker, bulkhead, rate limiter and fallback policies with the Resilience.create chain; order, state and error codes.">
+    <title>Resilience — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/resilience">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/resilience">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/resilience">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/resilience">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/resilience">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Resilience">
+    <meta property="og:description" content="Retry, timeout, circuit breaker, bulkhead, rate limiter and fallback policies with the Resilience.create chain; order, state and error codes.">
+    <script type="application/json" id="doc-data">{"slug":"resilience","locale":"en","title":"Resilience","description":"Retry, timeout, circuit breaker, bulkhead, rate limiter and fallback policies with the Resilience.create chain; order, state and error codes.","category":{"id":"3","title":"Application structure"},"html":"\u003Cp\u003ENetwork requests and external resources fail, slow down and get overloaded. \u003Ccode\u003EResilience\u003C/code\u003E offers six \u003Cstrong\u003Epolicies\u003C/strong\u003E for these situations and combines them in a single chain. It is independent of the rest of the framework, and can be used in services, in the data layer or inside a \u003Ccode\u003EdataRequest\u003C/code\u003E.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\u003Ccode\u003Eimport { Resilience } from \u0026quot;@motifx/core\u0026quot;;\n\nconst policy = Resilience.create\n  .retry({ retries: 3, delay: 200 })\n  .timeout({ timeoutMs: 5000 })\n  .fallback({ fallback: () =\u0026gt; [] });\n\nconst notes = await policy.execute(() =\u0026gt; fetch(\u0026quot;/api/notes\u0026quot;).then((r) =\u0026gt; r.json()));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/api.js\u0022\u003E\u003Ccode\u003Eimport { Resilience } from \u0026quot;@motifx/core\u0026quot;;\n\nconst policy = Resilience.create\n  .retry({ retries: 3, delay: 200 })\n  .timeout({ timeoutMs: 5000 })\n  .fallback({ fallback: () =\u0026gt; [] });\n\nconst notes = await policy.execute(() =\u0026gt; fetch(\u0026quot;/api/notes\u0026quot;).then((r) =\u0026gt; r.json()));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022chain\u0022\u003EThe chain and its order\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EResilience.create\u003C/code\u003E gives a new, empty chain; each policy method adds to the chain and returns the same object. \u003Ccode\u003Eexecute(action, ctx?)\u003C/code\u003E wraps the added policies \u003Cstrong\u003Efrom the outside in, in the order they were added\u003C/strong\u003E, and runs \u003Ccode\u003Eaction\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\u003Ccode\u003Econst load = () =\u0026gt; fetch(\u0026quot;/api/notes\u0026quot;).then((r) =\u0026gt; r.json());\n\nResilience.create.retry().timeout({ timeoutMs: 5000 }).execute(load);\n// retry( timeout( load ) ): each attempt has its own timeout\nResilience.create.timeout({ timeoutMs: 5000 }).retry().execute(load);\n// timeout( retry( load ) ): all attempts share a single timeout\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/api.js\u0022\u003E\u003Ccode\u003Econst load = () =\u0026gt; fetch(\u0026quot;/api/notes\u0026quot;).then((r) =\u0026gt; r.json());\n\nResilience.create.retry().timeout({ timeoutMs: 5000 }).execute(load);\n// retry( timeout( load ) ): each attempt has its own timeout\nResilience.create.timeout({ timeoutMs: 5000 }).retry().execute(load);\n// timeout( retry( load ) ): all attempts share a single timeout\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Etimeout\u003C/code\u003E and \u003Ccode\u003Efallback\u003C/code\u003E require an options object (the \u003Ccode\u003EtimeoutMs\u003C/code\u003E and \u003Ccode\u003Efallback\u003C/code\u003E fields are mandatory); for the other policies the options are optional. \u003Ccode\u003Eaction\u003C/code\u003E can be synchronous or return a \u003Ccode\u003EPromise\u003C/code\u003E; \u003Ccode\u003Eexecute\u003C/code\u003E always returns a \u003Ccode\u003EPromise\u003C/code\u003E. \u003Ccode\u003Ectx\u003C/code\u003E is a free-form object (\u003Ccode\u003EResilienceContext\u003C/code\u003E), passed as it is to \u003Ccode\u003Eaction(ctx)\u003C/code\u003E and to the callbacks.\u003C/p\u003E\n\u003Cp\u003EThe types are exported: \u003Ccode\u003ERetryOptions\u003C/code\u003E, \u003Ccode\u003ETimeoutOptions\u003C/code\u003E, \u003Ccode\u003ECircuitBreakerOptions\u003C/code\u003E, \u003Ccode\u003EBulkheadOptions\u003C/code\u003E, \u003Ccode\u003ERateLimiterOptions\u003C/code\u003E and \u003Ccode\u003EFallbackOptions\u0026lt;T\u0026gt;\u003C/code\u003E for the options; \u003Ccode\u003ECircuitState\u003C/code\u003E for the circuit state; \u003Ccode\u003EResiliencePolicy\u003C/code\u003E for the \u003Ccode\u003Eexecute\u003C/code\u003E signature and \u003Ccode\u003EResilienceAction\u0026lt;T\u0026gt;\u003C/code\u003E for \u003Ccode\u003Eaction\u003C/code\u003E. The \u003Ccode\u003EResilience\u003C/code\u003E class implements \u003Ccode\u003EResiliencePolicy\u003C/code\u003E; type a function that takes a chain as \u003Ccode\u003E(policy: ResiliencePolicy) =\u0026gt; …\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EState lives in the chain.\u003C/strong\u003E \u003Ccode\u003EcircuitBreaker\u003C/code\u003E, \u003Ccode\u003Ebulkhead\u003C/code\u003E and \u003Ccode\u003ErateLimiter\u003C/code\u003E keep counters between calls, and every \u003Ccode\u003EResilience.create\u003C/code\u003E opens new counters. For these policies to be of any use, build the chain once (a service field, a module constant) and use the \u003Ccode\u003Eexecute\u003C/code\u003E of \u003Cstrong\u003Ethe same\u003C/strong\u003E object on every call. \u003Ccode\u003Eretry\u003C/code\u003E, \u003Ccode\u003Etimeout\u003C/code\u003E and \u003Ccode\u003Efallback\u003C/code\u003E are stateless.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0027singleton\u0027 })\nexport class ApiClient {\n  private policy = Resilience.create\n    .circuitBreaker({ failureThreshold: 5, durationOfBreakMs: 30000 })\n    .retry({ retries: 2 })\n    .timeout({ timeoutMs: 8000 });\n\n  get\u0026lt;T\u0026gt;(url: string): Promise\u0026lt;T\u0026gt; {\n    return this.policy.execute(() =\u0026gt; fetch(url).then((r) =\u0026gt; r.json()));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/api.js\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0027singleton\u0027 })\nexport class ApiClient {\n  policy = Resilience.create\n    .circuitBreaker({ failureThreshold: 5, durationOfBreakMs: 30000 })\n    .retry({ retries: 2 })\n    .timeout({ timeoutMs: 8000 });\n\n  get(url) {\n    return this.policy.execute(() =\u0026gt; fetch(url).then((r) =\u0026gt; r.json()));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EIn this order each attempt runs with its own 8-second timeout. By default a timeout is neither retried nor counted as a failure for the circuit; if you want the circuit to open for a server that does not respond, give \u003Ccode\u003EcircuitBreaker\u003C/code\u003E \u003Ccode\u003EshouldHandle: () =\u0026gt; true\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022policies\u0022\u003EPolicies\u003C/h2\u003E\n\u003Ch3 id=\u0022retry\u0022\u003E\u003Ccode\u003Eretry(options?)\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EWaits and retries a failed \u003Ccode\u003Eaction\u003C/code\u003E.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EDefault\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eretries\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E3\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe number of retries; total attempts are \u003Ccode\u003Eretries \u002B 1\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebackoff\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027exponential\u0027\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027exponential\u0027\u003C/code\u003E: \u003Ccode\u003Edelay × 2^(attempt−1)\u003C/code\u003E; \u003Ccode\u003E\u0027fixed\u0027\u003C/code\u003E: \u003Ccode\u003Edelay\u003C/code\u003E every time; \u003Ccode\u003E\u0027none\u0027\u003C/code\u003E: no waiting.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edelay\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E100\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe base wait (ms).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ejitter\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E0.1\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe share of randomness added to the wait (0–1): the wait varies within \u003Ccode\u003E± jitter × wait\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EshouldHandle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eevery error except a timeout\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(error) =\u0026gt; boolean\u003C/code\u003E; if it returns \u003Ccode\u003Efalse\u003C/code\u003E, there is no retry and the error is thrown right away. The default does \u003Cstrong\u003Enot retry\u003C/strong\u003E a \u003Ccode\u003ETimeoutError\u003C/code\u003E (the \u003Ccode\u003Etimeout\u003C/code\u003E policy\u0027s error) or a rejection with \u003Ccode\u003Eundefined\u003C/code\u003E/\u003Ccode\u003Enull\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonRetry\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(attempt, error, waitMs, ctx)\u003C/code\u003E; called before each wait, and awaited if it returns a \u003Ccode\u003EPromise\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EIf the last attempt also fails, the last error is thrown. To retry a request that timed out as well, give \u003Ccode\u003EshouldHandle: () =\u0026gt; true\u003C/code\u003E.\u003C/p\u003E\n\u003Ch3 id=\u0022timeout\u0022 timeoutMs=\u0022\u0022\u003E\u0060timeout(\u003C/h3\u003E\n\u003Cp\u003EIf \u003Ccode\u003Eaction\u003C/code\u003E does not finish within \u003Ccode\u003EtimeoutMs\u003C/code\u003E, a \u003Ccode\u003EMotifError\u003C/code\u003E with the code \u003Ccode\u003EMJX605\u003C/code\u003E and the \u003Ccode\u003Ename\u003C/code\u003E \u003Ccode\u003E\u0027TimeoutError\u0027\u003C/code\u003E is thrown. The running operation is not cancelled (wire up an \u003Ccode\u003EAbortController\u003C/code\u003E yourself for \u003Ccode\u003Efetch\u003C/code\u003E); its result is just not waited for. The timer is cleared in both cases.\u003C/p\u003E\n\u003Ch3 id=\u0022circuit-breaker\u0022\u003E\u003Ccode\u003EcircuitBreaker(options?)\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EAfter failures in a row, it rejects calls for a while without making them at all, giving the resource room to recover.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EDefault\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EfailureThreshold\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E5\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EIn the \u003Ccode\u003ECLOSED\u003C/code\u003E state, this many consecutive failures open the circuit. A success in between resets the counter.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsuccessThreshold\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E2\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EIn the \u003Ccode\u003EHALF_OPEN\u003C/code\u003E state, this many consecutive successes close the circuit.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdurationOfBreakMs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E60000\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHow long the \u003Ccode\u003EOPEN\u003C/code\u003E state lasts; when it is over, the first call moves to \u003Ccode\u003EHALF_OPEN\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EshouldHandle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eevery error except a timeout\u003C/td\u003E\n\u003Ctd\u003EWhich errors count as failures. The default does not count a \u003Ccode\u003ETimeoutError\u003C/code\u003E or a rejection with \u003Ccode\u003Eundefined\u003C/code\u003E/\u003Ccode\u003Enull\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonStateChange\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(old, new)\u003C/code\u003E; \u003Ccode\u003E\u0027CLOSED\u0027 \\| \u0027OPEN\u0027 \\| \u0027HALF_OPEN\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EIn the \u003Ccode\u003EOPEN\u003C/code\u003E state, \u003Ccode\u003Eexecute\u003C/code\u003E throws \u003Ccode\u003EMJX602\u003C/code\u003E without calling \u003Ccode\u003Eaction\u003C/code\u003E. In \u003Ccode\u003EHALF_OPEN\u003C/code\u003E, a single failure opens the circuit again. Follow the circuit state with \u003Ccode\u003EonStateChange\u003C/code\u003E; the chain has no \u0026quot;read the state\u0026quot; method.\u003C/p\u003E\n\u003Ch3 id=\u0022bulkhead\u0022\u003E\u003Ccode\u003Ebulkhead(options?)\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003ELimits the number of \u003Ccode\u003Eaction\u003C/code\u003Es running at the same time; the rest go into a queue.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EDefault\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EmaxConcurrent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E10\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe concurrency limit.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EmaxQueue\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E50\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe limit of the waiting queue; when it is full, \u003Ccode\u003EMJX603\u003C/code\u003E is thrown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EThe queue is FIFO; when a call finishes, the next one starts.\u003C/p\u003E\n\u003Ch3 id=\u0022rate-limiter\u0022\u003E\u003Ccode\u003ErateLimiter(options?)\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EA token bucket: each call spends a token, and tokens refill at intervals.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EDefault\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtokensPerInterval\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E1\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETokens added each interval.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EintervalMs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E1000\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe interval.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecapacity\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EtokensPerInterval\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe bucket\u0027s capacity; the bucket starts full. Give a larger value if you want room for bursts.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EIf there are no tokens, \u003Ccode\u003Eexecute\u003C/code\u003E does not wait; it throws \u003Ccode\u003EMJX604\u003C/code\u003E. The defaults mean \u0026quot;at most 1 per second\u0026quot;; for \u0026quot;at most N per second\u0026quot;, \u003Ccode\u003EtokensPerInterval: N\u003C/code\u003E is enough. \u003Ccode\u003Ecapacity: 10, tokensPerInterval: 1\u003C/code\u003E lets the first 10 calls through at once, then allows 1 per second.\u003C/p\u003E\n\u003Ch3 id=\u0022fallback\u0022\u003E\u003Ccode\u003Efallback({ fallback, shouldHandle? })\u003C/code\u003E \u003C/h3\u003E\n\u003Cp\u003EIf \u003Ccode\u003Eaction\u003C/code\u003E fails, the value returned by \u003Ccode\u003Efallback(error, ctx)\u003C/code\u003E (synchronous or a \u003Ccode\u003EPromise\u003C/code\u003E) becomes the result. If \u003Ccode\u003EshouldHandle\u003C/code\u003E (every error by default) returns \u003Ccode\u003Efalse\u003C/code\u003E, the error is thrown. Put \u003Cstrong\u003Efirst\u003C/strong\u003E in the chain, it catches the last error of every policy inside it.\u003C/p\u003E\n\u003Ch2 id=\u0022decorate\u0022\u003E\u003Ccode\u003Edecorate(policy, fn)\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003ETies a chain to a function and makes it reusable:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/api.ts\u0022\u003E\u003Ccode\u003Eimport { Resilience, decorate } from \u0026quot;@motifx/core\u0026quot;;\n\nconst loadNotes = decorate(\n  Resilience.create.retry({ retries: 2 }).timeout({ timeoutMs: 5000 }),\n  () =\u0026gt; fetch(\u0026quot;/api/notes\u0026quot;).then((r) =\u0026gt; r.json()),\n);\n\nconst notes = await loadNotes();        // same as policy.execute(fn, ctx)\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/api.js\u0022\u003E\u003Ccode\u003Eimport { Resilience, decorate } from \u0026quot;@motifx/core\u0026quot;;\n\nconst loadNotes = decorate(\n  Resilience.create.retry({ retries: 2 }).timeout({ timeoutMs: 5000 }),\n  () =\u0026gt; fetch(\u0026quot;/api/notes\u0026quot;).then((r) =\u0026gt; r.json()),\n);\n\nconst notes = await loadNotes();        // same as policy.execute(fn, ctx)\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Edecorate(policy: ResiliencePolicy, fn: ResilienceAction\u0026lt;T\u0026gt;)\u003C/code\u003E accepts as its first argument any object that has an \u003Ccode\u003Eexecute(action, ctx?)\u003C/code\u003E method; the \u003Ccode\u003EResilience\u003C/code\u003E chain implements this interface.\u003C/p\u003E\n\u003Ch2 id=\u0022errors\u0022\u003EError codes\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ECode\u003C/th\u003E\n\u003Cth\u003EPolicy\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX602\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EcircuitBreaker\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe circuit is open; \u003Ccode\u003Eaction\u003C/code\u003E was not called.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX603\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebulkhead\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe queue is full.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX604\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ErateLimiter\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ENo tokens.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX605\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Etimeout\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETimeout (\u003Ccode\u003Ename: \u0027TimeoutError\u0027\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EAll four are \u003Ccode\u003EMotifError\u003C/code\u003Es and are thrown from \u003Ccode\u003Eexecute\u003C/code\u003E; they can be caught with \u003Ccode\u003Efallback\u003C/code\u003E. With the default \u003Ccode\u003EshouldHandle\u003C/code\u003E, \u003Ccode\u003Eretry\u003C/code\u003E and \u003Ccode\u003EcircuitBreaker\u003C/code\u003E do not count a timeout, but they do count the other three.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn about routing between pages, go on to \u003Ca href=\u0022/docs/routing\u0022\u003EIntroduction to Routing\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"chain","text":"The chain and its order","level":2},{"id":"policies","text":"Policies","level":2},{"id":"retry","text":"retry(options?)","level":3},{"id":"timeout","text":"\u0060timeout(","level":3},{"id":"circuit-breaker","text":"circuitBreaker(options?)","level":3},{"id":"bulkhead","text":"bulkhead(options?)","level":3},{"id":"rate-limiter","text":"rateLimiter(options?)","level":3},{"id":"fallback","text":"fallback({ fallback, shouldHandle? })","level":3},{"id":"decorate","text":"decorate(policy, fn)","level":2},{"id":"errors","text":"Error codes","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"error-handling","title":"Error Handling"},"next":{"slug":"windows","title":"Windows"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Application structure</p>
+        <h1>Resilience</h1>
+        <p>Retry, timeout, circuit breaker, bulkhead, rate limiter and fallback policies with the Resilience.create chain; order, state and error codes.</p>
+<p>Network requests and external resources fail, slow down and get overloaded. <code>Resilience</code> offers six <strong>policies</strong> for these situations and combines them in a single chain. It is independent of the rest of the framework, and can be used in services, in the data layer or inside a <code>dataRequest</code>.</p>
+<div class="doc-code" data-file="src/services/api.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/api.ts"><code>import { Resilience } from &quot;@motifx/core&quot;;
+
+const policy = Resilience.create
+  .retry({ retries: 3, delay: 200 })
+  .timeout({ timeoutMs: 5000 })
+  .fallback({ fallback: () =&gt; [] });
+
+const notes = await policy.execute(() =&gt; fetch(&quot;/api/notes&quot;).then((r) =&gt; r.json()));</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/api.js"><code>import { Resilience } from &quot;@motifx/core&quot;;
+
+const policy = Resilience.create
+  .retry({ retries: 3, delay: 200 })
+  .timeout({ timeoutMs: 5000 })
+  .fallback({ fallback: () =&gt; [] });
+
+const notes = await policy.execute(() =&gt; fetch(&quot;/api/notes&quot;).then((r) =&gt; r.json()));</code></pre>
+</div>
+<h2 id="chain">The chain and its order</h2>
+<p><code>Resilience.create</code> gives a new, empty chain; each policy method adds to the chain and returns the same object. <code>execute(action, ctx?)</code> wraps the added policies <strong>from the outside in, in the order they were added</strong>, and runs <code>action</code>:</p>
+<div class="doc-code" data-file="src/services/api.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/api.ts"><code>const load = () =&gt; fetch(&quot;/api/notes&quot;).then((r) =&gt; r.json());
+
+Resilience.create.retry().timeout({ timeoutMs: 5000 }).execute(load);
+// retry( timeout( load ) ): each attempt has its own timeout
+Resilience.create.timeout({ timeoutMs: 5000 }).retry().execute(load);
+// timeout( retry( load ) ): all attempts share a single timeout</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/api.js"><code>const load = () =&gt; fetch(&quot;/api/notes&quot;).then((r) =&gt; r.json());
+
+Resilience.create.retry().timeout({ timeoutMs: 5000 }).execute(load);
+// retry( timeout( load ) ): each attempt has its own timeout
+Resilience.create.timeout({ timeoutMs: 5000 }).retry().execute(load);
+// timeout( retry( load ) ): all attempts share a single timeout</code></pre>
+</div>
+<p><code>timeout</code> and <code>fallback</code> require an options object (the <code>timeoutMs</code> and <code>fallback</code> fields are mandatory); for the other policies the options are optional. <code>action</code> can be synchronous or return a <code>Promise</code>; <code>execute</code> always returns a <code>Promise</code>. <code>ctx</code> is a free-form object (<code>ResilienceContext</code>), passed as it is to <code>action(ctx)</code> and to the callbacks.</p>
+<p>The types are exported: <code>RetryOptions</code>, <code>TimeoutOptions</code>, <code>CircuitBreakerOptions</code>, <code>BulkheadOptions</code>, <code>RateLimiterOptions</code> and <code>FallbackOptions&lt;T&gt;</code> for the options; <code>CircuitState</code> for the circuit state; <code>ResiliencePolicy</code> for the <code>execute</code> signature and <code>ResilienceAction&lt;T&gt;</code> for <code>action</code>. The <code>Resilience</code> class implements <code>ResiliencePolicy</code>; type a function that takes a chain as <code>(policy: ResiliencePolicy) =&gt; …</code>.</p>
+<p><strong>State lives in the chain.</strong> <code>circuitBreaker</code>, <code>bulkhead</code> and <code>rateLimiter</code> keep counters between calls, and every <code>Resilience.create</code> opens new counters. For these policies to be of any use, build the chain once (a service field, a module constant) and use the <code>execute</code> of <strong>the same</strong> object on every call. <code>retry</code>, <code>timeout</code> and <code>fallback</code> are stateless.</p>
+<div class="doc-code" data-file="src/services/api.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/api.ts"><code>@Injectable({ lifetime: 'singleton' })
+export class ApiClient {
+  private policy = Resilience.create
+    .circuitBreaker({ failureThreshold: 5, durationOfBreakMs: 30000 })
+    .retry({ retries: 2 })
+    .timeout({ timeoutMs: 8000 });
+
+  get&lt;T&gt;(url: string): Promise&lt;T&gt; {
+    return this.policy.execute(() =&gt; fetch(url).then((r) =&gt; r.json()));
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/api.js"><code>@Injectable({ lifetime: 'singleton' })
+export class ApiClient {
+  policy = Resilience.create
+    .circuitBreaker({ failureThreshold: 5, durationOfBreakMs: 30000 })
+    .retry({ retries: 2 })
+    .timeout({ timeoutMs: 8000 });
+
+  get(url) {
+    return this.policy.execute(() =&gt; fetch(url).then((r) =&gt; r.json()));
+  }
+}</code></pre>
+</div>
+<p>In this order each attempt runs with its own 8-second timeout. By default a timeout is neither retried nor counted as a failure for the circuit; if you want the circuit to open for a server that does not respond, give <code>circuitBreaker</code> <code>shouldHandle: () =&gt; true</code>.</p>
+<h2 id="policies">Policies</h2>
+<h3 id="retry"><code>retry(options?)</code></h3>
+<p>Waits and retries a failed <code>action</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>retries</code></td>
+<td><code>3</code></td>
+<td>The number of retries; total attempts are <code>retries + 1</code>.</td>
+</tr>
+<tr>
+<td><code>backoff</code></td>
+<td><code>'exponential'</code></td>
+<td><code>'exponential'</code>: <code>delay × 2^(attempt−1)</code>; <code>'fixed'</code>: <code>delay</code> every time; <code>'none'</code>: no waiting.</td>
+</tr>
+<tr>
+<td><code>delay</code></td>
+<td><code>100</code></td>
+<td>The base wait (ms).</td>
+</tr>
+<tr>
+<td><code>jitter</code></td>
+<td><code>0.1</code></td>
+<td>The share of randomness added to the wait (0–1): the wait varies within <code>± jitter × wait</code>.</td>
+</tr>
+<tr>
+<td><code>shouldHandle</code></td>
+<td>every error except a timeout</td>
+<td><code>(error) =&gt; boolean</code>; if it returns <code>false</code>, there is no retry and the error is thrown right away. The default does <strong>not retry</strong> a <code>TimeoutError</code> (the <code>timeout</code> policy's error) or a rejection with <code>undefined</code>/<code>null</code>.</td>
+</tr>
+<tr>
+<td><code>onRetry</code></td>
+<td>—</td>
+<td><code>(attempt, error, waitMs, ctx)</code>; called before each wait, and awaited if it returns a <code>Promise</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>If the last attempt also fails, the last error is thrown. To retry a request that timed out as well, give <code>shouldHandle: () =&gt; true</code>.</p>
+<h3 id="timeout" timeoutMs="">`timeout(</h3>
+<p>If <code>action</code> does not finish within <code>timeoutMs</code>, a <code>MotifError</code> with the code <code>MJX605</code> and the <code>name</code> <code>'TimeoutError'</code> is thrown. The running operation is not cancelled (wire up an <code>AbortController</code> yourself for <code>fetch</code>); its result is just not waited for. The timer is cleared in both cases.</p>
+<h3 id="circuit-breaker"><code>circuitBreaker(options?)</code></h3>
+<p>After failures in a row, it rejects calls for a while without making them at all, giving the resource room to recover.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>failureThreshold</code></td>
+<td><code>5</code></td>
+<td>In the <code>CLOSED</code> state, this many consecutive failures open the circuit. A success in between resets the counter.</td>
+</tr>
+<tr>
+<td><code>successThreshold</code></td>
+<td><code>2</code></td>
+<td>In the <code>HALF_OPEN</code> state, this many consecutive successes close the circuit.</td>
+</tr>
+<tr>
+<td><code>durationOfBreakMs</code></td>
+<td><code>60000</code></td>
+<td>How long the <code>OPEN</code> state lasts; when it is over, the first call moves to <code>HALF_OPEN</code>.</td>
+</tr>
+<tr>
+<td><code>shouldHandle</code></td>
+<td>every error except a timeout</td>
+<td>Which errors count as failures. The default does not count a <code>TimeoutError</code> or a rejection with <code>undefined</code>/<code>null</code>.</td>
+</tr>
+<tr>
+<td><code>onStateChange</code></td>
+<td>—</td>
+<td><code>(old, new)</code>; <code>'CLOSED' \| 'OPEN' \| 'HALF_OPEN'</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>In the <code>OPEN</code> state, <code>execute</code> throws <code>MJX602</code> without calling <code>action</code>. In <code>HALF_OPEN</code>, a single failure opens the circuit again. Follow the circuit state with <code>onStateChange</code>; the chain has no &quot;read the state&quot; method.</p>
+<h3 id="bulkhead"><code>bulkhead(options?)</code></h3>
+<p>Limits the number of <code>action</code>s running at the same time; the rest go into a queue.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxConcurrent</code></td>
+<td><code>10</code></td>
+<td>The concurrency limit.</td>
+</tr>
+<tr>
+<td><code>maxQueue</code></td>
+<td><code>50</code></td>
+<td>The limit of the waiting queue; when it is full, <code>MJX603</code> is thrown.</td>
+</tr>
+</tbody>
+</table>
+<p>The queue is FIFO; when a call finishes, the next one starts.</p>
+<h3 id="rate-limiter"><code>rateLimiter(options?)</code></h3>
+<p>A token bucket: each call spends a token, and tokens refill at intervals.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tokensPerInterval</code></td>
+<td><code>1</code></td>
+<td>Tokens added each interval.</td>
+</tr>
+<tr>
+<td><code>intervalMs</code></td>
+<td><code>1000</code></td>
+<td>The interval.</td>
+</tr>
+<tr>
+<td><code>capacity</code></td>
+<td><code>tokensPerInterval</code></td>
+<td>The bucket's capacity; the bucket starts full. Give a larger value if you want room for bursts.</td>
+</tr>
+</tbody>
+</table>
+<p>If there are no tokens, <code>execute</code> does not wait; it throws <code>MJX604</code>. The defaults mean &quot;at most 1 per second&quot;; for &quot;at most N per second&quot;, <code>tokensPerInterval: N</code> is enough. <code>capacity: 10, tokensPerInterval: 1</code> lets the first 10 calls through at once, then allows 1 per second.</p>
+<h3 id="fallback"><code>fallback({ fallback, shouldHandle? })</code> </h3>
+<p>If <code>action</code> fails, the value returned by <code>fallback(error, ctx)</code> (synchronous or a <code>Promise</code>) becomes the result. If <code>shouldHandle</code> (every error by default) returns <code>false</code>, the error is thrown. Put <strong>first</strong> in the chain, it catches the last error of every policy inside it.</p>
+<h2 id="decorate"><code>decorate(policy, fn)</code></h2>
+<p>Ties a chain to a function and makes it reusable:</p>
+<div class="doc-code" data-file="src/services/api.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/api.ts"><code>import { Resilience, decorate } from &quot;@motifx/core&quot;;
+
+const loadNotes = decorate(
+  Resilience.create.retry({ retries: 2 }).timeout({ timeoutMs: 5000 }),
+  () =&gt; fetch(&quot;/api/notes&quot;).then((r) =&gt; r.json()),
+);
+
+const notes = await loadNotes();        // same as policy.execute(fn, ctx)</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/api.js"><code>import { Resilience, decorate } from &quot;@motifx/core&quot;;
+
+const loadNotes = decorate(
+  Resilience.create.retry({ retries: 2 }).timeout({ timeoutMs: 5000 }),
+  () =&gt; fetch(&quot;/api/notes&quot;).then((r) =&gt; r.json()),
+);
+
+const notes = await loadNotes();        // same as policy.execute(fn, ctx)</code></pre>
+</div>
+<p><code>decorate(policy: ResiliencePolicy, fn: ResilienceAction&lt;T&gt;)</code> accepts as its first argument any object that has an <code>execute(action, ctx?)</code> method; the <code>Resilience</code> chain implements this interface.</p>
+<h2 id="errors">Error codes</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Policy</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MJX602</code></td>
+<td><code>circuitBreaker</code></td>
+<td>The circuit is open; <code>action</code> was not called.</td>
+</tr>
+<tr>
+<td><code>MJX603</code></td>
+<td><code>bulkhead</code></td>
+<td>The queue is full.</td>
+</tr>
+<tr>
+<td><code>MJX604</code></td>
+<td><code>rateLimiter</code></td>
+<td>No tokens.</td>
+</tr>
+<tr>
+<td><code>MJX605</code></td>
+<td><code>timeout</code></td>
+<td>Timeout (<code>name: 'TimeoutError'</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>All four are <code>MotifError</code>s and are thrown from <code>execute</code>; they can be caught with <code>fallback</code>. With the default <code>shouldHandle</code>, <code>retry</code> and <code>circuitBreaker</code> do not count a timeout, but they do count the other three.</p>
+<h2 id="next">Next step</h2>
+<p>To learn about routing between pages, go on to <a href="/docs/routing">Introduction to Routing</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

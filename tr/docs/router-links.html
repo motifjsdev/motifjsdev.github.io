@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="rel=&quot;router&quot; bağlantıları, RouterLink ve herhangi bir bileşende rota sınıfları; JSX ile ve JSX&#x27;siz.">
+    <title>Bağlantılar — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/router-links">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/router-links">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/router-links">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/router-links">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/router-links">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Bağlantılar">
+    <meta property="og:description" content="rel=&quot;router&quot; bağlantıları, RouterLink ve herhangi bir bileşende rota sınıfları; JSX ile ve JSX&#x27;siz.">
+    <script type="application/json" id="doc-data">{"slug":"router-links","locale":"tr","title":"Bağlantılar","description":"rel=\u0022router\u0022 bağlantıları, RouterLink ve herhangi bir bileşende rota sınıfları; JSX ile ve JSX\u0027siz.","category":{"id":"4","title":"Yönlendirme"},"html":"\u003Cp\u003EUygulama içi bir bağlantıya tıklandığında sayfa yeniden yüklenmez; router adresi değiştirir ve rota zincirinin değişen halkasını kurar. Bunun için üç yol vardır: düz \u003Ccode\u003E\u0026lt;a\u0026gt;\u003C/code\u003E etiketine \u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E yazmak, aktif bağlantıyı sınıfla işaretleyen \u003Ccode\u003ERouterLink\u003C/code\u003E bileşeni ve aynı sınıf mantığını herhangi bir bileşene açan \u003Ccode\u003EenableRouterClassing\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022rel-router\u0022\u003E\u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E ile\u003C/h2\u003E\n\u003Cp\u003EStandart \u003Ccode\u003E\u0026lt;a\u0026gt;\u003C/code\u003E etiketine \u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E ekleyerek MotifJS\u0027in tıklamayı yakalamasını ve tam sayfa yenilemeden gezinmesini sağlayın. \u003Ccode\u003Ehref\u003C/code\u003E sabit bir yol ya da bir getter olabilir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;a rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}\u0060} class=\u0026quot;button button--sm ghost only-narrow\u0026quot;\u0026gt;‹ Geri\u0026lt;/a\u0026gt;\n\u0026lt;a rel=\u0026quot;router\u0026quot; href=\u0026quot;/notes\u0026quot; class=\u0026quot;button\u0026quot;\u0026gt;Tüm notlar\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/NotePage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;a rel=\u0026quot;router\u0026quot; href={\u0060/${folder()}\u0060} class=\u0026quot;button button--sm ghost only-narrow\u0026quot;\u0026gt;‹ Geri\u0026lt;/a\u0026gt;\n\u0026lt;a rel=\u0026quot;router\u0026quot; href=\u0026quot;/notes\u0026quot; class=\u0026quot;button\u0026quot;\u0026gt;Tüm notlar\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst back = motifComponent(\u0026quot;a\u0026quot;, (a: ComponentBase) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}\u0060 });\n  a.class.add(\u0026quot;button button--sm ghost only-narrow\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;‹ Geri\u0026quot;)));\n});\nconst all = motifComponent(\u0026quot;a\u0026quot;, (a: ComponentBase) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0026quot;/notes\u0026quot; });\n  a.class.add(\u0026quot;button\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Tüm notlar\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Econst back = motifComponent(\u0026quot;a\u0026quot;, (a: ComponentBase) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${folder()}\u0060 });\n  a.class.add(\u0026quot;button button--sm ghost only-narrow\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;‹ Geri\u0026quot;)));\n});\nconst all = motifComponent(\u0026quot;a\u0026quot;, (a: ComponentBase) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0026quot;/notes\u0026quot; });\n  a.class.add(\u0026quot;button\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Tüm notlar\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;a rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}\u0060} class=\u0026quot;button button--sm ghost only-narrow\u0026quot;\u0026gt;‹ Geri\u0026lt;/a\u0026gt;\n\u0026lt;a rel=\u0026quot;router\u0026quot; href=\u0026quot;/notes\u0026quot; class=\u0026quot;button\u0026quot;\u0026gt;Tüm notlar\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/NotePage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;a rel=\u0026quot;router\u0026quot; href={\u0060/${folder()}\u0060} class=\u0026quot;button button--sm ghost only-narrow\u0026quot;\u0026gt;‹ Geri\u0026lt;/a\u0026gt;\n\u0026lt;a rel=\u0026quot;router\u0026quot; href=\u0026quot;/notes\u0026quot; class=\u0026quot;button\u0026quot;\u0026gt;Tüm notlar\u0026lt;/a\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst back = motifComponent(\u0026quot;a\u0026quot;, (a) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}\u0060 });\n  a.class.add(\u0026quot;button button--sm ghost only-narrow\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;‹ Geri\u0026quot;)));\n});\nconst all = motifComponent(\u0026quot;a\u0026quot;, (a) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0026quot;/notes\u0026quot; });\n  a.class.add(\u0026quot;button\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Tüm notlar\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Econst back = motifComponent(\u0026quot;a\u0026quot;, (a) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${folder()}\u0060 });\n  a.class.add(\u0026quot;button button--sm ghost only-narrow\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;‹ Geri\u0026quot;)));\n});\nconst all = motifComponent(\u0026quot;a\u0026quot;, (a) =\u0026gt; {\n  a.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0026quot;/notes\u0026quot; });\n  a.class.add(\u0026quot;button\u0026quot;);\n  a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Tüm notlar\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Enotes\u003C/code\u003E \u003Ccode\u003EFromService\u003C/code\u003E ile alınan servis, \u003Ccode\u003Efolder()\u003C/code\u003E klasörü döndüren yerel fonksiyondur.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Erel\u003C/code\u003E başka değerlerle birlikte de verilebilir (\u003Ccode\u003Erel=\u0026quot;router nofollow\u0026quot;\u003C/code\u003E); \u003Ccode\u003Erouter\u003C/code\u003E belirtecinin kümede olması yeter. \u003Ccode\u003Edata-router-link\u003C/code\u003E özniteliği de aynı işi görür. Ctrl/Meta/Shift/Alt ile yapılan tıklamalar, \u003Ccode\u003Etarget\u003C/code\u003E\u0027ı \u003Ccode\u003E_self\u003C/code\u003E dışında olan bağlantılar ve \u003Ccode\u003Ehistory\u003C/code\u003E modunda başka origin\u0027e giden adresler yakalanmaz. \u003Ccode\u003Ehash\u003C/code\u003E/\u003Ccode\u003Efile\u003C/code\u003E modunda \u003Ccode\u003Ehref=\u0026quot;#/archive\u0026quot;\u003C/code\u003E ve \u003Ccode\u003Ehref=\u0026quot;/archive\u0026quot;\u003C/code\u003E aynı yere gider. Yakalayıcı sayfanın belgesinde ve \u003Ccode\u003Eapp.connectDocument\u003C/code\u003E ile bağlanan her belgede dinler; bir popup\u0027a taşınmış içerikteki \u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E bağlantısı o pencereyi yeniden yüklemez, sayfanın router\u0027ını gezdirir.\u003C/p\u003E\n\u003Ch2 id=\u0022router-link\u0022\u003E\u003Ccode\u003ERouterLink\u003C/code\u003E bileşeni\u003C/h2\u003E\n\u003Cp\u003EAktif/eşleşme sınıflarını otomatik yöneten bir bağlantı bileşenidir: geçerli adres \u003Ccode\u003Eto\u003C/code\u003E ile eşleştikçe \u003Ccode\u003EactiveClass\u003C/code\u003E / \u003Ccode\u003EexactClass\u003C/code\u003E sınıflarını ekler. Çocukları bağlantının içeriği olur; JSX\u0027siz yazımda çocuklar \u003Ccode\u003Echilds\u003C/code\u003E ile, yalnız metin olan bağlantının metni \u003Ccode\u003Etext\u003C/code\u003E ile verilir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;\n  Tüm notlar \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; this.notes.count(\u0026quot;notes\u0026quot;)}\u0026lt;/span\u0026gt;\n\u0026lt;/RouterLink\u0026gt;\n\u0026lt;RouterLink to=\u0026quot;/settings\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;Ayarlar\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;\n  Tüm notlar \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; notes.count(\u0026quot;notes\u0026quot;)}\u0026lt;/span\u0026gt;\n\u0026lt;/RouterLink\u0026gt;\n\u0026lt;RouterLink to=\u0026quot;/settings\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;Ayarlar\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [\n    motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Tüm notlar \u0026quot;)),\n    motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n      span.class.add(\u0026quot;badge\u0026quot;);\n      span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(\u0026quot;notes\u0026quot;))));\n    }),\n  ],\n});\nconst settings = motifComponent(RouterLink, { to: \u0026quot;/settings\u0026quot;, activeClass: \u0026quot;active\u0026quot;, text: \u0026quot;Ayarlar\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [\n    motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Tüm notlar \u0026quot;)),\n    motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n      span.class.add(\u0026quot;badge\u0026quot;);\n      span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; notes.count(\u0026quot;notes\u0026quot;))));\n    }),\n  ],\n});\nconst settings = motifComponent(RouterLink, { to: \u0026quot;/settings\u0026quot;, activeClass: \u0026quot;active\u0026quot;, text: \u0026quot;Ayarlar\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;\n  Tüm notlar \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; this.notes.count(\u0026quot;notes\u0026quot;)}\u0026lt;/span\u0026gt;\n\u0026lt;/RouterLink\u0026gt;\n\u0026lt;RouterLink to=\u0026quot;/settings\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;Ayarlar\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;\n  Tüm notlar \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; notes.count(\u0026quot;notes\u0026quot;)}\u0026lt;/span\u0026gt;\n\u0026lt;/RouterLink\u0026gt;\n\u0026lt;RouterLink to=\u0026quot;/settings\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;Ayarlar\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [\n    motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Tüm notlar \u0026quot;)),\n    motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n      span.class.add(\u0026quot;badge\u0026quot;);\n      span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(\u0026quot;notes\u0026quot;))));\n    }),\n  ],\n});\nconst settings = motifComponent(RouterLink, { to: \u0026quot;/settings\u0026quot;, activeClass: \u0026quot;active\u0026quot;, text: \u0026quot;Ayarlar\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [\n    motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Tüm notlar \u0026quot;)),\n    motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n      span.class.add(\u0026quot;badge\u0026quot;);\n      span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; notes.count(\u0026quot;notes\u0026quot;))));\n    }),\n  ],\n});\nconst settings = motifComponent(RouterLink, { to: \u0026quot;/settings\u0026quot;, activeClass: \u0026quot;active\u0026quot;, text: \u0026quot;Ayarlar\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBağlantı bir \u003Ccode\u003E\u0026lt;a\u0026gt;\u003C/code\u003E elemanıdır; başka bir etiket için \u003Ccode\u003Eel\u003C/code\u003E verilir. Prop\u0027lar:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EProp\u003C/th\u003E\n\u003Cth\u003EEtki\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eto\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHedef yol. \u003Ccode\u003Ehref\u003C/code\u003E olarak da yazılır; \u003Ccode\u003Ehash\u003C/code\u003E/\u003Ccode\u003Efile\u003C/code\u003E kipinde başına \u003Ccode\u003E#\u003C/code\u003E eklenir (\u003Ccode\u003E#/archive\u003C/code\u003E), böylece yeni sekmede açılan ya da kopyalanan bağlantı doğru adrese gider. \u003Ccode\u003Ehref\u003C/code\u003E bağlantı kurulurken router\u0027ın kipine göre yazılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EshowHref\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Efalse\u003C/code\u003E ise \u003Ccode\u003Ehref\u003C/code\u003E yazılmaz; tıklama yine gezinir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etarget\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÖznitelik olarak yazılır. \u003Ccode\u003E_self\u003C/code\u003E dışındaki bir değerde tıklama tarayıcıya bırakılır, router gezinmez.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etext\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBağlantının çocuğu yoksa metni; çocuk varsa çocuklar kullanılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebypass\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Etrue\u003C/code\u003E ise tıklama router\u0027a gitmez; bağlantı tarayıcıda normal bir bağlantı gibi açılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003ECtrl/Cmd/Shift/Alt ile yapılan tıklama tarayıcıya bırakılır. Diğer tıklamalarda \u003Ccode\u003ERouterLink\u003C/code\u003E \u003Ccode\u003Erouter.navigate(to)\u003C/code\u003E çağırır ve mevcut URL ile eşleşmeye göre sınıfları uygular:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESınıf / geri çağırım\u003C/th\u003E\n\u003Cth\u003ENe zaman\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EactiveClass\u003C/code\u003E, \u003Ccode\u003EonActive\u003C/code\u003E / \u003Ccode\u003EoffActive\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EMevcut yol \u003Ccode\u003Eto\u003C/code\u003E ile başlıyorsa (segment bazında; tam eşleşme dahil). \u003Ccode\u003E/notes/5\u003C/code\u003E\u0027teyken \u003Ccode\u003Eto=\u0026quot;/notes\u0026quot;\u003C/code\u003E aktiftir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EexactClass\u003C/code\u003E, \u003Ccode\u003EonExact\u003C/code\u003E / \u003Ccode\u003EoffExact\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYalnızca mevcut yol \u003Ccode\u003Eto\u003C/code\u003E ile tam eşleştiğinde (sorgu dizesi ve \u003Ccode\u003E#\u003C/code\u003E yok sayılır).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003ETam eşleşmede iki sınıf birlikte uygulanır. \u003Ccode\u003Eto=\u0026quot;/\u0026quot;\u003C/code\u003E yalnızca kök yolda aktif olur; her yolun öneki sayılmaz.\u003C/p\u003E\n\u003Ch2 id=\u0022router-classing\u0022\u003EHerhangi bir bileşende rota sınıfları — \u003Ccode\u003EenableRouterClassing\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003ERouterLink\u003C/code\u003E\u0027in sınıf mantığı her bileşene açıktır: \u003Ccode\u003Emotif.options.enableRouterClassing\u003C/code\u003E\u0027e bir \u003Ccode\u003ERouterClassingSettings\u003C/code\u003E yazıldığında bileşenin elemanı, geçerli adres \u003Ccode\u003Epath\u003C/code\u003E ile eşleştikçe sınıf alır. Menü öğesi, sekme ya da kenar çubuğu başlığı gibi \u003Ccode\u003E\u0026lt;a\u0026gt;\u003C/code\u003E olmayan elemanlar için kullanılır. \u003Ccode\u003ENavItem\u003C/code\u003E bir \u003Ccode\u003E\u0026lt;li\u0026gt;\u003C/code\u003E\u0027dir, metnini çocuk olarak alır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NavItem.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NavItem.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NavItem extends Component\u0026lt;HTMLLIElement, { path: string }\u0026gt; {\n  override onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: this.props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  }\n\n  override view() {\n    return \u0026lt;span\u0026gt;{this.childs}\u0026lt;/span\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NavItem.tsx\u0022\u003E\u003Ccode\u003Eimport type { ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NavItem(props: { path: string; childs?: ComponentBase[] }) {\n  return (\n    \u0026lt;li onConfigured={(item) =\u0026gt; {\n      item.motif.options.enableRouterClassing = {\n        to: \u0026quot;all\u0026quot;,\n        path: props.path,\n        activeClass: \u0026quot;is-active\u0026quot;,\n        exactClass: \u0026quot;is-exact\u0026quot;,\n      };\n    }}\u0026gt;\n      \u0026lt;span\u0026gt;{props.childs}\u0026lt;/span\u0026gt;\n    \u0026lt;/li\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NavItem.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NavItem = (props: { path: string }) =\u0026gt; motifOptions({\n  el: \u0026quot;li\u0026quot;,\n\n  onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  },\n\n  view() {\n    return \u0026lt;span\u0026gt;{this.childs}\u0026lt;/span\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NavItem.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NavItem extends Component\u0026lt;HTMLLIElement, { path: string }\u0026gt; {\n  static override elementTag = \u0026quot;li\u0026quot;;\n\n  override onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: this.props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.controls.add(...(this.childs ?? [])));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NavItem.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NavItem(props: { path: string; childs?: ComponentBase[] }) {\n  return motifComponent(\u0026quot;li\u0026quot;, {\n    onConfigured: (item: ComponentBase) =\u0026gt; {\n      item.motif.options.enableRouterClassing = {\n        to: \u0026quot;all\u0026quot;,\n        path: props.path,\n        activeClass: \u0026quot;is-active\u0026quot;,\n        exactClass: \u0026quot;is-exact\u0026quot;,\n      };\n    },\n    initializeComponent: (item: ComponentBase) =\u0026gt; item.controls.add(motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.controls.add(...(props.childs ?? [])))),\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NavItem.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NavItem = (props: { path: string }) =\u0026gt; motifOptions({\n  el: \u0026quot;li\u0026quot;,\n\n  onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  },\n\n  view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.controls.add(...(this.childs ?? [])));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NavItem.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NavItem extends Component {\n  static elementTag = \u0026quot;li\u0026quot;;\n\n  onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: this.props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  }\n\n  view() {\n    return \u0026lt;span\u0026gt;{this.childs}\u0026lt;/span\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NavItem.jsx\u0022\u003E\u003Ccode\u003Eexport function NavItem(props) {\n  return (\n    \u0026lt;li onConfigured={(item) =\u0026gt; {\n      item.motif.options.enableRouterClassing = {\n        to: \u0026quot;all\u0026quot;,\n        path: props.path,\n        activeClass: \u0026quot;is-active\u0026quot;,\n        exactClass: \u0026quot;is-exact\u0026quot;,\n      };\n    }}\u0026gt;\n      \u0026lt;span\u0026gt;{props.childs}\u0026lt;/span\u0026gt;\n    \u0026lt;/li\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NavItem.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NavItem = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;li\u0026quot;,\n\n  onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  },\n\n  view() {\n    return \u0026lt;span\u0026gt;{this.childs}\u0026lt;/span\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NavItem.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NavItem extends Component {\n  static elementTag = \u0026quot;li\u0026quot;;\n\n  onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: this.props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  }\n\n  view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.controls.add(...(this.childs ?? [])));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NavItem.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NavItem(props) {\n  return motifComponent(\u0026quot;li\u0026quot;, {\n    onConfigured: (item) =\u0026gt; {\n      item.motif.options.enableRouterClassing = {\n        to: \u0026quot;all\u0026quot;,\n        path: props.path,\n        activeClass: \u0026quot;is-active\u0026quot;,\n        exactClass: \u0026quot;is-exact\u0026quot;,\n      };\n    },\n    initializeComponent: (item) =\u0026gt; item.controls.add(motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.controls.add(...(props.childs ?? [])))),\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NavItem.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NavItem = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;li\u0026quot;,\n\n  onConfigured() {\n    this.motif.options.enableRouterClassing = {\n      to: \u0026quot;all\u0026quot;,\n      path: props.path,\n      activeClass: \u0026quot;is-active\u0026quot;,\n      exactClass: \u0026quot;is-exact\u0026quot;,\n    };\n  },\n\n  view() {\n    return motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.controls.add(...(this.childs ?? [])));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EKullanımı; \u003Ccode\u003E/notes\u003C/code\u003E adresinde ilk öğe \u003Ccode\u003Eis-active is-exact\u003C/code\u003E, \u003Ccode\u003E/notes/5\u003C/code\u003E\u0027te yalnız \u003Ccode\u003Eis-active\u003C/code\u003E alır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;ul class=\u0026quot;menu\u0026quot;\u0026gt;\n  \u0026lt;NavItem path=\u0026quot;/notes\u0026quot;\u0026gt;Tüm notlar\u0026lt;/NavItem\u0026gt;\n  \u0026lt;NavItem path=\u0026quot;/archive\u0026quot;\u0026gt;Arşiv\u0026lt;/NavItem\u0026gt;\n\u0026lt;/ul\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Econst menu = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; {\n  ul.class.add(\u0026quot;menu\u0026quot;);\n  ul.controls.add(\n    motifComponent(NavItem, { path: \u0026quot;/notes\u0026quot;, childs: [motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Tüm notlar\u0026quot;))] }),\n    motifComponent(NavItem, { path: \u0026quot;/archive\u0026quot;, childs: [motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Arşiv\u0026quot;))] }),\n  );\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;ul class=\u0026quot;menu\u0026quot;\u0026gt;\n  \u0026lt;NavItem path=\u0026quot;/notes\u0026quot;\u0026gt;Tüm notlar\u0026lt;/NavItem\u0026gt;\n  \u0026lt;NavItem path=\u0026quot;/archive\u0026quot;\u0026gt;Arşiv\u0026lt;/NavItem\u0026gt;\n\u0026lt;/ul\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Econst menu = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; {\n  ul.class.add(\u0026quot;menu\u0026quot;);\n  ul.controls.add(\n    motifComponent(NavItem, { path: \u0026quot;/notes\u0026quot;, childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Tüm notlar\u0026quot;))] }),\n    motifComponent(NavItem, { path: \u0026quot;/archive\u0026quot;, childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Arşiv\u0026quot;))] }),\n  );\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EAlan\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Epath\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKarşılaştırılacak yol.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eto\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHangi eşleşmelerin işleneceği: \u003Ccode\u003E\u0027all\u0027\u003C/code\u003E (ikisi), \u003Ccode\u003E\u0027active\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027exact\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027none\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EactiveClass\u003C/code\u003E / \u003Ccode\u003EexactClass\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBoşlukla ayrılmış sınıf adları; eşleşme durumuna göre \u003Ccode\u003EclassList.toggle\u003C/code\u003E edilir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonActive\u003C/code\u003E / \u003Ccode\u003EoffActive\u003C/code\u003E / \u003Ccode\u003EonExact\u003C/code\u003E / \u003Ccode\u003EoffExact\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHer değerlendirmede eşleşme durumuna göre çağrılan geri çağrılar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EEşleşme kuralları \u003Ccode\u003ERouterLink\u003C/code\u003E ile aynıdır (aktif = segment öneki ya da tam; exact = tam; sorgu ve \u003Ccode\u003E#\u003C/code\u003E yok sayılır). Ayar yazıldığı anda bir kez değerlendirilir, sonra her gezinmede (\u003Ccode\u003EonRouterChanged\u003C/code\u003E) yeniden; abonelik bileşenle birlikte kalkar. Değerlendirme hatası \u003Ccode\u003EMJX105\u003C/code\u003E olarak raporlanır. Router kurulmamışsa (\u003Ccode\u003EuseRouter\u003C/code\u003E yok) hiçbir şey yapmaz. Bileşenin bir elemanı olmalıdır; elemansız (fragment) bileşende sınıf yazılacak eleman yoktur (bkz. \u003Ca href=\u0022/docs/components#root-element\u0022\u003EKök eleman\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EKoddan gezinmek ve rota durumunu okumak için \u003Ca href=\u0022/docs/navigation\u0022\u003EGezinme ve Rota Durumu\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"rel-router","text":"rel=\u0022router\u0022 ile","level":2},{"id":"router-link","text":"RouterLink bileşeni","level":2},{"id":"router-classing","text":"Herhangi bir bileşende rota sınıfları — enableRouterClassing","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"router-view","title":"RouterView"},"next":{"slug":"navigation","title":"Gezinme ve Rota Durumu"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Yönlendirme</p>
+        <h1>Bağlantılar</h1>
+        <p>rel=&quot;router&quot; bağlantıları, RouterLink ve herhangi bir bileşende rota sınıfları; JSX ile ve JSX&#x27;siz.</p>
+<p>Uygulama içi bir bağlantıya tıklandığında sayfa yeniden yüklenmez; router adresi değiştirir ve rota zincirinin değişen halkasını kurar. Bunun için üç yol vardır: düz <code>&lt;a&gt;</code> etiketine <code>rel=&quot;router&quot;</code> yazmak, aktif bağlantıyı sınıfla işaretleyen <code>RouterLink</code> bileşeni ve aynı sınıf mantığını herhangi bir bileşene açan <code>enableRouterClassing</code>.</p>
+<h2 id="rel-router"><code>rel=&quot;router&quot;</code> ile</h2>
+<p>Standart <code>&lt;a&gt;</code> etiketine <code>rel=&quot;router&quot;</code> ekleyerek MotifJS'in tıklamayı yakalamasını ve tam sayfa yenilemeden gezinmesini sağlayın. <code>href</code> sabit bir yol ya da bir getter olabilir:</p>
+<div class="doc-code" data-file="src/pages/NotePage.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;a rel=&quot;router&quot; href={`/${this.folder}`} class=&quot;button button--sm ghost only-narrow&quot;&gt;‹ Geri&lt;/a&gt;
+&lt;a rel=&quot;router&quot; href=&quot;/notes&quot; class=&quot;button&quot;&gt;Tüm notlar&lt;/a&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/NotePage.tsx"><code>&lt;a rel=&quot;router&quot; href={`/${folder()}`} class=&quot;button button--sm ghost only-narrow&quot;&gt;‹ Geri&lt;/a&gt;
+&lt;a rel=&quot;router&quot; href=&quot;/notes&quot; class=&quot;button&quot;&gt;Tüm notlar&lt;/a&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/pages/NotePage.ts"><code>const back = motifComponent(&quot;a&quot;, (a: ComponentBase) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}` });
+  a.class.add(&quot;button button--sm ghost only-narrow&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;‹ Geri&quot;)));
+});
+const all = motifComponent(&quot;a&quot;, (a: ComponentBase) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: &quot;/notes&quot; });
+  a.class.add(&quot;button&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Tüm notlar&quot;)));
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/NotePage.ts"><code>const back = motifComponent(&quot;a&quot;, (a: ComponentBase) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${folder()}` });
+  a.class.add(&quot;button button--sm ghost only-narrow&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;‹ Geri&quot;)));
+});
+const all = motifComponent(&quot;a&quot;, (a: ComponentBase) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: &quot;/notes&quot; });
+  a.class.add(&quot;button&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Tüm notlar&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;a rel=&quot;router&quot; href={`/${this.folder}`} class=&quot;button button--sm ghost only-narrow&quot;&gt;‹ Geri&lt;/a&gt;
+&lt;a rel=&quot;router&quot; href=&quot;/notes&quot; class=&quot;button&quot;&gt;Tüm notlar&lt;/a&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/NotePage.jsx"><code>&lt;a rel=&quot;router&quot; href={`/${folder()}`} class=&quot;button button--sm ghost only-narrow&quot;&gt;‹ Geri&lt;/a&gt;
+&lt;a rel=&quot;router&quot; href=&quot;/notes&quot; class=&quot;button&quot;&gt;Tüm notlar&lt;/a&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/pages/NotePage.js"><code>const back = motifComponent(&quot;a&quot;, (a) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}` });
+  a.class.add(&quot;button button--sm ghost only-narrow&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;‹ Geri&quot;)));
+});
+const all = motifComponent(&quot;a&quot;, (a) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: &quot;/notes&quot; });
+  a.class.add(&quot;button&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Tüm notlar&quot;)));
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/NotePage.js"><code>const back = motifComponent(&quot;a&quot;, (a) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${folder()}` });
+  a.class.add(&quot;button button--sm ghost only-narrow&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;‹ Geri&quot;)));
+});
+const all = motifComponent(&quot;a&quot;, (a) =&gt; {
+  a.attr.add({ rel: &quot;router&quot;, href: &quot;/notes&quot; });
+  a.class.add(&quot;button&quot;);
+  a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Tüm notlar&quot;)));
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>notes</code> <code>FromService</code> ile alınan servis, <code>folder()</code> klasörü döndüren yerel fonksiyondur.</p>
+</div>
+<p><code>rel</code> başka değerlerle birlikte de verilebilir (<code>rel=&quot;router nofollow&quot;</code>); <code>router</code> belirtecinin kümede olması yeter. <code>data-router-link</code> özniteliği de aynı işi görür. Ctrl/Meta/Shift/Alt ile yapılan tıklamalar, <code>target</code>'ı <code>_self</code> dışında olan bağlantılar ve <code>history</code> modunda başka origin'e giden adresler yakalanmaz. <code>hash</code>/<code>file</code> modunda <code>href=&quot;#/archive&quot;</code> ve <code>href=&quot;/archive&quot;</code> aynı yere gider. Yakalayıcı sayfanın belgesinde ve <code>app.connectDocument</code> ile bağlanan her belgede dinler; bir popup'a taşınmış içerikteki <code>rel=&quot;router&quot;</code> bağlantısı o pencereyi yeniden yüklemez, sayfanın router'ını gezdirir.</p>
+<h2 id="router-link"><code>RouterLink</code> bileşeni</h2>
+<p>Aktif/eşleşme sınıflarını otomatik yöneten bir bağlantı bileşenidir: geçerli adres <code>to</code> ile eşleştikçe <code>activeClass</code> / <code>exactClass</code> sınıflarını ekler. Çocukları bağlantının içeriği olur; JSX'siz yazımda çocuklar <code>childs</code> ile, yalnız metin olan bağlantının metni <code>text</code> ile verilir:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/MainLayout.tsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;
+  Tüm notlar &lt;span class=&quot;badge&quot;&gt;{() =&gt; this.notes.count(&quot;notes&quot;)}&lt;/span&gt;
+&lt;/RouterLink&gt;
+&lt;RouterLink to=&quot;/settings&quot; activeClass=&quot;active&quot;&gt;Ayarlar&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/MainLayout.tsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;
+  Tüm notlar &lt;span class=&quot;badge&quot;&gt;{() =&gt; notes.count(&quot;notes&quot;)}&lt;/span&gt;
+&lt;/RouterLink&gt;
+&lt;RouterLink to=&quot;/settings&quot; activeClass=&quot;active&quot;&gt;Ayarlar&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/layouts/MainLayout.ts"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [
+    motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Tüm notlar &quot;)),
+    motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+      span.class.add(&quot;badge&quot;);
+      span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; this.notes.count(&quot;notes&quot;))));
+    }),
+  ],
+});
+const settings = motifComponent(RouterLink, { to: &quot;/settings&quot;, activeClass: &quot;active&quot;, text: &quot;Ayarlar&quot; });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/MainLayout.ts"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [
+    motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Tüm notlar &quot;)),
+    motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+      span.class.add(&quot;badge&quot;);
+      span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; notes.count(&quot;notes&quot;))));
+    }),
+  ],
+});
+const settings = motifComponent(RouterLink, { to: &quot;/settings&quot;, activeClass: &quot;active&quot;, text: &quot;Ayarlar&quot; });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/MainLayout.jsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;
+  Tüm notlar &lt;span class=&quot;badge&quot;&gt;{() =&gt; this.notes.count(&quot;notes&quot;)}&lt;/span&gt;
+&lt;/RouterLink&gt;
+&lt;RouterLink to=&quot;/settings&quot; activeClass=&quot;active&quot;&gt;Ayarlar&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/MainLayout.jsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;
+  Tüm notlar &lt;span class=&quot;badge&quot;&gt;{() =&gt; notes.count(&quot;notes&quot;)}&lt;/span&gt;
+&lt;/RouterLink&gt;
+&lt;RouterLink to=&quot;/settings&quot; activeClass=&quot;active&quot;&gt;Ayarlar&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/layouts/MainLayout.js"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [
+    motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Tüm notlar &quot;)),
+    motifComponent(&quot;span&quot;, (span) =&gt; {
+      span.class.add(&quot;badge&quot;);
+      span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; this.notes.count(&quot;notes&quot;))));
+    }),
+  ],
+});
+const settings = motifComponent(RouterLink, { to: &quot;/settings&quot;, activeClass: &quot;active&quot;, text: &quot;Ayarlar&quot; });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/MainLayout.js"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [
+    motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Tüm notlar &quot;)),
+    motifComponent(&quot;span&quot;, (span) =&gt; {
+      span.class.add(&quot;badge&quot;);
+      span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; notes.count(&quot;notes&quot;))));
+    }),
+  ],
+});
+const settings = motifComponent(RouterLink, { to: &quot;/settings&quot;, activeClass: &quot;active&quot;, text: &quot;Ayarlar&quot; });</code></pre>
+</div>
+<p>Bağlantı bir <code>&lt;a&gt;</code> elemanıdır; başka bir etiket için <code>el</code> verilir. Prop'lar:</p>
+<table>
+<thead>
+<tr>
+<th>Prop</th>
+<th>Etki</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>to</code></td>
+<td>Hedef yol. <code>href</code> olarak da yazılır; <code>hash</code>/<code>file</code> kipinde başına <code>#</code> eklenir (<code>#/archive</code>), böylece yeni sekmede açılan ya da kopyalanan bağlantı doğru adrese gider. <code>href</code> bağlantı kurulurken router'ın kipine göre yazılır.</td>
+</tr>
+<tr>
+<td><code>showHref</code></td>
+<td><code>false</code> ise <code>href</code> yazılmaz; tıklama yine gezinir.</td>
+</tr>
+<tr>
+<td><code>target</code></td>
+<td>Öznitelik olarak yazılır. <code>_self</code> dışındaki bir değerde tıklama tarayıcıya bırakılır, router gezinmez.</td>
+</tr>
+<tr>
+<td><code>text</code></td>
+<td>Bağlantının çocuğu yoksa metni; çocuk varsa çocuklar kullanılır.</td>
+</tr>
+<tr>
+<td><code>bypass</code></td>
+<td><code>true</code> ise tıklama router'a gitmez; bağlantı tarayıcıda normal bir bağlantı gibi açılır.</td>
+</tr>
+</tbody>
+</table>
+<p>Ctrl/Cmd/Shift/Alt ile yapılan tıklama tarayıcıya bırakılır. Diğer tıklamalarda <code>RouterLink</code> <code>router.navigate(to)</code> çağırır ve mevcut URL ile eşleşmeye göre sınıfları uygular:</p>
+<table>
+<thead>
+<tr>
+<th>Sınıf / geri çağırım</th>
+<th>Ne zaman</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>activeClass</code>, <code>onActive</code> / <code>offActive</code></td>
+<td>Mevcut yol <code>to</code> ile başlıyorsa (segment bazında; tam eşleşme dahil). <code>/notes/5</code>'teyken <code>to=&quot;/notes&quot;</code> aktiftir.</td>
+</tr>
+<tr>
+<td><code>exactClass</code>, <code>onExact</code> / <code>offExact</code></td>
+<td>Yalnızca mevcut yol <code>to</code> ile tam eşleştiğinde (sorgu dizesi ve <code>#</code> yok sayılır).</td>
+</tr>
+</tbody>
+</table>
+<p>Tam eşleşmede iki sınıf birlikte uygulanır. <code>to=&quot;/&quot;</code> yalnızca kök yolda aktif olur; her yolun öneki sayılmaz.</p>
+<h2 id="router-classing">Herhangi bir bileşende rota sınıfları — <code>enableRouterClassing</code></h2>
+<p><code>RouterLink</code>'in sınıf mantığı her bileşene açıktır: <code>motif.options.enableRouterClassing</code>'e bir <code>RouterClassingSettings</code> yazıldığında bileşenin elemanı, geçerli adres <code>path</code> ile eşleştikçe sınıf alır. Menü öğesi, sekme ya da kenar çubuğu başlığı gibi <code>&lt;a&gt;</code> olmayan elemanlar için kullanılır. <code>NavItem</code> bir <code>&lt;li&gt;</code>'dir, metnini çocuk olarak alır:</p>
+<div class="doc-code" data-file="src/parts/NavItem.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NavItem.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class NavItem extends Component&lt;HTMLLIElement, { path: string }&gt; {
+  override onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: this.props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  }
+
+  override view() {
+    return &lt;span&gt;{this.childs}&lt;/span&gt;;
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NavItem.tsx"><code>import type { ComponentBase } from &quot;@motifx/core&quot;;
+
+export function NavItem(props: { path: string; childs?: ComponentBase[] }) {
+  return (
+    &lt;li onConfigured={(item) =&gt; {
+      item.motif.options.enableRouterClassing = {
+        to: &quot;all&quot;,
+        path: props.path,
+        activeClass: &quot;is-active&quot;,
+        exactClass: &quot;is-exact&quot;,
+      };
+    }}&gt;
+      &lt;span&gt;{props.childs}&lt;/span&gt;
+    &lt;/li&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NavItem.tsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+
+export const NavItem = (props: { path: string }) =&gt; motifOptions({
+  el: &quot;li&quot;,
+
+  onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  },
+
+  view() {
+    return &lt;span&gt;{this.childs}&lt;/span&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NavItem.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+
+export class NavItem extends Component&lt;HTMLLIElement, { path: string }&gt; {
+  static override elementTag = &quot;li&quot;;
+
+  override onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: this.props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  }
+
+  override view() {
+    return motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.controls.add(...(this.childs ?? [])));
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NavItem.ts"><code>import { ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+
+export function NavItem(props: { path: string; childs?: ComponentBase[] }) {
+  return motifComponent(&quot;li&quot;, {
+    onConfigured: (item: ComponentBase) =&gt; {
+      item.motif.options.enableRouterClassing = {
+        to: &quot;all&quot;,
+        path: props.path,
+        activeClass: &quot;is-active&quot;,
+        exactClass: &quot;is-exact&quot;,
+      };
+    },
+    initializeComponent: (item: ComponentBase) =&gt; item.controls.add(motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.controls.add(...(props.childs ?? [])))),
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NavItem.ts"><code>import { ComponentBase, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+
+export const NavItem = (props: { path: string }) =&gt; motifOptions({
+  el: &quot;li&quot;,
+
+  onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  },
+
+  view() {
+    return motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.controls.add(...(this.childs ?? [])));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NavItem.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class NavItem extends Component {
+  static elementTag = &quot;li&quot;;
+
+  onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: this.props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  }
+
+  view() {
+    return &lt;span&gt;{this.childs}&lt;/span&gt;;
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NavItem.jsx"><code>export function NavItem(props) {
+  return (
+    &lt;li onConfigured={(item) =&gt; {
+      item.motif.options.enableRouterClassing = {
+        to: &quot;all&quot;,
+        path: props.path,
+        activeClass: &quot;is-active&quot;,
+        exactClass: &quot;is-exact&quot;,
+      };
+    }}&gt;
+      &lt;span&gt;{props.childs}&lt;/span&gt;
+    &lt;/li&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NavItem.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+
+export const NavItem = (props) =&gt; motifOptions({
+  el: &quot;li&quot;,
+
+  onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  },
+
+  view() {
+    return &lt;span&gt;{this.childs}&lt;/span&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NavItem.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+
+export class NavItem extends Component {
+  static elementTag = &quot;li&quot;;
+
+  onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: this.props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  }
+
+  view() {
+    return motifComponent(&quot;span&quot;, (span) =&gt; span.controls.add(...(this.childs ?? [])));
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NavItem.js"><code>import { motifComponent } from &quot;@motifx/core&quot;;
+
+export function NavItem(props) {
+  return motifComponent(&quot;li&quot;, {
+    onConfigured: (item) =&gt; {
+      item.motif.options.enableRouterClassing = {
+        to: &quot;all&quot;,
+        path: props.path,
+        activeClass: &quot;is-active&quot;,
+        exactClass: &quot;is-exact&quot;,
+      };
+    },
+    initializeComponent: (item) =&gt; item.controls.add(motifComponent(&quot;span&quot;, (span) =&gt; span.controls.add(...(props.childs ?? [])))),
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NavItem.js"><code>import { motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+
+export const NavItem = (props) =&gt; motifOptions({
+  el: &quot;li&quot;,
+
+  onConfigured() {
+    this.motif.options.enableRouterClassing = {
+      to: &quot;all&quot;,
+      path: props.path,
+      activeClass: &quot;is-active&quot;,
+      exactClass: &quot;is-exact&quot;,
+    };
+  },
+
+  view() {
+    return motifComponent(&quot;span&quot;, (span) =&gt; span.controls.add(...(this.childs ?? [])));
+  },
+});</code></pre>
+</div>
+<p>Kullanımı; <code>/notes</code> adresinde ilk öğe <code>is-active is-exact</code>, <code>/notes/5</code>'te yalnız <code>is-active</code> alır:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/MainLayout.tsx"><code>&lt;ul class=&quot;menu&quot;&gt;
+  &lt;NavItem path=&quot;/notes&quot;&gt;Tüm notlar&lt;/NavItem&gt;
+  &lt;NavItem path=&quot;/archive&quot;&gt;Arşiv&lt;/NavItem&gt;
+&lt;/ul&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/MainLayout.ts"><code>const menu = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; {
+  ul.class.add(&quot;menu&quot;);
+  ul.controls.add(
+    motifComponent(NavItem, { path: &quot;/notes&quot;, childs: [motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Tüm notlar&quot;))] }),
+    motifComponent(NavItem, { path: &quot;/archive&quot;, childs: [motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Arşiv&quot;))] }),
+  );
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/MainLayout.jsx"><code>&lt;ul class=&quot;menu&quot;&gt;
+  &lt;NavItem path=&quot;/notes&quot;&gt;Tüm notlar&lt;/NavItem&gt;
+  &lt;NavItem path=&quot;/archive&quot;&gt;Arşiv&lt;/NavItem&gt;
+&lt;/ul&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/MainLayout.js"><code>const menu = motifComponent(&quot;ul&quot;, (ul) =&gt; {
+  ul.class.add(&quot;menu&quot;);
+  ul.controls.add(
+    motifComponent(NavItem, { path: &quot;/notes&quot;, childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Tüm notlar&quot;))] }),
+    motifComponent(NavItem, { path: &quot;/archive&quot;, childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Arşiv&quot;))] }),
+  );
+});</code></pre>
+</div>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td>Karşılaştırılacak yol.</td>
+</tr>
+<tr>
+<td><code>to</code></td>
+<td>Hangi eşleşmelerin işleneceği: <code>'all'</code> (ikisi), <code>'active'</code>, <code>'exact'</code>, <code>'none'</code>.</td>
+</tr>
+<tr>
+<td><code>activeClass</code> / <code>exactClass</code></td>
+<td>Boşlukla ayrılmış sınıf adları; eşleşme durumuna göre <code>classList.toggle</code> edilir.</td>
+</tr>
+<tr>
+<td><code>onActive</code> / <code>offActive</code> / <code>onExact</code> / <code>offExact</code></td>
+<td>Her değerlendirmede eşleşme durumuna göre çağrılan geri çağrılar.</td>
+</tr>
+</tbody>
+</table>
+<p>Eşleşme kuralları <code>RouterLink</code> ile aynıdır (aktif = segment öneki ya da tam; exact = tam; sorgu ve <code>#</code> yok sayılır). Ayar yazıldığı anda bir kez değerlendirilir, sonra her gezinmede (<code>onRouterChanged</code>) yeniden; abonelik bileşenle birlikte kalkar. Değerlendirme hatası <code>MJX105</code> olarak raporlanır. Router kurulmamışsa (<code>useRouter</code> yok) hiçbir şey yapmaz. Bileşenin bir elemanı olmalıdır; elemansız (fragment) bileşende sınıf yazılacak eleman yoktur (bkz. <a href="/tr/docs/components#root-element">Kök eleman</a>).</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Koddan gezinmek ve rota durumunu okumak için <a href="/tr/docs/navigation">Gezinme ve Rota Durumu</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

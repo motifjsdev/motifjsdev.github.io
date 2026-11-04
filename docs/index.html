@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="What MotifJS does, an index of the sections, and a quick look through a slice of a notes list.">
+    <title>MotifJS Documentation — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/index">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/index">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/index">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/index">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/index">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="MotifJS Documentation">
+    <meta property="og:description" content="What MotifJS does, an index of the sections, and a quick look through a slice of a notes list.">
+    <script type="application/json" id="doc-data">{"slug":"index","locale":"en","title":"MotifJS Documentation","description":"What MotifJS does, an index of the sections, and a quick look through a slice of a notes list.","category":{"id":"1","title":"Get started"},"html":"\u003Cp\u003EMotifJS is a UI framework for JavaScript and TypeScript, built for modern web applications, that brings speed, reactivity and a clear architecture together under one roof. Views are written in JSX, and the compiler turns them into component calls at build time. The same calls can also be written directly, without JSX, in TypeScript or JavaScript. Every tag in JSX becomes a component object that carries its own DOM element, and these objects live in the \u003Ccode\u003Econtrols\u003C/code\u003E tree. A value bound to a getter updates only that property of the element it is bound to; the component is not rebuilt.\u003C/p\u003E\n\u003Ch2 id=\u0022what-is-different\u0022\u003EWhat does MotifJS do differently?\u003C/h2\u003E\n\u003Cp\u003EIn MotifJS the interface is a tree of component objects that live for as long as the application stays open. The view is built once, and from then on these objects carry it: bindings update values, the tree changes by hand or through bindings, and lifetimes are managed explicitly.\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EEvery tag is a component object.\u003C/strong\u003E A \u003Ccode\u003E\u0026lt;div\u0026gt;\u003C/code\u003E, a \u003Ccode\u003E\u0026lt;button\u0026gt;\u003C/code\u003E, even a piece of plain text turns into a \u003Ccode\u003EmotifComponent\u003C/code\u003E call in the compiler. The resulting object has its own \u003Ccode\u003Eelement\u003C/code\u003E, a \u003Ccode\u003Econtrols\u003C/code\u003E collection that holds its children, and the \u003Ccode\u003Ebindings\u003C/code\u003E, \u003Ccode\u003Eclass\u003C/code\u003E and \u003Ccode\u003Eattr\u003C/code\u003E members, plus \u003Ccode\u003Emotif\u003C/code\u003E, which handles events and visibility. The built element is not thrown away as a copy; it stays in hand for the life of the application, and you can find and change it in the tree through \u003Ccode\u003Eparent\u003C/code\u003E, \u003Ccode\u003Esiblings\u003C/code\u003E and \u003Ccode\u003E$()\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003Eview()\u003C/code\u003E runs once.\u003C/strong\u003E It is called while the component is being built, and bindings carry every change after that. On a component that is already built, \u003Ccode\u003Econtrols.add(\u0026lt;div/\u0026gt;)\u003C/code\u003E builds the child right away and puts its element in place; on a component that is not built yet, the child is built together with its owner.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe tree is edited at run time.\u003C/strong\u003E \u003Ccode\u003Econtrols.add\u003C/code\u003E, \u003Ccode\u003Einsert\u003C/code\u003E, \u003Ccode\u003Emove\u003C/code\u003E, \u003Ccode\u003EmoveToIndex\u003C/code\u003E and \u003Ccode\u003Eremove\u003C/code\u003E change the component tree directly. A component passed to another component\u0027s \u003Ccode\u003Econtrols.add\u003C/code\u003E leaves its old place and moves to the new one, taking its state, bindings and events with it. \u003Ccode\u003Eremove\u003C/code\u003E disposes the component. \u003Ccode\u003Edetach\u003C/code\u003E, on the other hand, plays the leave transition if there is one and only takes the component out of the tree and the DOM; a detached component can be added again later.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EAccess to the real element.\u003C/strong\u003E Every component\u0027s \u003Ccode\u003Eelement\u003C/code\u003E is created in the constructor, so you can reach it before the component is built and before it is added to the page. In a component without an element of its own (a fragment), \u003Ccode\u003Eelement\u003C/code\u003E is a comment node.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EFine-grained reactivity.\u003C/strong\u003E When a state field changes, only the DOM node or attribute bound to that field is updated, not the whole component.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EWaiting and hidden components keep their place.\u003C/strong\u003E \u003Ccode\u003Ex-wait\u003C/code\u003E does not build the component at all until its condition holds. \u003Ccode\u003Ex-display\u003C/code\u003E is the reverse of the same waiting: if it starts out \u003Ccode\u003Efalse\u003C/code\u003E the component is not built, and if it turns \u003Ccode\u003Efalse\u003C/code\u003E after the component is built, the component is hidden. In both cases the component leaves a comment marker in the DOM unless \u003Ccode\u003EhideStrategy: \u0026quot;detach\u0026quot;\u003C/code\u003E is given, and it comes back to the same spot when shown.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003ELifetimes are managed explicitly.\u003C/strong\u003E A disposed component shuts down its children, bindings and events, and resources tied to it with \u003Ccode\u003Emotif.register\u003C/code\u003E or \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E are closed along with it. An application subscription opened through the component\u0027s \u003Ccode\u003Econtext.on\u003C/code\u003E is removed on its own when the component is disposed.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EService lifetimes follow route changes.\u003C/strong\u003E When the router is in use, every route change opens its own service scope, and the components built during that change are tied to it. A service registered as \u003Ccode\u003Escoped\u003C/code\u003E is created once per scope. When the new change completes, the previous change\u0027s scope closes together with its services, unless a kept page is still holding it.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EA page is not rebuilt every time you return to it.\u003C/strong\u003E The component of a route given \u003Ccode\u003EkeepAlive: true\u003C/code\u003E is kept after its first build, and the same instance is shown when you come back. With stack navigation turned on (\u003Ccode\u003Eapp.useRouter({ …, stack: true })\u003C/code\u003E), pages left behind are kept for up to five steps by default; going back brings the same instances with their scroll positions. A slide transition (\u003Ccode\u003Eanimation: \u0026quot;slide\u0026quot;\u003C/code\u003E) and swiping back from the edge (\u003Ccode\u003EswipeBack\u003C/code\u003E) are options.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EBuilt-in infrastructure.\u003C/strong\u003E Routing, dependency injection, lifecycle, animation and memory management come with the core. \u003Ccode\u003EFrame\u003C/code\u003E, \u003Ccode\u003ELazy\u003C/code\u003E, \u003Ccode\u003ETransport\u003C/code\u003E / \u003Ccode\u003ETransportTo\u003C/code\u003E, \u003Ccode\u003EContentBody\u003C/code\u003E / \u003Ccode\u003EContentBlock\u003C/code\u003E, \u003Ccode\u003EVirtualization\u003C/code\u003E, \u003Ccode\u003EResilience\u003C/code\u003E, \u003Ccode\u003EQuery\u003C/code\u003E and the \u003Ccode\u003EList\u003C/code\u003E, \u003Ccode\u003EDictionary\u003C/code\u003E and \u003Ccode\u003ELinkedList\u003C/code\u003E collections are part of the core as well.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EJavaScript or TypeScript, with or without JSX.\u003C/strong\u003E Components are classes, functions or Options API objects, and the view is built with JSX or with the hand-written (imperative) form of the same calls. All three styles produce the same kind of component, and they sit side by side in the same tree.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cblockquote\u003E\n\u003Cp\u003EMotifJS is designed for long-lived, state-heavy interfaces. No planning has been done yet for server-side rendering (SSR); it may be considered in the future.\u003C/p\u003E\n\u003C/blockquote\u003E\n\u003Ch2 id=\u0022contents\u0022\u003EContents\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ECategory\u003C/th\u003E\n\u003Cth\u003ESection\u003C/th\u003E\n\u003Cth\u003ETopic\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGet started\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/getting-started\u0022\u003EGetting Started\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EInstallation, build setup, the first component and application\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/components\u0022\u003EComponents\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EClass / function / Options API components, the root element, \u003Ccode\u003Eview()\u003C/code\u003E and \u003Ccode\u003Econtrols\u003C/code\u003E, names of class members\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-creation\u0022\u003ECreating Components\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EDefining a component, giving it its element and content, using it; creation and building\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-props\u0022\u003EProps and Children\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eprops\u003C/code\u003E, data flow between components, \u003Ccode\u003Echilds\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-tree\u0022\u003Econtrols and the Component Tree\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003Econtrols\u003C/code\u003E collection, moving around the component tree, moving content somewhere else\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-element\u0022\u003EElement and Appearance\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eelement\u003C/code\u003E, \u003Ccode\u003Eref\u003C/code\u003E, \u003Ccode\u003EonRefCreated\u003C/code\u003E; \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003EsetText\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-motif\u0022\u003EThe motif Namespace\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eshow\u003C/code\u003E / \u003Ccode\u003Ehide\u003C/code\u003E, \u003Ccode\u003Eon\u003C/code\u003E / \u003Ccode\u003Eoff\u003C/code\u003E / \u003Ccode\u003Etrigger\u003C/code\u003E, \u003Ccode\u003EsetDisposable\u003C/code\u003E, \u003Ccode\u003Eclear\u003C/code\u003E, \u003Ccode\u003Emotif.options\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-bindings\u0022\u003Ebindings\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EWhat live expressions in JSX turn into, the \u003Ccode\u003Ebindings\u003C/code\u003E members, \u003Ccode\u003Ewatch\u003C/code\u003E, the lifetime of a binding\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-state\u0022\u003EState, Context and Services\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EState flags, \u003Ccode\u003EsetState\u003C/code\u003E / \u003Ccode\u003EreState\u003C/code\u003E, \u003Ccode\u003Econtext\u003C/code\u003E, reaching services, \u003Ccode\u003Ebuild\u003C/code\u003E / \u003Ccode\u003Edispose\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/using\u0022\u003EAsync Results with using\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EDropping a result that reaches a disposed component, handlers, \u003Ccode\u003EMJX129\u003C/code\u003E, when the check happens\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/do-work\u0022\u003EAsync Results with doWork\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EA promise tied to the component\u0027s lifetime, \u003Ccode\u003EMJX108\u003C/code\u003E, \u003Ccode\u003Ecatch\u003C/code\u003E and \u003Ccode\u003Efinally\u003C/code\u003E, how it differs from \u003Ccode\u003Eusing\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/jsx\u0022\u003EJSX and Templates\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EJSX rules, class/style/attributes, spread, \u003Ccode\u003Ex-\u003C/code\u003E directives, fragments, compile diagnostics, \u003Ccode\u003Eexplain\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/imperative\u0022\u003EViews without JSX\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003EmotifComponent\u003C/code\u003E and \u003Ccode\u003Enew Component\u003C/code\u003E call forms, props keys, text nodes, \u003Ccode\u003Epreconfig\u003C/code\u003E, fragments for branches and lists, class components in files without JSX, reading the compiled output\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/reactivity\u0022\u003EReactivity\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereactive\u003C/code\u003E, \u003Ccode\u003EcreateSignal\u003C/code\u003E, \u003Ccode\u003EcreateComputed\u003C/code\u003E, \u003Ccode\u003EcreateLazyComputed\u003C/code\u003E, \u003Ccode\u003Eeffect\u003C/code\u003E, \u003Ccode\u003Euntracked\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EConditional Rendering and Lists\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-wait\u003C/code\u003E/\u003Ccode\u003Ex-display\u003C/code\u003E, \u003Ccode\u003E\u0026amp;\u0026amp;\u003C/code\u003E, the ternary operator, \u003Ccode\u003E.map\u003C/code\u003E, \u003Ccode\u003Ekey\u003C/code\u003E and item identity, \u003Ccode\u003Eswitch\u003C/code\u003E, the binding API\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/events\u0022\u003EEvents\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EDOM events, modifiers, component, lifecycle and application events, service events (\u003Ccode\u003EEmitter\u003C/code\u003E)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/forms\u0022\u003EForms and Two-Way Binding\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EOne-way \u003Ccode\u003Evalue\u003C/code\u003E \u002B \u003Ccode\u003Eoninput\u003C/code\u003E, two-way binding with \u003Ccode\u003Ebindings.model\u003C/code\u003E and \u003Ccode\u003Ex-model\u003C/code\u003E, \u003Ccode\u003Echecked\u003C/code\u003E, \u003Ccode\u003Evalue\u003C/code\u003E, \u003Ccode\u003E\u0026lt;select\u0026gt;\u003C/code\u003E, form submission, a validation pattern\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECore concepts\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lifecycle\u0022\u003ELifecycle\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003ELifecycle hooks and their order, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, visibility, waiting, disposal, the application lifecycle\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EApplication structure\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/styling-and-transitions\u0022\u003EStyling and Animation\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003Eclass\u003C/code\u003E/\u003Ccode\u003Estyle\u003C/code\u003E/\u003Ccode\u003Eattr\u003C/code\u003E helpers, inline \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E, Tailwind, Bootstrap and external CSS, the transition system: CSS class and WAAPI keyframe transitions, the enter/leave mode (\u003Ccode\u003Emode\u003C/code\u003E)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EApplication structure\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EMemory Management and Disposal\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EIDisposable\u003C/code\u003E, automatic cleanup, \u003Ccode\u003Emotif.register\u003C/code\u003E/\u003Ccode\u003EsetDisposable\u003C/code\u003E, the dispose methods, \u003Ccode\u003Edetach\u003C/code\u003E/\u003Ccode\u003EsilentDetach\u003C/code\u003E/\u003Ccode\u003EsilentUnlink\u003C/code\u003E, \u003Ccode\u003EDisposableStore\u003C/code\u003E, \u003Ccode\u003Eusing\u003C/code\u003E/\u003Ccode\u003EdoWork\u003C/code\u003E, leak tracking, counting live components\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EApplication structure\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/error-handling\u0022\u003EError Handling\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EThe throw/report/warn paths, \u003Ccode\u003EMotifError\u003C/code\u003E, \u003Ccode\u003EerrorHandler\u003C/code\u003E, \u003Ccode\u003EsetUnexpectedErrorHandler\u003C/code\u003E, \u003Ccode\u003EsafeCall*\u003C/code\u003E, where an error in user code is caught\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EApplication structure\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/resilience\u0022\u003EResilience\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003EResilience.create\u003C/code\u003E chain and its order, \u003Ccode\u003Eretry\u003C/code\u003E, \u003Ccode\u003Etimeout\u003C/code\u003E, \u003Ccode\u003EcircuitBreaker\u003C/code\u003E, \u003Ccode\u003Ebulkhead\u003C/code\u003E, \u003Ccode\u003ErateLimiter\u003C/code\u003E, \u003Ccode\u003Efallback\u003C/code\u003E, \u003Ccode\u003Edecorate\u003C/code\u003E, error codes\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EApplication structure\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/windows\u0022\u003EWindows\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.windows\u003C/code\u003E: opening a component in a new window or in an always-on-top Picture-in-Picture window, taking it back, mirroring styles and theme, Electron\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ERouting\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/routing\u0022\u003EIntroduction to Routing\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EuseRouter\u003C/code\u003E, navigation modes, the not-found route and the error page\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ERouting\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/routes\u0022\u003EThe Route Table\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteItem\u003C/code\u003E fields, nested routes, \u003Ccode\u003Eredirect\u003C/code\u003E/\u003Ccode\u003Ealias\u003C/code\u003E, path parameters, \u003Ccode\u003Eresolve\u003C/code\u003E/\u003Ccode\u003Ehref\u003C/code\u003E/\u003Ccode\u003Eroutes\u003C/code\u003E, lazy routes\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ERouting\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/router-view\u0022\u003ERouterView\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EWhere a route\u0027s output goes, nested and named \u003Ccode\u003ERouterView\u003C/code\u003Es\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ERouting\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/router-links\u0022\u003ELinks\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E, \u003Ccode\u003ERouterLink\u003C/code\u003E, \u003Ccode\u003EenableRouterClassing\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ERouting\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/navigation\u0022\u003ENavigation and Route State\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enavigate\u003C/code\u003E/\u003Ccode\u003EnavigateByName\u003C/code\u003E, live route state, \u003Ccode\u003Edirection\u003C/code\u003E/\u003Ccode\u003Estate\u003C/code\u003E, \u003Ccode\u003EscrollMemory\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ERouting\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/route-guards\u0022\u003ERoute Hooks and Guards\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003ERoute hooks, \u003Ccode\u003EuseGuard\u003C/code\u003E, \u003Ccode\u003EonRouterChanged\u003C/code\u003E, \u003Ccode\u003Eapp.use\u003C/code\u003E, restarting and shutting down\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ERouting\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/navigation-stack\u0022\u003EStack Navigation\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Estack\u003C/code\u003E: kept pages, the transition animation, swiping back\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EDependency Injection\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/dependency-injection\u0022\u003EIntroduction to Dependency Injection\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003ERegistering a service, using it from a component, a full example\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EDependency Injection\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/service-registration\u0022\u003ERegistering Services\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EServiceCollection\u003C/code\u003E registration forms, \u003Ccode\u003Estartup\u003C/code\u003E singletons, \u003Ccode\u003E@Injectable\u003C/code\u003E and its options\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EDependency Injection\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/service-lifetimes\u0022\u003ELifetimes and Scopes\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Esingleton\u003C/code\u003E / \u003Ccode\u003Escoped\u003C/code\u003E / \u003Ccode\u003Etransient\u003C/code\u003E, the navigation scope, the scoped handle\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EDependency Injection\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/service-resolution\u0022\u003EResolving Services\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eprovider.get\u003C/code\u003E / \u003Ccode\u003EgetAsync\u003C/code\u003E, \u003Ccode\u003EgetService\u003C/code\u003E, \u003Ccode\u003EFromService\u003C/code\u003E, \u003Ccode\u003Einject\u003C/code\u003E, \u003Ccode\u003Edeps\u003C/code\u003E, \u003Ccode\u003EuseApplication\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EDependency Injection\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/service-disposal\u0022\u003EDisposing Services\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.dispose\u003C/code\u003E / \u003Ccode\u003Eprovider.dispose\u003C/code\u003E, closing a scope, tracking transients\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGuides\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/package-authoring\u0022\u003EWriting Packages on Motif\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EThe compiler output as an open API; the mechanisms that theme, layer, layout, plugin, data, wrapper, settings and transition packages rely on\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGuides\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/wrapping-libraries\u0022\u003EWrapping Third-Party Libraries\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003ETurning libraries that manage their own DOM into components\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGuides\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/publishing-libraries\u0022\u003EPublishing an npm Library for MotifJS\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EPreparing a component/service package: build, types, CSS, the prop contract, pre-publish checks\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGuides\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/component-libraries\u0022\u003EWriting a Component Library\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003ERules for a kit that applications use: props tracked by a single binding, data used as it is, untracked internal state, drawing by hand, writing only on change, lifetime traps, measuring\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGuides\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/devtools\u0022\u003EThe DevTools Contract\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003E__MOTIF_DEVTOOLS__\u003C/code\u003E object turned on by \u003Ccode\u003EuseDevelopment(true)\u003C/code\u003E: the tree, events, reactivity trace, counters, router and error records; \u003Ccode\u003EregisterDevtools\u003C/code\u003E for packages\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EReference\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/api-reference\u0022\u003EAPI Reference\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EA summary of every exported symbol\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EReference\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/error-codes\u0022\u003EError and Warning Codes\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EEvery \u003Ccode\u003EMJX\u003C/code\u003E code, its kind, its console message and what it means\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EReference\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/query\u0022\u003ECollection Queries (Query)\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EChainable filtering, sorting and grouping with \u003Ccode\u003EQuery.from(...)\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EReference\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/collections\u0022\u003ECollections\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EList\u003C/code\u003E, \u003Ccode\u003EDictionary\u003C/code\u003E, \u003Ccode\u003ENameValuePair\u003C/code\u003E, \u003Ccode\u003ELinkedList\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAdvanced\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/frame\u0022\u003EFrame\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EA container that holds a single changing piece of content; timing and transitions\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAdvanced\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EContent from a dynamic \u003Ccode\u003Eimport()\u003C/code\u003E or any \u003Ccode\u003EPromise\u003C/code\u003E; the loading flow, options, retries, cancellation, error reports\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAdvanced\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/transport\u0022\u003ETransport and TransportTo\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EShowing content in another slot; the \u003Ccode\u003Ereplace\u003C/code\u003E/\u003Ccode\u003Emerge\u003C/code\u003E modes, \u003Ccode\u003ETransporter\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAdvanced\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/content-body\u0022\u003EContentBody and ContentBlock\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EA body that several blocks fill together\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAdvanced\u003C/td\u003E\n\u003Ctd\u003E\u003Ca href=\u0022/docs/virtualization\u0022\u003EVirtual Lists (Virtualization)\u003C/a\u003E\u003C/td\u003E\n\u003Ctd\u003EVirtual scrolling for large data\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022quick-look\u0022\u003EQuick look\u003C/h2\u003E\n\u003Cp\u003EA notes list: \u003Ccode\u003ENotesService\u003C/code\u003E keeps the notes in one place, and \u003Ccode\u003ENotesPane\u003C/code\u003E shows the search box, the rows and an editor for the selected note. \u003Ccode\u003ESettingsService\u003C/code\u003E holds the theme and density settings and is created when the application starts. The same component is written in six forms: class, function and Options API, each with JSX and without it.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/notes.ts\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface Note {\n  id: number;\n  title: string;\n  body: string;\n  pinned: boolean;\n  archived: boolean;\n  createdAt: number;\n  updatedAt: number;\n}\n\nexport type Folder = \u0026quot;notes\u0026quot; | \u0026quot;pinned\u0026quot; | \u0026quot;archive\u0026quot;;\n\nexport const FOLDERS: Record\u0026lt;Folder, { title: string; empty: string }\u0026gt; = {\n  notes: { title: \u0026quot;All notes\u0026quot;, empty: \u0026quot;No notes yet. Write the first one.\u0026quot; },\n  pinned: { title: \u0026quot;Pinned\u0026quot;, empty: \u0026quot;No pinned notes. Pin a note you want to keep at the top.\u0026quot; },\n  archive: { title: \u0026quot;Archive\u0026quot;, empty: \u0026quot;The archive is empty.\u0026quot; },\n};\n\nconst inFolder: Record\u0026lt;Folder, (note: Note) =\u0026gt; boolean\u0026gt; = {\n  notes: (note) =\u0026gt; !note.archived,\n  pinned: (note) =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived,\n  archive: (note) =\u0026gt; note.archived,\n};\n\nexport class NotesService {\n  readonly state = reactive({ items: [] as Note[] });\n  private nextId = this.state.items.length \u002B 1;\n\n  list(folder: Folder, query = \u0026quot;\u0026quot;): Note[] {\n    const q = query.trim().toLowerCase();\n    return this.state.items\n      .filter(inFolder[folder])\n      .filter((note) =\u0026gt; !q || \u0060${note.title}\\n${note.body}\u0060.toLowerCase().includes(q))\n      .sort((a, b) =\u0026gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);\n  }\n\n  count(folder: Folder): number {\n    return this.state.items.filter(inFolder[folder]).length;\n  }\n\n  find(id: number | string): Note | undefined {\n    const wanted = Number(id);\n    return this.state.items.find((note) =\u0026gt; note.id === wanted);\n  }\n\n  create(): Note {\n    const now = Date.now();\n    this.state.items.unshift({ id: this.nextId\u002B\u002B, title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });\n    return this.state.items[0];\n  }\n\n  touch(note: Note): void {\n    note.updatedAt = Date.now();\n  }\n\n  togglePin(note: Note): void {\n    note.pinned = !note.pinned;\n    this.touch(note);\n  }\n\n  archive(note: Note): void {\n    note.archived = true;\n    note.pinned = false;\n    this.touch(note);\n  }\n\n  restore(note: Note): void {\n    note.archived = false;\n    this.touch(note);\n  }\n\n  remove(id: number): boolean {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    this.state.items.splice(index, 1);\n    return true;\n  }\n\n  emptyArchive(): number {\n    let removed = 0;\n    for (let i = this.state.items.length - 1; i \u0026gt;= 0; i--) {\n      if (!this.state.items[i].archived) continue;\n      this.state.items.splice(i, 1);\n      removed\u002B\u002B;\n    }\n    return removed;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/notes.js\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const FOLDERS = {\n  notes: { title: \u0026quot;All notes\u0026quot;, empty: \u0026quot;No notes yet. Write the first one.\u0026quot; },\n  pinned: { title: \u0026quot;Pinned\u0026quot;, empty: \u0026quot;No pinned notes. Pin a note you want to keep at the top.\u0026quot; },\n  archive: { title: \u0026quot;Archive\u0026quot;, empty: \u0026quot;The archive is empty.\u0026quot; },\n};\n\nconst inFolder = {\n  notes: (note) =\u0026gt; !note.archived,\n  pinned: (note) =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived,\n  archive: (note) =\u0026gt; note.archived,\n};\n\nexport class NotesService {\n  state = reactive({ items: [] });\n  nextId = this.state.items.length \u002B 1;\n\n  list(folder, query = \u0026quot;\u0026quot;) {\n    const q = query.trim().toLowerCase();\n    return this.state.items\n      .filter(inFolder[folder])\n      .filter((note) =\u0026gt; !q || \u0060${note.title}\\n${note.body}\u0060.toLowerCase().includes(q))\n      .sort((a, b) =\u0026gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);\n  }\n\n  count(folder) {\n    return this.state.items.filter(inFolder[folder]).length;\n  }\n\n  find(id) {\n    const wanted = Number(id);\n    return this.state.items.find((note) =\u0026gt; note.id === wanted);\n  }\n\n  create() {\n    const now = Date.now();\n    this.state.items.unshift({ id: this.nextId\u002B\u002B, title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });\n    return this.state.items[0];\n  }\n\n  touch(note) {\n    note.updatedAt = Date.now();\n  }\n\n  togglePin(note) {\n    note.pinned = !note.pinned;\n    this.touch(note);\n  }\n\n  archive(note) {\n    note.archived = true;\n    note.pinned = false;\n    this.touch(note);\n  }\n\n  restore(note) {\n    note.archived = false;\n    this.touch(note);\n  }\n\n  remove(id) {\n    const index = this.state.items.findIndex((note) =\u0026gt; note.id === id);\n    if (index \u0026lt; 0) return false;\n    this.state.items.splice(index, 1);\n    return true;\n  }\n\n  emptyArchive() {\n    let removed = 0;\n    for (let i = this.state.items.length - 1; i \u0026gt;= 0; i--) {\n      if (!this.state.items[i].archived) continue;\n      this.state.items.splice(i, 1);\n      removed\u002B\u002B;\n    }\n    return removed;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport type Theme = \u0026quot;system\u0026quot; | \u0026quot;light\u0026quot; | \u0026quot;dark\u0026quot;;\nexport type Density = \u0026quot;comfortable\u0026quot; | \u0026quot;compact\u0026quot;;\n\nexport const THEMES: readonly Theme[] = [\u0026quot;system\u0026quot;, \u0026quot;light\u0026quot;, \u0026quot;dark\u0026quot;];\nexport const DENSITIES: readonly Density[] = [\u0026quot;comfortable\u0026quot;, \u0026quot;compact\u0026quot;];\n\nconst STORAGE_KEY = \u0026quot;settings\u0026quot;;\n\nexport class SettingsService {\n  readonly state = reactive({ theme: \u0026quot;system\u0026quot; as Theme, density: \u0026quot;comfortable\u0026quot; as Density });\n\n  constructor() {\n    try {\n      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? \u0026quot;{}\u0026quot;);\n      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;\n      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;\n    } catch {}\n    this.apply();\n  }\n\n  setTheme(theme: Theme) {\n    this.state.theme = theme;\n    this.save();\n  }\n\n  setDensity(density: Density) {\n    this.state.density = density;\n    this.save();\n  }\n\n  private save() {\n    this.apply();\n    try {\n      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));\n    } catch {}\n  }\n\n  private apply() {\n    const root = document.documentElement;\n    if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n    else root.dataset.theme = this.state.theme;\n    if (this.state.density === \u0026quot;comfortable\u0026quot;) delete root.dataset.density;\n    else root.dataset.density = this.state.density;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/settings.js\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const THEMES = [\u0026quot;system\u0026quot;, \u0026quot;light\u0026quot;, \u0026quot;dark\u0026quot;];\nexport const DENSITIES = [\u0026quot;comfortable\u0026quot;, \u0026quot;compact\u0026quot;];\n\nconst STORAGE_KEY = \u0026quot;settings\u0026quot;;\n\nexport class SettingsService {\n  state = reactive({ theme: \u0026quot;system\u0026quot;, density: \u0026quot;comfortable\u0026quot; });\n\n  constructor() {\n    try {\n      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? \u0026quot;{}\u0026quot;);\n      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;\n      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;\n    } catch {}\n    this.apply();\n  }\n\n  setTheme(theme) {\n    this.state.theme = theme;\n    this.save();\n  }\n\n  setDensity(density) {\n    this.state.density = density;\n    this.save();\n  }\n\n  save() {\n    this.apply();\n    try {\n      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));\n    } catch {}\n  }\n\n  apply() {\n    const root = document.documentElement;\n    if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n    else root.dataset.theme = this.state.theme;\n    if (this.state.density === \u0026quot;comfortable\u0026quot;) delete root.dataset.density;\n    else root.dataset.density = this.state.density;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotesPane.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/pages/NotesPane.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesPane extends Component {\n  notes = this.getService(NotesService)!;\n  state = reactive({ query: \u0026quot;\u0026quot;, current: null as Note | null });\n\n  get visible() {\n    return this.notes.list(\u0026quot;notes\u0026quot;, this.state.query);\n  }\n\n  create() {\n    this.state.current = this.notes.create();\n  }\n\n  override view() {\n    return (\n      \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n        \u0026lt;header class=\u0026quot;list__head\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;Notes\u0026lt;/h2\u0026gt;\n          \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;New note\u0026lt;/button\u0026gt;\n        \u0026lt;/header\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; x-model={() =\u0026gt; this.state.query} /\u0026gt;\n        \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n          {this.visible.map((note) =\u0026gt; (\n            \u0026lt;button type=\u0026quot;button\u0026quot; key={note.id} class={() =\u0026gt; (note === this.state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;)} onclick={() =\u0026gt; (this.state.current = note)}\u0026gt;\n              \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n              \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n            \u0026lt;/button\u0026gt;\n          ))}\n          \u0026lt;p class=\u0026quot;list__empty\u0026quot; x-display={() =\u0026gt; this.visible.length === 0}\u0026gt;\n            {() =\u0026gt; (this.state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;)}\n          \u0026lt;/p\u0026gt;\n        \u0026lt;/div\u0026gt;\n        \u0026lt;article class=\u0026quot;detail\u0026quot; x-display={() =\u0026gt; this.state.current !== null}\u0026gt;\n          \u0026lt;input placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.state.current!.title} /\u0026gt;\n          \u0026lt;textarea placeholder=\u0026quot;Note\u0026quot; x-model={() =\u0026gt; this.state.current!.body} /\u0026gt;\n          \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.notes.togglePin(this.state.current!)}\u0026gt;\n            {() =\u0026gt; (this.state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;)}\n          \u0026lt;/button\u0026gt;\n        \u0026lt;/article\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/NotesPane.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesPane() {\n  const notes = FromService(NotesService)!;\n  const state = reactive({ query: \u0026quot;\u0026quot;, current: null as Note | null });\n  const visible = () =\u0026gt; notes.list(\u0026quot;notes\u0026quot;, state.query);\n  const create = () =\u0026gt; (state.current = notes.create());\n\n  return (\n    \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n      \u0026lt;header class=\u0026quot;list__head\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;Notes\u0026lt;/h2\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={create}\u0026gt;New note\u0026lt;/button\u0026gt;\n      \u0026lt;/header\u0026gt;\n      \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; x-model={() =\u0026gt; state.query} /\u0026gt;\n      \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n        {visible().map((note) =\u0026gt; (\n          \u0026lt;button type=\u0026quot;button\u0026quot; key={note.id} class={() =\u0026gt; (note === state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;)} onclick={() =\u0026gt; (state.current = note)}\u0026gt;\n            \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n            \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n          \u0026lt;/button\u0026gt;\n        ))}\n        \u0026lt;p class=\u0026quot;list__empty\u0026quot; x-display={() =\u0026gt; visible().length === 0}\u0026gt;\n          {() =\u0026gt; (state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;)}\n        \u0026lt;/p\u0026gt;\n      \u0026lt;/div\u0026gt;\n      \u0026lt;article class=\u0026quot;detail\u0026quot; x-display={() =\u0026gt; state.current !== null}\u0026gt;\n        \u0026lt;input placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; state.current!.title} /\u0026gt;\n        \u0026lt;textarea placeholder=\u0026quot;Note\u0026quot; x-model={() =\u0026gt; state.current!.body} /\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(state.current!)}\u0026gt;\n          {() =\u0026gt; (state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;)}\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/article\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/pages/NotesPane.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesPane = () =\u0026gt; {\n  const notes = FromService(NotesService)!;\n\n  return motifOptions({\n    el: \u0026quot;div\u0026quot;,\n    data: reactive({ query: \u0026quot;\u0026quot;, current: null as Note | null }),\n\n    visible() {\n      return notes.list(\u0026quot;notes\u0026quot;, this.data.query);\n    },\n\n    create() {\n      this.data.current = notes.create();\n    },\n\n    view() {\n      this.class.add(\u0026quot;notes\u0026quot;);\n      return (\n        \u0026lt;\u0026gt;\n          \u0026lt;header class=\u0026quot;list__head\u0026quot;\u0026gt;\n            \u0026lt;h2\u0026gt;Notes\u0026lt;/h2\u0026gt;\n            \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;New note\u0026lt;/button\u0026gt;\n          \u0026lt;/header\u0026gt;\n          \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; x-model={() =\u0026gt; this.data.query} /\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {this.visible().map((note) =\u0026gt; (\n              \u0026lt;button type=\u0026quot;button\u0026quot; key={note.id} class={() =\u0026gt; (note === this.data.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;)} onclick={() =\u0026gt; (this.data.current = note)}\u0026gt;\n                \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n                \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n              \u0026lt;/button\u0026gt;\n            ))}\n            \u0026lt;p class=\u0026quot;list__empty\u0026quot; x-display={() =\u0026gt; this.visible().length === 0}\u0026gt;\n              {() =\u0026gt; (this.data.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;)}\n            \u0026lt;/p\u0026gt;\n          \u0026lt;/div\u0026gt;\n          \u0026lt;article class=\u0026quot;detail\u0026quot; x-display={() =\u0026gt; this.data.current !== null}\u0026gt;\n            \u0026lt;input placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.data.current!.title} /\u0026gt;\n            \u0026lt;textarea placeholder=\u0026quot;Note\u0026quot; x-model={() =\u0026gt; this.data.current!.body} /\u0026gt;\n            \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(this.data.current!)}\u0026gt;\n              {() =\u0026gt; (this.data.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;)}\n            \u0026lt;/button\u0026gt;\n          \u0026lt;/article\u0026gt;\n        \u0026lt;/\u0026gt;\n      );\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/pages/NotesPane.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesPane extends Component {\n  notes = this.getService(NotesService)!;\n  state = reactive({ query: \u0026quot;\u0026quot;, current: null as Note | null });\n\n  get visible() {\n    return this.notes.list(\u0026quot;notes\u0026quot;, this.state.query);\n  }\n\n  create() {\n    this.state.current = this.notes.create();\n  }\n  \n  override view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      root.controls.add(this.head(), this.search(), this.rows(), this.detail());\n    });\n  }\n\n  private head() {\n    return motifComponent(\u0026quot;header\u0026quot;, (head: ComponentBase) =\u0026gt; {\n      head.class.add(\u0026quot;list__head\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n        h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;)));\n      });\n      const newNote = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;New note\u0026quot;)));\n      });\n      head.controls.add(title, newNote);\n    });\n  }\n\n  private search() {\n    return motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n      field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; });\n      field.bindings.model(() =\u0026gt; this.state.query, (value: string) =\u0026gt; (this.state.query = value));\n    });\n  }\n\n  private rows() {\n    return motifComponent(\u0026quot;div\u0026quot;, (rows: ComponentBase) =\u0026gt; {\n      rows.class.add(\u0026quot;rows\u0026quot;);\n      const list = motifComponent({\n        initializeComponent: (holder: ComponentBase) =\u0026gt; {\n          holder.bindings.list(() =\u0026gt; this.visible, (note: Note) =\u0026gt; this.row(note));\n        },\n      });\n      const empty = motifComponent(\u0026quot;p\u0026quot;, {\n        preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; this.visible.length === 0),\n        initializeComponent: (p: ComponentBase) =\u0026gt; {\n          p.class.add(\u0026quot;list__empty\u0026quot;);\n          p.bindings.text(() =\u0026gt; (this.state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;));\n        },\n      });\n      rows.controls.add(list, empty);\n    });\n  }\n\n  private row(note: Note) {\n    return motifComponent(\u0026quot;button\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (row: ComponentBase) =\u0026gt; {\n        row.attr.add({ type: \u0026quot;button\u0026quot; });\n        row.class.add(() =\u0026gt; (note === this.state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;));\n        row.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.state.current = note));\n        const pin = motifComponent(\u0026quot;i\u0026quot;, {\n          preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n          initializeComponent: (i: ComponentBase) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n        });\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        row.controls.add(pin, title);\n      },\n    });\n  }\n\n  private detail() {\n    return motifComponent(\u0026quot;article\u0026quot;, {\n      preconfig: (article: ComponentBase) =\u0026gt; article.bindings.display(() =\u0026gt; this.state.current !== null),\n      initializeComponent: (article: ComponentBase) =\u0026gt; {\n        article.class.add(\u0026quot;detail\u0026quot;);\n        const title = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n          field.attr.add({ placeholder: \u0026quot;Title\u0026quot; });\n          field.bindings.model(() =\u0026gt; this.state.current!.title, (value: string) =\u0026gt; (this.state.current!.title = value));\n        });\n        const body = motifComponent(\u0026quot;textarea\u0026quot;, (field: ComponentBase) =\u0026gt; {\n          field.attr.add({ placeholder: \u0026quot;Note\u0026quot; });\n          field.bindings.model(() =\u0026gt; this.state.current!.body, (value: string) =\u0026gt; (this.state.current!.body = value));\n        });\n        const pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.togglePin(this.state.current!));\n          button.bindings.text(() =\u0026gt; (this.state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;));\n        });\n        article.controls.add(title, body, pin);\n      },\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/NotesPane.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesPane() {\n  const notes = FromService(NotesService)!;\n  const state = reactive({ query: \u0026quot;\u0026quot;, current: null as Note | null });\n  const visible = () =\u0026gt; notes.list(\u0026quot;notes\u0026quot;, state.query);\n  const create = () =\u0026gt; (state.current = notes.create());\n\n  const head = motifComponent(\u0026quot;header\u0026quot;, (bar: ComponentBase) =\u0026gt; {\n    bar.class.add(\u0026quot;list__head\u0026quot;);\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;)));\n    });\n    const newNote = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, create);\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;New note\u0026quot;)));\n    });\n    bar.controls.add(title, newNote);\n  });\n\n  const search = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n    field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; });\n    field.bindings.model(() =\u0026gt; state.query, (value: string) =\u0026gt; (state.query = value));\n  });\n\n  const row = (note: Note) =\u0026gt;\n    motifComponent(\u0026quot;button\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (item: ComponentBase) =\u0026gt; {\n        item.attr.add({ type: \u0026quot;button\u0026quot; });\n        item.class.add(() =\u0026gt; (note === state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;));\n        item.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (state.current = note));\n        const pin = motifComponent(\u0026quot;i\u0026quot;, {\n          preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n          initializeComponent: (i: ComponentBase) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n        });\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        item.controls.add(pin, title);\n      },\n    });\n\n  const rows = motifComponent(\u0026quot;div\u0026quot;, (box: ComponentBase) =\u0026gt; {\n    box.class.add(\u0026quot;rows\u0026quot;);\n    const list = motifComponent({\n      initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(visible, row),\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; visible().length === 0),\n      initializeComponent: (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.bindings.text(() =\u0026gt; (state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;));\n      },\n    });\n    box.controls.add(list, empty);\n  });\n\n  const detail = motifComponent(\u0026quot;article\u0026quot;, {\n    preconfig: (article: ComponentBase) =\u0026gt; article.bindings.display(() =\u0026gt; state.current !== null),\n    initializeComponent: (article: ComponentBase) =\u0026gt; {\n      article.class.add(\u0026quot;detail\u0026quot;);\n      const title = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n        field.attr.add({ placeholder: \u0026quot;Title\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.current!.title, (value: string) =\u0026gt; (state.current!.title = value));\n      });\n      const body = motifComponent(\u0026quot;textarea\u0026quot;, (field: ComponentBase) =\u0026gt; {\n        field.attr.add({ placeholder: \u0026quot;Note\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.current!.body, (value: string) =\u0026gt; (state.current!.body = value));\n      });\n      const pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(state.current!));\n        button.bindings.text(() =\u0026gt; (state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;));\n      });\n      article.controls.add(title, body, pin);\n    },\n  });\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n    root.class.add(\u0026quot;notes\u0026quot;);\n    root.controls.add(head, search, rows, detail);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/pages/NotesPane.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesPane = () =\u0026gt; {\n  const notes = FromService(NotesService)!;\n\n  return motifOptions({\n    el: \u0026quot;div\u0026quot;,\n    data: reactive({ query: \u0026quot;\u0026quot;, current: null as Note | null }),\n\n    visible() {\n      return notes.list(\u0026quot;notes\u0026quot;, this.data.query);\n    },\n\n    create() {\n      this.data.current = notes.create();\n    },\n\n    view() {\n      this.class.add(\u0026quot;notes\u0026quot;);\n      return [this.head(), this.search(), this.rows(), this.detail()];\n    },\n\n    head() {\n      return motifComponent(\u0026quot;header\u0026quot;, (head: ComponentBase) =\u0026gt; {\n        head.class.add(\u0026quot;list__head\u0026quot;);\n        const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n          h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;)));\n        });\n        const newNote = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;New note\u0026quot;)));\n        });\n        head.controls.add(title, newNote);\n      });\n    },\n\n    search() {\n      return motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n        field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; });\n        field.bindings.model(() =\u0026gt; this.data.query, (value: string) =\u0026gt; (this.data.query = value));\n      });\n    },\n\n    rows() {\n      return motifComponent(\u0026quot;div\u0026quot;, (rows: ComponentBase) =\u0026gt; {\n        rows.class.add(\u0026quot;rows\u0026quot;);\n        const list = motifComponent({\n          initializeComponent: (holder: ComponentBase) =\u0026gt; {\n            holder.bindings.list(() =\u0026gt; this.visible(), (note: Note) =\u0026gt; this.row(note));\n          },\n        });\n        const empty = motifComponent(\u0026quot;p\u0026quot;, {\n          preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; this.visible().length === 0),\n          initializeComponent: (p: ComponentBase) =\u0026gt; {\n            p.class.add(\u0026quot;list__empty\u0026quot;);\n            p.bindings.text(() =\u0026gt; (this.data.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;));\n          },\n        });\n        rows.controls.add(list, empty);\n      });\n    },\n\n    row(note: Note) {\n      return motifComponent(\u0026quot;button\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (row: ComponentBase) =\u0026gt; {\n          row.attr.add({ type: \u0026quot;button\u0026quot; });\n          row.class.add(() =\u0026gt; (note === this.data.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;));\n          row.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.data.current = note));\n          const pin = motifComponent(\u0026quot;i\u0026quot;, {\n            preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n            initializeComponent: (i: ComponentBase) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n          });\n          const title = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n          row.controls.add(pin, title);\n        },\n      });\n    },\n\n    detail() {\n      return motifComponent(\u0026quot;article\u0026quot;, {\n        preconfig: (article: ComponentBase) =\u0026gt; article.bindings.display(() =\u0026gt; this.data.current !== null),\n        initializeComponent: (article: ComponentBase) =\u0026gt; {\n          article.class.add(\u0026quot;detail\u0026quot;);\n          const title = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n            field.attr.add({ placeholder: \u0026quot;Title\u0026quot; });\n            field.bindings.model(() =\u0026gt; this.data.current!.title, (value: string) =\u0026gt; (this.data.current!.title = value));\n          });\n          const body = motifComponent(\u0026quot;textarea\u0026quot;, (field: ComponentBase) =\u0026gt; {\n            field.attr.add({ placeholder: \u0026quot;Note\u0026quot; });\n            field.bindings.model(() =\u0026gt; this.data.current!.body, (value: string) =\u0026gt; (this.data.current!.body = value));\n          });\n          const pin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot; });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(this.data.current!));\n            button.bindings.text(() =\u0026gt; (this.data.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;));\n          });\n          article.controls.add(title, body, pin);\n        },\n      });\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/pages/NotesPane.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesPane extends Component {\n  notes = this.getService(NotesService);\n  state = reactive({ query: \u0026quot;\u0026quot;, current: null });\n\n  get visible() {\n    return this.notes.list(\u0026quot;notes\u0026quot;, this.state.query);\n  }\n\n  create() {\n    this.state.current = this.notes.create();\n  }\n\n  view() {\n    return (\n      \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n        \u0026lt;header class=\u0026quot;list__head\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;Notes\u0026lt;/h2\u0026gt;\n          \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;New note\u0026lt;/button\u0026gt;\n        \u0026lt;/header\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; x-model={() =\u0026gt; this.state.query} /\u0026gt;\n        \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n          {this.visible.map((note) =\u0026gt; (\n            \u0026lt;button type=\u0026quot;button\u0026quot; key={note.id} class={() =\u0026gt; (note === this.state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;)} onclick={() =\u0026gt; (this.state.current = note)}\u0026gt;\n              \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n              \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n            \u0026lt;/button\u0026gt;\n          ))}\n          \u0026lt;p class=\u0026quot;list__empty\u0026quot; x-display={() =\u0026gt; this.visible.length === 0}\u0026gt;\n            {() =\u0026gt; (this.state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;)}\n          \u0026lt;/p\u0026gt;\n        \u0026lt;/div\u0026gt;\n        \u0026lt;article class=\u0026quot;detail\u0026quot; x-display={() =\u0026gt; this.state.current !== null}\u0026gt;\n          \u0026lt;input placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.state.current.title} /\u0026gt;\n          \u0026lt;textarea placeholder=\u0026quot;Note\u0026quot; x-model={() =\u0026gt; this.state.current.body} /\u0026gt;\n          \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.notes.togglePin(this.state.current)}\u0026gt;\n            {() =\u0026gt; (this.state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;)}\n          \u0026lt;/button\u0026gt;\n        \u0026lt;/article\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/NotesPane.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesPane() {\n  const notes = FromService(NotesService);\n  const state = reactive({ query: \u0026quot;\u0026quot;, current: null });\n  const visible = () =\u0026gt; notes.list(\u0026quot;notes\u0026quot;, state.query);\n  const create = () =\u0026gt; (state.current = notes.create());\n\n  return (\n    \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n      \u0026lt;header class=\u0026quot;list__head\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;Notes\u0026lt;/h2\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={create}\u0026gt;New note\u0026lt;/button\u0026gt;\n      \u0026lt;/header\u0026gt;\n      \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; x-model={() =\u0026gt; state.query} /\u0026gt;\n      \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n        {visible().map((note) =\u0026gt; (\n          \u0026lt;button type=\u0026quot;button\u0026quot; key={note.id} class={() =\u0026gt; (note === state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;)} onclick={() =\u0026gt; (state.current = note)}\u0026gt;\n            \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n            \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n          \u0026lt;/button\u0026gt;\n        ))}\n        \u0026lt;p class=\u0026quot;list__empty\u0026quot; x-display={() =\u0026gt; visible().length === 0}\u0026gt;\n          {() =\u0026gt; (state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;)}\n        \u0026lt;/p\u0026gt;\n      \u0026lt;/div\u0026gt;\n      \u0026lt;article class=\u0026quot;detail\u0026quot; x-display={() =\u0026gt; state.current !== null}\u0026gt;\n        \u0026lt;input placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; state.current.title} /\u0026gt;\n        \u0026lt;textarea placeholder=\u0026quot;Note\u0026quot; x-model={() =\u0026gt; state.current.body} /\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(state.current)}\u0026gt;\n          {() =\u0026gt; (state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;)}\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/article\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/pages/NotesPane.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesPane = () =\u0026gt; {\n  const notes = FromService(NotesService);\n\n  return motifOptions({\n    el: \u0026quot;div\u0026quot;,\n    data: reactive({ query: \u0026quot;\u0026quot;, current: null }),\n\n    visible() {\n      return notes.list(\u0026quot;notes\u0026quot;, this.data.query);\n    },\n\n    create() {\n      this.data.current = notes.create();\n    },\n\n    view() {\n      this.class.add(\u0026quot;notes\u0026quot;);\n      return (\n        \u0026lt;\u0026gt;\n          \u0026lt;header class=\u0026quot;list__head\u0026quot;\u0026gt;\n            \u0026lt;h2\u0026gt;Notes\u0026lt;/h2\u0026gt;\n            \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;New note\u0026lt;/button\u0026gt;\n          \u0026lt;/header\u0026gt;\n          \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; x-model={() =\u0026gt; this.data.query} /\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {this.visible().map((note) =\u0026gt; (\n              \u0026lt;button type=\u0026quot;button\u0026quot; key={note.id} class={() =\u0026gt; (note === this.data.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;)} onclick={() =\u0026gt; (this.data.current = note)}\u0026gt;\n                \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n                \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n              \u0026lt;/button\u0026gt;\n            ))}\n            \u0026lt;p class=\u0026quot;list__empty\u0026quot; x-display={() =\u0026gt; this.visible().length === 0}\u0026gt;\n              {() =\u0026gt; (this.data.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;)}\n            \u0026lt;/p\u0026gt;\n          \u0026lt;/div\u0026gt;\n          \u0026lt;article class=\u0026quot;detail\u0026quot; x-display={() =\u0026gt; this.data.current !== null}\u0026gt;\n            \u0026lt;input placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.data.current.title} /\u0026gt;\n            \u0026lt;textarea placeholder=\u0026quot;Note\u0026quot; x-model={() =\u0026gt; this.data.current.body} /\u0026gt;\n            \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; notes.togglePin(this.data.current)}\u0026gt;\n              {() =\u0026gt; (this.data.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;)}\n            \u0026lt;/button\u0026gt;\n          \u0026lt;/article\u0026gt;\n        \u0026lt;/\u0026gt;\n      );\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/pages/NotesPane.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesPane extends Component {\n  notes = this.getService(NotesService);\n  state = reactive({ query: \u0026quot;\u0026quot;, current: null });\n\n  get visible() {\n    return this.notes.list(\u0026quot;notes\u0026quot;, this.state.query);\n  }\n\n  create() {\n    this.state.current = this.notes.create();\n  }\n\n  view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      root.controls.add(this.head(), this.search(), this.rows(), this.detail());\n    });\n  }\n\n  head() {\n    return motifComponent(\u0026quot;header\u0026quot;, (head) =\u0026gt; {\n      head.class.add(\u0026quot;list__head\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n        h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;)));\n      });\n      const newNote = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;New note\u0026quot;)));\n      });\n      head.controls.add(title, newNote);\n    });\n  }\n\n  search() {\n    return motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n      field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; });\n      field.bindings.model(() =\u0026gt; this.state.query, (value) =\u0026gt; (this.state.query = value));\n    });\n  }\n\n  rows() {\n    return motifComponent(\u0026quot;div\u0026quot;, (rows) =\u0026gt; {\n      rows.class.add(\u0026quot;rows\u0026quot;);\n      const list = motifComponent({\n        initializeComponent: (holder) =\u0026gt; {\n          holder.bindings.list(() =\u0026gt; this.visible, (note) =\u0026gt; this.row(note));\n        },\n      });\n      const empty = motifComponent(\u0026quot;p\u0026quot;, {\n        preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; this.visible.length === 0),\n        initializeComponent: (p) =\u0026gt; {\n          p.class.add(\u0026quot;list__empty\u0026quot;);\n          p.bindings.text(() =\u0026gt; (this.state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;));\n        },\n      });\n      rows.controls.add(list, empty);\n    });\n  }\n\n  row(note) {\n    return motifComponent(\u0026quot;button\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (row) =\u0026gt; {\n        row.attr.add({ type: \u0026quot;button\u0026quot; });\n        row.class.add(() =\u0026gt; (note === this.state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;));\n        row.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.state.current = note));\n        const pin = motifComponent(\u0026quot;i\u0026quot;, {\n          preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n          initializeComponent: (i) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n        });\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        row.controls.add(pin, title);\n      },\n    });\n  }\n\n  detail() {\n    return motifComponent(\u0026quot;article\u0026quot;, {\n      preconfig: (article) =\u0026gt; article.bindings.display(() =\u0026gt; this.state.current !== null),\n      initializeComponent: (article) =\u0026gt; {\n        article.class.add(\u0026quot;detail\u0026quot;);\n        const title = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n          field.attr.add({ placeholder: \u0026quot;Title\u0026quot; });\n          field.bindings.model(() =\u0026gt; this.state.current.title, (value) =\u0026gt; (this.state.current.title = value));\n        });\n        const body = motifComponent(\u0026quot;textarea\u0026quot;, (field) =\u0026gt; {\n          field.attr.add({ placeholder: \u0026quot;Note\u0026quot; });\n          field.bindings.model(() =\u0026gt; this.state.current.body, (value) =\u0026gt; (this.state.current.body = value));\n        });\n        const pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.togglePin(this.state.current));\n          button.bindings.text(() =\u0026gt; (this.state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;));\n        });\n        article.controls.add(title, body, pin);\n      },\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/NotesPane.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesPane() {\n  const notes = FromService(NotesService);\n  const state = reactive({ query: \u0026quot;\u0026quot;, current: null });\n  const visible = () =\u0026gt; notes.list(\u0026quot;notes\u0026quot;, state.query);\n  const create = () =\u0026gt; (state.current = notes.create());\n\n  const head = motifComponent(\u0026quot;header\u0026quot;, (bar) =\u0026gt; {\n    bar.class.add(\u0026quot;list__head\u0026quot;);\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;)));\n    });\n    const newNote = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, create);\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;New note\u0026quot;)));\n    });\n    bar.controls.add(title, newNote);\n  });\n\n  const search = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n    field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; });\n    field.bindings.model(() =\u0026gt; state.query, (value) =\u0026gt; (state.query = value));\n  });\n\n  const row = (note) =\u0026gt;\n    motifComponent(\u0026quot;button\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (item) =\u0026gt; {\n        item.attr.add({ type: \u0026quot;button\u0026quot; });\n        item.class.add(() =\u0026gt; (note === state.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;));\n        item.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (state.current = note));\n        const pin = motifComponent(\u0026quot;i\u0026quot;, {\n          preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n          initializeComponent: (i) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n        });\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        item.controls.add(pin, title);\n      },\n    });\n\n  const rows = motifComponent(\u0026quot;div\u0026quot;, (box) =\u0026gt; {\n    box.class.add(\u0026quot;rows\u0026quot;);\n    const list = motifComponent({\n      initializeComponent: (holder) =\u0026gt; holder.bindings.list(visible, row),\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; visible().length === 0),\n      initializeComponent: (p) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.bindings.text(() =\u0026gt; (state.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;));\n      },\n    });\n    box.controls.add(list, empty);\n  });\n\n  const detail = motifComponent(\u0026quot;article\u0026quot;, {\n    preconfig: (article) =\u0026gt; article.bindings.display(() =\u0026gt; state.current !== null),\n    initializeComponent: (article) =\u0026gt; {\n      article.class.add(\u0026quot;detail\u0026quot;);\n      const title = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n        field.attr.add({ placeholder: \u0026quot;Title\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.current.title, (value) =\u0026gt; (state.current.title = value));\n      });\n      const body = motifComponent(\u0026quot;textarea\u0026quot;, (field) =\u0026gt; {\n        field.attr.add({ placeholder: \u0026quot;Note\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.current.body, (value) =\u0026gt; (state.current.body = value));\n      });\n      const pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(state.current));\n        button.bindings.text(() =\u0026gt; (state.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;));\n      });\n      article.controls.add(title, body, pin);\n    },\n  });\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n    root.class.add(\u0026quot;notes\u0026quot;);\n    root.controls.add(head, search, rows, detail);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/pages/NotesPane.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesPane = () =\u0026gt; {\n  const notes = FromService(NotesService);\n\n  return motifOptions({\n    el: \u0026quot;div\u0026quot;,\n    data: reactive({ query: \u0026quot;\u0026quot;, current: null }),\n\n    visible() {\n      return notes.list(\u0026quot;notes\u0026quot;, this.data.query);\n    },\n\n    create() {\n      this.data.current = notes.create();\n    },\n\n    view() {\n      this.class.add(\u0026quot;notes\u0026quot;);\n      return [this.head(), this.search(), this.rows(), this.detail()];\n    },\n\n    head() {\n      return motifComponent(\u0026quot;header\u0026quot;, (head) =\u0026gt; {\n        head.class.add(\u0026quot;list__head\u0026quot;);\n        const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n          h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;)));\n        });\n        const newNote = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;New note\u0026quot;)));\n        });\n        head.controls.add(title, newNote);\n      });\n    },\n\n    search() {\n      return motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n        field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; });\n        field.bindings.model(() =\u0026gt; this.data.query, (value) =\u0026gt; (this.data.query = value));\n      });\n    },\n\n    rows() {\n      return motifComponent(\u0026quot;div\u0026quot;, (rows) =\u0026gt; {\n        rows.class.add(\u0026quot;rows\u0026quot;);\n        const list = motifComponent({\n          initializeComponent: (holder) =\u0026gt; {\n            holder.bindings.list(() =\u0026gt; this.visible(), (note) =\u0026gt; this.row(note));\n          },\n        });\n        const empty = motifComponent(\u0026quot;p\u0026quot;, {\n          preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; this.visible().length === 0),\n          initializeComponent: (p) =\u0026gt; {\n            p.class.add(\u0026quot;list__empty\u0026quot;);\n            p.bindings.text(() =\u0026gt; (this.data.query.trim() ? \u0026quot;No search results.\u0026quot; : \u0026quot;No notes yet.\u0026quot;));\n          },\n        });\n        rows.controls.add(list, empty);\n      });\n    },\n\n    row(note) {\n      return motifComponent(\u0026quot;button\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (row) =\u0026gt; {\n          row.attr.add({ type: \u0026quot;button\u0026quot; });\n          row.class.add(() =\u0026gt; (note === this.data.current ? \u0026quot;row active\u0026quot; : \u0026quot;row\u0026quot;));\n          row.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.data.current = note));\n          const pin = motifComponent(\u0026quot;i\u0026quot;, {\n            preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n            initializeComponent: (i) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n          });\n          const title = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n          row.controls.add(pin, title);\n        },\n      });\n    },\n\n    detail() {\n      return motifComponent(\u0026quot;article\u0026quot;, {\n        preconfig: (article) =\u0026gt; article.bindings.display(() =\u0026gt; this.data.current !== null),\n        initializeComponent: (article) =\u0026gt; {\n          article.class.add(\u0026quot;detail\u0026quot;);\n          const title = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n            field.attr.add({ placeholder: \u0026quot;Title\u0026quot; });\n            field.bindings.model(() =\u0026gt; this.data.current.title, (value) =\u0026gt; (this.data.current.title = value));\n          });\n          const body = motifComponent(\u0026quot;textarea\u0026quot;, (field) =\u0026gt; {\n            field.attr.add({ placeholder: \u0026quot;Note\u0026quot; });\n            field.bindings.model(() =\u0026gt; this.data.current.body, (value) =\u0026gt; (this.data.current.body = value));\n          });\n          const pin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot; });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(this.data.current));\n            button.bindings.text(() =\u0026gt; (this.data.current?.pinned ? \u0026quot;Unpin\u0026quot; : \u0026quot;Pin\u0026quot;));\n          });\n          article.controls.add(title, body, pin);\n        },\n      });\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/main.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/main.tsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new NotesPane());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript,declarative/options/typescript\u0022 data-file=\u0022src/main.tsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, \u0026lt;NotesPane /\u0026gt;);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new NotesPane());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, NotesPane());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, motifComponent(NotesPane));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/main.jsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new NotesPane());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript,declarative/options/javascript\u0022 data-file=\u0022src/main.jsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, \u0026lt;NotesPane /\u0026gt;);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new NotesPane());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, NotesPane());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesPane } from \u0026quot;./pages/NotesPane\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, motifComponent(NotesPane));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EA few things worth noticing in the example:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EEach note is a single reactive object.\u003C/strong\u003E When the title changes in the editor, the text in the row updates, and when pinning changes, so does the icon in the row; the list is not rebuilt. \u003Ccode\u003ENotesService.create\u003C/code\u003E adds to the front of the list, and the rows follow that on their own.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EBindings are fine-grained.\u003C/strong\u003E \u003Ccode\u003Ex-model\u003C/code\u003E / \u003Ccode\u003Ebindings.model\u003C/code\u003E is a two-way binding, \u003Ccode\u003E{() =\u0026gt; …}\u003C/code\u003E / \u003Ccode\u003Ebindings.text\u003C/code\u003E is live text, \u003Ccode\u003Ex-display\u003C/code\u003E / \u003Ccode\u003Ebindings.display\u003C/code\u003E is visibility, and \u003Ccode\u003E.map\u003C/code\u003E \u002B \u003Ccode\u003Ekey\u003C/code\u003E / \u003Ccode\u003Ebindings.list\u003C/code\u003E \u002B \u003Ccode\u003Eindexkey\u003C/code\u003E is a list of rows. Rows are matched to the item object itself; \u003Ccode\u003Ekey\u003C/code\u003E does not change that matching, and if the same key is used twice, development mode prints an MJX202 warning. In JSX, the compiler turns a field read such as \u003Ccode\u003E{note.title}\u003C/code\u003E into a binding by itself; when writing without JSX, a value that has to stay live is passed as a getter, while \u003Ccode\u003EsetText(\u0026quot;…\u0026quot;)\u003C/code\u003E and plain values are written once.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EServices are registered while the application is being built.\u003C/strong\u003E \u003Ccode\u003Ebuilder.services.addSingleton(NotesService, { useClass: NotesService })\u003C/code\u003E registers the service before \u003Ccode\u003Ebuild()\u003C/code\u003E. A singleton given \u003Ccode\u003Estartup: true\u003C/code\u003E is created at the start of \u003Ccode\u003Eapp.run()\u003C/code\u003E, before the root component is built, without waiting for a component to ask for it; on a service that is not a singleton this option is ignored and an MJX415 warning is printed. The other way to register is to mark the class with \u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\u003C/code\u003E. That mark enters the registry when the class\u0027s module is loaded: \u003Ccode\u003Ebuild()\u003C/code\u003E registers only the marked classes loaded up to that point, so a service whose module has not been loaded yet is not in the registry until the module loads and it is asked for the first time, and it is not created at startup even with \u003Ccode\u003Estartup: true\u003C/code\u003E. On a class that was registered in the builder, the mark is ignored. In the example the class component gets the service with \u003Ccode\u003Ethis.getService\u003C/code\u003E, and the function and Options components with \u003Ccode\u003EFromService\u003C/code\u003E; the Options component can use \u003Ccode\u003Ethis.getService\u003C/code\u003E too.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe imperative form is the same core calls written by hand.\u003C/strong\u003E \u003Ccode\u003EmotifComponent(tag, setup)\u003C/code\u003E creates a component, and the setup function runs once as \u003Ccode\u003EinitializeComponent\u003C/code\u003E. For an element that starts out hidden, the \u003Ccode\u003Edisplay\u003C/code\u003E binding is set up in \u003Ccode\u003Epreconfig\u003C/code\u003E so the element is not built until it becomes visible. Plain text is a \u003Ccode\u003E\u0026quot;text\u0026quot;\u003C/code\u003E component: \u003Ccode\u003EmotifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;…\u0026quot;))\u003C/code\u003E. The compiler produces whichever binding it picks for each expression (\u003Ccode\u003Ebindings.method\u003C/code\u003E for live text, \u003Ccode\u003Ebindings.ternary\u003C/code\u003E for a ternary); when writing by hand, \u003Ccode\u003Ebindings.text\u003C/code\u003E is enough for live text. \u003Ccode\u003Enpx motif-explain file.tsx\u003C/code\u003E prints which call a JSX expression comes down to.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo begin, go on to \u003Ca href=\u0022/docs/getting-started\u0022\u003EGetting Started\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"what-is-different","text":"What does MotifJS do differently?","level":2},{"id":"contents","text":"Contents","level":2},{"id":"quick-look","text":"Quick look","level":2},{"id":"next","text":"Next step","level":2}],"previous":null,"next":{"slug":"getting-started","title":"Getting Started"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Get started</p>
+        <h1>MotifJS Documentation</h1>
+        <p>What MotifJS does, an index of the sections, and a quick look through a slice of a notes list.</p>
+<p>MotifJS is a UI framework for JavaScript and TypeScript, built for modern web applications, that brings speed, reactivity and a clear architecture together under one roof. Views are written in JSX, and the compiler turns them into component calls at build time. The same calls can also be written directly, without JSX, in TypeScript or JavaScript. Every tag in JSX becomes a component object that carries its own DOM element, and these objects live in the <code>controls</code> tree. A value bound to a getter updates only that property of the element it is bound to; the component is not rebuilt.</p>
+<h2 id="what-is-different">What does MotifJS do differently?</h2>
+<p>In MotifJS the interface is a tree of component objects that live for as long as the application stays open. The view is built once, and from then on these objects carry it: bindings update values, the tree changes by hand or through bindings, and lifetimes are managed explicitly.</p>
+<ul>
+<li><strong>Every tag is a component object.</strong> A <code>&lt;div&gt;</code>, a <code>&lt;button&gt;</code>, even a piece of plain text turns into a <code>motifComponent</code> call in the compiler. The resulting object has its own <code>element</code>, a <code>controls</code> collection that holds its children, and the <code>bindings</code>, <code>class</code> and <code>attr</code> members, plus <code>motif</code>, which handles events and visibility. The built element is not thrown away as a copy; it stays in hand for the life of the application, and you can find and change it in the tree through <code>parent</code>, <code>siblings</code> and <code>$()</code>.</li>
+<li><strong><code>view()</code> runs once.</strong> It is called while the component is being built, and bindings carry every change after that. On a component that is already built, <code>controls.add(&lt;div/&gt;)</code> builds the child right away and puts its element in place; on a component that is not built yet, the child is built together with its owner.</li>
+<li><strong>The tree is edited at run time.</strong> <code>controls.add</code>, <code>insert</code>, <code>move</code>, <code>moveToIndex</code> and <code>remove</code> change the component tree directly. A component passed to another component's <code>controls.add</code> leaves its old place and moves to the new one, taking its state, bindings and events with it. <code>remove</code> disposes the component. <code>detach</code>, on the other hand, plays the leave transition if there is one and only takes the component out of the tree and the DOM; a detached component can be added again later.</li>
+<li><strong>Access to the real element.</strong> Every component's <code>element</code> is created in the constructor, so you can reach it before the component is built and before it is added to the page. In a component without an element of its own (a fragment), <code>element</code> is a comment node.</li>
+<li><strong>Fine-grained reactivity.</strong> When a state field changes, only the DOM node or attribute bound to that field is updated, not the whole component.</li>
+<li><strong>Waiting and hidden components keep their place.</strong> <code>x-wait</code> does not build the component at all until its condition holds. <code>x-display</code> is the reverse of the same waiting: if it starts out <code>false</code> the component is not built, and if it turns <code>false</code> after the component is built, the component is hidden. In both cases the component leaves a comment marker in the DOM unless <code>hideStrategy: &quot;detach&quot;</code> is given, and it comes back to the same spot when shown.</li>
+<li><strong>Lifetimes are managed explicitly.</strong> A disposed component shuts down its children, bindings and events, and resources tied to it with <code>motif.register</code> or <code>motif.setDisposable</code> are closed along with it. An application subscription opened through the component's <code>context.on</code> is removed on its own when the component is disposed.</li>
+<li><strong>Service lifetimes follow route changes.</strong> When the router is in use, every route change opens its own service scope, and the components built during that change are tied to it. A service registered as <code>scoped</code> is created once per scope. When the new change completes, the previous change's scope closes together with its services, unless a kept page is still holding it.</li>
+<li><strong>A page is not rebuilt every time you return to it.</strong> The component of a route given <code>keepAlive: true</code> is kept after its first build, and the same instance is shown when you come back. With stack navigation turned on (<code>app.useRouter({ …, stack: true })</code>), pages left behind are kept for up to five steps by default; going back brings the same instances with their scroll positions. A slide transition (<code>animation: &quot;slide&quot;</code>) and swiping back from the edge (<code>swipeBack</code>) are options.</li>
+<li><strong>Built-in infrastructure.</strong> Routing, dependency injection, lifecycle, animation and memory management come with the core. <code>Frame</code>, <code>Lazy</code>, <code>Transport</code> / <code>TransportTo</code>, <code>ContentBody</code> / <code>ContentBlock</code>, <code>Virtualization</code>, <code>Resilience</code>, <code>Query</code> and the <code>List</code>, <code>Dictionary</code> and <code>LinkedList</code> collections are part of the core as well.</li>
+<li><strong>JavaScript or TypeScript, with or without JSX.</strong> Components are classes, functions or Options API objects, and the view is built with JSX or with the hand-written (imperative) form of the same calls. All three styles produce the same kind of component, and they sit side by side in the same tree.</li>
+</ul>
+<blockquote>
+<p>MotifJS is designed for long-lived, state-heavy interfaces. No planning has been done yet for server-side rendering (SSR); it may be considered in the future.</p>
+</blockquote>
+<h2 id="contents">Contents</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Section</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Get started</td>
+<td><a href="/docs/getting-started">Getting Started</a></td>
+<td>Installation, build setup, the first component and application</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/components">Components</a></td>
+<td>Class / function / Options API components, the root element, <code>view()</code> and <code>controls</code>, names of class members</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/component-creation">Creating Components</a></td>
+<td>Defining a component, giving it its element and content, using it; creation and building</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/component-props">Props and Children</a></td>
+<td><code>props</code>, data flow between components, <code>childs</code></td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/component-tree">controls and the Component Tree</a></td>
+<td>The <code>controls</code> collection, moving around the component tree, moving content somewhere else</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/component-element">Element and Appearance</a></td>
+<td><code>element</code>, <code>ref</code>, <code>onRefCreated</code>; <code>class</code>, <code>attr</code>, <code>style</code>, <code>setText</code></td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/component-motif">The motif Namespace</a></td>
+<td><code>show</code> / <code>hide</code>, <code>on</code> / <code>off</code> / <code>trigger</code>, <code>setDisposable</code>, <code>clear</code>, <code>motif.options</code></td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/component-bindings">bindings</a></td>
+<td>What live expressions in JSX turn into, the <code>bindings</code> members, <code>watch</code>, the lifetime of a binding</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/component-state">State, Context and Services</a></td>
+<td>State flags, <code>setState</code> / <code>reState</code>, <code>context</code>, reaching services, <code>build</code> / <code>dispose</code></td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/using">Async Results with using</a></td>
+<td>Dropping a result that reaches a disposed component, handlers, <code>MJX129</code>, when the check happens</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/do-work">Async Results with doWork</a></td>
+<td>A promise tied to the component's lifetime, <code>MJX108</code>, <code>catch</code> and <code>finally</code>, how it differs from <code>using</code></td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/jsx">JSX and Templates</a></td>
+<td>JSX rules, class/style/attributes, spread, <code>x-</code> directives, fragments, compile diagnostics, <code>explain</code></td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/imperative">Views without JSX</a></td>
+<td>The <code>motifComponent</code> and <code>new Component</code> call forms, props keys, text nodes, <code>preconfig</code>, fragments for branches and lists, class components in files without JSX, reading the compiled output</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/reactivity">Reactivity</a></td>
+<td><code>reactive</code>, <code>createSignal</code>, <code>createComputed</code>, <code>createLazyComputed</code>, <code>effect</code>, <code>untracked</code></td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/conditionals-and-lists">Conditional Rendering and Lists</a></td>
+<td><code>x-wait</code>/<code>x-display</code>, <code>&amp;&amp;</code>, the ternary operator, <code>.map</code>, <code>key</code> and item identity, <code>switch</code>, the binding API</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/events">Events</a></td>
+<td>DOM events, modifiers, component, lifecycle and application events, service events (<code>Emitter</code>)</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/forms">Forms and Two-Way Binding</a></td>
+<td>One-way <code>value</code> + <code>oninput</code>, two-way binding with <code>bindings.model</code> and <code>x-model</code>, <code>checked</code>, <code>value</code>, <code>&lt;select&gt;</code>, form submission, a validation pattern</td>
+</tr>
+<tr>
+<td>Core concepts</td>
+<td><a href="/docs/lifecycle">Lifecycle</a></td>
+<td>Lifecycle hooks and their order, <code>initializeComponent</code>, visibility, waiting, disposal, the application lifecycle</td>
+</tr>
+<tr>
+<td>Application structure</td>
+<td><a href="/docs/styling-and-transitions">Styling and Animation</a></td>
+<td>The <code>class</code>/<code>style</code>/<code>attr</code> helpers, inline <code>&lt;style&gt;</code>, Tailwind, Bootstrap and external CSS, the transition system: CSS class and WAAPI keyframe transitions, the enter/leave mode (<code>mode</code>)</td>
+</tr>
+<tr>
+<td>Application structure</td>
+<td><a href="/docs/memory-and-dispose">Memory Management and Disposal</a></td>
+<td><code>IDisposable</code>, automatic cleanup, <code>motif.register</code>/<code>setDisposable</code>, the dispose methods, <code>detach</code>/<code>silentDetach</code>/<code>silentUnlink</code>, <code>DisposableStore</code>, <code>using</code>/<code>doWork</code>, leak tracking, counting live components</td>
+</tr>
+<tr>
+<td>Application structure</td>
+<td><a href="/docs/error-handling">Error Handling</a></td>
+<td>The throw/report/warn paths, <code>MotifError</code>, <code>errorHandler</code>, <code>setUnexpectedErrorHandler</code>, <code>safeCall*</code>, where an error in user code is caught</td>
+</tr>
+<tr>
+<td>Application structure</td>
+<td><a href="/docs/resilience">Resilience</a></td>
+<td>The <code>Resilience.create</code> chain and its order, <code>retry</code>, <code>timeout</code>, <code>circuitBreaker</code>, <code>bulkhead</code>, <code>rateLimiter</code>, <code>fallback</code>, <code>decorate</code>, error codes</td>
+</tr>
+<tr>
+<td>Application structure</td>
+<td><a href="/docs/windows">Windows</a></td>
+<td><code>app.windows</code>: opening a component in a new window or in an always-on-top Picture-in-Picture window, taking it back, mirroring styles and theme, Electron</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><a href="/docs/routing">Introduction to Routing</a></td>
+<td><code>useRouter</code>, navigation modes, the not-found route and the error page</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><a href="/docs/routes">The Route Table</a></td>
+<td><code>RouteItem</code> fields, nested routes, <code>redirect</code>/<code>alias</code>, path parameters, <code>resolve</code>/<code>href</code>/<code>routes</code>, lazy routes</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><a href="/docs/router-view">RouterView</a></td>
+<td>Where a route's output goes, nested and named <code>RouterView</code>s</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><a href="/docs/router-links">Links</a></td>
+<td><code>rel=&quot;router&quot;</code>, <code>RouterLink</code>, <code>enableRouterClassing</code></td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><a href="/docs/navigation">Navigation and Route State</a></td>
+<td><code>navigate</code>/<code>navigateByName</code>, live route state, <code>direction</code>/<code>state</code>, <code>scrollMemory</code></td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><a href="/docs/route-guards">Route Hooks and Guards</a></td>
+<td>Route hooks, <code>useGuard</code>, <code>onRouterChanged</code>, <code>app.use</code>, restarting and shutting down</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td><a href="/docs/navigation-stack">Stack Navigation</a></td>
+<td><code>stack</code>: kept pages, the transition animation, swiping back</td>
+</tr>
+<tr>
+<td>Dependency Injection</td>
+<td><a href="/docs/dependency-injection">Introduction to Dependency Injection</a></td>
+<td>Registering a service, using it from a component, a full example</td>
+</tr>
+<tr>
+<td>Dependency Injection</td>
+<td><a href="/docs/service-registration">Registering Services</a></td>
+<td><code>ServiceCollection</code> registration forms, <code>startup</code> singletons, <code>@Injectable</code> and its options</td>
+</tr>
+<tr>
+<td>Dependency Injection</td>
+<td><a href="/docs/service-lifetimes">Lifetimes and Scopes</a></td>
+<td><code>singleton</code> / <code>scoped</code> / <code>transient</code>, the navigation scope, the scoped handle</td>
+</tr>
+<tr>
+<td>Dependency Injection</td>
+<td><a href="/docs/service-resolution">Resolving Services</a></td>
+<td><code>provider.get</code> / <code>getAsync</code>, <code>getService</code>, <code>FromService</code>, <code>inject</code>, <code>deps</code>, <code>useApplication</code></td>
+</tr>
+<tr>
+<td>Dependency Injection</td>
+<td><a href="/docs/service-disposal">Disposing Services</a></td>
+<td><code>app.dispose</code> / <code>provider.dispose</code>, closing a scope, tracking transients</td>
+</tr>
+<tr>
+<td>Guides</td>
+<td><a href="/docs/package-authoring">Writing Packages on Motif</a></td>
+<td>The compiler output as an open API; the mechanisms that theme, layer, layout, plugin, data, wrapper, settings and transition packages rely on</td>
+</tr>
+<tr>
+<td>Guides</td>
+<td><a href="/docs/wrapping-libraries">Wrapping Third-Party Libraries</a></td>
+<td>Turning libraries that manage their own DOM into components</td>
+</tr>
+<tr>
+<td>Guides</td>
+<td><a href="/docs/publishing-libraries">Publishing an npm Library for MotifJS</a></td>
+<td>Preparing a component/service package: build, types, CSS, the prop contract, pre-publish checks</td>
+</tr>
+<tr>
+<td>Guides</td>
+<td><a href="/docs/component-libraries">Writing a Component Library</a></td>
+<td>Rules for a kit that applications use: props tracked by a single binding, data used as it is, untracked internal state, drawing by hand, writing only on change, lifetime traps, measuring</td>
+</tr>
+<tr>
+<td>Guides</td>
+<td><a href="/docs/devtools">The DevTools Contract</a></td>
+<td>The <code>__MOTIF_DEVTOOLS__</code> object turned on by <code>useDevelopment(true)</code>: the tree, events, reactivity trace, counters, router and error records; <code>registerDevtools</code> for packages</td>
+</tr>
+<tr>
+<td>Reference</td>
+<td><a href="/docs/api-reference">API Reference</a></td>
+<td>A summary of every exported symbol</td>
+</tr>
+<tr>
+<td>Reference</td>
+<td><a href="/docs/error-codes">Error and Warning Codes</a></td>
+<td>Every <code>MJX</code> code, its kind, its console message and what it means</td>
+</tr>
+<tr>
+<td>Reference</td>
+<td><a href="/docs/query">Collection Queries (Query)</a></td>
+<td>Chainable filtering, sorting and grouping with <code>Query.from(...)</code></td>
+</tr>
+<tr>
+<td>Reference</td>
+<td><a href="/docs/collections">Collections</a></td>
+<td><code>List</code>, <code>Dictionary</code>, <code>NameValuePair</code>, <code>LinkedList</code></td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td><a href="/docs/frame">Frame</a></td>
+<td>A container that holds a single changing piece of content; timing and transitions</td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td><a href="/docs/lazy">Lazy</a></td>
+<td>Content from a dynamic <code>import()</code> or any <code>Promise</code>; the loading flow, options, retries, cancellation, error reports</td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td><a href="/docs/transport">Transport and TransportTo</a></td>
+<td>Showing content in another slot; the <code>replace</code>/<code>merge</code> modes, <code>Transporter</code></td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td><a href="/docs/content-body">ContentBody and ContentBlock</a></td>
+<td>A body that several blocks fill together</td>
+</tr>
+<tr>
+<td>Advanced</td>
+<td><a href="/docs/virtualization">Virtual Lists (Virtualization)</a></td>
+<td>Virtual scrolling for large data</td>
+</tr>
+</tbody>
+</table>
+<h2 id="quick-look">Quick look</h2>
+<p>A notes list: <code>NotesService</code> keeps the notes in one place, and <code>NotesPane</code> shows the search box, the rows and an editor for the selected note. <code>SettingsService</code> holds the theme and density settings and is created when the application starts. The same component is written in six forms: class, function and Options API, each with JSX and without it.</p>
+<div class="doc-code" data-file="src/services/notes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/notes.ts"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export interface Note {
+  id: number;
+  title: string;
+  body: string;
+  pinned: boolean;
+  archived: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export type Folder = &quot;notes&quot; | &quot;pinned&quot; | &quot;archive&quot;;
+
+export const FOLDERS: Record&lt;Folder, { title: string; empty: string }&gt; = {
+  notes: { title: &quot;All notes&quot;, empty: &quot;No notes yet. Write the first one.&quot; },
+  pinned: { title: &quot;Pinned&quot;, empty: &quot;No pinned notes. Pin a note you want to keep at the top.&quot; },
+  archive: { title: &quot;Archive&quot;, empty: &quot;The archive is empty.&quot; },
+};
+
+const inFolder: Record&lt;Folder, (note: Note) =&gt; boolean&gt; = {
+  notes: (note) =&gt; !note.archived,
+  pinned: (note) =&gt; note.pinned &amp;&amp; !note.archived,
+  archive: (note) =&gt; note.archived,
+};
+
+export class NotesService {
+  readonly state = reactive({ items: [] as Note[] });
+  private nextId = this.state.items.length + 1;
+
+  list(folder: Folder, query = &quot;&quot;): Note[] {
+    const q = query.trim().toLowerCase();
+    return this.state.items
+      .filter(inFolder[folder])
+      .filter((note) =&gt; !q || `${note.title}\n${note.body}`.toLowerCase().includes(q))
+      .sort((a, b) =&gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);
+  }
+
+  count(folder: Folder): number {
+    return this.state.items.filter(inFolder[folder]).length;
+  }
+
+  find(id: number | string): Note | undefined {
+    const wanted = Number(id);
+    return this.state.items.find((note) =&gt; note.id === wanted);
+  }
+
+  create(): Note {
+    const now = Date.now();
+    this.state.items.unshift({ id: this.nextId++, title: &quot;&quot;, body: &quot;&quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });
+    return this.state.items[0];
+  }
+
+  touch(note: Note): void {
+    note.updatedAt = Date.now();
+  }
+
+  togglePin(note: Note): void {
+    note.pinned = !note.pinned;
+    this.touch(note);
+  }
+
+  archive(note: Note): void {
+    note.archived = true;
+    note.pinned = false;
+    this.touch(note);
+  }
+
+  restore(note: Note): void {
+    note.archived = false;
+    this.touch(note);
+  }
+
+  remove(id: number): boolean {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    this.state.items.splice(index, 1);
+    return true;
+  }
+
+  emptyArchive(): number {
+    let removed = 0;
+    for (let i = this.state.items.length - 1; i &gt;= 0; i--) {
+      if (!this.state.items[i].archived) continue;
+      this.state.items.splice(i, 1);
+      removed++;
+    }
+    return removed;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/notes.js"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export const FOLDERS = {
+  notes: { title: &quot;All notes&quot;, empty: &quot;No notes yet. Write the first one.&quot; },
+  pinned: { title: &quot;Pinned&quot;, empty: &quot;No pinned notes. Pin a note you want to keep at the top.&quot; },
+  archive: { title: &quot;Archive&quot;, empty: &quot;The archive is empty.&quot; },
+};
+
+const inFolder = {
+  notes: (note) =&gt; !note.archived,
+  pinned: (note) =&gt; note.pinned &amp;&amp; !note.archived,
+  archive: (note) =&gt; note.archived,
+};
+
+export class NotesService {
+  state = reactive({ items: [] });
+  nextId = this.state.items.length + 1;
+
+  list(folder, query = &quot;&quot;) {
+    const q = query.trim().toLowerCase();
+    return this.state.items
+      .filter(inFolder[folder])
+      .filter((note) =&gt; !q || `${note.title}\n${note.body}`.toLowerCase().includes(q))
+      .sort((a, b) =&gt; Number(b.pinned) - Number(a.pinned) || b.updatedAt - a.updatedAt);
+  }
+
+  count(folder) {
+    return this.state.items.filter(inFolder[folder]).length;
+  }
+
+  find(id) {
+    const wanted = Number(id);
+    return this.state.items.find((note) =&gt; note.id === wanted);
+  }
+
+  create() {
+    const now = Date.now();
+    this.state.items.unshift({ id: this.nextId++, title: &quot;&quot;, body: &quot;&quot;, pinned: false, archived: false, createdAt: now, updatedAt: now });
+    return this.state.items[0];
+  }
+
+  touch(note) {
+    note.updatedAt = Date.now();
+  }
+
+  togglePin(note) {
+    note.pinned = !note.pinned;
+    this.touch(note);
+  }
+
+  archive(note) {
+    note.archived = true;
+    note.pinned = false;
+    this.touch(note);
+  }
+
+  restore(note) {
+    note.archived = false;
+    this.touch(note);
+  }
+
+  remove(id) {
+    const index = this.state.items.findIndex((note) =&gt; note.id === id);
+    if (index &lt; 0) return false;
+    this.state.items.splice(index, 1);
+    return true;
+  }
+
+  emptyArchive() {
+    let removed = 0;
+    for (let i = this.state.items.length - 1; i &gt;= 0; i--) {
+      if (!this.state.items[i].archived) continue;
+      this.state.items.splice(i, 1);
+      removed++;
+    }
+    return removed;
+  }
+}</code></pre>
+</div>
+<div class="doc-code" data-file="src/services/settings.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/settings.ts"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export type Theme = &quot;system&quot; | &quot;light&quot; | &quot;dark&quot;;
+export type Density = &quot;comfortable&quot; | &quot;compact&quot;;
+
+export const THEMES: readonly Theme[] = [&quot;system&quot;, &quot;light&quot;, &quot;dark&quot;];
+export const DENSITIES: readonly Density[] = [&quot;comfortable&quot;, &quot;compact&quot;];
+
+const STORAGE_KEY = &quot;settings&quot;;
+
+export class SettingsService {
+  readonly state = reactive({ theme: &quot;system&quot; as Theme, density: &quot;comfortable&quot; as Density });
+
+  constructor() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? &quot;{}&quot;);
+      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;
+      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;
+    } catch {}
+    this.apply();
+  }
+
+  setTheme(theme: Theme) {
+    this.state.theme = theme;
+    this.save();
+  }
+
+  setDensity(density: Density) {
+    this.state.density = density;
+    this.save();
+  }
+
+  private save() {
+    this.apply();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));
+    } catch {}
+  }
+
+  private apply() {
+    const root = document.documentElement;
+    if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+    else root.dataset.theme = this.state.theme;
+    if (this.state.density === &quot;comfortable&quot;) delete root.dataset.density;
+    else root.dataset.density = this.state.density;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/settings.js"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export const THEMES = [&quot;system&quot;, &quot;light&quot;, &quot;dark&quot;];
+export const DENSITIES = [&quot;comfortable&quot;, &quot;compact&quot;];
+
+const STORAGE_KEY = &quot;settings&quot;;
+
+export class SettingsService {
+  state = reactive({ theme: &quot;system&quot;, density: &quot;comfortable&quot; });
+
+  constructor() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? &quot;{}&quot;);
+      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;
+      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;
+    } catch {}
+    this.apply();
+  }
+
+  setTheme(theme) {
+    this.state.theme = theme;
+    this.save();
+  }
+
+  setDensity(density) {
+    this.state.density = density;
+    this.save();
+  }
+
+  save() {
+    this.apply();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));
+    } catch {}
+  }
+
+  apply() {
+    const root = document.documentElement;
+    if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+    else root.dataset.theme = this.state.theme;
+    if (this.state.density === &quot;comfortable&quot;) delete root.dataset.density;
+    else root.dataset.density = this.state.density;
+  }
+}</code></pre>
+</div>
+<div class="doc-code" data-file="src/pages/NotesPane.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/pages/NotesPane.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export class NotesPane extends Component {
+  notes = this.getService(NotesService)!;
+  state = reactive({ query: &quot;&quot;, current: null as Note | null });
+
+  get visible() {
+    return this.notes.list(&quot;notes&quot;, this.state.query);
+  }
+
+  create() {
+    this.state.current = this.notes.create();
+  }
+
+  override view() {
+    return (
+      &lt;div class=&quot;notes&quot;&gt;
+        &lt;header class=&quot;list__head&quot;&gt;
+          &lt;h2&gt;Notes&lt;/h2&gt;
+          &lt;button type=&quot;button&quot; onclick={() =&gt; this.create()}&gt;New note&lt;/button&gt;
+        &lt;/header&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Search notes&quot; x-model={() =&gt; this.state.query} /&gt;
+        &lt;div class=&quot;rows&quot;&gt;
+          {this.visible.map((note) =&gt; (
+            &lt;button type=&quot;button&quot; key={note.id} class={() =&gt; (note === this.state.current ? &quot;row active&quot; : &quot;row&quot;)} onclick={() =&gt; (this.state.current = note)}&gt;
+              &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+              &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+            &lt;/button&gt;
+          ))}
+          &lt;p class=&quot;list__empty&quot; x-display={() =&gt; this.visible.length === 0}&gt;
+            {() =&gt; (this.state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;)}
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;article class=&quot;detail&quot; x-display={() =&gt; this.state.current !== null}&gt;
+          &lt;input placeholder=&quot;Title&quot; x-model={() =&gt; this.state.current!.title} /&gt;
+          &lt;textarea placeholder=&quot;Note&quot; x-model={() =&gt; this.state.current!.body} /&gt;
+          &lt;button type=&quot;button&quot; onclick={() =&gt; this.notes.togglePin(this.state.current!)}&gt;
+            {() =&gt; (this.state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;)}
+          &lt;/button&gt;
+        &lt;/article&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/NotesPane.tsx"><code>import { FromService, reactive } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export function NotesPane() {
+  const notes = FromService(NotesService)!;
+  const state = reactive({ query: &quot;&quot;, current: null as Note | null });
+  const visible = () =&gt; notes.list(&quot;notes&quot;, state.query);
+  const create = () =&gt; (state.current = notes.create());
+
+  return (
+    &lt;div class=&quot;notes&quot;&gt;
+      &lt;header class=&quot;list__head&quot;&gt;
+        &lt;h2&gt;Notes&lt;/h2&gt;
+        &lt;button type=&quot;button&quot; onclick={create}&gt;New note&lt;/button&gt;
+      &lt;/header&gt;
+      &lt;input type=&quot;search&quot; placeholder=&quot;Search notes&quot; x-model={() =&gt; state.query} /&gt;
+      &lt;div class=&quot;rows&quot;&gt;
+        {visible().map((note) =&gt; (
+          &lt;button type=&quot;button&quot; key={note.id} class={() =&gt; (note === state.current ? &quot;row active&quot; : &quot;row&quot;)} onclick={() =&gt; (state.current = note)}&gt;
+            &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+            &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+          &lt;/button&gt;
+        ))}
+        &lt;p class=&quot;list__empty&quot; x-display={() =&gt; visible().length === 0}&gt;
+          {() =&gt; (state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;)}
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;article class=&quot;detail&quot; x-display={() =&gt; state.current !== null}&gt;
+        &lt;input placeholder=&quot;Title&quot; x-model={() =&gt; state.current!.title} /&gt;
+        &lt;textarea placeholder=&quot;Note&quot; x-model={() =&gt; state.current!.body} /&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(state.current!)}&gt;
+          {() =&gt; (state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;)}
+        &lt;/button&gt;
+      &lt;/article&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/pages/NotesPane.tsx"><code>import { FromService, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export const NotesPane = () =&gt; {
+  const notes = FromService(NotesService)!;
+
+  return motifOptions({
+    el: &quot;div&quot;,
+    data: reactive({ query: &quot;&quot;, current: null as Note | null }),
+
+    visible() {
+      return notes.list(&quot;notes&quot;, this.data.query);
+    },
+
+    create() {
+      this.data.current = notes.create();
+    },
+
+    view() {
+      this.class.add(&quot;notes&quot;);
+      return (
+        &lt;&gt;
+          &lt;header class=&quot;list__head&quot;&gt;
+            &lt;h2&gt;Notes&lt;/h2&gt;
+            &lt;button type=&quot;button&quot; onclick={() =&gt; this.create()}&gt;New note&lt;/button&gt;
+          &lt;/header&gt;
+          &lt;input type=&quot;search&quot; placeholder=&quot;Search notes&quot; x-model={() =&gt; this.data.query} /&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {this.visible().map((note) =&gt; (
+              &lt;button type=&quot;button&quot; key={note.id} class={() =&gt; (note === this.data.current ? &quot;row active&quot; : &quot;row&quot;)} onclick={() =&gt; (this.data.current = note)}&gt;
+                &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+                &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+              &lt;/button&gt;
+            ))}
+            &lt;p class=&quot;list__empty&quot; x-display={() =&gt; this.visible().length === 0}&gt;
+              {() =&gt; (this.data.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;)}
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;article class=&quot;detail&quot; x-display={() =&gt; this.data.current !== null}&gt;
+            &lt;input placeholder=&quot;Title&quot; x-model={() =&gt; this.data.current!.title} /&gt;
+            &lt;textarea placeholder=&quot;Note&quot; x-model={() =&gt; this.data.current!.body} /&gt;
+            &lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(this.data.current!)}&gt;
+              {() =&gt; (this.data.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;)}
+            &lt;/button&gt;
+          &lt;/article&gt;
+        &lt;/&gt;
+      );
+    },
+  });
+};</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/pages/NotesPane.ts"><code>import { Component, ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export class NotesPane extends Component {
+  notes = this.getService(NotesService)!;
+  state = reactive({ query: &quot;&quot;, current: null as Note | null });
+
+  get visible() {
+    return this.notes.list(&quot;notes&quot;, this.state.query);
+  }
+
+  create() {
+    this.state.current = this.notes.create();
+  }
+  
+  override view() {
+    return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      root.controls.add(this.head(), this.search(), this.rows(), this.detail());
+    });
+  }
+
+  private head() {
+    return motifComponent(&quot;header&quot;, (head: ComponentBase) =&gt; {
+      head.class.add(&quot;list__head&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+        h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Notes&quot;)));
+      });
+      const newNote = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.motif.on(&quot;click&quot;, () =&gt; this.create());
+        button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;New note&quot;)));
+      });
+      head.controls.add(title, newNote);
+    });
+  }
+
+  private search() {
+    return motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+      field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Search notes&quot; });
+      field.bindings.model(() =&gt; this.state.query, (value: string) =&gt; (this.state.query = value));
+    });
+  }
+
+  private rows() {
+    return motifComponent(&quot;div&quot;, (rows: ComponentBase) =&gt; {
+      rows.class.add(&quot;rows&quot;);
+      const list = motifComponent({
+        initializeComponent: (holder: ComponentBase) =&gt; {
+          holder.bindings.list(() =&gt; this.visible, (note: Note) =&gt; this.row(note));
+        },
+      });
+      const empty = motifComponent(&quot;p&quot;, {
+        preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; this.visible.length === 0),
+        initializeComponent: (p: ComponentBase) =&gt; {
+          p.class.add(&quot;list__empty&quot;);
+          p.bindings.text(() =&gt; (this.state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;));
+        },
+      });
+      rows.controls.add(list, empty);
+    });
+  }
+
+  private row(note: Note) {
+    return motifComponent(&quot;button&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (row: ComponentBase) =&gt; {
+        row.attr.add({ type: &quot;button&quot; });
+        row.class.add(() =&gt; (note === this.state.current ? &quot;row active&quot; : &quot;row&quot;));
+        row.motif.on(&quot;click&quot;, () =&gt; (this.state.current = note));
+        const pin = motifComponent(&quot;i&quot;, {
+          preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned),
+          initializeComponent: (i: ComponentBase) =&gt; i.class.add(&quot;pin&quot;),
+        });
+        const title = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        row.controls.add(pin, title);
+      },
+    });
+  }
+
+  private detail() {
+    return motifComponent(&quot;article&quot;, {
+      preconfig: (article: ComponentBase) =&gt; article.bindings.display(() =&gt; this.state.current !== null),
+      initializeComponent: (article: ComponentBase) =&gt; {
+        article.class.add(&quot;detail&quot;);
+        const title = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+          field.attr.add({ placeholder: &quot;Title&quot; });
+          field.bindings.model(() =&gt; this.state.current!.title, (value: string) =&gt; (this.state.current!.title = value));
+        });
+        const body = motifComponent(&quot;textarea&quot;, (field: ComponentBase) =&gt; {
+          field.attr.add({ placeholder: &quot;Note&quot; });
+          field.bindings.model(() =&gt; this.state.current!.body, (value: string) =&gt; (this.state.current!.body = value));
+        });
+        const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+          button.attr.add({ type: &quot;button&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; this.notes.togglePin(this.state.current!));
+          button.bindings.text(() =&gt; (this.state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;));
+        });
+        article.controls.add(title, body, pin);
+      },
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/NotesPane.ts"><code>import { ComponentBase, FromService, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export function NotesPane() {
+  const notes = FromService(NotesService)!;
+  const state = reactive({ query: &quot;&quot;, current: null as Note | null });
+  const visible = () =&gt; notes.list(&quot;notes&quot;, state.query);
+  const create = () =&gt; (state.current = notes.create());
+
+  const head = motifComponent(&quot;header&quot;, (bar: ComponentBase) =&gt; {
+    bar.class.add(&quot;list__head&quot;);
+    const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+      h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Notes&quot;)));
+    });
+    const newNote = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, create);
+      button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;New note&quot;)));
+    });
+    bar.controls.add(title, newNote);
+  });
+
+  const search = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+    field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Search notes&quot; });
+    field.bindings.model(() =&gt; state.query, (value: string) =&gt; (state.query = value));
+  });
+
+  const row = (note: Note) =&gt;
+    motifComponent(&quot;button&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (item: ComponentBase) =&gt; {
+        item.attr.add({ type: &quot;button&quot; });
+        item.class.add(() =&gt; (note === state.current ? &quot;row active&quot; : &quot;row&quot;));
+        item.motif.on(&quot;click&quot;, () =&gt; (state.current = note));
+        const pin = motifComponent(&quot;i&quot;, {
+          preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned),
+          initializeComponent: (i: ComponentBase) =&gt; i.class.add(&quot;pin&quot;),
+        });
+        const title = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        item.controls.add(pin, title);
+      },
+    });
+
+  const rows = motifComponent(&quot;div&quot;, (box: ComponentBase) =&gt; {
+    box.class.add(&quot;rows&quot;);
+    const list = motifComponent({
+      initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(visible, row),
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; visible().length === 0),
+      initializeComponent: (p: ComponentBase) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.bindings.text(() =&gt; (state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;));
+      },
+    });
+    box.controls.add(list, empty);
+  });
+
+  const detail = motifComponent(&quot;article&quot;, {
+    preconfig: (article: ComponentBase) =&gt; article.bindings.display(() =&gt; state.current !== null),
+    initializeComponent: (article: ComponentBase) =&gt; {
+      article.class.add(&quot;detail&quot;);
+      const title = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+        field.attr.add({ placeholder: &quot;Title&quot; });
+        field.bindings.model(() =&gt; state.current!.title, (value: string) =&gt; (state.current!.title = value));
+      });
+      const body = motifComponent(&quot;textarea&quot;, (field: ComponentBase) =&gt; {
+        field.attr.add({ placeholder: &quot;Note&quot; });
+        field.bindings.model(() =&gt; state.current!.body, (value: string) =&gt; (state.current!.body = value));
+      });
+      const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(state.current!));
+        button.bindings.text(() =&gt; (state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;));
+      });
+      article.controls.add(title, body, pin);
+    },
+  });
+
+  return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+    root.class.add(&quot;notes&quot;);
+    root.controls.add(head, search, rows, detail);
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/pages/NotesPane.ts"><code>import { ComponentBase, FromService, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export const NotesPane = () =&gt; {
+  const notes = FromService(NotesService)!;
+
+  return motifOptions({
+    el: &quot;div&quot;,
+    data: reactive({ query: &quot;&quot;, current: null as Note | null }),
+
+    visible() {
+      return notes.list(&quot;notes&quot;, this.data.query);
+    },
+
+    create() {
+      this.data.current = notes.create();
+    },
+
+    view() {
+      this.class.add(&quot;notes&quot;);
+      return [this.head(), this.search(), this.rows(), this.detail()];
+    },
+
+    head() {
+      return motifComponent(&quot;header&quot;, (head: ComponentBase) =&gt; {
+        head.class.add(&quot;list__head&quot;);
+        const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+          h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Notes&quot;)));
+        });
+        const newNote = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+          button.attr.add({ type: &quot;button&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; this.create());
+          button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;New note&quot;)));
+        });
+        head.controls.add(title, newNote);
+      });
+    },
+
+    search() {
+      return motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+        field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Search notes&quot; });
+        field.bindings.model(() =&gt; this.data.query, (value: string) =&gt; (this.data.query = value));
+      });
+    },
+
+    rows() {
+      return motifComponent(&quot;div&quot;, (rows: ComponentBase) =&gt; {
+        rows.class.add(&quot;rows&quot;);
+        const list = motifComponent({
+          initializeComponent: (holder: ComponentBase) =&gt; {
+            holder.bindings.list(() =&gt; this.visible(), (note: Note) =&gt; this.row(note));
+          },
+        });
+        const empty = motifComponent(&quot;p&quot;, {
+          preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; this.visible().length === 0),
+          initializeComponent: (p: ComponentBase) =&gt; {
+            p.class.add(&quot;list__empty&quot;);
+            p.bindings.text(() =&gt; (this.data.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;));
+          },
+        });
+        rows.controls.add(list, empty);
+      });
+    },
+
+    row(note: Note) {
+      return motifComponent(&quot;button&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (row: ComponentBase) =&gt; {
+          row.attr.add({ type: &quot;button&quot; });
+          row.class.add(() =&gt; (note === this.data.current ? &quot;row active&quot; : &quot;row&quot;));
+          row.motif.on(&quot;click&quot;, () =&gt; (this.data.current = note));
+          const pin = motifComponent(&quot;i&quot;, {
+            preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned),
+            initializeComponent: (i: ComponentBase) =&gt; i.class.add(&quot;pin&quot;),
+          });
+          const title = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+          row.controls.add(pin, title);
+        },
+      });
+    },
+
+    detail() {
+      return motifComponent(&quot;article&quot;, {
+        preconfig: (article: ComponentBase) =&gt; article.bindings.display(() =&gt; this.data.current !== null),
+        initializeComponent: (article: ComponentBase) =&gt; {
+          article.class.add(&quot;detail&quot;);
+          const title = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+            field.attr.add({ placeholder: &quot;Title&quot; });
+            field.bindings.model(() =&gt; this.data.current!.title, (value: string) =&gt; (this.data.current!.title = value));
+          });
+          const body = motifComponent(&quot;textarea&quot;, (field: ComponentBase) =&gt; {
+            field.attr.add({ placeholder: &quot;Note&quot; });
+            field.bindings.model(() =&gt; this.data.current!.body, (value: string) =&gt; (this.data.current!.body = value));
+          });
+          const pin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+            button.attr.add({ type: &quot;button&quot; });
+            button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(this.data.current!));
+            button.bindings.text(() =&gt; (this.data.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;));
+          });
+          article.controls.add(title, body, pin);
+        },
+      });
+    },
+  });
+};</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/pages/NotesPane.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class NotesPane extends Component {
+  notes = this.getService(NotesService);
+  state = reactive({ query: &quot;&quot;, current: null });
+
+  get visible() {
+    return this.notes.list(&quot;notes&quot;, this.state.query);
+  }
+
+  create() {
+    this.state.current = this.notes.create();
+  }
+
+  view() {
+    return (
+      &lt;div class=&quot;notes&quot;&gt;
+        &lt;header class=&quot;list__head&quot;&gt;
+          &lt;h2&gt;Notes&lt;/h2&gt;
+          &lt;button type=&quot;button&quot; onclick={() =&gt; this.create()}&gt;New note&lt;/button&gt;
+        &lt;/header&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Search notes&quot; x-model={() =&gt; this.state.query} /&gt;
+        &lt;div class=&quot;rows&quot;&gt;
+          {this.visible.map((note) =&gt; (
+            &lt;button type=&quot;button&quot; key={note.id} class={() =&gt; (note === this.state.current ? &quot;row active&quot; : &quot;row&quot;)} onclick={() =&gt; (this.state.current = note)}&gt;
+              &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+              &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+            &lt;/button&gt;
+          ))}
+          &lt;p class=&quot;list__empty&quot; x-display={() =&gt; this.visible.length === 0}&gt;
+            {() =&gt; (this.state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;)}
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;article class=&quot;detail&quot; x-display={() =&gt; this.state.current !== null}&gt;
+          &lt;input placeholder=&quot;Title&quot; x-model={() =&gt; this.state.current.title} /&gt;
+          &lt;textarea placeholder=&quot;Note&quot; x-model={() =&gt; this.state.current.body} /&gt;
+          &lt;button type=&quot;button&quot; onclick={() =&gt; this.notes.togglePin(this.state.current)}&gt;
+            {() =&gt; (this.state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;)}
+          &lt;/button&gt;
+        &lt;/article&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/NotesPane.jsx"><code>import { FromService, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function NotesPane() {
+  const notes = FromService(NotesService);
+  const state = reactive({ query: &quot;&quot;, current: null });
+  const visible = () =&gt; notes.list(&quot;notes&quot;, state.query);
+  const create = () =&gt; (state.current = notes.create());
+
+  return (
+    &lt;div class=&quot;notes&quot;&gt;
+      &lt;header class=&quot;list__head&quot;&gt;
+        &lt;h2&gt;Notes&lt;/h2&gt;
+        &lt;button type=&quot;button&quot; onclick={create}&gt;New note&lt;/button&gt;
+      &lt;/header&gt;
+      &lt;input type=&quot;search&quot; placeholder=&quot;Search notes&quot; x-model={() =&gt; state.query} /&gt;
+      &lt;div class=&quot;rows&quot;&gt;
+        {visible().map((note) =&gt; (
+          &lt;button type=&quot;button&quot; key={note.id} class={() =&gt; (note === state.current ? &quot;row active&quot; : &quot;row&quot;)} onclick={() =&gt; (state.current = note)}&gt;
+            &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+            &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+          &lt;/button&gt;
+        ))}
+        &lt;p class=&quot;list__empty&quot; x-display={() =&gt; visible().length === 0}&gt;
+          {() =&gt; (state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;)}
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;article class=&quot;detail&quot; x-display={() =&gt; state.current !== null}&gt;
+        &lt;input placeholder=&quot;Title&quot; x-model={() =&gt; state.current.title} /&gt;
+        &lt;textarea placeholder=&quot;Note&quot; x-model={() =&gt; state.current.body} /&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(state.current)}&gt;
+          {() =&gt; (state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;)}
+        &lt;/button&gt;
+      &lt;/article&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/pages/NotesPane.jsx"><code>import { FromService, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const NotesPane = () =&gt; {
+  const notes = FromService(NotesService);
+
+  return motifOptions({
+    el: &quot;div&quot;,
+    data: reactive({ query: &quot;&quot;, current: null }),
+
+    visible() {
+      return notes.list(&quot;notes&quot;, this.data.query);
+    },
+
+    create() {
+      this.data.current = notes.create();
+    },
+
+    view() {
+      this.class.add(&quot;notes&quot;);
+      return (
+        &lt;&gt;
+          &lt;header class=&quot;list__head&quot;&gt;
+            &lt;h2&gt;Notes&lt;/h2&gt;
+            &lt;button type=&quot;button&quot; onclick={() =&gt; this.create()}&gt;New note&lt;/button&gt;
+          &lt;/header&gt;
+          &lt;input type=&quot;search&quot; placeholder=&quot;Search notes&quot; x-model={() =&gt; this.data.query} /&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {this.visible().map((note) =&gt; (
+              &lt;button type=&quot;button&quot; key={note.id} class={() =&gt; (note === this.data.current ? &quot;row active&quot; : &quot;row&quot;)} onclick={() =&gt; (this.data.current = note)}&gt;
+                &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+                &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+              &lt;/button&gt;
+            ))}
+            &lt;p class=&quot;list__empty&quot; x-display={() =&gt; this.visible().length === 0}&gt;
+              {() =&gt; (this.data.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;)}
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;article class=&quot;detail&quot; x-display={() =&gt; this.data.current !== null}&gt;
+            &lt;input placeholder=&quot;Title&quot; x-model={() =&gt; this.data.current.title} /&gt;
+            &lt;textarea placeholder=&quot;Note&quot; x-model={() =&gt; this.data.current.body} /&gt;
+            &lt;button type=&quot;button&quot; onclick={() =&gt; notes.togglePin(this.data.current)}&gt;
+              {() =&gt; (this.data.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;)}
+            &lt;/button&gt;
+          &lt;/article&gt;
+        &lt;/&gt;
+      );
+    },
+  });
+};</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/pages/NotesPane.js"><code>import { Component, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class NotesPane extends Component {
+  notes = this.getService(NotesService);
+  state = reactive({ query: &quot;&quot;, current: null });
+
+  get visible() {
+    return this.notes.list(&quot;notes&quot;, this.state.query);
+  }
+
+  create() {
+    this.state.current = this.notes.create();
+  }
+
+  view() {
+    return motifComponent(&quot;div&quot;, (root) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      root.controls.add(this.head(), this.search(), this.rows(), this.detail());
+    });
+  }
+
+  head() {
+    return motifComponent(&quot;header&quot;, (head) =&gt; {
+      head.class.add(&quot;list__head&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+        h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Notes&quot;)));
+      });
+      const newNote = motifComponent(&quot;button&quot;, (button) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.motif.on(&quot;click&quot;, () =&gt; this.create());
+        button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;New note&quot;)));
+      });
+      head.controls.add(title, newNote);
+    });
+  }
+
+  search() {
+    return motifComponent(&quot;input&quot;, (field) =&gt; {
+      field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Search notes&quot; });
+      field.bindings.model(() =&gt; this.state.query, (value) =&gt; (this.state.query = value));
+    });
+  }
+
+  rows() {
+    return motifComponent(&quot;div&quot;, (rows) =&gt; {
+      rows.class.add(&quot;rows&quot;);
+      const list = motifComponent({
+        initializeComponent: (holder) =&gt; {
+          holder.bindings.list(() =&gt; this.visible, (note) =&gt; this.row(note));
+        },
+      });
+      const empty = motifComponent(&quot;p&quot;, {
+        preconfig: (p) =&gt; p.bindings.display(() =&gt; this.visible.length === 0),
+        initializeComponent: (p) =&gt; {
+          p.class.add(&quot;list__empty&quot;);
+          p.bindings.text(() =&gt; (this.state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;));
+        },
+      });
+      rows.controls.add(list, empty);
+    });
+  }
+
+  row(note) {
+    return motifComponent(&quot;button&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (row) =&gt; {
+        row.attr.add({ type: &quot;button&quot; });
+        row.class.add(() =&gt; (note === this.state.current ? &quot;row active&quot; : &quot;row&quot;));
+        row.motif.on(&quot;click&quot;, () =&gt; (this.state.current = note));
+        const pin = motifComponent(&quot;i&quot;, {
+          preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned),
+          initializeComponent: (i) =&gt; i.class.add(&quot;pin&quot;),
+        });
+        const title = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        row.controls.add(pin, title);
+      },
+    });
+  }
+
+  detail() {
+    return motifComponent(&quot;article&quot;, {
+      preconfig: (article) =&gt; article.bindings.display(() =&gt; this.state.current !== null),
+      initializeComponent: (article) =&gt; {
+        article.class.add(&quot;detail&quot;);
+        const title = motifComponent(&quot;input&quot;, (field) =&gt; {
+          field.attr.add({ placeholder: &quot;Title&quot; });
+          field.bindings.model(() =&gt; this.state.current.title, (value) =&gt; (this.state.current.title = value));
+        });
+        const body = motifComponent(&quot;textarea&quot;, (field) =&gt; {
+          field.attr.add({ placeholder: &quot;Note&quot; });
+          field.bindings.model(() =&gt; this.state.current.body, (value) =&gt; (this.state.current.body = value));
+        });
+        const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+          button.attr.add({ type: &quot;button&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; this.notes.togglePin(this.state.current));
+          button.bindings.text(() =&gt; (this.state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;));
+        });
+        article.controls.add(title, body, pin);
+      },
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/NotesPane.js"><code>import { FromService, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function NotesPane() {
+  const notes = FromService(NotesService);
+  const state = reactive({ query: &quot;&quot;, current: null });
+  const visible = () =&gt; notes.list(&quot;notes&quot;, state.query);
+  const create = () =&gt; (state.current = notes.create());
+
+  const head = motifComponent(&quot;header&quot;, (bar) =&gt; {
+    bar.class.add(&quot;list__head&quot;);
+    const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+      h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Notes&quot;)));
+    });
+    const newNote = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, create);
+      button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;New note&quot;)));
+    });
+    bar.controls.add(title, newNote);
+  });
+
+  const search = motifComponent(&quot;input&quot;, (field) =&gt; {
+    field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Search notes&quot; });
+    field.bindings.model(() =&gt; state.query, (value) =&gt; (state.query = value));
+  });
+
+  const row = (note) =&gt;
+    motifComponent(&quot;button&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (item) =&gt; {
+        item.attr.add({ type: &quot;button&quot; });
+        item.class.add(() =&gt; (note === state.current ? &quot;row active&quot; : &quot;row&quot;));
+        item.motif.on(&quot;click&quot;, () =&gt; (state.current = note));
+        const pin = motifComponent(&quot;i&quot;, {
+          preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned),
+          initializeComponent: (i) =&gt; i.class.add(&quot;pin&quot;),
+        });
+        const title = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        item.controls.add(pin, title);
+      },
+    });
+
+  const rows = motifComponent(&quot;div&quot;, (box) =&gt; {
+    box.class.add(&quot;rows&quot;);
+    const list = motifComponent({
+      initializeComponent: (holder) =&gt; holder.bindings.list(visible, row),
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p) =&gt; p.bindings.display(() =&gt; visible().length === 0),
+      initializeComponent: (p) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.bindings.text(() =&gt; (state.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;));
+      },
+    });
+    box.controls.add(list, empty);
+  });
+
+  const detail = motifComponent(&quot;article&quot;, {
+    preconfig: (article) =&gt; article.bindings.display(() =&gt; state.current !== null),
+    initializeComponent: (article) =&gt; {
+      article.class.add(&quot;detail&quot;);
+      const title = motifComponent(&quot;input&quot;, (field) =&gt; {
+        field.attr.add({ placeholder: &quot;Title&quot; });
+        field.bindings.model(() =&gt; state.current.title, (value) =&gt; (state.current.title = value));
+      });
+      const body = motifComponent(&quot;textarea&quot;, (field) =&gt; {
+        field.attr.add({ placeholder: &quot;Note&quot; });
+        field.bindings.model(() =&gt; state.current.body, (value) =&gt; (state.current.body = value));
+      });
+      const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(state.current));
+        button.bindings.text(() =&gt; (state.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;));
+      });
+      article.controls.add(title, body, pin);
+    },
+  });
+
+  return motifComponent(&quot;div&quot;, (root) =&gt; {
+    root.class.add(&quot;notes&quot;);
+    root.controls.add(head, search, rows, detail);
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/pages/NotesPane.js"><code>import { FromService, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const NotesPane = () =&gt; {
+  const notes = FromService(NotesService);
+
+  return motifOptions({
+    el: &quot;div&quot;,
+    data: reactive({ query: &quot;&quot;, current: null }),
+
+    visible() {
+      return notes.list(&quot;notes&quot;, this.data.query);
+    },
+
+    create() {
+      this.data.current = notes.create();
+    },
+
+    view() {
+      this.class.add(&quot;notes&quot;);
+      return [this.head(), this.search(), this.rows(), this.detail()];
+    },
+
+    head() {
+      return motifComponent(&quot;header&quot;, (head) =&gt; {
+        head.class.add(&quot;list__head&quot;);
+        const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+          h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Notes&quot;)));
+        });
+        const newNote = motifComponent(&quot;button&quot;, (button) =&gt; {
+          button.attr.add({ type: &quot;button&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; this.create());
+          button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;New note&quot;)));
+        });
+        head.controls.add(title, newNote);
+      });
+    },
+
+    search() {
+      return motifComponent(&quot;input&quot;, (field) =&gt; {
+        field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Search notes&quot; });
+        field.bindings.model(() =&gt; this.data.query, (value) =&gt; (this.data.query = value));
+      });
+    },
+
+    rows() {
+      return motifComponent(&quot;div&quot;, (rows) =&gt; {
+        rows.class.add(&quot;rows&quot;);
+        const list = motifComponent({
+          initializeComponent: (holder) =&gt; {
+            holder.bindings.list(() =&gt; this.visible(), (note) =&gt; this.row(note));
+          },
+        });
+        const empty = motifComponent(&quot;p&quot;, {
+          preconfig: (p) =&gt; p.bindings.display(() =&gt; this.visible().length === 0),
+          initializeComponent: (p) =&gt; {
+            p.class.add(&quot;list__empty&quot;);
+            p.bindings.text(() =&gt; (this.data.query.trim() ? &quot;No search results.&quot; : &quot;No notes yet.&quot;));
+          },
+        });
+        rows.controls.add(list, empty);
+      });
+    },
+
+    row(note) {
+      return motifComponent(&quot;button&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (row) =&gt; {
+          row.attr.add({ type: &quot;button&quot; });
+          row.class.add(() =&gt; (note === this.data.current ? &quot;row active&quot; : &quot;row&quot;));
+          row.motif.on(&quot;click&quot;, () =&gt; (this.data.current = note));
+          const pin = motifComponent(&quot;i&quot;, {
+            preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned),
+            initializeComponent: (i) =&gt; i.class.add(&quot;pin&quot;),
+          });
+          const title = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+          row.controls.add(pin, title);
+        },
+      });
+    },
+
+    detail() {
+      return motifComponent(&quot;article&quot;, {
+        preconfig: (article) =&gt; article.bindings.display(() =&gt; this.data.current !== null),
+        initializeComponent: (article) =&gt; {
+          article.class.add(&quot;detail&quot;);
+          const title = motifComponent(&quot;input&quot;, (field) =&gt; {
+            field.attr.add({ placeholder: &quot;Title&quot; });
+            field.bindings.model(() =&gt; this.data.current.title, (value) =&gt; (this.data.current.title = value));
+          });
+          const body = motifComponent(&quot;textarea&quot;, (field) =&gt; {
+            field.attr.add({ placeholder: &quot;Note&quot; });
+            field.bindings.model(() =&gt; this.data.current.body, (value) =&gt; (this.data.current.body = value));
+          });
+          const pin = motifComponent(&quot;button&quot;, (button) =&gt; {
+            button.attr.add({ type: &quot;button&quot; });
+            button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(this.data.current));
+            button.bindings.text(() =&gt; (this.data.current?.pinned ? &quot;Unpin&quot; : &quot;Pin&quot;));
+          });
+          article.controls.add(title, body, pin);
+        },
+      });
+    },
+  });
+};</code></pre>
+</div>
+<div class="doc-code" data-file="src/main.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/main.tsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new NotesPane());</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript,declarative/options/typescript" data-file="src/main.tsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, &lt;NotesPane /&gt;);</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/main.ts"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new NotesPane());</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/main.ts"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, NotesPane());</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/main.ts"><code>import { Application, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, motifComponent(NotesPane));</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/main.jsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new NotesPane());</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript,declarative/options/javascript" data-file="src/main.jsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, &lt;NotesPane /&gt;);</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/main.js"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new NotesPane());</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/main.js"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, NotesPane());</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/main.js"><code>import { Application, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesPane } from &quot;./pages/NotesPane&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, motifComponent(NotesPane));</code></pre>
+</div>
+<p>A few things worth noticing in the example:</p>
+<ul>
+<li><strong>Each note is a single reactive object.</strong> When the title changes in the editor, the text in the row updates, and when pinning changes, so does the icon in the row; the list is not rebuilt. <code>NotesService.create</code> adds to the front of the list, and the rows follow that on their own.</li>
+<li><strong>Bindings are fine-grained.</strong> <code>x-model</code> / <code>bindings.model</code> is a two-way binding, <code>{() =&gt; …}</code> / <code>bindings.text</code> is live text, <code>x-display</code> / <code>bindings.display</code> is visibility, and <code>.map</code> + <code>key</code> / <code>bindings.list</code> + <code>indexkey</code> is a list of rows. Rows are matched to the item object itself; <code>key</code> does not change that matching, and if the same key is used twice, development mode prints an MJX202 warning. In JSX, the compiler turns a field read such as <code>{note.title}</code> into a binding by itself; when writing without JSX, a value that has to stay live is passed as a getter, while <code>setText(&quot;…&quot;)</code> and plain values are written once.</li>
+<li><strong>Services are registered while the application is being built.</strong> <code>builder.services.addSingleton(NotesService, { useClass: NotesService })</code> registers the service before <code>build()</code>. A singleton given <code>startup: true</code> is created at the start of <code>app.run()</code>, before the root component is built, without waiting for a component to ask for it; on a service that is not a singleton this option is ignored and an MJX415 warning is printed. The other way to register is to mark the class with <code>@Injectable({ lifetime: &quot;singleton&quot; })</code>. That mark enters the registry when the class's module is loaded: <code>build()</code> registers only the marked classes loaded up to that point, so a service whose module has not been loaded yet is not in the registry until the module loads and it is asked for the first time, and it is not created at startup even with <code>startup: true</code>. On a class that was registered in the builder, the mark is ignored. In the example the class component gets the service with <code>this.getService</code>, and the function and Options components with <code>FromService</code>; the Options component can use <code>this.getService</code> too.</li>
+<li><strong>The imperative form is the same core calls written by hand.</strong> <code>motifComponent(tag, setup)</code> creates a component, and the setup function runs once as <code>initializeComponent</code>. For an element that starts out hidden, the <code>display</code> binding is set up in <code>preconfig</code> so the element is not built until it becomes visible. Plain text is a <code>&quot;text&quot;</code> component: <code>motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;…&quot;))</code>. The compiler produces whichever binding it picks for each expression (<code>bindings.method</code> for live text, <code>bindings.ternary</code> for a ternary); when writing by hand, <code>bindings.text</code> is enough for live text. <code>npx motif-explain file.tsx</code> prints which call a JSX expression comes down to.</li>
+</ul>
+<h2 id="next">Next step</h2>
+<p>To begin, go on to <a href="/docs/getting-started">Getting Started</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

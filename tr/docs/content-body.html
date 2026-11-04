@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Birden çok bloğun birlikte doldurduğu gövde; ContentBody gövdesi, ContentBlock parçaları, birikme, serbest bırakma ve Transport&#x27;tan farkı.">
+    <title>ContentBody ve ContentBlock — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/content-body">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/content-body">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/content-body">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/content-body">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/content-body">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="ContentBody ve ContentBlock">
+    <meta property="og:description" content="Birden çok bloğun birlikte doldurduğu gövde; ContentBody gövdesi, ContentBlock parçaları, birikme, serbest bırakma ve Transport&#x27;tan farkı.">
+    <script type="application/json" id="doc-data">{"slug":"content-body","locale":"tr","title":"ContentBody ve ContentBlock","description":"Birden çok bloğun birlikte doldurduğu gövde; ContentBody gövdesi, ContentBlock parçaları, birikme, serbest bırakma ve Transport\u0027tan farkı.","category":{"id":"8","title":"Gelişmiş"},"html":"\u003Cp\u003E\u003Ca href=\u0022/docs/transport\u0022\u003ETransport\u003C/a\u003E tek bir gönderenin içeriğini bir yuvada \u003Cstrong\u003Egösterir\u003C/strong\u003E; \u003Ccode\u003EContentBody\u003C/code\u003E ise birden çok bloğun \u003Cstrong\u003Ebirlikte doldurduğu\u003C/strong\u003E bir gövdedir. Layout\u0027ta bir gövde açılır, sayfanın farklı yerlerindeki bloklar parçalarını oraya ekler ve parçalar gövdede birikir.\u003C/p\u003E\n\u003Ch2 id=\u0022usage\u0022\u003EKullanım\u003C/h2\u003E\n\u003Cp\u003EÖrnekte layout\u0027un alt çubuğu bir gövde açar; klasör listesi toplam not sayısını, not sayfası açık notun düzenlenme zamanını oraya ekler. Gövde:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/StatusBar.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/layouts/StatusBar.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, ContentBody } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class StatusBar extends Component\u0026lt;HTMLElement\u0026gt; {\n  static override elementTag = \u0026quot;footer\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  }\n\n  override view() {\n    return \u0026lt;ContentBody name=\u0026quot;status\u0026quot; /\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/StatusBar.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ContentBody } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class StatusBar extends Component\u0026lt;HTMLElement\u0026gt; {\n  static override elementTag = \u0026quot;footer\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  }\n\n  override view() {\n    return new ContentBody({ name: \u0026quot;status\u0026quot; });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/StatusBar.tsx\u0022\u003E\u003Ccode\u003Eimport { ContentBody } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function StatusBar() {\n  return (\n    \u0026lt;footer class=\u0026quot;statusbar\u0026quot;\u0026gt;\n      \u0026lt;ContentBody name=\u0026quot;status\u0026quot; /\u0026gt;\n    \u0026lt;/footer\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/StatusBar.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, ContentBody, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function StatusBar() {\n  return motifComponent(\u0026quot;footer\u0026quot;, (footer: ComponentBase) =\u0026gt; {\n    footer.class.add(\u0026quot;statusbar\u0026quot;);\n    footer.controls.add(new ContentBody({ name: \u0026quot;status\u0026quot; }));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/layouts/StatusBar.tsx\u0022\u003E\u003Ccode\u003Eimport { ContentBody, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const StatusBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;footer\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  },\n\n  view() {\n    return \u0026lt;ContentBody name=\u0026quot;status\u0026quot; /\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/StatusBar.ts\u0022\u003E\u003Ccode\u003Eimport { ContentBody, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const StatusBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;footer\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  },\n\n  view() {\n    return new ContentBody({ name: \u0026quot;status\u0026quot; });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/layouts/StatusBar.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, ContentBody } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class StatusBar extends Component {\n  static elementTag = \u0026quot;footer\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  }\n\n  view() {\n    return \u0026lt;ContentBody name=\u0026quot;status\u0026quot; /\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/StatusBar.js\u0022\u003E\u003Ccode\u003Eimport { Component, ContentBody } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class StatusBar extends Component {\n  static elementTag = \u0026quot;footer\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  }\n\n  view() {\n    return new ContentBody({ name: \u0026quot;status\u0026quot; });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/StatusBar.jsx\u0022\u003E\u003Ccode\u003Eimport { ContentBody } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function StatusBar() {\n  return (\n    \u0026lt;footer class=\u0026quot;statusbar\u0026quot;\u0026gt;\n      \u0026lt;ContentBody name=\u0026quot;status\u0026quot; /\u0026gt;\n    \u0026lt;/footer\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/StatusBar.js\u0022\u003E\u003Ccode\u003Eimport { ContentBody, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function StatusBar() {\n  return motifComponent(\u0026quot;footer\u0026quot;, (footer) =\u0026gt; {\n    footer.class.add(\u0026quot;statusbar\u0026quot;);\n    footer.controls.add(new ContentBody({ name: \u0026quot;status\u0026quot; }));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/layouts/StatusBar.jsx\u0022\u003E\u003Ccode\u003Eimport { ContentBody, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const StatusBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;footer\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  },\n\n  view() {\n    return \u0026lt;ContentBody name=\u0026quot;status\u0026quot; /\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/StatusBar.js\u0022\u003E\u003Ccode\u003Eimport { ContentBody, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const StatusBar = () =\u0026gt; motifOptions({\n  el: \u0026quot;footer\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;statusbar\u0026quot;);\n  },\n\n  view() {\n    return new ContentBody({ name: \u0026quot;status\u0026quot; });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBloklar:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/StatusItems.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/StatusItems.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, ContentBlock } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class CountStatus extends Component {\n  notes = this.getService(NotesService)!;\n\n  override view() {\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  }\n}\n\nexport class EditedStatus extends Component\u0026lt;any, { note: Note }\u0026gt; {\n  override view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/StatusItems.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, ContentBlock, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class CountStatus extends Component {\n  notes = this.getService(NotesService)!;\n\n  override view() {\n    const count = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [count] });\n  }\n}\n\nexport class EditedStatus extends Component\u0026lt;any, { note: Note }\u0026gt; {\n  override view() {\n    const { note } = this.props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [edited] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/StatusItems.tsx\u0022\u003E\u003Ccode\u003Eimport { ContentBlock, FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function CountStatus() {\n  const notes = FromService(NotesService)!;\n\n  return (\n    \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n      \u0026lt;span\u0026gt;{() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060}\u0026lt;/span\u0026gt;\n    \u0026lt;/ContentBlock\u0026gt;\n  );\n}\n\nexport function EditedStatus(props: { note: Note }) {\n  const { note } = props;\n\n  return (\n    \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n      \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n    \u0026lt;/ContentBlock\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/StatusItems.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, ContentBlock, FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function CountStatus() {\n  const notes = FromService(NotesService)!;\n\n  const count = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060));\n  return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [count] });\n}\n\nexport function EditedStatus(props: { note: Note }) {\n  const { note } = props;\n\n  const edited = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n  return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [edited] });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/StatusItems.tsx\u0022\u003E\u003Ccode\u003Eimport { ContentBlock, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const CountStatus = () =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  },\n});\n\nexport const EditedStatus = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const { note } = props;\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/StatusItems.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, ContentBlock, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const CountStatus = () =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    const count = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [count] });\n  },\n});\n\nexport const EditedStatus = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const { note } = props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [edited] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/StatusItems.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, ContentBlock } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class CountStatus extends Component {\n  notes = this.getService(NotesService);\n\n  view() {\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  }\n}\n\nexport class EditedStatus extends Component {\n  view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/StatusItems.js\u0022\u003E\u003Ccode\u003Eimport { Component, ContentBlock, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class CountStatus extends Component {\n  notes = this.getService(NotesService);\n\n  view() {\n    const count = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [count] });\n  }\n}\n\nexport class EditedStatus extends Component {\n  view() {\n    const { note } = this.props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [edited] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/StatusItems.jsx\u0022\u003E\u003Ccode\u003Eimport { ContentBlock, FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function CountStatus() {\n  const notes = FromService(NotesService);\n\n  return (\n    \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n      \u0026lt;span\u0026gt;{() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060}\u0026lt;/span\u0026gt;\n    \u0026lt;/ContentBlock\u0026gt;\n  );\n}\n\nexport function EditedStatus(props) {\n  const { note } = props;\n\n  return (\n    \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n      \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n    \u0026lt;/ContentBlock\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/StatusItems.js\u0022\u003E\u003Ccode\u003Eimport { ContentBlock, FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function CountStatus() {\n  const notes = FromService(NotesService);\n\n  const count = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060));\n  return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [count] });\n}\n\nexport function EditedStatus(props) {\n  const { note } = props;\n\n  const edited = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n  return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [edited] });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/StatusItems.jsx\u0022\u003E\u003Ccode\u003Eimport { ContentBlock, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const CountStatus = () =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  },\n});\n\nexport const EditedStatus = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const { note } = props;\n    return (\n      \u0026lt;ContentBlock target=\u0026quot;status\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060}\u0026lt;/span\u0026gt;\n      \u0026lt;/ContentBlock\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/StatusItems.js\u0022\u003E\u003Ccode\u003Eimport { ContentBlock, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const CountStatus = () =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    const count = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [count] });\n  },\n});\n\nexport const EditedStatus = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const { note } = props;\n    const edited = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; \u0060Düzenlendi ${new Date(note.updatedAt).toLocaleString(\u0026quot;tr-TR\u0026quot;)}\u0060));\n    return motifComponent(ContentBlock, { target: \u0026quot;status\u0026quot;, childs: [edited] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003ELayout alt çubuğu \u003Ccode\u003E\u0026lt;StatusBar /\u0026gt;\u003C/code\u003E ile, klasör listesi \u003Ccode\u003E\u0026lt;CountStatus /\u0026gt;\u003C/code\u003E ile, not sayfası \u003Ccode\u003E\u0026lt;EditedStatus note={note} /\u0026gt;\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003ELayout alt çubuğu \u003Ccode\u003Enew StatusBar()\u003C/code\u003E, klasör listesi \u003Ccode\u003Enew CountStatus()\u003C/code\u003E, not sayfası \u003Ccode\u003Enew EditedStatus({ note })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003ELayout alt çubuğu \u003Ccode\u003EmotifComponent(StatusBar)\u003C/code\u003E, klasör listesi \u003Ccode\u003EmotifComponent(CountStatus)\u003C/code\u003E, not sayfası \u003Ccode\u003EmotifComponent(EditedStatus, { note })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003EContentBody\u003C/code\u003E ve \u003Ccode\u003EContentBlock\u003C/code\u003E çekirdeğin sınıflarıdır. JSX\u0027siz yazımda gövde \u003Ccode\u003Enew ContentBody({ name })\u003C/code\u003E, blok derleyicinin ürettiği gibi \u003Ccode\u003EmotifComponent(ContentBlock, { target, childs })\u003C/code\u003E ile kurulur.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003ENot sayfası açıkken çubukta iki parça yan yana durur: not sayısı ve düzenlenme zamanı. İkisi de yazıldıkları bileşenin bağıyla güncellenir. Sayfa kapanınca yalnız onun parçası gider; klasör listesinin parçası kalır.\u003C/p\u003E\n\u003Ch2 id=\u0022props\u0022\u003EProp\u0027lar\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EBileşen\u003C/th\u003E\n\u003Cth\u003EProp\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EContentBody\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGövdenin adı. Aynı adla ikinci bir gövde kurulursa yeni bloklar ona gider; eski gövdenin sonradan serbest bırakılması yeni gövdenin kaydını bozmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EContentBlock\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Etarget\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EParçaların ekleneceği gövdenin adı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022behavior\u0022\u003EDavranış\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003Eİkisi de fragment köklüdür; bulundukları yere eleman eklemezler.\u003C/li\u003E\n\u003Cli\u003EHedef gövde varken blok çocuklarını \u003Cstrong\u003Ekendisi kurmaz\u003C/strong\u003E: eklenen her çocuk (blokla birlikte verilen \u003Ccode\u003Echilds\u003C/code\u003E ve sonradan \u003Ccode\u003Econtrols.add\u003C/code\u003E ile gelenler) o anda gövdenin \u003Ccode\u003Econtrols\u003C/code\u003E\u0027una taşınır ve orada kurulur; ebeveyni gövde olur. \u003Ccode\u003Echilds\u003C/code\u003E bloğun yapıcısında, blok kurulmadan taşınır. Bloğun \u003Ccode\u003Econtroladded\u003C/code\u003E olayı her çocuk için tetiklenir.\u003C/li\u003E\n\u003Cli\u003EGövde henüz yoksa, blok kurulurken elinde olan çocuklar blokla birlikte kurulur ve bloğun yerinde görünür; blok kurulduktan sonra \u003Ccode\u003Econtrols.add\u003C/code\u003E ile eklenenler kurulmadan bekler. Aynı adlı gövde oluşturulduğu anda hepsi gövdeye taşınır; son yerleşim sıradan bağımsızdır.\u003C/li\u003E\n\u003Cli\u003EParçalar gövdede \u003Cstrong\u003Ebirikir\u003C/strong\u003E; her blok yalnız kendi eklediği parçaları bilir. Blok serbest bırakılınca gövdedeki kendi parçalarını kaldırır ve serbest bırakır (geliştirme modunda her parça için \u003Ccode\u003EMJX109\u003C/code\u003E uyarısı yazılır); diğer blokların parçaları kalır.\u003C/li\u003E\n\u003Cli\u003EGövde serbest bırakılınca içindeki bütün parçalar onunla serbest bırakılır; bloklar bilgilendirilmez, aynı adla yeni bir gövde kurulsa da parçalar geri gelmez.\u003C/li\u003E\n\u003Cli\u003ETaşınan parçaların bağları ve olay işleyicileri yazıldıkları bileşenin durumuyla çalışmaya devam eder.\u003C/li\u003E\n\u003Cli\u003EGövde ile bloklar uygulamanın olayıyla haberleşir; bu yüzden kurulmuş bir \u003Ccode\u003EApplication\u003C/code\u003E içinde kullanılırlar. Uygulama kurulmadan oluşturulan gövde hata verir.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022vs-transport\u0022\u003ETransport ile karşılaştırma\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003E\u003C/th\u003E\n\u003Cth\u003E\u003Ccode\u003ETransport\u003C/code\u003E / \u003Ccode\u003ETransportTo\u003C/code\u003E\u003C/th\u003E\n\u003Cth\u003E\u003Ccode\u003EContentBody\u003C/code\u003E / \u003Ccode\u003EContentBlock\u003C/code\u003E\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAmaç\u003C/td\u003E\n\u003Ctd\u003EBir gönderenin içeriğini yuvada \u003Cstrong\u003Egöstermek\u003C/strong\u003E\u003C/td\u003E\n\u003Ctd\u003EBirçok bloğun parçalarını gövdede \u003Cstrong\u003Ebiriktirmek\u003C/strong\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EBirden çok kaynak\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Emode: \u0027replace\u0027\u003C/code\u003E sonuncuyu bırakır; \u003Ccode\u003E\u0027merge\u0027\u003C/code\u003E birleştirir\u003C/td\u003E\n\u003Ctd\u003EHer zaman birikir\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGönderen serbest bırakılınca\u003C/td\u003E\n\u003Ctd\u003EKendi içeriğini kaldırır\u003C/td\u003E\n\u003Ctd\u003EKendi parçalarını kaldırır (\u003Ccode\u003EMJX109\u003C/code\u003E)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EYerleşim\u003C/td\u003E\n\u003Ctd\u003EYuva fragment, gönderen boş \u003Ccode\u003E\u0026lt;div\u0026gt;\u003C/code\u003E bırakır\u003C/td\u003E\n\u003Ctd\u003Eİkisi de fragment\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBüyük listeleri sanal kaydırmayla göstermek için \u003Ca href=\u0022/docs/virtualization\u0022\u003ESanal Listeler (Virtualization)\u003C/a\u003E bölümüne geçin. Tek gönderenli yuva ve programatik taşıma için \u003Ca href=\u0022/docs/transport\u0022\u003ETransport ve TransportTo\u003C/a\u003E; bileşen ağacının temelleri için \u003Ca href=\u0022/docs/components\u0022\u003EBileşenler\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"usage","text":"Kullanım","level":2},{"id":"props","text":"Prop\u0027lar","level":2},{"id":"behavior","text":"Davranış","level":2},{"id":"vs-transport","text":"Transport ile karşılaştırma","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"transport","title":"Transport ve TransportTo"},"next":{"slug":"virtualization","title":"Sanal Listeler (Virtualization)"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Gelişmiş</p>
+        <h1>ContentBody ve ContentBlock</h1>
+        <p>Birden çok bloğun birlikte doldurduğu gövde; ContentBody gövdesi, ContentBlock parçaları, birikme, serbest bırakma ve Transport&#x27;tan farkı.</p>
+<p><a href="/tr/docs/transport">Transport</a> tek bir gönderenin içeriğini bir yuvada <strong>gösterir</strong>; <code>ContentBody</code> ise birden çok bloğun <strong>birlikte doldurduğu</strong> bir gövdedir. Layout'ta bir gövde açılır, sayfanın farklı yerlerindeki bloklar parçalarını oraya ekler ve parçalar gövdede birikir.</p>
+<h2 id="usage">Kullanım</h2>
+<p>Örnekte layout'un alt çubuğu bir gövde açar; klasör listesi toplam not sayısını, not sayfası açık notun düzenlenme zamanını oraya ekler. Gövde:</p>
+<div class="doc-code" data-file="src/layouts/StatusBar.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/layouts/StatusBar.tsx"><code>import { Component, ContentBody } from &quot;@motifx/core&quot;;
+
+export class StatusBar extends Component&lt;HTMLElement&gt; {
+  static override elementTag = &quot;footer&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  }
+
+  override view() {
+    return &lt;ContentBody name=&quot;status&quot; /&gt;;
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/StatusBar.ts"><code>import { Component, ContentBody } from &quot;@motifx/core&quot;;
+
+export class StatusBar extends Component&lt;HTMLElement&gt; {
+  static override elementTag = &quot;footer&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  }
+
+  override view() {
+    return new ContentBody({ name: &quot;status&quot; });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/StatusBar.tsx"><code>import { ContentBody } from &quot;@motifx/core&quot;;
+
+export function StatusBar() {
+  return (
+    &lt;footer class=&quot;statusbar&quot;&gt;
+      &lt;ContentBody name=&quot;status&quot; /&gt;
+    &lt;/footer&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/StatusBar.ts"><code>import { ComponentBase, ContentBody, motifComponent } from &quot;@motifx/core&quot;;
+
+export function StatusBar() {
+  return motifComponent(&quot;footer&quot;, (footer: ComponentBase) =&gt; {
+    footer.class.add(&quot;statusbar&quot;);
+    footer.controls.add(new ContentBody({ name: &quot;status&quot; }));
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/layouts/StatusBar.tsx"><code>import { ContentBody, motifOptions } from &quot;@motifx/core&quot;;
+
+export const StatusBar = () =&gt; motifOptions({
+  el: &quot;footer&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  },
+
+  view() {
+    return &lt;ContentBody name=&quot;status&quot; /&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/StatusBar.ts"><code>import { ContentBody, motifOptions } from &quot;@motifx/core&quot;;
+
+export const StatusBar = () =&gt; motifOptions({
+  el: &quot;footer&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  },
+
+  view() {
+    return new ContentBody({ name: &quot;status&quot; });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/layouts/StatusBar.jsx"><code>import { Component, ContentBody } from &quot;@motifx/core&quot;;
+
+export class StatusBar extends Component {
+  static elementTag = &quot;footer&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  }
+
+  view() {
+    return &lt;ContentBody name=&quot;status&quot; /&gt;;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/StatusBar.js"><code>import { Component, ContentBody } from &quot;@motifx/core&quot;;
+
+export class StatusBar extends Component {
+  static elementTag = &quot;footer&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  }
+
+  view() {
+    return new ContentBody({ name: &quot;status&quot; });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/StatusBar.jsx"><code>import { ContentBody } from &quot;@motifx/core&quot;;
+
+export function StatusBar() {
+  return (
+    &lt;footer class=&quot;statusbar&quot;&gt;
+      &lt;ContentBody name=&quot;status&quot; /&gt;
+    &lt;/footer&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/StatusBar.js"><code>import { ContentBody, motifComponent } from &quot;@motifx/core&quot;;
+
+export function StatusBar() {
+  return motifComponent(&quot;footer&quot;, (footer) =&gt; {
+    footer.class.add(&quot;statusbar&quot;);
+    footer.controls.add(new ContentBody({ name: &quot;status&quot; }));
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/layouts/StatusBar.jsx"><code>import { ContentBody, motifOptions } from &quot;@motifx/core&quot;;
+
+export const StatusBar = () =&gt; motifOptions({
+  el: &quot;footer&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  },
+
+  view() {
+    return &lt;ContentBody name=&quot;status&quot; /&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/StatusBar.js"><code>import { ContentBody, motifOptions } from &quot;@motifx/core&quot;;
+
+export const StatusBar = () =&gt; motifOptions({
+  el: &quot;footer&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;statusbar&quot;);
+  },
+
+  view() {
+    return new ContentBody({ name: &quot;status&quot; });
+  },
+});</code></pre>
+</div>
+<p>Bloklar:</p>
+<div class="doc-code" data-file="src/parts/StatusItems.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/StatusItems.tsx"><code>import { Component, ContentBlock } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export class CountStatus extends Component {
+  notes = this.getService(NotesService)!;
+
+  override view() {
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `${this.notes.count(&quot;notes&quot;)} not`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  }
+}
+
+export class EditedStatus extends Component&lt;any, { note: Note }&gt; {
+  override view() {
+    const { note } = this.props;
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/StatusItems.ts"><code>import { Component, ComponentBase, ContentBlock, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export class CountStatus extends Component {
+  notes = this.getService(NotesService)!;
+
+  override view() {
+    const count = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `${this.notes.count(&quot;notes&quot;)} not`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [count] });
+  }
+}
+
+export class EditedStatus extends Component&lt;any, { note: Note }&gt; {
+  override view() {
+    const { note } = this.props;
+    const edited = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [edited] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/StatusItems.tsx"><code>import { ContentBlock, FromService } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export function CountStatus() {
+  const notes = FromService(NotesService)!;
+
+  return (
+    &lt;ContentBlock target=&quot;status&quot;&gt;
+      &lt;span&gt;{() =&gt; `${notes.count(&quot;notes&quot;)} not`}&lt;/span&gt;
+    &lt;/ContentBlock&gt;
+  );
+}
+
+export function EditedStatus(props: { note: Note }) {
+  const { note } = props;
+
+  return (
+    &lt;ContentBlock target=&quot;status&quot;&gt;
+      &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+    &lt;/ContentBlock&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/StatusItems.ts"><code>import { ComponentBase, ContentBlock, FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export function CountStatus() {
+  const notes = FromService(NotesService)!;
+
+  const count = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`));
+  return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [count] });
+}
+
+export function EditedStatus(props: { note: Note }) {
+  const { note } = props;
+
+  const edited = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+  return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [edited] });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/StatusItems.tsx"><code>import { ContentBlock, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export const CountStatus = () =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `${notes.count(&quot;notes&quot;)} not`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  },
+});
+
+export const EditedStatus = (props: { note: Note }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const { note } = props;
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/StatusItems.ts"><code>import { ComponentBase, ContentBlock, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export const CountStatus = () =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    const count = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [count] });
+  },
+});
+
+export const EditedStatus = (props: { note: Note }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const { note } = props;
+    const edited = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [edited] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/StatusItems.jsx"><code>import { Component, ContentBlock } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class CountStatus extends Component {
+  notes = this.getService(NotesService);
+
+  view() {
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `${this.notes.count(&quot;notes&quot;)} not`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  }
+}
+
+export class EditedStatus extends Component {
+  view() {
+    const { note } = this.props;
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/StatusItems.js"><code>import { Component, ContentBlock, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class CountStatus extends Component {
+  notes = this.getService(NotesService);
+
+  view() {
+    const count = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `${this.notes.count(&quot;notes&quot;)} not`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [count] });
+  }
+}
+
+export class EditedStatus extends Component {
+  view() {
+    const { note } = this.props;
+    const edited = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [edited] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/StatusItems.jsx"><code>import { ContentBlock, FromService } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function CountStatus() {
+  const notes = FromService(NotesService);
+
+  return (
+    &lt;ContentBlock target=&quot;status&quot;&gt;
+      &lt;span&gt;{() =&gt; `${notes.count(&quot;notes&quot;)} not`}&lt;/span&gt;
+    &lt;/ContentBlock&gt;
+  );
+}
+
+export function EditedStatus(props) {
+  const { note } = props;
+
+  return (
+    &lt;ContentBlock target=&quot;status&quot;&gt;
+      &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+    &lt;/ContentBlock&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/StatusItems.js"><code>import { ContentBlock, FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function CountStatus() {
+  const notes = FromService(NotesService);
+
+  const count = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`));
+  return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [count] });
+}
+
+export function EditedStatus(props) {
+  const { note } = props;
+
+  const edited = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+  return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [edited] });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/StatusItems.jsx"><code>import { ContentBlock, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const CountStatus = () =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `${notes.count(&quot;notes&quot;)} not`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  },
+});
+
+export const EditedStatus = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const { note } = props;
+    return (
+      &lt;ContentBlock target=&quot;status&quot;&gt;
+        &lt;span&gt;{() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`}&lt;/span&gt;
+      &lt;/ContentBlock&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/StatusItems.js"><code>import { ContentBlock, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const CountStatus = () =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    const count = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [count] });
+  },
+});
+
+export const EditedStatus = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const { note } = props;
+    const edited = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; `Düzenlendi ${new Date(note.updatedAt).toLocaleString(&quot;tr-TR&quot;)}`));
+    return motifComponent(ContentBlock, { target: &quot;status&quot;, childs: [edited] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Layout alt çubuğu <code>&lt;StatusBar /&gt;</code> ile, klasör listesi <code>&lt;CountStatus /&gt;</code> ile, not sayfası <code>&lt;EditedStatus note={note} /&gt;</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Layout alt çubuğu <code>new StatusBar()</code>, klasör listesi <code>new CountStatus()</code>, not sayfası <code>new EditedStatus({ note })</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Layout alt çubuğu <code>motifComponent(StatusBar)</code>, klasör listesi <code>motifComponent(CountStatus)</code>, not sayfası <code>motifComponent(EditedStatus, { note })</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p><code>ContentBody</code> ve <code>ContentBlock</code> çekirdeğin sınıflarıdır. JSX'siz yazımda gövde <code>new ContentBody({ name })</code>, blok derleyicinin ürettiği gibi <code>motifComponent(ContentBlock, { target, childs })</code> ile kurulur.</p>
+</div>
+<p>Not sayfası açıkken çubukta iki parça yan yana durur: not sayısı ve düzenlenme zamanı. İkisi de yazıldıkları bileşenin bağıyla güncellenir. Sayfa kapanınca yalnız onun parçası gider; klasör listesinin parçası kalır.</p>
+<h2 id="props">Prop'lar</h2>
+<table>
+<thead>
+<tr>
+<th>Bileşen</th>
+<th>Prop</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ContentBody</code></td>
+<td><code>name</code></td>
+<td>Gövdenin adı. Aynı adla ikinci bir gövde kurulursa yeni bloklar ona gider; eski gövdenin sonradan serbest bırakılması yeni gövdenin kaydını bozmaz.</td>
+</tr>
+<tr>
+<td><code>ContentBlock</code></td>
+<td><code>target</code></td>
+<td>Parçaların ekleneceği gövdenin adı.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="behavior">Davranış</h2>
+<ul>
+<li>İkisi de fragment köklüdür; bulundukları yere eleman eklemezler.</li>
+<li>Hedef gövde varken blok çocuklarını <strong>kendisi kurmaz</strong>: eklenen her çocuk (blokla birlikte verilen <code>childs</code> ve sonradan <code>controls.add</code> ile gelenler) o anda gövdenin <code>controls</code>'una taşınır ve orada kurulur; ebeveyni gövde olur. <code>childs</code> bloğun yapıcısında, blok kurulmadan taşınır. Bloğun <code>controladded</code> olayı her çocuk için tetiklenir.</li>
+<li>Gövde henüz yoksa, blok kurulurken elinde olan çocuklar blokla birlikte kurulur ve bloğun yerinde görünür; blok kurulduktan sonra <code>controls.add</code> ile eklenenler kurulmadan bekler. Aynı adlı gövde oluşturulduğu anda hepsi gövdeye taşınır; son yerleşim sıradan bağımsızdır.</li>
+<li>Parçalar gövdede <strong>birikir</strong>; her blok yalnız kendi eklediği parçaları bilir. Blok serbest bırakılınca gövdedeki kendi parçalarını kaldırır ve serbest bırakır (geliştirme modunda her parça için <code>MJX109</code> uyarısı yazılır); diğer blokların parçaları kalır.</li>
+<li>Gövde serbest bırakılınca içindeki bütün parçalar onunla serbest bırakılır; bloklar bilgilendirilmez, aynı adla yeni bir gövde kurulsa da parçalar geri gelmez.</li>
+<li>Taşınan parçaların bağları ve olay işleyicileri yazıldıkları bileşenin durumuyla çalışmaya devam eder.</li>
+<li>Gövde ile bloklar uygulamanın olayıyla haberleşir; bu yüzden kurulmuş bir <code>Application</code> içinde kullanılırlar. Uygulama kurulmadan oluşturulan gövde hata verir.</li>
+</ul>
+<h2 id="vs-transport">Transport ile karşılaştırma</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>Transport</code> / <code>TransportTo</code></th>
+<th><code>ContentBody</code> / <code>ContentBlock</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Amaç</td>
+<td>Bir gönderenin içeriğini yuvada <strong>göstermek</strong></td>
+<td>Birçok bloğun parçalarını gövdede <strong>biriktirmek</strong></td>
+</tr>
+<tr>
+<td>Birden çok kaynak</td>
+<td><code>mode: 'replace'</code> sonuncuyu bırakır; <code>'merge'</code> birleştirir</td>
+<td>Her zaman birikir</td>
+</tr>
+<tr>
+<td>Gönderen serbest bırakılınca</td>
+<td>Kendi içeriğini kaldırır</td>
+<td>Kendi parçalarını kaldırır (<code>MJX109</code>)</td>
+</tr>
+<tr>
+<td>Yerleşim</td>
+<td>Yuva fragment, gönderen boş <code>&lt;div&gt;</code> bırakır</td>
+<td>İkisi de fragment</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Sonraki adım</h2>
+<p>Büyük listeleri sanal kaydırmayla göstermek için <a href="/tr/docs/virtualization">Sanal Listeler (Virtualization)</a> bölümüne geçin. Tek gönderenli yuva ve programatik taşıma için <a href="/tr/docs/transport">Transport ve TransportTo</a>; bileşen ağacının temelleri için <a href="/tr/docs/components">Bileşenler</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Preparing an npm package with MotifJS components, services or wrappers; the package format, build, types, CSS, the prop contract, testing and pre-publish checks.">
+    <title>Publishing an npm Library for MotifJS — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/publishing-libraries">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/publishing-libraries">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/publishing-libraries">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/publishing-libraries">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/publishing-libraries">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Publishing an npm Library for MotifJS">
+    <meta property="og:description" content="Preparing an npm package with MotifJS components, services or wrappers; the package format, build, types, CSS, the prop contract, testing and pre-publish checks.">
+    <script type="application/json" id="doc-data">{"slug":"publishing-libraries","locale":"en","title":"Publishing an npm Library for MotifJS","description":"Preparing an npm package with MotifJS components, services or wrappers; the package format, build, types, CSS, the prop contract, testing and pre-publish checks.","category":{"id":"6","title":"Guides"},"html":"\u003Cp\u003EIf you are writing a UI library, a wrapper or a set of services and want others to use it through \u003Ccode\u003Enpm install\u003C/code\u003E, this section is for you. The package must attach to the same \u003Ccode\u003E@motifx/core\u003C/code\u003E instance the application uses, carry its JSX \u003Cstrong\u003Ealready compiled\u003C/strong\u003E, and impose nothing on the consumer\u0027s build setup. The setup below makes that happen.\u003C/p\u003E\n\u003Ch2 id=\u0022boundary\u0022\u003EThe package\u0027s boundary\u003C/h2\u003E\n\u003Cp\u003EThere are two kinds of packages, and the difference in setup is small:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EPackage\u003C/th\u003E\n\u003Cth\u003EContent\u003C/th\u003E\n\u003Cth\u003EIs the compiler needed?\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Cstrong\u003EA package without JSX\u003C/strong\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E.ts\u003C/code\u003E components that do not use JSX (\u003Ccode\u003Esuper(\u0027canvas\u0027)\u003C/code\u003E, \u003Ccode\u003Econtrols.add\u003C/code\u003E, \u003Ccode\u003Ebindings.*\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003ENo, if the root element is declared with \u003Ccode\u003Estatic elementTag\u003C/code\u003E or \u003Ccode\u003Esuper(...)\u003C/code\u003E and no decorators are used; \u003Ccode\u003Etsc\u003C/code\u003E or any bundler is enough. If the root element is to be produced from the generic, the compiler plugin is needed.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Cstrong\u003EA JSX library\u003C/strong\u003E (a UI kit)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E.tsx\u003C/code\u003E components\u003C/td\u003E\n\u003Ctd\u003EYes; the package is compiled with \u003Ccode\u003E@motifx/compiler\u003C/code\u003E before it is published.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EIn both cases \u003Ccode\u003E@motifx/core\u003C/code\u003E is a \u003Cstrong\u003Epeer dependency\u003C/strong\u003E: the package does not bundle it, it uses the copy the consumer installs. Two copies mean two reactivity engines, and that error is silent (see \u003Ca href=\u0022/docs/wrapping-libraries#single-copy\u0022\u003EThe single-copy rule\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022package-json\u0022\u003Epackage.json\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022package.json\u0022\u003E\n\u003Cpre data-lang=\u0022jsonc\u0022 data-file=\u0022package.json\u0022\u003E\u003Ccode\u003E{\n  \u0026quot;name\u0026quot;: \u0026quot;@acme/motif-ui\u0026quot;,\n  \u0026quot;version\u0026quot;: \u0026quot;0.1.0\u0026quot;,\n  \u0026quot;type\u0026quot;: \u0026quot;module\u0026quot;,\n  \u0026quot;sideEffects\u0026quot;: false,\n  \u0026quot;main\u0026quot;: \u0026quot;./dist/index.cjs\u0026quot;,\n  \u0026quot;module\u0026quot;: \u0026quot;./dist/index.js\u0026quot;,\n  \u0026quot;types\u0026quot;: \u0026quot;./dist/types/index.d.ts\u0026quot;,\n  \u0026quot;exports\u0026quot;: {\n    \u0026quot;.\u0026quot;: {\n      \u0026quot;types\u0026quot;: \u0026quot;./dist/types/index.d.ts\u0026quot;,\n      \u0026quot;import\u0026quot;: \u0026quot;./dist/index.js\u0026quot;,\n      \u0026quot;require\u0026quot;: \u0026quot;./dist/index.cjs\u0026quot;\n    },\n    \u0026quot;./style.css\u0026quot;: \u0026quot;./dist/style.css\u0026quot;,\n    \u0026quot;./package.json\u0026quot;: \u0026quot;./package.json\u0026quot;\n  },\n  \u0026quot;files\u0026quot;: [\u0026quot;dist\u0026quot;, \u0026quot;README.md\u0026quot;],\n  \u0026quot;scripts\u0026quot;: {\n    \u0026quot;dev\u0026quot;: \u0026quot;vite\u0026quot;,\n    \u0026quot;build\u0026quot;: \u0026quot;vite build \u0026amp;\u0026amp; tsc -p tsconfig.build.json\u0026quot;,\n    \u0026quot;typecheck\u0026quot;: \u0026quot;tsc --noEmit\u0026quot;,\n    \u0026quot;test\u0026quot;: \u0026quot;vitest run\u0026quot;,\n    \u0026quot;prepublishOnly\u0026quot;: \u0026quot;npm run build\u0026quot;\n  },\n  \u0026quot;peerDependencies\u0026quot;: {\n    \u0026quot;@motifx/core\u0026quot;: \u0026quot;^1.0.0\u0026quot;\n  },\n  \u0026quot;devDependencies\u0026quot;: {\n    \u0026quot;@motifx/core\u0026quot;: \u0026quot;^1.0.0\u0026quot;,\n    \u0026quot;@motifx/compiler\u0026quot;: \u0026quot;^1.0.0\u0026quot;,\n    \u0026quot;jsdom\u0026quot;: \u0026quot;^26.0.0\u0026quot;,\n    \u0026quot;typescript\u0026quot;: \u0026quot;^5.4.0\u0026quot;,\n    \u0026quot;vite\u0026quot;: \u0026quot;^5.4.0\u0026quot;,\n    \u0026quot;vitest\u0026quot;: \u0026quot;^3.0.0\u0026quot;\n  },\n  \u0026quot;keywords\u0026quot;: [\u0026quot;motifjs\u0026quot;, \u0026quot;motifx\u0026quot;],\n  \u0026quot;publishConfig\u0026quot;: { \u0026quot;access\u0026quot;: \u0026quot;public\u0026quot; }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EThe same \u003Ccode\u003E@motifx/core\u003C/code\u003E major in \u003Ccode\u003EpeerDependencies\u003C/code\u003E and \u003Ccode\u003EdevDependencies\u003C/code\u003E: one is a requirement for the consumer, the other is for your own build and tests.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003E@motifx/compiler\u003C/code\u003E is only in \u003Ccode\u003EdevDependencies\u003C/code\u003E; the consumer does not have to install it, because the package carries compiled code.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EsideEffects: false\u003C/code\u003E turns on tree-shaking; in that case \u003Cstrong\u003Edo not have\u003C/strong\u003E a module that does work when imported (global CSS injection, a global registration). If you need something like that, export it as an explicit function (\u003Ccode\u003EregisterX(app)\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003EA third-party library you wrap (such as \u003Ccode\u003Echart.js\u003C/code\u003E) becomes a peer dependency too; add it to the \u003Ccode\u003Eexternal\u003C/code\u003E list as well.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022build\u0022\u003EBuild\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022vite.config.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022vite.config.ts\u0022\u003E\u003Ccode\u003E/// \u0026lt;reference types=\u0026quot;vitest/config\u0026quot; /\u0026gt;\nimport { fileURLToPath, URL } from \u0027node:url\u0027;\nimport { defineConfig } from \u0027vite\u0027;\nimport compiler from \u0027@motifx/compiler\u0027;\n\nexport default defineConfig({\n  plugins: [compiler()],\n  build: {\n    lib: {\n      entry: fileURLToPath(new URL(\u0027./src/index.ts\u0027, import.meta.url)),\n      formats: [\u0027es\u0027, \u0027cjs\u0027],\n      fileName: (format) =\u0026gt; (format === \u0027es\u0027 ? \u0027index.js\u0027 : \u0027index.cjs\u0027),\n    },\n    rollupOptions: {\n      external: [\u0027@motifx/core\u0027],\n    },\n    sourcemap: true,\n    minify: false,\n    target: \u0027es2020\u0027,\n  },\n  test: {\n    environment: \u0027jsdom\u0027,\n    include: [\u0027src/**/*.test.{ts,tsx}\u0027],\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022vite.config.js\u0022\u003E\u003Ccode\u003E/// \u0026lt;reference types=\u0026quot;vitest/config\u0026quot; /\u0026gt;\nimport { fileURLToPath, URL } from \u0027node:url\u0027;\nimport { defineConfig } from \u0027vite\u0027;\nimport compiler from \u0027@motifx/compiler\u0027;\n\nexport default defineConfig({\n  plugins: [compiler()],\n  build: {\n    lib: {\n      entry: fileURLToPath(new URL(\u0027./src/index.ts\u0027, import.meta.url)),\n      formats: [\u0027es\u0027, \u0027cjs\u0027],\n      fileName: (format) =\u0026gt; (format === \u0027es\u0027 ? \u0027index.js\u0027 : \u0027index.cjs\u0027),\n    },\n    rollupOptions: {\n      external: [\u0027@motifx/core\u0027],\n    },\n    sourcemap: true,\n    minify: false,\n    target: \u0027es2020\u0027,\n  },\n  test: {\n    environment: \u0027jsdom\u0027,\n    include: [\u0027src/**/*.test.{ts,tsx}\u0027],\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022tsconfig.json\u0022\u003E\n\u003Cpre data-lang=\u0022jsonc\u0022 data-file=\u0022tsconfig.json\u0022\u003E\u003Ccode\u003E{\n  \u0026quot;compilerOptions\u0026quot;: {\n    \u0026quot;target\u0026quot;: \u0026quot;ES2021\u0026quot;,\n    \u0026quot;module\u0026quot;: \u0026quot;esnext\u0026quot;,\n    \u0026quot;moduleResolution\u0026quot;: \u0026quot;bundler\u0026quot;,\n    \u0026quot;strict\u0026quot;: true,\n    \u0026quot;jsx\u0026quot;: \u0026quot;preserve\u0026quot;,\n    \u0026quot;useDefineForClassFields\u0026quot;: true,\n    \u0026quot;noImplicitOverride\u0026quot;: true,\n    \u0026quot;declaration\u0026quot;: true,\n    \u0026quot;declarationMap\u0026quot;: true,\n    \u0026quot;noEmit\u0026quot;: true,\n    \u0026quot;skipLibCheck\u0026quot;: true,\n    \u0026quot;lib\u0026quot;: [\u0026quot;ESNext\u0026quot;, \u0026quot;DOM\u0026quot;, \u0026quot;DOM.Iterable\u0026quot;]\n  },\n  \u0026quot;include\u0026quot;: [\u0026quot;./src/**/*\u0026quot;, \u0026quot;./vite.config.ts\u0026quot;]\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022tsconfig.build.json\u0022\u003E\n\u003Cpre data-lang=\u0022jsonc\u0022 data-file=\u0022tsconfig.build.json\u0022\u003E\u003Ccode\u003E{\n  \u0026quot;extends\u0026quot;: \u0026quot;./tsconfig.json\u0026quot;,\n  \u0026quot;compilerOptions\u0026quot;: {\n    \u0026quot;noEmit\u0026quot;: false,\n    \u0026quot;emitDeclarationOnly\u0026quot;: true,\n    \u0026quot;outDir\u0026quot;: \u0026quot;./dist/types\u0026quot;,\n    \u0026quot;rootDir\u0026quot;: \u0026quot;./src\u0026quot;\n  },\n  \u0026quot;include\u0026quot;: [\u0026quot;./src/**/*\u0026quot;],\n  \u0026quot;exclude\u0026quot;: [\u0026quot;./src/**/*.test.ts\u0026quot;, \u0026quot;./src/**/*.test.tsx\u0026quot;]\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EWhat happens:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Evite build\u003C/code\u003E runs in library mode; \u003Ccode\u003E@motifx/compiler\u003C/code\u003E brings the JSX in every \u003Ccode\u003E.tsx\u003C/code\u003E file down to \u003Ccode\u003Ebindings.*\u003C/code\u003E calls. The output is plain JavaScript with no JSX left; the \u003Ccode\u003E@motifx/core\u003C/code\u003E imports (\u003Ccode\u003EmotifComponent\u003C/code\u003E, \u003Ccode\u003EmotifCompiled\u003C/code\u003E …) are \u003Ccode\u003Eexternal\u003C/code\u003E, so they stay outside the package and attach to the consumer\u0027s copy.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Etsc -p tsconfig.build.json\u003C/code\u003E produces only \u003Ccode\u003E.d.ts\u003C/code\u003E; the compiler does not touch the types. The \u003Ccode\u003Estatic elementTag\u003C/code\u003E produced from the \u003Ccode\u003EComponent\u0026lt;HTMLDivElement\u0026gt;\u003C/code\u003E generic exists in the compiled JS; it does not appear on the type side, and it does not need to.\u003C/li\u003E\n\u003Cli\u003ECompiled code depends on a \u003Cstrong\u003Ecompiler contract\u003C/strong\u003E. The core recognizes the contracts it supports; for code compiled with an unsupported contract, the consumer sees an \u003Ccode\u003EMJX121\u003C/code\u003E warning in development mode. Give the \u003Ccode\u003EpeerDependencies\u003C/code\u003E range according to the major version of the core you compiled the package with (\u003Ccode\u003E^1.0.0\u003C/code\u003E); when the core\u0027s major version goes up, recompile and republish the package.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EnoImplicitOverride\u003C/code\u003E: if your component classes accidentally shadow a member of \u003Ccode\u003EComponentBase\u003C/code\u003E (\u003Ccode\u003Edispose\u003C/code\u003E, \u003Ccode\u003Econtrols\u003C/code\u003E, \u003Ccode\u003Eprops\u003C/code\u003E, \u003Ccode\u003Eelement\u003C/code\u003E …), you get a compile error.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EIn a wrapper that does not use JSX the \u003Ccode\u003Ejsx\u003C/code\u003E lines are unnecessary. \u003Ccode\u003Eplugins: [compiler()]\u003C/code\u003E is still needed: it is what produces the element type from the generic in \u003Ccode\u003E.ts\u003C/code\u003E files and transforms decorators. If you write the element yourself with \u003Ccode\u003Estatic elementTag\u003C/code\u003E and use no decorators, you can drop it too; the rest is the same.\u003C/p\u003E\n\u003Ch2 id=\u0022entry\u0022\u003EEntry point and exports\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/index.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/index.ts\u0022\u003E\u003Ccode\u003Eexport { Button } from \u0027./Button\u0027;\nexport { Dialog } from \u0027./Dialog\u0027;\nexport type { ButtonProps } from \u0027./Button\u0027;\nexport { registerUiServices } from \u0027./services\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/index.js\u0022\u003E\u003Ccode\u003Eexport { Button } from \u0027./Button\u0027;\nexport { Dialog } from \u0027./Dialog\u0027;\nexport { registerUiServices } from \u0027./services\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EExport the components and prop types by \u003Cstrong\u003Ename\u003C/strong\u003E; a \u003Ccode\u003Edefault export\u003C/code\u003E only makes sense for single components meant for \u003Ccode\u003ELazy\u003C/code\u003E/lazy route loading.\u003C/li\u003E\n\u003Cli\u003EYou can offer heavy components (an editor, a chart, a map) from separate subpaths: \u003Ccode\u003Eexports[\u0026quot;./editor\u0026quot;]\u003C/code\u003E \u002B a \u003Ccode\u003Ebuild.lib.entry\u003C/code\u003E object. The consumer loads only what is needed with \u003Ccode\u003ELazy({ caller: () =\u0026gt; import(\u0027@acme/motif-ui/editor\u0027) })\u003C/code\u003E (see \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022prop-contract\u0022\u003EThe prop contract\u003C/h2\u003E\n\u003Cp\u003EThe package\u0027s components will be used in other people\u0027s code; define a prop surface that follows the compiler\u0027s rules:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport class Button extends Component\u0026lt;HTMLButtonElement, ButtonProps\u0026gt; {\n  override onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  override view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(this.props.label)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/Button.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport class Button extends Component\u0026lt;HTMLButtonElement, ButtonProps\u0026gt; {\n  static override elementTag = \u0026quot;button\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; read(this.props.label)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\u003Ccode\u003Eimport { read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport function Button(props: ButtonProps) {\n  return (\n    \u0026lt;button\n      type=\u0026quot;button\u0026quot;\n      class={() =\u0026gt; \u0060mf-button mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060}\n      disabled={() =\u0026gt; read(props.disabled) ?? false}\n      onclick={(e) =\u0026gt; props.onPress?.(e)}\n    \u0026gt;\n      {() =\u0026gt; read(props.label)}\n    \u0026lt;/button\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/Button.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport function Button(props: ButtonProps) {\n  return motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    button.motif.on(\u0026quot;click\u0026quot;, (_button: ComponentBase, e: MouseEvent) =\u0026gt; props.onPress?.(e));\n    button.bindings.text(() =\u0026gt; read(props.label));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport const Button = (props: ButtonProps) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(props.label)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/Button.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport const Button = (props: ButtonProps) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; read(props.label)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/Button.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class Button extends Component {\n  static elementTag = \u0026quot;button\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(this.props.label)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/Button.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class Button extends Component {\n  static elementTag = \u0026quot;button\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; read(this.props.label)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/Button.jsx\u0022\u003E\u003Ccode\u003Eimport { read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function Button(props) {\n  return (\n    \u0026lt;button\n      type=\u0026quot;button\u0026quot;\n      class={() =\u0026gt; \u0060mf-button mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060}\n      disabled={() =\u0026gt; read(props.disabled) ?? false}\n      onclick={(e) =\u0026gt; props.onPress?.(e)}\n    \u0026gt;\n      {() =\u0026gt; read(props.label)}\n    \u0026lt;/button\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/Button.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function Button(props) {\n  return motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    button.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; props.onPress?.(e));\n    button.bindings.text(() =\u0026gt; read(props.label));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/Button.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const Button = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(props.label)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/Button.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const Button = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; read(props.label)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe consumer uses the component in their own form:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;New note\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; this.create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;New note\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst newNote = new Button({ label: \u0026quot;New note\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;New note\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;New note\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;New note\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; this.create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;New note\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst newNote = new Button({ label: \u0026quot;New note\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;New note\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;New note\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; create() });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the function component, \u003Ccode\u003Ecreate\u003C/code\u003E is a local function inside the layout function.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class\u0022\u003E\n\u003Cp\u003EIn a class, \u003Ccode\u003Eview()\u003C/code\u003E returns the content, not the root. The root element comes from the generic (\u003Ccode\u003EComponent\u0026lt;HTMLButtonElement\u0026gt;\u003C/code\u003E), from \u003Ccode\u003Estatic elementTag\u003C/code\u003E or from a \u003Ccode\u003Esuper(\u0026quot;button\u0026quot;)\u003C/code\u003E call; the root\u0027s class, attributes and events are attached in \u003Ccode\u003EonConfigured\u003C/code\u003E. Writing a \u003Ccode\u003E\u0026lt;button\u0026gt;\u003C/code\u003E again inside \u003Ccode\u003Eview()\u003C/code\u003E produces two nested elements.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022options\u0022\u003E\n\u003Cp\u003EIn Options, \u003Ccode\u003Eview()\u003C/code\u003E returns the content, not the root. The root element is the \u003Ccode\u003Eel\u003C/code\u003E field; the root\u0027s class, attributes and events are attached in \u003Ccode\u003EonConfigured\u003C/code\u003E. Writing a \u003Ccode\u003E\u0026lt;button\u0026gt;\u003C/code\u003E again inside \u003Ccode\u003Eview()\u003C/code\u003E produces two nested elements.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn a function component the returned element is the root; classes, attributes and events are written directly on it.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe rules:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EEvery prop that can change is a \u003Ccode\u003EBind\u0026lt;T\u0026gt;\u003C/code\u003E\u003C/strong\u003E and is read with \u003Ccode\u003Eread()\u003C/code\u003E. The consumer can write \u003Ccode\u003Elabel=\u0026quot;Save\u0026quot;\u003C/code\u003E or \u003Ccode\u003Elabel={() =\u0026gt; state.text}\u003C/code\u003E; the compiler already wraps a ternary in an attribute in a getter (see \u003Ca href=\u0022/docs/jsx#attribute-ternary\u0022\u003ETernaries in attributes\u003C/a\u003E). If the prop is read without \u003Ccode\u003Eread()\u003C/code\u003E, the getter form does not work.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003ECommon attributes fall through to the root.\u003C/strong\u003E \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Etabindex\u003C/code\u003E, \u003Ccode\u003Erole\u003C/code\u003E, \u003Ccode\u003Earia-*\u003C/code\u003E and \u003Ccode\u003Edata-*\u003C/code\u003E are applied automatically from the component tag to the root element; do not define them as props and copy them by hand (see \u003Ca href=\u0022/docs/jsx#attribute-fallthrough\u0022\u003EAttribute fallthrough\u003C/a\u003E). The root\u0027s own \u003Ccode\u003Eclass\u003C/code\u003E is merged with the consumer\u0027s.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EDo not use reserved names:\u003C/strong\u003E \u003Ccode\u003Eoptions\u003C/code\u003E, \u003Ccode\u003Eref\u003C/code\u003E, \u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Etransition\u003C/code\u003E, \u003Ccode\u003Echilds\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E and the names of the lifecycle hooks (\u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E …) go to the framework (see \u003Ca href=\u0022/docs/wrapping-libraries#prop-names\u0022\u003ECareful with prop names\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EDo not give a callback a name that clashes with a DOM event name.\u003C/strong\u003E A prop such as \u003Ccode\u003EonChange\u003C/code\u003E, \u003Ccode\u003EonSelect\u003C/code\u003E, \u003Ccode\u003EonResize\u003C/code\u003E, \u003Ccode\u003EonReset\u003C/code\u003E, \u003Ccode\u003EonCopy\u003C/code\u003E or \u003Ccode\u003EonContextMenu\u003C/code\u003E on a component tag is attached to the root element as a DOM listener and never reaches the props; the compiler warns with \u003Ccode\u003EMJX002\u003C/code\u003E. Names such as \u003Ccode\u003EonPress\u003C/code\u003E, \u003Ccode\u003EonValueChange\u003C/code\u003E and \u003Ccode\u003EonCommit\u003C/code\u003E are safe.\u003C/li\u003E\n\u003Cli\u003EAssume the consumer will reach the component instance through \u003Ccode\u003Eref\u003C/code\u003E; expose the behaviour you want to offer as a method (\u003Ccode\u003Edialog.open()\u003C/code\u003E) and keep the inner fields closed.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class\u0022\u003E\n\u003Cp\u003EChild content arrives through \u003Ccode\u003Echilds\u003C/code\u003E; in a class whose root element is declared with the generic or \u003Ccode\u003Estatic elementTag\u003C/code\u003E and that writes no \u003Ccode\u003Eview()\u003C/code\u003E, the \u003Ccode\u003E\u0026lt;Card\u0026gt;…\u0026lt;/Card\u0026gt;\u003C/code\u003E form works directly. In a class that builds its root with \u003Ccode\u003Esuper(\u0026quot;div\u0026quot;, props)\u003C/code\u003E, you place the children yourself (see \u003Ca href=\u0022/docs/component-props#childs\u0022\u003EChild components\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EChild content arrives through \u003Ccode\u003Eprops.childs\u003C/code\u003E and is placed inside the returned root (see \u003Ca href=\u0022/docs/component-props#childs\u0022\u003EChild components\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022options\u0022\u003E\n\u003Cp\u003EChild content arrives through \u003Ccode\u003Echilds\u003C/code\u003E; in an Options component that writes no \u003Ccode\u003Eview()\u003C/code\u003E, the \u003Ccode\u003E\u0026lt;Card\u0026gt;…\u0026lt;/Card\u0026gt;\u003C/code\u003E form works directly, and the children are added to the \u003Ccode\u003Eel\u003C/code\u003E element. An Options component that writes \u003Ccode\u003Eview()\u003C/code\u003E places them itself with \u003Ccode\u003Ethis.childs\u003C/code\u003E (see \u003Ca href=\u0022/docs/component-props#childs\u0022\u003EChild components\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022css\u0022\u003EStyles and CSS\u003C/h2\u003E\n\u003Cp\u003EShip the package\u0027s CSS as \u003Cstrong\u003Ea single file\u003C/strong\u003E, and let the consumer import it deliberately:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003E// consumer\nimport \u0027@acme/motif-ui/style.css\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003E// consumer\nimport \u0027@acme/motif-ui/style.css\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EIn library mode, CSS imported from \u003Ccode\u003Esrc/index.ts\u003C/code\u003E is written as \u003Ccode\u003Edist/style.css\u003C/code\u003E in Vite 5 (in Vite 6, give the name with \u003Ccode\u003Ebuild.lib.cssFileName: \u0027style\u0027\u003C/code\u003E); \u003Ccode\u003Eexports[\u0026quot;./style.css\u0026quot;]\u003C/code\u003E makes it addressable. Importing it from the entry does not conflict with \u003Ccode\u003EsideEffects: false\u003C/code\u003E: bundlers treat CSS files as having side effects.\u003C/li\u003E\n\u003Cli\u003EPut the rules inside an \u003Ccode\u003E@layer\u003C/code\u003E (\u003Ccode\u003E@layer mf.base, mf.components;\u003C/code\u003E). Unlayered rules override every layer regardless of specificity, so a one-line override by the consumer always wins; give theme values through prefixed CSS variables such as \u003Ccode\u003E--mf-*\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EA \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E tag inside a component (see \u003Ca href=\u0022/docs/styling-and-transitions#inline-style-tag\u0022\u003EInline style\u003C/a\u003E) is useful for small, self-contained components, but it produces a \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E node in every instance and is not scoped; at library scale, prefer a file.\u003C/li\u003E\n\u003Cli\u003EDocument the class names for transitions: a consumer who writes \u003Ccode\u003Etransition=\u0026quot;mf-fade\u0026quot;\u003C/code\u003E expects the \u003Ccode\u003Emf-fade-enter-from/active/to\u003C/code\u003E rules from you (see \u003Ca href=\u0022/docs/styling-and-transitions#transition-prop\u0022\u003EThe transition prop\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022services\u0022\u003EServices\u003C/h2\u003E\n\u003Cp\u003EIf the package carries a service (a theme, a notification queue, a language), mark it with \u003Ccode\u003E@Injectable\u003C/code\u003E; the class is marked the moment its module loads and is registered when the application is \u003Ccode\u003Ebuild()\u003C/code\u003E-ed. A class whose module loads after \u003Ccode\u003Ebuild()\u003C/code\u003E is registered on its first resolution (see \u003Ca href=\u0022/docs/service-registration#injectable-decorator\u0022\u003EAutomatic registration with decorators\u003C/a\u003E). The compiler plugin compiles decorators in \u003Ccode\u003E.ts\u003C/code\u003E files too; in a wrapper without the plugin, TypeScript compiles the standard decorator itself.\u003C/p\u003E\n\u003Cp\u003EIf the consumer needs to choose the lifetime, an explicit registration function is clearer:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services.ts\u0022\u003E\u003Ccode\u003Eimport { ServiceCollection } from \u0027@motifx/core\u0027;\nimport { ThemeService } from \u0027./ThemeService\u0027;\n\nexport function registerUiServices(services: ServiceCollection) {\n  services.addSingleton(ThemeService, ThemeService);\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services.js\u0022\u003E\u003Ccode\u003Eimport { ThemeService } from \u0027./ThemeService\u0027;\n\nexport function registerUiServices(services) {\n  services.addSingleton(ThemeService, ThemeService);\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003E// consumer\nconst builder = Application.CreateBuilder();\nregisterUiServices(builder.services);\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003E// consumer\nconst builder = Application.CreateBuilder();\nregisterUiServices(builder.services);\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EAn explicit registration overrides the decorator, so giving both is safe.\u003C/p\u003E\n\u003Ch2 id=\u0022testing\u0022\u003ETesting and development\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Evitest\u003C/code\u003E \u002B \u003Ccode\u003Ejsdom\u003C/code\u003E work with the same plugin as in \u003Ccode\u003Evite.config.ts\u003C/code\u003E; no extra setting is needed for JSX in tests. Add things to \u003Ccode\u003Edocument\u003C/code\u003E and test the \u003Ccode\u003EonMounted\u003C/code\u003E behaviour as well.\u003C/li\u003E\n\u003Cli\u003EWrite a \u003Cstrong\u003Eround-trip test\u003C/strong\u003E for every component: build it, add it to the DOM, \u003Ccode\u003Edispose()\u003C/code\u003E, and check that the number of live components went back to where it started (see \u003Ca href=\u0022/docs/wrapping-libraries#prove-cleanup\u0022\u003EProve the cleanup\u003C/a\u003E). A leak only shows up this way.\u003C/li\u003E\n\u003Cli\u003EFor development, put an \u003Ccode\u003Eindex.html\u003C/code\u003E and \u003Ccode\u003Esrc/showcase/\u003C/code\u003E in the package root, and look at the components in a real browser with \u003Ccode\u003Evite\u003C/code\u003E. The showcase stays outside \u003Ccode\u003Eexports\u003C/code\u003E, so it does not go into the package.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif-lint\u003C/code\u003E (it comes with \u003Ccode\u003E@motifx/compiler\u003C/code\u003E) checks JSX against the prop types; add \u003Ccode\u003E\u0026quot;lint:jsx\u0026quot;: \u0026quot;motif-lint\u0026quot;\u003C/code\u003E to \u003Ccode\u003Epackage.json\u003C/code\u003E (see \u003Ca href=\u0022/docs/jsx#motif-lint\u0022\u003Emotif-lint\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022release-checklist\u0022\u003EPre-publish checks\u003C/h2\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Ccode\u003Enpm run build\u003C/code\u003E → were \u003Ccode\u003Edist/index.js\u003C/code\u003E, \u003Ccode\u003Edist/index.cjs\u003C/code\u003E, \u003Ccode\u003Edist/types/index.d.ts\u003C/code\u003E and \u003Ccode\u003Edist/style.css\u003C/code\u003E created?\u003C/li\u003E\n\u003Cli\u003EIs there no \u003Ccode\u003Ejsx(\u003C/code\u003E/\u003Ccode\u003EcreateElement(\u003C/code\u003E in \u003Ccode\u003Edist/index.js\u003C/code\u003E, and is there a \u003Ccode\u003Efrom \u0026quot;@motifx/core\u0026quot;\u003C/code\u003E? (The compiler ran and the core stayed outside.)\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Enpx publint\u003C/code\u003E and \u003Ccode\u003Enpx @arethetypeswrong/cli --pack\u003C/code\u003E: are \u003Ccode\u003Eexports\u003C/code\u003E/\u003Ccode\u003Etypes\u003C/code\u003E consistent, and does a CJS consumer see the types?\u003C/li\u003E\n\u003Cli\u003EInstall the \u003Ccode\u003Enpm pack\u003C/code\u003E output in an empty Vite application and use a component; with \u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E, check that no \u003Ccode\u003EMJX121\u003C/code\u003E or \u003Ccode\u003EMJX002\u003C/code\u003E warning appears.\u003C/li\u003E\n\u003Cli\u003EWhen testing in a monorepo linked with \u003Ccode\u003Efile:\u003C/code\u003E/\u003Ccode\u003Elink:\u003C/code\u003E, give \u003Ccode\u003Eresolve: { dedupe: [\u0027@motifx/core\u0027] }\u003C/code\u003E on the consumer side; the published package does not need this.\u003C/li\u003E\n\u003Cli\u003EIn the \u003Ccode\u003EREADME\u003C/code\u003E, write down the peer dependencies, the \u003Ccode\u003Estyle.css\u003C/code\u003E import, the prop table and the transition class names.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo inspect the component tree, reactivity and counters while developing a package, go on to \u003Ca href=\u0022/docs/devtools\u0022\u003EThe DevTools Contract\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"boundary","text":"The package\u0027s boundary","level":2},{"id":"package-json","text":"package.json","level":2},{"id":"build","text":"Build","level":2},{"id":"entry","text":"Entry point and exports","level":2},{"id":"prop-contract","text":"The prop contract","level":2},{"id":"css","text":"Styles and CSS","level":2},{"id":"services","text":"Services","level":2},{"id":"testing","text":"Testing and development","level":2},{"id":"release-checklist","text":"Pre-publish checks","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"wrapping-libraries","title":"Wrapping Third-Party Libraries"},"next":{"slug":"devtools","title":"The DevTools Contract"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Guides</p>
+        <h1>Publishing an npm Library for MotifJS</h1>
+        <p>Preparing an npm package with MotifJS components, services or wrappers; the package format, build, types, CSS, the prop contract, testing and pre-publish checks.</p>
+<p>If you are writing a UI library, a wrapper or a set of services and want others to use it through <code>npm install</code>, this section is for you. The package must attach to the same <code>@motifx/core</code> instance the application uses, carry its JSX <strong>already compiled</strong>, and impose nothing on the consumer's build setup. The setup below makes that happen.</p>
+<h2 id="boundary">The package's boundary</h2>
+<p>There are two kinds of packages, and the difference in setup is small:</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Content</th>
+<th>Is the compiler needed?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A package without JSX</strong></td>
+<td><code>.ts</code> components that do not use JSX (<code>super('canvas')</code>, <code>controls.add</code>, <code>bindings.*</code>)</td>
+<td>No, if the root element is declared with <code>static elementTag</code> or <code>super(...)</code> and no decorators are used; <code>tsc</code> or any bundler is enough. If the root element is to be produced from the generic, the compiler plugin is needed.</td>
+</tr>
+<tr>
+<td><strong>A JSX library</strong> (a UI kit)</td>
+<td><code>.tsx</code> components</td>
+<td>Yes; the package is compiled with <code>@motifx/compiler</code> before it is published.</td>
+</tr>
+</tbody>
+</table>
+<p>In both cases <code>@motifx/core</code> is a <strong>peer dependency</strong>: the package does not bundle it, it uses the copy the consumer installs. Two copies mean two reactivity engines, and that error is silent (see <a href="/docs/wrapping-libraries#single-copy">The single-copy rule</a>).</p>
+<h2 id="package-json">package.json</h2>
+<div class="doc-code" data-file="package.json">
+<pre data-lang="jsonc" data-file="package.json"><code>{
+  &quot;name&quot;: &quot;@acme/motif-ui&quot;,
+  &quot;version&quot;: &quot;0.1.0&quot;,
+  &quot;type&quot;: &quot;module&quot;,
+  &quot;sideEffects&quot;: false,
+  &quot;main&quot;: &quot;./dist/index.cjs&quot;,
+  &quot;module&quot;: &quot;./dist/index.js&quot;,
+  &quot;types&quot;: &quot;./dist/types/index.d.ts&quot;,
+  &quot;exports&quot;: {
+    &quot;.&quot;: {
+      &quot;types&quot;: &quot;./dist/types/index.d.ts&quot;,
+      &quot;import&quot;: &quot;./dist/index.js&quot;,
+      &quot;require&quot;: &quot;./dist/index.cjs&quot;
+    },
+    &quot;./style.css&quot;: &quot;./dist/style.css&quot;,
+    &quot;./package.json&quot;: &quot;./package.json&quot;
+  },
+  &quot;files&quot;: [&quot;dist&quot;, &quot;README.md&quot;],
+  &quot;scripts&quot;: {
+    &quot;dev&quot;: &quot;vite&quot;,
+    &quot;build&quot;: &quot;vite build &amp;&amp; tsc -p tsconfig.build.json&quot;,
+    &quot;typecheck&quot;: &quot;tsc --noEmit&quot;,
+    &quot;test&quot;: &quot;vitest run&quot;,
+    &quot;prepublishOnly&quot;: &quot;npm run build&quot;
+  },
+  &quot;peerDependencies&quot;: {
+    &quot;@motifx/core&quot;: &quot;^1.0.0&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;@motifx/core&quot;: &quot;^1.0.0&quot;,
+    &quot;@motifx/compiler&quot;: &quot;^1.0.0&quot;,
+    &quot;jsdom&quot;: &quot;^26.0.0&quot;,
+    &quot;typescript&quot;: &quot;^5.4.0&quot;,
+    &quot;vite&quot;: &quot;^5.4.0&quot;,
+    &quot;vitest&quot;: &quot;^3.0.0&quot;
+  },
+  &quot;keywords&quot;: [&quot;motifjs&quot;, &quot;motifx&quot;],
+  &quot;publishConfig&quot;: { &quot;access&quot;: &quot;public&quot; }
+}</code></pre>
+</div>
+<ul>
+<li>The same <code>@motifx/core</code> major in <code>peerDependencies</code> and <code>devDependencies</code>: one is a requirement for the consumer, the other is for your own build and tests.</li>
+<li><code>@motifx/compiler</code> is only in <code>devDependencies</code>; the consumer does not have to install it, because the package carries compiled code.</li>
+<li><code>sideEffects: false</code> turns on tree-shaking; in that case <strong>do not have</strong> a module that does work when imported (global CSS injection, a global registration). If you need something like that, export it as an explicit function (<code>registerX(app)</code>).</li>
+<li>A third-party library you wrap (such as <code>chart.js</code>) becomes a peer dependency too; add it to the <code>external</code> list as well.</li>
+</ul>
+<h2 id="build">Build</h2>
+<div class="doc-code" data-file="vite.config.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="vite.config.ts"><code>/// &lt;reference types=&quot;vitest/config&quot; /&gt;
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
+import compiler from '@motifx/compiler';
+
+export default defineConfig({
+  plugins: [compiler()],
+  build: {
+    lib: {
+      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      formats: ['es', 'cjs'],
+      fileName: (format) =&gt; (format === 'es' ? 'index.js' : 'index.cjs'),
+    },
+    rollupOptions: {
+      external: ['@motifx/core'],
+    },
+    sourcemap: true,
+    minify: false,
+    target: 'es2020',
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.{ts,tsx}'],
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="vite.config.js"><code>/// &lt;reference types=&quot;vitest/config&quot; /&gt;
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
+import compiler from '@motifx/compiler';
+
+export default defineConfig({
+  plugins: [compiler()],
+  build: {
+    lib: {
+      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      formats: ['es', 'cjs'],
+      fileName: (format) =&gt; (format === 'es' ? 'index.js' : 'index.cjs'),
+    },
+    rollupOptions: {
+      external: ['@motifx/core'],
+    },
+    sourcemap: true,
+    minify: false,
+    target: 'es2020',
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.{ts,tsx}'],
+  },
+});</code></pre>
+</div>
+<div class="doc-code" data-file="tsconfig.json">
+<pre data-lang="jsonc" data-file="tsconfig.json"><code>{
+  &quot;compilerOptions&quot;: {
+    &quot;target&quot;: &quot;ES2021&quot;,
+    &quot;module&quot;: &quot;esnext&quot;,
+    &quot;moduleResolution&quot;: &quot;bundler&quot;,
+    &quot;strict&quot;: true,
+    &quot;jsx&quot;: &quot;preserve&quot;,
+    &quot;useDefineForClassFields&quot;: true,
+    &quot;noImplicitOverride&quot;: true,
+    &quot;declaration&quot;: true,
+    &quot;declarationMap&quot;: true,
+    &quot;noEmit&quot;: true,
+    &quot;skipLibCheck&quot;: true,
+    &quot;lib&quot;: [&quot;ESNext&quot;, &quot;DOM&quot;, &quot;DOM.Iterable&quot;]
+  },
+  &quot;include&quot;: [&quot;./src/**/*&quot;, &quot;./vite.config.ts&quot;]
+}</code></pre>
+</div>
+<div class="doc-code" data-file="tsconfig.build.json">
+<pre data-lang="jsonc" data-file="tsconfig.build.json"><code>{
+  &quot;extends&quot;: &quot;./tsconfig.json&quot;,
+  &quot;compilerOptions&quot;: {
+    &quot;noEmit&quot;: false,
+    &quot;emitDeclarationOnly&quot;: true,
+    &quot;outDir&quot;: &quot;./dist/types&quot;,
+    &quot;rootDir&quot;: &quot;./src&quot;
+  },
+  &quot;include&quot;: [&quot;./src/**/*&quot;],
+  &quot;exclude&quot;: [&quot;./src/**/*.test.ts&quot;, &quot;./src/**/*.test.tsx&quot;]
+}</code></pre>
+</div>
+<p>What happens:</p>
+<ul>
+<li><code>vite build</code> runs in library mode; <code>@motifx/compiler</code> brings the JSX in every <code>.tsx</code> file down to <code>bindings.*</code> calls. The output is plain JavaScript with no JSX left; the <code>@motifx/core</code> imports (<code>motifComponent</code>, <code>motifCompiled</code> …) are <code>external</code>, so they stay outside the package and attach to the consumer's copy.</li>
+<li><code>tsc -p tsconfig.build.json</code> produces only <code>.d.ts</code>; the compiler does not touch the types. The <code>static elementTag</code> produced from the <code>Component&lt;HTMLDivElement&gt;</code> generic exists in the compiled JS; it does not appear on the type side, and it does not need to.</li>
+<li>Compiled code depends on a <strong>compiler contract</strong>. The core recognizes the contracts it supports; for code compiled with an unsupported contract, the consumer sees an <code>MJX121</code> warning in development mode. Give the <code>peerDependencies</code> range according to the major version of the core you compiled the package with (<code>^1.0.0</code>); when the core's major version goes up, recompile and republish the package.</li>
+<li><code>noImplicitOverride</code>: if your component classes accidentally shadow a member of <code>ComponentBase</code> (<code>dispose</code>, <code>controls</code>, <code>props</code>, <code>element</code> …), you get a compile error.</li>
+</ul>
+<p>In a wrapper that does not use JSX the <code>jsx</code> lines are unnecessary. <code>plugins: [compiler()]</code> is still needed: it is what produces the element type from the generic in <code>.ts</code> files and transforms decorators. If you write the element yourself with <code>static elementTag</code> and use no decorators, you can drop it too; the rest is the same.</p>
+<h2 id="entry">Entry point and exports</h2>
+<div class="doc-code" data-file="src/index.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/index.ts"><code>export { Button } from './Button';
+export { Dialog } from './Dialog';
+export type { ButtonProps } from './Button';
+export { registerUiServices } from './services';</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/index.js"><code>export { Button } from './Button';
+export { Dialog } from './Dialog';
+export { registerUiServices } from './services';</code></pre>
+</div>
+<ul>
+<li>Export the components and prop types by <strong>name</strong>; a <code>default export</code> only makes sense for single components meant for <code>Lazy</code>/lazy route loading.</li>
+<li>You can offer heavy components (an editor, a chart, a map) from separate subpaths: <code>exports[&quot;./editor&quot;]</code> + a <code>build.lib.entry</code> object. The consumer loads only what is needed with <code>Lazy({ caller: () =&gt; import('@acme/motif-ui/editor') })</code> (see <a href="/docs/lazy">Lazy</a>).</li>
+</ul>
+<h2 id="prop-contract">The prop contract</h2>
+<p>The package's components will be used in other people's code; define a prop surface that follows the compiler's rules:</p>
+<div class="doc-code" data-file="src/Button.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/Button.tsx"><code>import { Component, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export class Button extends Component&lt;HTMLButtonElement, ButtonProps&gt; {
+  override onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; this.props.onPress?.(e));
+  }
+
+  override view() {
+    return &lt;&gt;{() =&gt; read(this.props.label)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/Button.ts"><code>import { Component, ComponentBase, motifComponent, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export class Button extends Component&lt;HTMLButtonElement, ButtonProps&gt; {
+  static override elementTag = &quot;button&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; this.props.onPress?.(e));
+  }
+
+  override view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; read(this.props.label)));
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/Button.tsx"><code>import { read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export function Button(props: ButtonProps) {
+  return (
+    &lt;button
+      type=&quot;button&quot;
+      class={() =&gt; `mf-button mf-button--${read(props.tone) ?? &quot;default&quot;}`}
+      disabled={() =&gt; read(props.disabled) ?? false}
+      onclick={(e) =&gt; props.onPress?.(e)}
+    &gt;
+      {() =&gt; read(props.label)}
+    &lt;/button&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/Button.ts"><code>import { ComponentBase, motifComponent, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export function Button(props: ButtonProps) {
+  return motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    button.motif.on(&quot;click&quot;, (_button: ComponentBase, e: MouseEvent) =&gt; props.onPress?.(e));
+    button.bindings.text(() =&gt; read(props.label));
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/Button.tsx"><code>import { motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export const Button = (props: ButtonProps) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; read(props.label)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/Button.ts"><code>import { ComponentBase, motifComponent, motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export const Button = (props: ButtonProps) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; read(props.label)));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/Button.jsx"><code>import { Component, read } from &quot;@motifx/core&quot;;
+
+export class Button extends Component {
+  static elementTag = &quot;button&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; this.props.onPress?.(e));
+  }
+
+  view() {
+    return &lt;&gt;{() =&gt; read(this.props.label)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/Button.js"><code>import { Component, motifComponent, read } from &quot;@motifx/core&quot;;
+
+export class Button extends Component {
+  static elementTag = &quot;button&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; this.props.onPress?.(e));
+  }
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; read(this.props.label)));
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/Button.jsx"><code>import { read } from &quot;@motifx/core&quot;;
+
+export function Button(props) {
+  return (
+    &lt;button
+      type=&quot;button&quot;
+      class={() =&gt; `mf-button mf-button--${read(props.tone) ?? &quot;default&quot;}`}
+      disabled={() =&gt; read(props.disabled) ?? false}
+      onclick={(e) =&gt; props.onPress?.(e)}
+    &gt;
+      {() =&gt; read(props.label)}
+    &lt;/button&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/Button.js"><code>import { motifComponent, read } from &quot;@motifx/core&quot;;
+
+export function Button(props) {
+  return motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    button.motif.on(&quot;click&quot;, (_button, e) =&gt; props.onPress?.(e));
+    button.bindings.text(() =&gt; read(props.label));
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/Button.jsx"><code>import { motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const Button = (props) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; read(props.label)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/Button.js"><code>import { motifComponent, motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const Button = (props) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; read(props.label)));
+  },
+});</code></pre>
+</div>
+<p>The consumer uses the component in their own form:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;Button label=&quot;New note&quot; tone=&quot;accent&quot; onPress={() =&gt; this.create()} /&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;Button label=&quot;New note&quot; tone=&quot;accent&quot; onPress={() =&gt; create()} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/NotesLayout.ts"><code>const newNote = new Button({ label: &quot;New note&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const newNote = motifComponent(Button, { label: &quot;New note&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const newNote = motifComponent(Button, { label: &quot;New note&quot;, tone: &quot;accent&quot;, onPress: () =&gt; create() });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;Button label=&quot;New note&quot; tone=&quot;accent&quot; onPress={() =&gt; this.create()} /&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;Button label=&quot;New note&quot; tone=&quot;accent&quot; onPress={() =&gt; create()} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/NotesLayout.js"><code>const newNote = new Button({ label: &quot;New note&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>const newNote = motifComponent(Button, { label: &quot;New note&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>const newNote = motifComponent(Button, { label: &quot;New note&quot;, tone: &quot;accent&quot;, onPress: () =&gt; create() });</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the function component, <code>create</code> is a local function inside the layout function.</p>
+</div>
+<div class="doc-variant" data-variant="class">
+<p>In a class, <code>view()</code> returns the content, not the root. The root element comes from the generic (<code>Component&lt;HTMLButtonElement&gt;</code>), from <code>static elementTag</code> or from a <code>super(&quot;button&quot;)</code> call; the root's class, attributes and events are attached in <code>onConfigured</code>. Writing a <code>&lt;button&gt;</code> again inside <code>view()</code> produces two nested elements.</p>
+</div>
+<div class="doc-variant" data-variant="options">
+<p>In Options, <code>view()</code> returns the content, not the root. The root element is the <code>el</code> field; the root's class, attributes and events are attached in <code>onConfigured</code>. Writing a <code>&lt;button&gt;</code> again inside <code>view()</code> produces two nested elements.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In a function component the returned element is the root; classes, attributes and events are written directly on it.</p>
+</div>
+<p>The rules:</p>
+<ul>
+<li><strong>Every prop that can change is a <code>Bind&lt;T&gt;</code></strong> and is read with <code>read()</code>. The consumer can write <code>label=&quot;Save&quot;</code> or <code>label={() =&gt; state.text}</code>; the compiler already wraps a ternary in an attribute in a getter (see <a href="/docs/jsx#attribute-ternary">Ternaries in attributes</a>). If the prop is read without <code>read()</code>, the getter form does not work.</li>
+<li><strong>Common attributes fall through to the root.</strong> <code>class</code>, <code>style</code>, <code>id</code>, <code>tabindex</code>, <code>role</code>, <code>aria-*</code> and <code>data-*</code> are applied automatically from the component tag to the root element; do not define them as props and copy them by hand (see <a href="/docs/jsx#attribute-fallthrough">Attribute fallthrough</a>). The root's own <code>class</code> is merged with the consumer's.</li>
+<li><strong>Do not use reserved names:</strong> <code>options</code>, <code>ref</code>, <code>key</code>, <code>transition</code>, <code>childs</code>, <code>initializeComponent</code> and the names of the lifecycle hooks (<code>onBuilt</code>, <code>onMounted</code> …) go to the framework (see <a href="/docs/wrapping-libraries#prop-names">Careful with prop names</a>).</li>
+<li><strong>Do not give a callback a name that clashes with a DOM event name.</strong> A prop such as <code>onChange</code>, <code>onSelect</code>, <code>onResize</code>, <code>onReset</code>, <code>onCopy</code> or <code>onContextMenu</code> on a component tag is attached to the root element as a DOM listener and never reaches the props; the compiler warns with <code>MJX002</code>. Names such as <code>onPress</code>, <code>onValueChange</code> and <code>onCommit</code> are safe.</li>
+<li>Assume the consumer will reach the component instance through <code>ref</code>; expose the behaviour you want to offer as a method (<code>dialog.open()</code>) and keep the inner fields closed.</li>
+</ul>
+<div class="doc-variant" data-variant="class">
+<p>Child content arrives through <code>childs</code>; in a class whose root element is declared with the generic or <code>static elementTag</code> and that writes no <code>view()</code>, the <code>&lt;Card&gt;…&lt;/Card&gt;</code> form works directly. In a class that builds its root with <code>super(&quot;div&quot;, props)</code>, you place the children yourself (see <a href="/docs/component-props#childs">Child components</a>).</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Child content arrives through <code>props.childs</code> and is placed inside the returned root (see <a href="/docs/component-props#childs">Child components</a>).</p>
+</div>
+<div class="doc-variant" data-variant="options">
+<p>Child content arrives through <code>childs</code>; in an Options component that writes no <code>view()</code>, the <code>&lt;Card&gt;…&lt;/Card&gt;</code> form works directly, and the children are added to the <code>el</code> element. An Options component that writes <code>view()</code> places them itself with <code>this.childs</code> (see <a href="/docs/component-props#childs">Child components</a>).</p>
+</div>
+<h2 id="css">Styles and CSS</h2>
+<p>Ship the package's CSS as <strong>a single file</strong>, and let the consumer import it deliberately:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>// consumer
+import '@acme/motif-ui/style.css';</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>// consumer
+import '@acme/motif-ui/style.css';</code></pre>
+</div>
+<ul>
+<li>In library mode, CSS imported from <code>src/index.ts</code> is written as <code>dist/style.css</code> in Vite 5 (in Vite 6, give the name with <code>build.lib.cssFileName: 'style'</code>); <code>exports[&quot;./style.css&quot;]</code> makes it addressable. Importing it from the entry does not conflict with <code>sideEffects: false</code>: bundlers treat CSS files as having side effects.</li>
+<li>Put the rules inside an <code>@layer</code> (<code>@layer mf.base, mf.components;</code>). Unlayered rules override every layer regardless of specificity, so a one-line override by the consumer always wins; give theme values through prefixed CSS variables such as <code>--mf-*</code>.</li>
+<li>A <code>&lt;style&gt;</code> tag inside a component (see <a href="/docs/styling-and-transitions#inline-style-tag">Inline style</a>) is useful for small, self-contained components, but it produces a <code>&lt;style&gt;</code> node in every instance and is not scoped; at library scale, prefer a file.</li>
+<li>Document the class names for transitions: a consumer who writes <code>transition=&quot;mf-fade&quot;</code> expects the <code>mf-fade-enter-from/active/to</code> rules from you (see <a href="/docs/styling-and-transitions#transition-prop">The transition prop</a>).</li>
+</ul>
+<h2 id="services">Services</h2>
+<p>If the package carries a service (a theme, a notification queue, a language), mark it with <code>@Injectable</code>; the class is marked the moment its module loads and is registered when the application is <code>build()</code>-ed. A class whose module loads after <code>build()</code> is registered on its first resolution (see <a href="/docs/service-registration#injectable-decorator">Automatic registration with decorators</a>). The compiler plugin compiles decorators in <code>.ts</code> files too; in a wrapper without the plugin, TypeScript compiles the standard decorator itself.</p>
+<p>If the consumer needs to choose the lifetime, an explicit registration function is clearer:</p>
+<div class="doc-code" data-file="src/services.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services.ts"><code>import { ServiceCollection } from '@motifx/core';
+import { ThemeService } from './ThemeService';
+
+export function registerUiServices(services: ServiceCollection) {
+  services.addSingleton(ThemeService, ThemeService);
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services.js"><code>import { ThemeService } from './ThemeService';
+
+export function registerUiServices(services) {
+  services.addSingleton(ThemeService, ThemeService);
+}</code></pre>
+</div>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>// consumer
+const builder = Application.CreateBuilder();
+registerUiServices(builder.services);
+const app = builder.build();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>// consumer
+const builder = Application.CreateBuilder();
+registerUiServices(builder.services);
+const app = builder.build();</code></pre>
+</div>
+<p>An explicit registration overrides the decorator, so giving both is safe.</p>
+<h2 id="testing">Testing and development</h2>
+<ul>
+<li><code>vitest</code> + <code>jsdom</code> work with the same plugin as in <code>vite.config.ts</code>; no extra setting is needed for JSX in tests. Add things to <code>document</code> and test the <code>onMounted</code> behaviour as well.</li>
+<li>Write a <strong>round-trip test</strong> for every component: build it, add it to the DOM, <code>dispose()</code>, and check that the number of live components went back to where it started (see <a href="/docs/wrapping-libraries#prove-cleanup">Prove the cleanup</a>). A leak only shows up this way.</li>
+<li>For development, put an <code>index.html</code> and <code>src/showcase/</code> in the package root, and look at the components in a real browser with <code>vite</code>. The showcase stays outside <code>exports</code>, so it does not go into the package.</li>
+<li><code>motif-lint</code> (it comes with <code>@motifx/compiler</code>) checks JSX against the prop types; add <code>&quot;lint:jsx&quot;: &quot;motif-lint&quot;</code> to <code>package.json</code> (see <a href="/docs/jsx#motif-lint">motif-lint</a>).</li>
+</ul>
+<h2 id="release-checklist">Pre-publish checks</h2>
+<ol>
+<li><code>npm run build</code> → were <code>dist/index.js</code>, <code>dist/index.cjs</code>, <code>dist/types/index.d.ts</code> and <code>dist/style.css</code> created?</li>
+<li>Is there no <code>jsx(</code>/<code>createElement(</code> in <code>dist/index.js</code>, and is there a <code>from &quot;@motifx/core&quot;</code>? (The compiler ran and the core stayed outside.)</li>
+<li><code>npx publint</code> and <code>npx @arethetypeswrong/cli --pack</code>: are <code>exports</code>/<code>types</code> consistent, and does a CJS consumer see the types?</li>
+<li>Install the <code>npm pack</code> output in an empty Vite application and use a component; with <code>app.useDevelopment(true)</code>, check that no <code>MJX121</code> or <code>MJX002</code> warning appears.</li>
+<li>When testing in a monorepo linked with <code>file:</code>/<code>link:</code>, give <code>resolve: { dedupe: ['@motifx/core'] }</code> on the consumer side; the published package does not need this.</li>
+<li>In the <code>README</code>, write down the peer dependencies, the <code>style.css</code> import, the prop table and the transition class names.</li>
+</ol>
+<h2 id="next">Next step</h2>
+<p>To inspect the component tree, reactivity and counters while developing a package, go on to <a href="/docs/devtools">The DevTools Contract</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

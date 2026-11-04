@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="RouteItem fields, nested routes, redirect and alias, path parameters, querying the route table, lazy routes and the route check in development mode.">
+    <title>The Route Table — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/routes">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/routes">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/routes">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/routes">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/routes">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="The Route Table">
+    <meta property="og:description" content="RouteItem fields, nested routes, redirect and alias, path parameters, querying the route table, lazy routes and the route check in development mode.">
+    <script type="application/json" id="doc-data">{"slug":"routes","locale":"en","title":"The Route Table","description":"RouteItem fields, nested routes, redirect and alias, path parameters, querying the route table, lazy routes and the route check in development mode.","category":{"id":"4","title":"Routing"},"html":"\u003Ch2 id=\u0022route-item\u0022\u003EDefining a route (\u003Ccode\u003ERouteItem\u003C/code\u003E)\u003C/h2\u003E\n\u003Cp\u003ERoutes are a \u003Ccode\u003ERouteItem[]\u003C/code\u003E array. Each item maps a path (\u003Ccode\u003Epath\u003C/code\u003E) to a component (\u003Ccode\u003Econtrol\u003C/code\u003E). The example table shows the commonly used fields of \u003Ccode\u003ERouteItem\u003C/code\u003E together: a pattern-constrained, named route (\u003Ccode\u003E{id(\\d\u002B)}\u003C/code\u003E, \u003Ccode\u003Ename\u003C/code\u003E), a layout alias, an optional parameter with a default, and a redirect (an extended version of the table on the \u003Ca href=\u0022/docs/routing#from-address-to-screen\u0022\u003EIntroduction to Routing\u003C/a\u003E page):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Eimport type { RouteItem } from \u0026quot;@motifx/core\u0026quot;;\nimport MainLayout from \u0026quot;./layouts/MainLayout\u0026quot;;\nimport NotesLayout from \u0026quot;./layouts/NotesLayout\u0026quot;;\nimport NoteEmptyPage from \u0026quot;./pages/NoteEmptyPage\u0026quot;;\nimport NotePage from \u0026quot;./pages/NotePage\u0026quot;;\nimport type { Folder } from \u0026quot;./services/notes\u0026quot;;\n\nconst folder = (name: Folder): RouteItem =\u0026gt; ({\n  path: \u0060/${name}\u0060,\n  control: NotesLayout,\n  meta: { folder: name },\n  childs: [\n    { path: \u0026quot;/\u0026quot;, control: NoteEmptyPage },\n    { path: \u0026quot;/{id(\\\\d\u002B)}\u0026quot;, name: \u0060${name}-note\u0060, control: NotePage },\n  ],\n});\n\nexport const routes: RouteItem[] = [\n  {\n    path: \u0026quot;/\u0026quot;,\n    control: MainLayout,\n    childs: [\n      { path: \u0026quot;/\u0026quot;, redirect: \u0026quot;/notes\u0026quot; },\n      { ...folder(\u0026quot;notes\u0026quot;), alias: \u0026quot;/my-notes\u0026quot; },\n      folder(\u0026quot;pinned\u0026quot;),\n      folder(\u0026quot;archive\u0026quot;),\n      { path: \u0026quot;/settings/{section?:appearance}\u0026quot;, name: \u0026quot;settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;) },\n      { path: \u0026quot;/n/{id}\u0026quot;, redirect: \u0026quot;/notes/{id}\u0026quot; },\n    ],\n  },\n];\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Eimport MainLayout from \u0026quot;./layouts/MainLayout\u0026quot;;\nimport NotesLayout from \u0026quot;./layouts/NotesLayout\u0026quot;;\nimport NoteEmptyPage from \u0026quot;./pages/NoteEmptyPage\u0026quot;;\nimport NotePage from \u0026quot;./pages/NotePage\u0026quot;;\n\nconst folder = (name) =\u0026gt; ({\n  path: \u0060/${name}\u0060,\n  control: NotesLayout,\n  meta: { folder: name },\n  childs: [\n    { path: \u0026quot;/\u0026quot;, control: NoteEmptyPage },\n    { path: \u0026quot;/{id(\\\\d\u002B)}\u0026quot;, name: \u0060${name}-note\u0060, control: NotePage },\n  ],\n});\n\nexport const routes = [\n  {\n    path: \u0026quot;/\u0026quot;,\n    control: MainLayout,\n    childs: [\n      { path: \u0026quot;/\u0026quot;, redirect: \u0026quot;/notes\u0026quot; },\n      { ...folder(\u0026quot;notes\u0026quot;), alias: \u0026quot;/my-notes\u0026quot; },\n      folder(\u0026quot;pinned\u0026quot;),\n      folder(\u0026quot;archive\u0026quot;),\n      { path: \u0026quot;/settings/{section?:appearance}\u0026quot;, name: \u0026quot;settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;) },\n      { path: \u0026quot;/n/{id}\u0026quot;, redirect: \u0026quot;/notes/{id}\u0026quot; },\n    ],\n  },\n];\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EWhat these fields do:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EA segment that does not fit the pattern does not match the route: \u003Ccode\u003E/notes/3\u003C/code\u003E matches, \u003Ccode\u003E/notes/abc\u003C/code\u003E does not, and \u003Ccode\u003Efallbacks.notFound\u003C/code\u003E is shown.\u003C/li\u003E\n\u003Cli\u003EThe path of a route given a \u003Ccode\u003Ename\u003C/code\u003E is produced with \u003Ccode\u003Ehref\u003C/code\u003E / \u003Ccode\u003EnavigateByName\u003C/code\u003E: \u003Ccode\u003Eapp.router.href(\u0026quot;archive-note\u0026quot;, { id: 7 })\u003C/code\u003E → \u003Ccode\u003E/archive/7\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EAn alias opens the same route at a second address, and the alias stays in the address bar: \u003Ccode\u003E/my-notes/3\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EAn optional parameter that is missing from the address gets its default: at \u003Ccode\u003E/settings\u003C/code\u003E, \u003Ccode\u003Eparams.section\u003C/code\u003E is \u003Ccode\u003E\u0026quot;appearance\u0026quot;\u003C/code\u003E, and at \u003Ccode\u003E/settings/notes\u003C/code\u003E it is \u003Ccode\u003E\u0026quot;notes\u0026quot;\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003E{id}\u003C/code\u003E in a \u003Ccode\u003Eredirect\u003C/code\u003E string is filled with the matched parameter: \u003Ccode\u003E/n/3\u003C/code\u003E → \u003Ccode\u003E/notes/3\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022route-item-fields\u0022\u003E\u003Ccode\u003ERouteItem\u003C/code\u003E fields\u003C/h3\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EField\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Epath\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe route path. Parameters are in the \u003Ccode\u003E{name}\u003C/code\u003E form. \u003Ccode\u003E\u0027/\u0027\u003C/code\u003E for a layout and the default child; every child path starts with \u003Ccode\u003E/\u003C/code\u003E (otherwise development mode warns with \u003Ccode\u003EMJX311\u003C/code\u003E). At the same depth a static segment comes before a parameter (\u003Ccode\u003E/archive\u003C/code\u003E beats \u003Ccode\u003E/{slug}\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Econtrol\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe route component. It can be a component class, a ready component instance, \u003Ccode\u003E() =\u0026gt; Component\u003C/code\u003E, an Options API factory, \u003Ccode\u003E() =\u0026gt; import(...)\u003C/code\u003E (lazy) or a Promise. It is not required only on a route that defines \u003Ccode\u003Eredirect\u003C/code\u003E. A route given a ready instance (or a Promise that resolves to one) behaves like \u003Ccode\u003EkeepAlive\u003C/code\u003E: the instance is built once, detached from the outlet on leaving, and the same instance is attached again on return; it is not rebuilt on a parameter change (\u003Ccode\u003EonUpdate\u003C/code\u003E runs). \u003Ccode\u003Eapp.router.evict()\u003C/code\u003E does not dispose this instance, \u003Ccode\u003Eapp.dispose()\u003C/code\u003E does. If the route is entered while the instance has been disposed, the page cannot be built: \u003Ccode\u003EMJX304\u003C/code\u003E is reported (with \u003Ccode\u003EMJX318\u003C/code\u003E as the cause) and the error route is shown; a page that wants fresh state on every entry gives a class or a factory.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Echilds\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EChild routes. If defined, this route is a \u003Cstrong\u003Elayout\u003C/strong\u003E route.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EFor reaching the route by name (optional); \u003Ccode\u003Ehref\u003C/code\u003E and \u003Ccode\u003EnavigateByName\u003C/code\u003E use this name.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emeta\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EFree-form data that guards and hooks can use (\u003Ccode\u003E{ requiresAuth: true, title: \u0027...\u0027 }\u003C/code\u003E). The \u003Ccode\u003Emeta\u003C/code\u003E objects in the matched chain (layout → child) are merged; a \u003Ccode\u003ErequiresAuth\u003C/code\u003E written on a layout shows up in its children as well. In the example, \u003Ccode\u003Emeta.folder\u003C/code\u003E is written on the layout route and read on the note route under it too.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eextend\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EExtra data attached to the route; merged along the chain like \u003Ccode\u003Emeta\u003C/code\u003E. \u003Ccode\u003Eextend.targetOutlet\u003C/code\u003E picks the named \u003Ccode\u003ERouterView\u003C/code\u003E the route\u0027s component will sit in (see \u003Ca href=\u0022/docs/router-view#router-view\u0022\u003E\u003Ccode\u003ERouterView\u003C/code\u003E\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EkeepAlive\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EIf \u003Ccode\u003Etrue\u003C/code\u003E, the component instance is kept: on leaving it is \u003Cstrong\u003Edetached from the outlet and cached\u003C/strong\u003E (\u003Ccode\u003EonDeactivated\u003C/code\u003E), and on return the same instance is attached again in the same position (\u003Ccode\u003EonActivated\u003C/code\u003E); both are passed on to the page\u0027s visible child components. The cache is emptied with \u003Ccode\u003Eapp.router.evict(name \\| route)\u003C/code\u003E (with no argument: all of them; the instance on screen at that moment is skipped) or \u003Ccode\u003Eapp.dispose()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eredirect\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERedirects to another path when this route is reached: a path string with \u003Ccode\u003E{param}\u003C/code\u003E placeholders, or a \u003Ccode\u003E(to) =\u0026gt; path\u003C/code\u003E function. Details: \u003Ca href=\u0022#redirect-and-alias\u0022\u003ERedirect and alias\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ealias\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EExtra path(s) that open the same route; the alias stays in the address bar. Details: \u003Ca href=\u0022#redirect-and-alias\u0022\u003ERedirect and alias\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Evalidate(e)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECalled during matching with \u003Ccode\u003E{ uri, key, routes, params }\u003C/code\u003E; if it returns \u003Ccode\u003Efalse\u003C/code\u003E, this route does not count as matched (another route or \u003Ccode\u003Efallbacks.notFound\u003C/code\u003E takes over). The \u003Ccode\u003Evalidate\u003C/code\u003E of every route in the chain runs. \u003Ccode\u003Ekey\u003C/code\u003E is the route\u0027s name, or its full path if it has none (its own path for an alias match too); \u003Ccode\u003Eroutes\u003C/code\u003E is the route table keyed by the same rule (a \u003Ccode\u003EMap\u003C/code\u003E): \u003Ccode\u003Eroutes.get(e.key)\u003C/code\u003E is the route being validated, and another route is reached by its name or full path.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonShow(component)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECalled with the component instance every time the route\u0027s component is placed in its own \u003Ccode\u003ERouterView\u003C/code\u003E: the first show, rebuilding on a parameter change, coming back from the \u003Ccode\u003EkeepAlive\u003C/code\u003E cache, and being placed again when the \u003Ccode\u003ERouterView\u003C/code\u003E is rebuilt. It is called for layout routes too; it is not called again for a layout that stays in place throughout a navigation. An error thrown by the hook is reported with the code \u003Ccode\u003EMJX306\u003C/code\u003E and does not stop the navigation.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EThe route hooks tied to navigation (\u003Ccode\u003EonEntering\u003C/code\u003E, \u003Ccode\u003EonEnter\u003C/code\u003E, \u003Ccode\u003EonLeave\u003C/code\u003E, \u003Ccode\u003EonUpdate\u003C/code\u003E) are described on the \u003Ca href=\u0022/docs/route-guards#route-hooks\u0022\u003ERoute Hooks and Guards\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch3 id=\u0022redirect-and-alias\u0022\u003ERedirect and alias\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003E/n/{id}\u003C/code\u003E in the example is a redirect in string form. If the target depends on a calculation, give a function:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Econst shortcuts: RouteItem[] = [\n  { path: \u0026quot;/n/{id}\u0026quot;, redirect: \u0026quot;/notes/{id}\u0026quot; },\n  { path: \u0026quot;/find/{q}\u0026quot;, redirect: (to) =\u0026gt; \u0026quot;/notes?q=\u0026quot; \u002B encodeURIComponent(to.params.q) },\n];\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Econst shortcuts = [\n  { path: \u0026quot;/n/{id}\u0026quot;, redirect: \u0026quot;/notes/{id}\u0026quot; },\n  { path: \u0026quot;/find/{q}\u0026quot;, redirect: (to) =\u0026gt; \u0026quot;/notes?q=\u0026quot; \u002B encodeURIComponent(to.params.q) },\n];\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Cstrong\u003E\u003Ccode\u003Eredirect\u003C/code\u003E\u003C/strong\u003E\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EIn the string form, the \u003Ccode\u003E{param}\u003C/code\u003E placeholders are filled with the matched parameters. The query string (\u003Ccode\u003E?…\u003C/code\u003E) and \u003Ccode\u003E#…\u003C/code\u003E of the source address are carried over to the target unless the target contains its own query/\u003Ccode\u003E#\u003C/code\u003E: \u003Ccode\u003E/n/3?from=mail\u003C/code\u003E → \u003Ccode\u003E/notes/3?from=mail\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EThe function form receives \u003Ccode\u003E{ path, params, meta }\u003C/code\u003E; the path it returns is used as it is.\u003C/li\u003E\n\u003Cli\u003EThe redirect is applied right after matching, \u003Cstrong\u003Ebefore\u003C/strong\u003E \u003Ccode\u003EonLeave\u003C/code\u003E and the \u003Ccode\u003EuseGuard\u003C/code\u003E guards; guards and hooks run only for the target route. The source route\u0027s component is never created.\u003C/li\u003E\n\u003Cli\u003EThe chain is followed (\u003Ccode\u003E/a\u003C/code\u003E → \u003Ccode\u003E/b\u003C/code\u003E → \u003Ccode\u003E/c\u003C/code\u003E). A redirect that goes over 10 steps or comes back to a path passed earlier is stopped, the \u003Ccode\u003Efallbacks.error\u003C/code\u003E page is shown at the requested address, and in development mode an \u003Ccode\u003EMJX303\u003C/code\u003E warning is written to the console.\u003C/li\u003E\n\u003Cli\u003EOnly the target enters the browser history. If the address bar already shows the source path (first load, back/forward), the entry is changed with \u003Ccode\u003Ereplace\u003C/code\u003E, so the \u0026quot;back\u0026quot; button does not get stuck on the redirect.\u003C/li\u003E\n\u003Cli\u003EWhere the target came from is read through \u003Ccode\u003Eto.redirectedFrom\u003C/code\u003E (in the guard and \u003Ccode\u003EonLeave\u003C/code\u003E context) and the \u003Ccode\u003EredirectedFrom\u003C/code\u003E field of the \u003Ccode\u003EonRouterChanged\u003C/code\u003E payload.\u003C/li\u003E\n\u003Cli\u003EOnly the \u003Ccode\u003Eredirect\u003C/code\u003E of the matched \u003Cstrong\u003Eleaf\u003C/strong\u003E route is applied. If a layout has a \u003Ccode\u003E\u0027/\u0027\u003C/code\u003E default child, the leaf that matches at the layout\u0027s path is that child; in that case a \u003Ccode\u003Eredirect\u003C/code\u003E written on the layout does not run, so write the redirect on the default child. The root route in the example does this: at the address \u003Ccode\u003E/\u003C/code\u003E, the one that redirects is the \u003Ccode\u003E\u0027/\u0027\u003C/code\u003E child of \u003Ccode\u003EMainLayout\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003E\u003Cstrong\u003E\u003Ccode\u003Ealias\u003C/code\u003E\u003C/strong\u003E\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EAn alias is added to the parent path by the same rule as \u003Ccode\u003Epath\u003C/code\u003E (\u003Ccode\u003Ealias: \u0027/detail/{id}\u0027\u003C/code\u003E under \u003Ccode\u003E/notes\u003C/code\u003E → \u003Ccode\u003E/notes/detail/{id}\u003C/code\u003E). Parameters are read from the alias pattern.\u003C/li\u003E\n\u003Cli\u003EThe children open under a layout\u0027s alias too: in the example, \u003Ccode\u003E/my-notes/5\u003C/code\u003E → \u003Ccode\u003ENotePage\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EThe alias and the main path are the same route: moving between them with the same parameters keeps the component; if the parameters change, \u003Ccode\u003EonUpdate\u003C/code\u003E runs and the page is rebuilt, as on any parameter change (\u003Ccode\u003EkeepAlive: true\u003C/code\u003E keeps it). The \u003Ccode\u003EkeepAlive\u003C/code\u003E cache is shared as well.\u003C/li\u003E\n\u003Cli\u003EIf an alias clashes with the main path of another route, the main path wins. The check in development mode warns when an alias equals its own path (\u003Ccode\u003EMJX315\u003C/code\u003E), when two routes use the same alias (\u003Ccode\u003EMJX316\u003C/code\u003E), and when a child alias is missing the \u003Ccode\u003E/\u003C/code\u003E prefix (\u003Ccode\u003EMJX314\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eapp.router.fullPath\u003C/code\u003E gives the matched pattern (the alias pattern for an alias), and \u003Ccode\u003Eapp.router.aliasOf\u003C/code\u003E gives the main pattern (\u003Ccode\u003Enull\u003C/code\u003E if it is not an alias): at \u003Ccode\u003E/my-notes/5\u003C/code\u003E, \u003Ccode\u003E/my-notes/{id(\\d\u002B)}\u003C/code\u003E and \u003Ccode\u003E/notes/{id(\\d\u002B)}\u003C/code\u003E. \u003Ccode\u003EnavigateByName\u003C/code\u003E and \u003Ccode\u003Ehref\u003C/code\u003E always produce the main path.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003ERouterLink\u003C/code\u003E classes look at the URL: while at \u003Ccode\u003E/my-notes\u003C/code\u003E, a link with \u003Ccode\u003Eto=\u0026quot;/notes\u0026quot;\u003C/code\u003E does not count as active.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022params\u0022\u003EPath parameters\u003C/h2\u003E\n\u003Cp\u003EParameters are defined with the \u003Ccode\u003E{name}\u003C/code\u003E syntax:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESyntax\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{id}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA required parameter.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{id:1}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERequired; \u003Ccode\u003E1\u003C/code\u003E is used only when \u003Ccode\u003Ehref\u003C/code\u003E / \u003Ccode\u003EnavigateByName\u003C/code\u003E produces a path and no value is given (the pattern \u003Ccode\u003E/h/{id:1}\u003C/code\u003E does not match the address \u003Ccode\u003E/h\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{id?}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOptional.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{id?:5}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOptional, with the default \u003Ccode\u003E5\u003C/code\u003E: if it is missing from the address, \u003Ccode\u003Eparams.id\u003C/code\u003E becomes \u003Ccode\u003E\u00275\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{id(\\d\u002B)}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA pattern constraint: the segment matches only if it fits the regular expression in the parentheses (case-insensitive; capturing groups in the pattern are ignored; \u003Ccode\u003E?\u003C/code\u003E and \u003Ccode\u003E:\u003C/code\u003E are part of the pattern). It combines with \u003Ccode\u003E?\u003C/code\u003E and a default: \u003Ccode\u003E{id(\\d\u002B)?:1}\u003C/code\u003E. The pattern applies to a single segment and cannot contain \u003Ccode\u003E/\u003C/code\u003E. In a JavaScript string the backslash is written twice: \u003Ccode\u003E\u0026quot;/{id(\\\\d\u002B)}\u0026quot;\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{path\u002B}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOne or more segments: for \u003Ccode\u003E/files/a/b/c\u003C/code\u003E, \u003Ccode\u003Eparams.path\u003C/code\u003E becomes \u003Ccode\u003E\u0027a/b/c\u0027\u003C/code\u003E (plain text; each segment is decoded separately, and you can \u003Ccode\u003Esplit(\u0027/\u0027)\u003C/code\u003E the parts if needed). For \u003Ccode\u003Ehref\u003C/code\u003E, give \u003Ccode\u003E\u0027a/b\u0027\u003C/code\u003E or \u003Ccode\u003E[\u0027a\u0027,\u0027b\u0027]\u003C/code\u003E, and the segments are encoded separately. It combines with a pattern, and the pattern applies to every segment: \u003Ccode\u003E{ids(\\d\u002B)\u002B}\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{path*}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ELike \u003Ccode\u003E{path\u002B}\u003C/code\u003E, but there may be no segment at all (optional like \u003Ccode\u003E{path?}\u003C/code\u003E, and it takes a \u003Ccode\u003E:default\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EA \u003Ccode\u003E:\u003C/code\u003E outside the curly braces and the rest of the segment drop out of the pattern (\u003Ccode\u003E/user/:id\u003C/code\u003E → \u003Ccode\u003E/user/\u003C/code\u003E, which matches no address); in development mode the check warns with \u003Ccode\u003EMJX319\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003EIn the ordering, a route containing \u003Ccode\u003E{…\u002B}\u003C/code\u003E or \u003Ccode\u003E{…*}\u003C/code\u003E comes after routes at the same depth with the same number of static segments: \u003Ccode\u003E/f/{a}/{b}\u003C/code\u003E before \u003Ccode\u003E/f/{rest\u002B}\u003C/code\u003E; \u003Ccode\u003E/docs/{rest\u002B}\u003C/code\u003E, with its static segment, before \u003Ccode\u003E/{a}/{b}\u003C/code\u003E. For an unusable pattern (one that does not compile, has an unclosed \u003Ccode\u003E(\u003C/code\u003E or contains \u003Ccode\u003E/\u003C/code\u003E), the check warns in development mode with \u003Ccode\u003EMJX320\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Ehref\u003C/code\u003E, \u003Ccode\u003EnavigateByName\u003C/code\u003E and the \u003Ccode\u003Eredirect\u003C/code\u003E string fill the \u003Ccode\u003E{…}\u003C/code\u003E placeholders, and the values are encoded with \u003Ccode\u003EencodeURIComponent\u003C/code\u003E (\u003Ccode\u003Ehref(\u0027tag\u0027, { name: \u0027a/b\u0027 })\u003C/code\u003E → \u003Ccode\u003E/tags/a%2Fb\u003C/code\u003E, \u003Ccode\u003E{ name: \u0027café\u0027 }\u003C/code\u003E → \u003Ccode\u003E/tags/caf%C3%A9\u003C/code\u003E).\u003C/p\u003E\n\u003Cp\u003EParameters are reached from the navigation context or the router:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nconst nav = useNavigation();\nconst noteId = Number(nav.params.id);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nconst nav = useNavigation();\nconst noteId = Number(nav.params.id);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Eparams\u003C/code\u003E also contains the query string values. Like path parameters, query values are strings and arrive with their percent-encoding decoded (\u003Ccode\u003E/notes/5?tab=history\u003C/code\u003E → \u003Ccode\u003E{ id: \u00275\u0027, tab: \u0027history\u0027 }\u003C/code\u003E, \u003Ccode\u003E/tags/caf%C3%A9?q=a%20b\u003C/code\u003E → \u003Ccode\u003E{ name: \u0027café\u0027, q: \u0027a b\u0027 }\u003C/code\u003E); in the path \u003Ccode\u003E\u002B\u003C/code\u003E is a plain character, while in the query it is a space; values such as \u003Ccode\u003Etrue\u003C/code\u003E, \u003Ccode\u003Enull\u003C/code\u003E, \u003Ccode\u003E2025-10-27\u003C/code\u003E or \u003Ccode\u003E{\u0026quot;a\u0026quot;:1}\u003C/code\u003E stay text as well. If you need a number, a boolean or a date, convert the value yourself (\u003Ccode\u003ENumber(params.id)\u003C/code\u003E). A repeated key (\u003Ccode\u003E?tag=work\u0026amp;tag=home\u003C/code\u003E) becomes an array of strings (\u003Ccode\u003E[\u0027work\u0027, \u0027home\u0027]\u003C/code\u003E). A path parameter with the same name overrides the query value. The \u003Ccode\u003E#…\u003C/code\u003E part never enters \u003Ccode\u003Eparams\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Erouter.uri\u003C/code\u003E, the \u003Ccode\u003Euri\u003C/code\u003E of the \u003Ccode\u003EonRouterChanged\u003C/code\u003E event, the middleware\u0027s \u003Ccode\u003Ectx.uri\u003C/code\u003E and the guard\u0027s \u003Ccode\u003Eto.path\u003C/code\u003E are in address form: percent-encoded, the same as the address bar (\u003Ccode\u003E/tags/caf%C3%A9\u003C/code\u003E). To display one, use \u003Ccode\u003EdecodeURIComponent\u003C/code\u003E; for the value, use \u003Ccode\u003Eparams\u003C/code\u003E. \u003Ccode\u003Enavigate\u003C/code\u003E, the \u003Ccode\u003Eto\u003C/code\u003E of \u003Ccode\u003ERouterLink\u003C/code\u003E and the \u003Ccode\u003EonActive\u003C/code\u003E/\u003Ccode\u003EonExact\u003C/code\u003E path can be written raw (\u003Ccode\u003E/tags/café\u003C/code\u003E) or encoded; both go to the same address and make the same link active.\u003C/p\u003E\n\u003Cp\u003EThe query is read only from the address being navigated to: in \u003Ccode\u003Ehistory\u003C/code\u003E mode, if there is no \u003Ccode\u003E?\u003C/code\u003E in the address, \u003Ccode\u003Eparams\u003C/code\u003E contains no query values (the previous page\u0027s query is not carried over). In \u003Ccode\u003Ehash\u003C/code\u003E/\u003Ccode\u003Efile\u003C/code\u003E mode, the query before \u003Ccode\u003E#\u003C/code\u003E (\u003Ccode\u003E/?x=1#/a\u003C/code\u003E) is page-level; it reaches \u003Ccode\u003Eparams\u003C/code\u003E on every route that has no query of its own, and if the route has its own query (\u003Ccode\u003E#/b?z=3\u003C/code\u003E), that one is used instead.\u003C/p\u003E\n\u003Ch2 id=\u0022resolve-href-routes\u0022\u003EQuerying the route table — \u003Ccode\u003Eresolve\u003C/code\u003E, \u003Ccode\u003Ehref\u003C/code\u003E, \u003Ccode\u003Eroutes\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.router\u003C/code\u003E carries three members for querying the route table without navigating:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003E// Which route does an address match? (does not navigate, does not touch the address bar)\nconst { chain, result } = app.router.resolve(\u0026quot;/notes/5\u0026quot;);\nif (result.ok) console.log(result.route?.name, result.params.id, result.meta.folder);  // \u0026quot;notes-note\u0026quot; \u0026quot;5\u0026quot; \u0026quot;notes\u0026quot;\nchain;                                      // [\u0027/\u0027, \u0027/notes\u0027, \u0027/5\u0027]\nresult.chain.map((r) =\u0026gt; r.path);            // [\u0027/\u0027, \u0027/notes\u0027, \u0027/{id(\\\\d\u002B)}\u0027]: definitions from the root to the route\n\n// Every route in definition order (aliases excluded); for building a menu or a site map\nconst paths = app.router.routes.map((r) =\u0026gt; r.fullPath);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003E// Which route does an address match? (does not navigate, does not touch the address bar)\nconst { chain, result } = app.router.resolve(\u0026quot;/notes/5\u0026quot;);\nif (result.ok) console.log(result.route?.name, result.params.id, result.meta.folder);  // \u0026quot;notes-note\u0026quot; \u0026quot;5\u0026quot; \u0026quot;notes\u0026quot;\nchain;                                      // [\u0027/\u0027, \u0027/notes\u0027, \u0027/5\u0027]\nresult.chain.map((r) =\u0026gt; r.path);            // [\u0027/\u0027, \u0027/notes\u0027, \u0027/{id(\\\\d\u002B)}\u0027]: definitions from the root to the route\n\n// Every route in definition order (aliases excluded); for building a menu or a site map\nconst paths = app.router.routes.map((r) =\u0026gt; r.fullPath);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe path of a named route is produced with \u003Ccode\u003Ehref\u003C/code\u003E; for the \u003Ccode\u003Eto\u003C/code\u003E of a \u003Ccode\u003ERouterLink\u003C/code\u003E, for menus and breadcrumbs. In the example the link\u0027s target is produced from a named route (\u003Ccode\u003Enav\u003C/code\u003E is the router returned by \u003Ccode\u003EuseNavigation()\u003C/code\u003E):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to={nav.href(\u0060${folder}-note\u0060, { id: note.id })}\u0026gt;{note.title}\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Econst link = motifComponent(RouterLink, {\n  to: nav.href(\u0060${folder}-note\u0060, { id: note.id }),\n  childs: [motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteRow.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to={nav.href(\u0060${folder}-note\u0060, { id: note.id })}\u0026gt;{note.title}\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Econst link = motifComponent(RouterLink, {\n  to: nav.href(\u0060${folder}-note\u0060, { id: note.id }),\n  childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMember\u003C/th\u003E\n\u003Cth\u003EReturns\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eresolve(uri)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteResolution\u003C/code\u003E: \u003Ccode\u003E{ chain, result }\u003C/code\u003E. \u003Ccode\u003Echain\u003C/code\u003E has the same form as \u003Ccode\u003Eapp.router.chain\u003C/code\u003E (\u003Ccode\u003Estring[]\u003C/code\u003E, each route\u0027s own path with its parameters filled in). \u003Ccode\u003Eresult\u003C/code\u003E is the \u003Ccode\u003EResolveResult\u003C/code\u003E that \u003Ccode\u003Enavigate\u003C/code\u003E would return when going to that address: \u003Ccode\u003E{ ok, uri, fullPath, route, chain, params, meta, extend, aliasOf }\u003C/code\u003E; \u003Ccode\u003Eresult.chain\u003C/code\u003E is the route definitions from the root to the route (\u003Ccode\u003ERouteItem[]\u003C/code\u003E). If there is no match, \u003Ccode\u003Eresult.ok\u003C/code\u003E is \u003Ccode\u003Efalse\u003C/code\u003E and \u003Ccode\u003Echain\u003C/code\u003E is \u003Ccode\u003E[]\u003C/code\u003E. Guards, middleware and redirects do not run.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ehref(name, params?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe path of the named route with its parameters filled in (the same calculation as \u003Ccode\u003EnavigateByName\u003C/code\u003E). \u003Ccode\u003E0\u003C/code\u003E and \u003Ccode\u003Efalse\u003C/code\u003E values are written; for a parameter given as \u003Ccode\u003Eundefined\u003C/code\u003E, \u003Ccode\u003Enull\u003C/code\u003E or \u003Ccode\u003E\u0027\u0027\u003C/code\u003E, or not given at all, the pattern\u0027s default is used (if there is no default, that segment is not written). Parameters that are not in the pattern are not written; if you need a query, append it to the produced path (\u003Ccode\u003Ehref(\u0026quot;notes-note\u0026quot;, { id: 3 }) \u002B \u0026quot;?tab=history\u0026quot;\u003C/code\u003E). If the name does not exist, it throws \u003Ccode\u003EMJX302\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eroutes\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ERouteInfo[]\u003C/code\u003E: \u003Ccode\u003E{ fullPath, name, meta, route, chain }\u003C/code\u003E. A layout and its default child are separate items; \u003Ccode\u003Echain\u003C/code\u003E is the route definitions from the root to this route.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022lazy\u0022\u003ELazy loading\u003C/h2\u003E\n\u003Cp\u003EUsing \u003Ccode\u003E() =\u0026gt; import(...)\u003C/code\u003E in the \u003Ccode\u003Econtrol\u003C/code\u003E field loads the route component only when it is needed and gives automatic code splitting. A page given this way is split into a separate chunk and downloaded the first time the route is visited:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Econst settings: RouteItem = { path: \u0026quot;/settings/{section?:appearance}\u0026quot;, name: \u0026quot;settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;) };\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Econst settings = { path: \u0026quot;/settings/{section?:appearance}\u0026quot;, name: \u0026quot;settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;) };\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe loaded module must export the page as \u003Ccode\u003Edefault\u003C/code\u003E. For a named export, map it: \u003Ccode\u003Econtrol: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;).then((m) =\u0026gt; m.SettingsPage)\u003C/code\u003E. The page cannot be built with a module that has no \u003Ccode\u003Edefault\u003C/code\u003E export, or with some other object that is not a component: \u003Ccode\u003EMJX304\u003C/code\u003E is reported (with \u003Ccode\u003EMJX127\u003C/code\u003E as the cause) and \u003Ccode\u003Efallbacks.error\u003C/code\u003E is shown.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Efallbacks.notFound\u003C/code\u003E and \u003Ccode\u003Efallbacks.error\u003C/code\u003E support the same lazy form.\u003C/p\u003E\n\u003Cp\u003EA route\u0027s \u003Ccode\u003Eimport()\u003C/code\u003E does not use a loading view or retries. To lazily load a heavy part \u003Cstrong\u003Einside\u003C/strong\u003E a page, show a view while it loads and retry on a mobile network, use the \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E component (see \u003Ca href=\u0022/docs/lazy#retry\u0022\u003ERetrying\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022route-lint\u0022\u003ERoute check in development mode\u003C/h2\u003E\n\u003Cp\u003EWhen \u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E is called before \u003Ccode\u003EuseRouter\u003C/code\u003E, the route table is checked while it is being set up; a problematic definition is written to the console as a warning, and the router keeps working:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ECode\u003C/th\u003E\n\u003Cth\u003EWhen\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX310\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe route path is empty (\u003Ccode\u003E\u0027\u0027\u003C/code\u003E); for the default child, write \u003Ccode\u003E\u0027/\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX311\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA child route\u0027s path does not start with \u003Ccode\u003E/\u003C/code\u003E (\u003Ccode\u003E\u0027notes\u0027\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX312\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA child route ends up at the same full path as its parent (except the default child \u003Ccode\u003E\u0027/\u0027\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX313\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESeveral routes end up at the same full path.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX314\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA child route\u0027s alias does not start with \u003Ccode\u003E/\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX315\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAn alias is equal to the route\u0027s own path.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX316\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESeveral routes use the same alias.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX319\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThere is a \u003Ccode\u003E:\u003C/code\u003E outside the curly braces in a path or an alias (\u003Ccode\u003E/user/:id\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX320\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA parameter pattern cannot be used: it does not compile, has an unclosed \u003Ccode\u003E(\u003C/code\u003E or contains \u003Ccode\u003E/\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn where route components are placed on screen, go on to \u003Ca href=\u0022/docs/router-view\u0022\u003ERouterView\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"route-item","text":"Defining a route (RouteItem)","level":2},{"id":"route-item-fields","text":"RouteItem fields","level":3},{"id":"redirect-and-alias","text":"Redirect and alias","level":3},{"id":"params","text":"Path parameters","level":2},{"id":"resolve-href-routes","text":"Querying the route table — resolve, href, routes","level":2},{"id":"lazy","text":"Lazy loading","level":2},{"id":"route-lint","text":"Route check in development mode","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"routing","title":"Introduction to Routing"},"next":{"slug":"router-view","title":"RouterView"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Routing</p>
+        <h1>The Route Table</h1>
+        <p>RouteItem fields, nested routes, redirect and alias, path parameters, querying the route table, lazy routes and the route check in development mode.</p>
+<h2 id="route-item">Defining a route (<code>RouteItem</code>)</h2>
+<p>Routes are a <code>RouteItem[]</code> array. Each item maps a path (<code>path</code>) to a component (<code>control</code>). The example table shows the commonly used fields of <code>RouteItem</code> together: a pattern-constrained, named route (<code>{id(\d+)}</code>, <code>name</code>), a layout alias, an optional parameter with a default, and a redirect (an extended version of the table on the <a href="/docs/routing#from-address-to-screen">Introduction to Routing</a> page):</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>import type { RouteItem } from &quot;@motifx/core&quot;;
+import MainLayout from &quot;./layouts/MainLayout&quot;;
+import NotesLayout from &quot;./layouts/NotesLayout&quot;;
+import NoteEmptyPage from &quot;./pages/NoteEmptyPage&quot;;
+import NotePage from &quot;./pages/NotePage&quot;;
+import type { Folder } from &quot;./services/notes&quot;;
+
+const folder = (name: Folder): RouteItem =&gt; ({
+  path: `/${name}`,
+  control: NotesLayout,
+  meta: { folder: name },
+  childs: [
+    { path: &quot;/&quot;, control: NoteEmptyPage },
+    { path: &quot;/{id(\\d+)}&quot;, name: `${name}-note`, control: NotePage },
+  ],
+});
+
+export const routes: RouteItem[] = [
+  {
+    path: &quot;/&quot;,
+    control: MainLayout,
+    childs: [
+      { path: &quot;/&quot;, redirect: &quot;/notes&quot; },
+      { ...folder(&quot;notes&quot;), alias: &quot;/my-notes&quot; },
+      folder(&quot;pinned&quot;),
+      folder(&quot;archive&quot;),
+      { path: &quot;/settings/{section?:appearance}&quot;, name: &quot;settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;) },
+      { path: &quot;/n/{id}&quot;, redirect: &quot;/notes/{id}&quot; },
+    ],
+  },
+];</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>import MainLayout from &quot;./layouts/MainLayout&quot;;
+import NotesLayout from &quot;./layouts/NotesLayout&quot;;
+import NoteEmptyPage from &quot;./pages/NoteEmptyPage&quot;;
+import NotePage from &quot;./pages/NotePage&quot;;
+
+const folder = (name) =&gt; ({
+  path: `/${name}`,
+  control: NotesLayout,
+  meta: { folder: name },
+  childs: [
+    { path: &quot;/&quot;, control: NoteEmptyPage },
+    { path: &quot;/{id(\\d+)}&quot;, name: `${name}-note`, control: NotePage },
+  ],
+});
+
+export const routes = [
+  {
+    path: &quot;/&quot;,
+    control: MainLayout,
+    childs: [
+      { path: &quot;/&quot;, redirect: &quot;/notes&quot; },
+      { ...folder(&quot;notes&quot;), alias: &quot;/my-notes&quot; },
+      folder(&quot;pinned&quot;),
+      folder(&quot;archive&quot;),
+      { path: &quot;/settings/{section?:appearance}&quot;, name: &quot;settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;) },
+      { path: &quot;/n/{id}&quot;, redirect: &quot;/notes/{id}&quot; },
+    ],
+  },
+];</code></pre>
+</div>
+<p>What these fields do:</p>
+<ul>
+<li>A segment that does not fit the pattern does not match the route: <code>/notes/3</code> matches, <code>/notes/abc</code> does not, and <code>fallbacks.notFound</code> is shown.</li>
+<li>The path of a route given a <code>name</code> is produced with <code>href</code> / <code>navigateByName</code>: <code>app.router.href(&quot;archive-note&quot;, { id: 7 })</code> → <code>/archive/7</code>.</li>
+<li>An alias opens the same route at a second address, and the alias stays in the address bar: <code>/my-notes/3</code>.</li>
+<li>An optional parameter that is missing from the address gets its default: at <code>/settings</code>, <code>params.section</code> is <code>&quot;appearance&quot;</code>, and at <code>/settings/notes</code> it is <code>&quot;notes&quot;</code>.</li>
+<li><code>{id}</code> in a <code>redirect</code> string is filled with the matched parameter: <code>/n/3</code> → <code>/notes/3</code>.</li>
+</ul>
+<h3 id="route-item-fields"><code>RouteItem</code> fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td>The route path. Parameters are in the <code>{name}</code> form. <code>'/'</code> for a layout and the default child; every child path starts with <code>/</code> (otherwise development mode warns with <code>MJX311</code>). At the same depth a static segment comes before a parameter (<code>/archive</code> beats <code>/{slug}</code>).</td>
+</tr>
+<tr>
+<td><code>control</code></td>
+<td>The route component. It can be a component class, a ready component instance, <code>() =&gt; Component</code>, an Options API factory, <code>() =&gt; import(...)</code> (lazy) or a Promise. It is not required only on a route that defines <code>redirect</code>. A route given a ready instance (or a Promise that resolves to one) behaves like <code>keepAlive</code>: the instance is built once, detached from the outlet on leaving, and the same instance is attached again on return; it is not rebuilt on a parameter change (<code>onUpdate</code> runs). <code>app.router.evict()</code> does not dispose this instance, <code>app.dispose()</code> does. If the route is entered while the instance has been disposed, the page cannot be built: <code>MJX304</code> is reported (with <code>MJX318</code> as the cause) and the error route is shown; a page that wants fresh state on every entry gives a class or a factory.</td>
+</tr>
+<tr>
+<td><code>childs</code></td>
+<td>Child routes. If defined, this route is a <strong>layout</strong> route.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>For reaching the route by name (optional); <code>href</code> and <code>navigateByName</code> use this name.</td>
+</tr>
+<tr>
+<td><code>meta</code></td>
+<td>Free-form data that guards and hooks can use (<code>{ requiresAuth: true, title: '...' }</code>). The <code>meta</code> objects in the matched chain (layout → child) are merged; a <code>requiresAuth</code> written on a layout shows up in its children as well. In the example, <code>meta.folder</code> is written on the layout route and read on the note route under it too.</td>
+</tr>
+<tr>
+<td><code>extend</code></td>
+<td>Extra data attached to the route; merged along the chain like <code>meta</code>. <code>extend.targetOutlet</code> picks the named <code>RouterView</code> the route's component will sit in (see <a href="/docs/router-view#router-view"><code>RouterView</code></a>).</td>
+</tr>
+<tr>
+<td><code>keepAlive</code></td>
+<td>If <code>true</code>, the component instance is kept: on leaving it is <strong>detached from the outlet and cached</strong> (<code>onDeactivated</code>), and on return the same instance is attached again in the same position (<code>onActivated</code>); both are passed on to the page's visible child components. The cache is emptied with <code>app.router.evict(name \| route)</code> (with no argument: all of them; the instance on screen at that moment is skipped) or <code>app.dispose()</code>.</td>
+</tr>
+<tr>
+<td><code>redirect</code></td>
+<td>Redirects to another path when this route is reached: a path string with <code>{param}</code> placeholders, or a <code>(to) =&gt; path</code> function. Details: <a href="#redirect-and-alias">Redirect and alias</a>.</td>
+</tr>
+<tr>
+<td><code>alias</code></td>
+<td>Extra path(s) that open the same route; the alias stays in the address bar. Details: <a href="#redirect-and-alias">Redirect and alias</a>.</td>
+</tr>
+<tr>
+<td><code>validate(e)</code></td>
+<td>Called during matching with <code>{ uri, key, routes, params }</code>; if it returns <code>false</code>, this route does not count as matched (another route or <code>fallbacks.notFound</code> takes over). The <code>validate</code> of every route in the chain runs. <code>key</code> is the route's name, or its full path if it has none (its own path for an alias match too); <code>routes</code> is the route table keyed by the same rule (a <code>Map</code>): <code>routes.get(e.key)</code> is the route being validated, and another route is reached by its name or full path.</td>
+</tr>
+<tr>
+<td><code>onShow(component)</code></td>
+<td>Called with the component instance every time the route's component is placed in its own <code>RouterView</code>: the first show, rebuilding on a parameter change, coming back from the <code>keepAlive</code> cache, and being placed again when the <code>RouterView</code> is rebuilt. It is called for layout routes too; it is not called again for a layout that stays in place throughout a navigation. An error thrown by the hook is reported with the code <code>MJX306</code> and does not stop the navigation.</td>
+</tr>
+</tbody>
+</table>
+<p>The route hooks tied to navigation (<code>onEntering</code>, <code>onEnter</code>, <code>onLeave</code>, <code>onUpdate</code>) are described on the <a href="/docs/route-guards#route-hooks">Route Hooks and Guards</a> page.</p>
+<h3 id="redirect-and-alias">Redirect and alias</h3>
+<p><code>/n/{id}</code> in the example is a redirect in string form. If the target depends on a calculation, give a function:</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>const shortcuts: RouteItem[] = [
+  { path: &quot;/n/{id}&quot;, redirect: &quot;/notes/{id}&quot; },
+  { path: &quot;/find/{q}&quot;, redirect: (to) =&gt; &quot;/notes?q=&quot; + encodeURIComponent(to.params.q) },
+];</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>const shortcuts = [
+  { path: &quot;/n/{id}&quot;, redirect: &quot;/notes/{id}&quot; },
+  { path: &quot;/find/{q}&quot;, redirect: (to) =&gt; &quot;/notes?q=&quot; + encodeURIComponent(to.params.q) },
+];</code></pre>
+</div>
+<p><strong><code>redirect</code></strong></p>
+<ul>
+<li>In the string form, the <code>{param}</code> placeholders are filled with the matched parameters. The query string (<code>?…</code>) and <code>#…</code> of the source address are carried over to the target unless the target contains its own query/<code>#</code>: <code>/n/3?from=mail</code> → <code>/notes/3?from=mail</code>.</li>
+<li>The function form receives <code>{ path, params, meta }</code>; the path it returns is used as it is.</li>
+<li>The redirect is applied right after matching, <strong>before</strong> <code>onLeave</code> and the <code>useGuard</code> guards; guards and hooks run only for the target route. The source route's component is never created.</li>
+<li>The chain is followed (<code>/a</code> → <code>/b</code> → <code>/c</code>). A redirect that goes over 10 steps or comes back to a path passed earlier is stopped, the <code>fallbacks.error</code> page is shown at the requested address, and in development mode an <code>MJX303</code> warning is written to the console.</li>
+<li>Only the target enters the browser history. If the address bar already shows the source path (first load, back/forward), the entry is changed with <code>replace</code>, so the &quot;back&quot; button does not get stuck on the redirect.</li>
+<li>Where the target came from is read through <code>to.redirectedFrom</code> (in the guard and <code>onLeave</code> context) and the <code>redirectedFrom</code> field of the <code>onRouterChanged</code> payload.</li>
+<li>Only the <code>redirect</code> of the matched <strong>leaf</strong> route is applied. If a layout has a <code>'/'</code> default child, the leaf that matches at the layout's path is that child; in that case a <code>redirect</code> written on the layout does not run, so write the redirect on the default child. The root route in the example does this: at the address <code>/</code>, the one that redirects is the <code>'/'</code> child of <code>MainLayout</code>.</li>
+</ul>
+<p><strong><code>alias</code></strong></p>
+<ul>
+<li>An alias is added to the parent path by the same rule as <code>path</code> (<code>alias: '/detail/{id}'</code> under <code>/notes</code> → <code>/notes/detail/{id}</code>). Parameters are read from the alias pattern.</li>
+<li>The children open under a layout's alias too: in the example, <code>/my-notes/5</code> → <code>NotePage</code>.</li>
+<li>The alias and the main path are the same route: moving between them with the same parameters keeps the component; if the parameters change, <code>onUpdate</code> runs and the page is rebuilt, as on any parameter change (<code>keepAlive: true</code> keeps it). The <code>keepAlive</code> cache is shared as well.</li>
+<li>If an alias clashes with the main path of another route, the main path wins. The check in development mode warns when an alias equals its own path (<code>MJX315</code>), when two routes use the same alias (<code>MJX316</code>), and when a child alias is missing the <code>/</code> prefix (<code>MJX314</code>).</li>
+<li><code>app.router.fullPath</code> gives the matched pattern (the alias pattern for an alias), and <code>app.router.aliasOf</code> gives the main pattern (<code>null</code> if it is not an alias): at <code>/my-notes/5</code>, <code>/my-notes/{id(\d+)}</code> and <code>/notes/{id(\d+)}</code>. <code>navigateByName</code> and <code>href</code> always produce the main path.</li>
+<li><code>RouterLink</code> classes look at the URL: while at <code>/my-notes</code>, a link with <code>to=&quot;/notes&quot;</code> does not count as active.</li>
+</ul>
+<h2 id="params">Path parameters</h2>
+<p>Parameters are defined with the <code>{name}</code> syntax:</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{id}</code></td>
+<td>A required parameter.</td>
+</tr>
+<tr>
+<td><code>{id:1}</code></td>
+<td>Required; <code>1</code> is used only when <code>href</code> / <code>navigateByName</code> produces a path and no value is given (the pattern <code>/h/{id:1}</code> does not match the address <code>/h</code>).</td>
+</tr>
+<tr>
+<td><code>{id?}</code></td>
+<td>Optional.</td>
+</tr>
+<tr>
+<td><code>{id?:5}</code></td>
+<td>Optional, with the default <code>5</code>: if it is missing from the address, <code>params.id</code> becomes <code>'5'</code>.</td>
+</tr>
+<tr>
+<td><code>{id(\d+)}</code></td>
+<td>A pattern constraint: the segment matches only if it fits the regular expression in the parentheses (case-insensitive; capturing groups in the pattern are ignored; <code>?</code> and <code>:</code> are part of the pattern). It combines with <code>?</code> and a default: <code>{id(\d+)?:1}</code>. The pattern applies to a single segment and cannot contain <code>/</code>. In a JavaScript string the backslash is written twice: <code>&quot;/{id(\\d+)}&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>{path+}</code></td>
+<td>One or more segments: for <code>/files/a/b/c</code>, <code>params.path</code> becomes <code>'a/b/c'</code> (plain text; each segment is decoded separately, and you can <code>split('/')</code> the parts if needed). For <code>href</code>, give <code>'a/b'</code> or <code>['a','b']</code>, and the segments are encoded separately. It combines with a pattern, and the pattern applies to every segment: <code>{ids(\d+)+}</code>.</td>
+</tr>
+<tr>
+<td><code>{path*}</code></td>
+<td>Like <code>{path+}</code>, but there may be no segment at all (optional like <code>{path?}</code>, and it takes a <code>:default</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>A <code>:</code> outside the curly braces and the rest of the segment drop out of the pattern (<code>/user/:id</code> → <code>/user/</code>, which matches no address); in development mode the check warns with <code>MJX319</code>.</p>
+<p>In the ordering, a route containing <code>{…+}</code> or <code>{…*}</code> comes after routes at the same depth with the same number of static segments: <code>/f/{a}/{b}</code> before <code>/f/{rest+}</code>; <code>/docs/{rest+}</code>, with its static segment, before <code>/{a}/{b}</code>. For an unusable pattern (one that does not compile, has an unclosed <code>(</code> or contains <code>/</code>), the check warns in development mode with <code>MJX320</code>.</p>
+<p><code>href</code>, <code>navigateByName</code> and the <code>redirect</code> string fill the <code>{…}</code> placeholders, and the values are encoded with <code>encodeURIComponent</code> (<code>href('tag', { name: 'a/b' })</code> → <code>/tags/a%2Fb</code>, <code>{ name: 'café' }</code> → <code>/tags/caf%C3%A9</code>).</p>
+<p>Parameters are reached from the navigation context or the router:</p>
+<div class="doc-code" data-file="src/pages/NotePage.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/pages/NotePage.ts"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+const nav = useNavigation();
+const noteId = Number(nav.params.id);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/pages/NotePage.js"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+const nav = useNavigation();
+const noteId = Number(nav.params.id);</code></pre>
+</div>
+<p><code>params</code> also contains the query string values. Like path parameters, query values are strings and arrive with their percent-encoding decoded (<code>/notes/5?tab=history</code> → <code>{ id: '5', tab: 'history' }</code>, <code>/tags/caf%C3%A9?q=a%20b</code> → <code>{ name: 'café', q: 'a b' }</code>); in the path <code>+</code> is a plain character, while in the query it is a space; values such as <code>true</code>, <code>null</code>, <code>2025-10-27</code> or <code>{&quot;a&quot;:1}</code> stay text as well. If you need a number, a boolean or a date, convert the value yourself (<code>Number(params.id)</code>). A repeated key (<code>?tag=work&amp;tag=home</code>) becomes an array of strings (<code>['work', 'home']</code>). A path parameter with the same name overrides the query value. The <code>#…</code> part never enters <code>params</code>.</p>
+<p><code>router.uri</code>, the <code>uri</code> of the <code>onRouterChanged</code> event, the middleware's <code>ctx.uri</code> and the guard's <code>to.path</code> are in address form: percent-encoded, the same as the address bar (<code>/tags/caf%C3%A9</code>). To display one, use <code>decodeURIComponent</code>; for the value, use <code>params</code>. <code>navigate</code>, the <code>to</code> of <code>RouterLink</code> and the <code>onActive</code>/<code>onExact</code> path can be written raw (<code>/tags/café</code>) or encoded; both go to the same address and make the same link active.</p>
+<p>The query is read only from the address being navigated to: in <code>history</code> mode, if there is no <code>?</code> in the address, <code>params</code> contains no query values (the previous page's query is not carried over). In <code>hash</code>/<code>file</code> mode, the query before <code>#</code> (<code>/?x=1#/a</code>) is page-level; it reaches <code>params</code> on every route that has no query of its own, and if the route has its own query (<code>#/b?z=3</code>), that one is used instead.</p>
+<h2 id="resolve-href-routes">Querying the route table — <code>resolve</code>, <code>href</code>, <code>routes</code></h2>
+<p><code>app.router</code> carries three members for querying the route table without navigating:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>// Which route does an address match? (does not navigate, does not touch the address bar)
+const { chain, result } = app.router.resolve(&quot;/notes/5&quot;);
+if (result.ok) console.log(result.route?.name, result.params.id, result.meta.folder);  // &quot;notes-note&quot; &quot;5&quot; &quot;notes&quot;
+chain;                                      // ['/', '/notes', '/5']
+result.chain.map((r) =&gt; r.path);            // ['/', '/notes', '/{id(\\d+)}']: definitions from the root to the route
+
+// Every route in definition order (aliases excluded); for building a menu or a site map
+const paths = app.router.routes.map((r) =&gt; r.fullPath);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>// Which route does an address match? (does not navigate, does not touch the address bar)
+const { chain, result } = app.router.resolve(&quot;/notes/5&quot;);
+if (result.ok) console.log(result.route?.name, result.params.id, result.meta.folder);  // &quot;notes-note&quot; &quot;5&quot; &quot;notes&quot;
+chain;                                      // ['/', '/notes', '/5']
+result.chain.map((r) =&gt; r.path);            // ['/', '/notes', '/{id(\\d+)}']: definitions from the root to the route
+
+// Every route in definition order (aliases excluded); for building a menu or a site map
+const paths = app.router.routes.map((r) =&gt; r.fullPath);</code></pre>
+</div>
+<p>The path of a named route is produced with <code>href</code>; for the <code>to</code> of a <code>RouterLink</code>, for menus and breadcrumbs. In the example the link's target is produced from a named route (<code>nav</code> is the router returned by <code>useNavigation()</code>):</p>
+<div class="doc-code" data-file="src/parts/NoteRow.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteRow.tsx"><code>&lt;RouterLink to={nav.href(`${folder}-note`, { id: note.id })}&gt;{note.title}&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteRow.ts"><code>const link = motifComponent(RouterLink, {
+  to: nav.href(`${folder}-note`, { id: note.id }),
+  childs: [motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))],
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteRow.jsx"><code>&lt;RouterLink to={nav.href(`${folder}-note`, { id: note.id })}&gt;{note.title}&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteRow.js"><code>const link = motifComponent(RouterLink, {
+  to: nav.href(`${folder}-note`, { id: note.id }),
+  childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))],
+});</code></pre>
+</div>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resolve(uri)</code></td>
+<td><code>RouteResolution</code>: <code>{ chain, result }</code>. <code>chain</code> has the same form as <code>app.router.chain</code> (<code>string[]</code>, each route's own path with its parameters filled in). <code>result</code> is the <code>ResolveResult</code> that <code>navigate</code> would return when going to that address: <code>{ ok, uri, fullPath, route, chain, params, meta, extend, aliasOf }</code>; <code>result.chain</code> is the route definitions from the root to the route (<code>RouteItem[]</code>). If there is no match, <code>result.ok</code> is <code>false</code> and <code>chain</code> is <code>[]</code>. Guards, middleware and redirects do not run.</td>
+</tr>
+<tr>
+<td><code>href(name, params?)</code></td>
+<td>The path of the named route with its parameters filled in (the same calculation as <code>navigateByName</code>). <code>0</code> and <code>false</code> values are written; for a parameter given as <code>undefined</code>, <code>null</code> or <code>''</code>, or not given at all, the pattern's default is used (if there is no default, that segment is not written). Parameters that are not in the pattern are not written; if you need a query, append it to the produced path (<code>href(&quot;notes-note&quot;, { id: 3 }) + &quot;?tab=history&quot;</code>). If the name does not exist, it throws <code>MJX302</code>.</td>
+</tr>
+<tr>
+<td><code>routes</code></td>
+<td><code>RouteInfo[]</code>: <code>{ fullPath, name, meta, route, chain }</code>. A layout and its default child are separate items; <code>chain</code> is the route definitions from the root to this route.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lazy">Lazy loading</h2>
+<p>Using <code>() =&gt; import(...)</code> in the <code>control</code> field loads the route component only when it is needed and gives automatic code splitting. A page given this way is split into a separate chunk and downloaded the first time the route is visited:</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>const settings: RouteItem = { path: &quot;/settings/{section?:appearance}&quot;, name: &quot;settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;) };</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>const settings = { path: &quot;/settings/{section?:appearance}&quot;, name: &quot;settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;) };</code></pre>
+</div>
+<p>The loaded module must export the page as <code>default</code>. For a named export, map it: <code>control: () =&gt; import(&quot;./pages/SettingsPage&quot;).then((m) =&gt; m.SettingsPage)</code>. The page cannot be built with a module that has no <code>default</code> export, or with some other object that is not a component: <code>MJX304</code> is reported (with <code>MJX127</code> as the cause) and <code>fallbacks.error</code> is shown.</p>
+<p><code>fallbacks.notFound</code> and <code>fallbacks.error</code> support the same lazy form.</p>
+<p>A route's <code>import()</code> does not use a loading view or retries. To lazily load a heavy part <strong>inside</strong> a page, show a view while it loads and retry on a mobile network, use the <a href="/docs/lazy">Lazy</a> component (see <a href="/docs/lazy#retry">Retrying</a>).</p>
+<h2 id="route-lint">Route check in development mode</h2>
+<p>When <code>app.useDevelopment(true)</code> is called before <code>useRouter</code>, the route table is checked while it is being set up; a problematic definition is written to the console as a warning, and the router keeps working:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MJX310</code></td>
+<td>The route path is empty (<code>''</code>); for the default child, write <code>'/'</code>.</td>
+</tr>
+<tr>
+<td><code>MJX311</code></td>
+<td>A child route's path does not start with <code>/</code> (<code>'notes'</code>).</td>
+</tr>
+<tr>
+<td><code>MJX312</code></td>
+<td>A child route ends up at the same full path as its parent (except the default child <code>'/'</code>).</td>
+</tr>
+<tr>
+<td><code>MJX313</code></td>
+<td>Several routes end up at the same full path.</td>
+</tr>
+<tr>
+<td><code>MJX314</code></td>
+<td>A child route's alias does not start with <code>/</code>.</td>
+</tr>
+<tr>
+<td><code>MJX315</code></td>
+<td>An alias is equal to the route's own path.</td>
+</tr>
+<tr>
+<td><code>MJX316</code></td>
+<td>Several routes use the same alias.</td>
+</tr>
+<tr>
+<td><code>MJX319</code></td>
+<td>There is a <code>:</code> outside the curly braces in a path or an alias (<code>/user/:id</code>).</td>
+</tr>
+<tr>
+<td><code>MJX320</code></td>
+<td>A parameter pattern cannot be used: it does not compile, has an unclosed <code>(</code> or contains <code>/</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Next step</h2>
+<p>To learn where route components are placed on screen, go on to <a href="/docs/router-view">RouterView</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

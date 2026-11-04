@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="What is released on its own, motif.setDisposable/register, the dispose methods, detach/silentDetach/silentUnlink, DisposableStore, using/doWork, leak tracking and counting live components.">
+    <title>Memory Management and Disposal — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/memory-and-dispose">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/memory-and-dispose">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/memory-and-dispose">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/memory-and-dispose">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/memory-and-dispose">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Memory Management and Disposal">
+    <meta property="og:description" content="What is released on its own, motif.setDisposable/register, the dispose methods, detach/silentDetach/silentUnlink, DisposableStore, using/doWork, leak tracking and counting live components.">
+    <script type="application/json" id="doc-data">{"slug":"memory-and-dispose","locale":"en","title":"Memory Management and Disposal","description":"What is released on its own, motif.setDisposable/register, the dispose methods, detach/silentDetach/silentUnlink, DisposableStore, using/doWork, leak tracking and counting live components.","category":{"id":"3","title":"Application structure"},"html":"\u003Cp\u003EIn MotifJS every element is a live component: it holds its own event listeners, bindings, reactive subscriptions and children. When the component is disposed, these are released together with it. Resources opened outside the component (a timer, a listener added to the document, an observer, a connection), on the other hand, you tie to the component yourself.\u003C/p\u003E\n\u003Ch2 id=\u0022auto-cleanup\u0022\u003EWhat is released on its own\u003C/h2\u003E\n\u003Cp\u003EWhile a component is being disposed, MotifJS does the following itself:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003ERemoves the DOM listeners attached with \u003Ccode\u003Emotif.on\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EStops the bindings (\u003Ccode\u003Ebindings\u003C/code\u003E: text, attributes, \u003Ccode\u003Ewatch\u003C/code\u003E, \u003Ccode\u003Emethod\u003C/code\u003E …).\u003C/li\u003E\n\u003Cli\u003EReleases the \u003Ccode\u003Econtext.on\u003C/code\u003E and \u003Ccode\u003Econtext.onRouterChanged\u003C/code\u003E subscriptions.\u003C/li\u003E\n\u003Cli\u003ERuns the functions registered with \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E and disposes the objects tied with \u003Ccode\u003Emotif.register\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EDisposes the child components the same way.\u003C/li\u003E\n\u003Cli\u003ETakes the element out of the document; if a leave transition is defined, after the transition finishes.\u003C/li\u003E\n\u003Cli\u003EClears the component\u0027s fields: \u003Ccode\u003Eelement\u003C/code\u003E, \u003Ccode\u003Eprops\u003C/code\u003E, \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E and the fields you added to the component become \u003Ccode\u003Eundefined\u003C/code\u003E. For children this step is skipped with \u003Ccode\u003Edispose({ deep: false })\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003ENo manual cleanup is needed for the events, bindings and children the component sets up itself.\u003C/p\u003E\n\u003Ch2 id=\u0022manual-resources\u0022\u003EResources tied by hand\u003C/h2\u003E\n\u003Cp\u003EThe component does not know about a resource opened outside it: \u003Ccode\u003EsetInterval\u003C/code\u003E, a \u003Ccode\u003Edocument\u003C/code\u003E or \u003Ccode\u003Ewindow\u003C/code\u003E listener, \u003Ccode\u003EResizeObserver\u003C/code\u003E, \u003Ccode\u003EWebSocket\u003C/code\u003E. These are tied to the component\u0027s lifetime through the \u003Ccode\u003Emotif\u003C/code\u003E namespace; \u003Ccode\u003Ethis.motif\u003C/code\u003E in a class and in Options, and the root\u0027s \u003Ccode\u003Emotif\u003C/code\u003E in a function component.\u003C/p\u003E\n\u003Ch3 id=\u0022register\u0022\u003E\u003Ccode\u003Emotif.setDisposable(fn)\u003C/code\u003E and \u003Ccode\u003Emotif.register(object)\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EA note row\u0027s date is written with \u003Ccode\u003EformatDay(note.updatedAt, now)\u003C/code\u003E: the time for today, \u0026quot;Yesterday\u0026quot; for yesterday, and the day for anything older. The component in the example refreshes \u003Ccode\u003Enow\u003C/code\u003E once a minute so the text changes when the day turns over; the timer stops when the component is disposed:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteTime.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteTime.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteTime extends Component\u0026lt;HTMLTimeElement, { note: Note }\u0026gt; {\n  state = reactive({ now: Date.now() });\n\n  override onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  override view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; formatDay(this.props.note.updatedAt, this.state.now)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteTime.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteTime extends Component\u0026lt;HTMLTimeElement, { note: Note }\u0026gt; {\n  static override elementTag = \u0026quot;time\u0026quot;;\n  state = reactive({ now: Date.now() });\n\n  override onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; formatDay(this.props.note.updatedAt, this.state.now)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteTime.tsx\u0022\u003E\u003Ccode\u003Eimport { reactive, type ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteTime(props: { note: Note }) {\n  const state = reactive({ now: Date.now() });\n\n  const start = (time: ComponentBase) =\u0026gt; {\n    const timer = setInterval(() =\u0026gt; (state.now = Date.now()), 60_000);\n    time.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  };\n\n  return \u0026lt;time onConfig={start}\u0026gt;{() =\u0026gt; formatDay(props.note.updatedAt, state.now)}\u0026lt;/time\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteTime.ts\u0022\u003E\u003Ccode\u003Eimport { motifComponent, reactive, type ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteTime(props: { note: Note }) {\n  const state = reactive({ now: Date.now() });\n\n  return motifComponent(\u0026quot;time\u0026quot;, (time: ComponentBase) =\u0026gt; {\n    const timer = setInterval(() =\u0026gt; (state.now = Date.now()), 60_000);\n    time.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n    time.bindings.text(() =\u0026gt; formatDay(props.note.updatedAt, state.now));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteTime.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteTime = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: \u0026quot;time\u0026quot;,\n  state: reactive({ now: Date.now() }),\n\n  onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; formatDay(props.note.updatedAt, this.state.now)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteTime.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteTime = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: \u0026quot;time\u0026quot;,\n  state: reactive({ now: Date.now() }),\n\n  onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; formatDay(props.note.updatedAt, this.state.now)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteTime.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\n\nexport class NoteTime extends Component {\n  static elementTag = \u0026quot;time\u0026quot;;\n  state = reactive({ now: Date.now() });\n\n  onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; formatDay(this.props.note.updatedAt, this.state.now)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteTime.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\n\nexport class NoteTime extends Component {\n  static elementTag = \u0026quot;time\u0026quot;;\n  state = reactive({ now: Date.now() });\n\n  onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; formatDay(this.props.note.updatedAt, this.state.now)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteTime.jsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\n\nexport function NoteTime(props) {\n  const state = reactive({ now: Date.now() });\n\n  const start = (time) =\u0026gt; {\n    const timer = setInterval(() =\u0026gt; (state.now = Date.now()), 60_000);\n    time.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  };\n\n  return \u0026lt;time onConfig={start}\u0026gt;{() =\u0026gt; formatDay(props.note.updatedAt, state.now)}\u0026lt;/time\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteTime.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\n\nexport function NoteTime(props) {\n  const state = reactive({ now: Date.now() });\n\n  return motifComponent(\u0026quot;time\u0026quot;, (time) =\u0026gt; {\n    const timer = setInterval(() =\u0026gt; (state.now = Date.now()), 60_000);\n    time.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n    time.bindings.text(() =\u0026gt; formatDay(props.note.updatedAt, state.now));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteTime.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\n\nexport const NoteTime = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;time\u0026quot;,\n  state: reactive({ now: Date.now() }),\n\n  onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; formatDay(props.note.updatedAt, this.state.now)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteTime.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { formatDay } from \u0026quot;../format\u0026quot;;\n\nexport const NoteTime = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;time\u0026quot;,\n  state: reactive({ now: Date.now() }),\n\n  onConfigured() {\n    const timer = setInterval(() =\u0026gt; (this.state.now = Date.now()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; formatDay(props.note.updatedAt, this.state.now)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe row places the date with \u003Ccode\u003E\u0026lt;NoteTime note={note} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003EThe row places the date with \u003Ccode\u003Enew NoteTime({ note })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003EThe row places the date with \u003Ccode\u003EmotifComponent(NoteTime, { note })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.setDisposable(fn)\u003C/code\u003E: \u003Ccode\u003Efn\u003C/code\u003E runs once, while the component is being disposed.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif.register(object)\u003C/code\u003E: ties an object that has a \u003Ccode\u003Edispose()\u003C/code\u003E method (\u003Ccode\u003EIDisposable\u003C/code\u003E) to the component\u0027s lifetime; the object is disposed together with the component. \u003Ccode\u003EdisposableCore.toDisposable(fn)\u003C/code\u003E turns a function into such an object: \u003Ccode\u003Emotif.register(disposableCore.toDisposable(() =\u0026gt; clearInterval(timer)))\u003C/code\u003E does the same job as \u003Ccode\u003EsetDisposable\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022app-event-unsubscribe\u0022\u003EApplication event subscriptions\u003C/h3\u003E\n\u003Cp\u003EA subscription the component opens with \u003Ccode\u003Econtext.on(...)\u003C/code\u003E is tied to the component\u0027s lifetime on its own and goes away when the component is disposed. To release it earlier, call the function it returns:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst off = this.context.on(\u0026quot;notes-imported\u0026quot;, () =\u0026gt; (this.state.query = \u0026quot;\u0026quot;));\noff();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst off = list.context.on(\u0026quot;notes-imported\u0026quot;, () =\u0026gt; (state.query = \u0026quot;\u0026quot;));\noff();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst off = this.context.on(\u0026quot;notes-imported\u0026quot;, () =\u0026gt; (this.state.query = \u0026quot;\u0026quot;));\noff();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst off = list.context.on(\u0026quot;notes-imported\u0026quot;, () =\u0026gt; (state.query = \u0026quot;\u0026quot;));\noff();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn a function component the calls on this page are made on the component itself (\u003Ccode\u003Elist\u003C/code\u003E in the examples): in JSX, the component that reaches the root\u0027s \u003Ccode\u003EonConfig\u003C/code\u003E hook or \u003Ccode\u003Eref\u003C/code\u003E, and without JSX, the component received by the function of the \u003Ccode\u003EmotifComponent\u003C/code\u003E call that builds the root.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EA subscription opened outside the component, through the application (\u003Ccode\u003Eapp.on(...)\u003C/code\u003E, \u003Ccode\u003EApplication.main.on(...)\u003C/code\u003E), is not tied to any component; give the function it returns to a component with \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E, or call it yourself.\u003C/p\u003E\n\u003Ch2 id=\u0022effect-cleanup\u0022\u003ECleaning up an \u003Ccode\u003Eeffect\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eeffect(...)\u003C/code\u003E is not tied to any component; to stop it, call the function it returns. For a watcher that belongs to a component, \u003Ccode\u003Ebindings.watch\u003C/code\u003E does the same job and stops together with the component:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Ethis.bindings.watch(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, this.state.query));\n\nconst stop = effect(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, this.state.query));\nthis.motif.setDisposable(stop);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Elist.bindings.watch(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, state.query));\n\nconst stop = effect(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, state.query));\nlist.motif.setDisposable(stop);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Ethis.bindings.watch(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, this.state.query));\n\nconst stop = effect(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, this.state.query));\nthis.motif.setDisposable(stop);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Elist.bindings.watch(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, state.query));\n\nconst stop = effect(() =\u0026gt; localStorage.setItem(\u0026quot;notes.query\u0026quot;, state.query));\nlist.motif.setDisposable(stop);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe two forms give the same result: in the first, the component releases the watcher, and in the second, you hand the stop function to the component yourself.\u003C/p\u003E\n\u003Ch2 id=\u0022dispose-methods\u0022\u003EThe dispose methods\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eawait this.dispose();                                 // with the leave transition; references in the subtree are cleared too\nawait this.dispose({ skipLeaveTransition: true });    // without playing the leave transition\nawait this.dispose({ deep: false });                  // reference cleanup in the children is skipped\nawait this.disposeAsync();                            // the leave transition is not played, running animations are stopped\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eawait list.dispose();                                 // with the leave transition; references in the subtree are cleared too\nawait list.dispose({ skipLeaveTransition: true });    // without playing the leave transition\nawait list.dispose({ deep: false });                  // reference cleanup in the children is skipped\nawait list.disposeAsync();                            // the leave transition is not played, running animations are stopped\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eawait this.dispose();                                 // with the leave transition; references in the subtree are cleared too\nawait this.dispose({ skipLeaveTransition: true });    // without playing the leave transition\nawait this.dispose({ deep: false });                  // reference cleanup in the children is skipped\nawait this.disposeAsync();                            // the leave transition is not played, running animations are stopped\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eawait list.dispose();                                 // with the leave transition; references in the subtree are cleared too\nawait list.dispose({ skipLeaveTransition: true });    // without playing the leave transition\nawait list.dispose({ deep: false });                  // reference cleanup in the children is skipped\nawait list.disposeAsync();                            // the leave transition is not played, running animations are stopped\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EFor details of the options, see \u003Ca href=\u0022/docs/lifecycle#dispose\u0022\u003EDisposal\u003C/a\u003E. \u003Ccode\u003EisDisposed\u003C/code\u003E tells whether the component has been disposed; calling \u003Ccode\u003Edispose()\u003C/code\u003E again on a disposed component does nothing, and \u003Ccode\u003Emotif\u003C/code\u003E calls do not throw.\u003C/p\u003E\n\u003Cp\u003EChildren are disposed through \u003Ccode\u003Econtrols\u003C/code\u003E as well:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Ethis.controls.remove(child);   // removes child and disposes it\nthis.controls.clear();         // disposes every child\nawait this.motif.clear();      // disposes every child, resolves when all are done\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Elist.controls.remove(child);   // removes child and disposes it\nlist.controls.clear();         // disposes every child\nawait list.motif.clear();      // disposes every child, resolves when all are done\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Ethis.controls.remove(child);   // removes child and disposes it\nthis.controls.clear();         // disposes every child\nawait this.motif.clear();      // disposes every child, resolves when all are done\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Elist.controls.remove(child);   // removes child and disposes it\nlist.controls.clear();         // disposes every child\nawait list.motif.clear();      // disposes every child, resolves when all are done\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Emotif.clear()\u003C/code\u003E does nothing if \u003Ccode\u003Emotif.options.disableDisposal\u003C/code\u003E is on; \u003Ccode\u003Econtrols.clear()\u003C/code\u003E ignores this setting.\u003C/p\u003E\n\u003Ch3 id=\u0022detach\u0022\u003EMoving without disposing\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Eremove()\u003C/code\u003E and \u003Ccode\u003Eclear()\u003C/code\u003E dispose the child: its bindings, watchers, listeners and DOM go away. To move a component somewhere else without disposing it, or to reuse it later, use one of these three:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMethod\u003C/th\u003E\n\u003Cth\u003ECollection\u003C/th\u003E\n\u003Cth\u003ELeave animation\u003C/th\u003E\n\u003Cth\u003EDOM\u003C/th\u003E\n\u003Cth\u003ENotification\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edetach(child)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eremoves\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003Eplays it\u003C/strong\u003E: the element\u0027s own leave if the root is an element; if the root is a fragment, the leaves of its visible element children (nested fragments included) together\u003C/td\u003E\n\u003Ctd\u003Eremoves it when the leave finishes (for a fragment root, the whole range from opening to closing; if hidden, the placeholder); synchronous if no transition is defined\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Econtrolremoved\u003C/code\u003E on the parent after the leave finishes and the DOM is removed\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsilentDetach(child)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eremoves\u003C/td\u003E\n\u003Ctd\u003Edoes not play\u003C/td\u003E\n\u003Ctd\u003Eremoves synchronously\u003C/td\u003E\n\u003Ctd\u003Enone\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsilentUnlink(child)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eremoves\u003C/td\u003E\n\u003Ctd\u003Edoes not play\u003C/td\u003E\n\u003Ctd\u003Edoes not touch\u003C/td\u003E\n\u003Ctd\u003Enone\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EAll three leave the component and its children alive. \u003Ccode\u003Edetach\u003C/code\u003E and \u003Ccode\u003EsilentDetach\u003C/code\u003E send \u003Ccode\u003EonDeactivated\u003C/code\u003E to the component and its visible subtree when the DOM is removed, and \u003Ccode\u003EonActivated\u003C/code\u003E when the component is placed again with \u003Ccode\u003Econtrols.add\u003C/code\u003E; \u003Ccode\u003EsilentUnlink\u003C/code\u003E does not touch the DOM, so it sends no notification (\u003Ca href=\u0022/docs/lifecycle\u0022\u003ELifecycle\u003C/a\u003E). \u003Ccode\u003Edetach\u003C/code\u003E returns a \u003Ccode\u003EPromise\u003C/code\u003E; if there is a transition it resolves when the removal is finished, otherwise it comes back already resolved:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eawait this.controls.detach(child);   // leave has played, the DOM is detached\nother.controls.add(child);           // moved to its new place\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eawait list.controls.detach(child);   // leave has played, the DOM is detached\nother.controls.add(child);           // moved to its new place\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eawait this.controls.detach(child);   // leave has played, the DOM is detached\nother.controls.add(child);           // moved to its new place\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eawait list.controls.detach(child);   // leave has played, the DOM is detached\nother.controls.add(child);           // moved to its new place\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EWriting \u003Ccode\u003Eother.controls.add(child)\u003C/code\u003E without waiting is safe too: \u003Ccode\u003Edetach\u003C/code\u003E from the old parent happens on its own, the collection and \u003Ccode\u003Eparent\u003C/code\u003E are updated right away, and the DOM is attached to the new parent when the leave finishes. The other ways of removing with animation are \u003Ccode\u003Emotif.hide()\u003C/code\u003E and \u003Ccode\u003Edispose()\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022disposable-store\u0022\u003E\u003Ccode\u003EDisposableStore\u003C/code\u003E — cleaning up a group\u003C/h2\u003E\n\u003Cp\u003ESeveral resources are collected in a \u003Ccode\u003EDisposableStore\u003C/code\u003E and disposed together:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\u003Ccode\u003Eimport { DisposableStore, disposableCore } from \u0026quot;@motifx/core\u0026quot;;\n\nconst store = new DisposableStore();\nconst timer = setInterval(() =\u0026gt; (state.now = Date.now()), 60_000);\nconst tick = store.add(disposableCore.toDisposable(() =\u0026gt; clearInterval(timer)));   // add returns what it added\nconst observer = new ResizeObserver(() =\u0026gt; autosize(area));\nstore.add(disposableCore.toDisposable(() =\u0026gt; observer.disconnect()));\n\nstore.delete(tick);   // removes one and disposes it\nstore.detach(tick);   // removes one, does not dispose it\nstore.clear();        // disposes them all, the store stays open\nstore.dispose();      // disposes them all and closes the store\nstore.isDisposed;     // true\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/sync.js\u0022\u003E\u003Ccode\u003Eimport { DisposableStore, disposableCore } from \u0026quot;@motifx/core\u0026quot;;\n\nconst store = new DisposableStore();\nconst timer = setInterval(() =\u0026gt; (state.now = Date.now()), 60_000);\nconst tick = store.add(disposableCore.toDisposable(() =\u0026gt; clearInterval(timer)));   // add returns what it added\nconst observer = new ResizeObserver(() =\u0026gt; autosize(area));\nstore.add(disposableCore.toDisposable(() =\u0026gt; observer.disconnect()));\n\nstore.delete(tick);   // removes one and disposes it\nstore.detach(tick);   // removes one, does not dispose it\nstore.clear();        // disposes them all, the store stays open\nstore.dispose();      // disposes them all and closes the store\nstore.isDisposed;     // true\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EIf you \u003Ccode\u003Eadd\u003C/code\u003E to a store that has been closed, the added object does not enter the store and is not disposed (it leaks); in development mode an \u003Ccode\u003EMJX504\u003C/code\u003E warning is written. If several items throw during \u003Ccode\u003Eclear\u003C/code\u003E/\u003Ccode\u003Edispose\u003C/code\u003E, all of them are gathered in an \u003Ccode\u003EAggregateError\u003C/code\u003E in the \u003Ccode\u003Ecause\u003C/code\u003E of a single \u003Ccode\u003EMJX503\u003C/code\u003E error; a single error is thrown as it is.\u003C/p\u003E\n\u003Cp\u003EA store is tied to a component with \u003Ccode\u003Emotif.register(store)\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022using-dowork\u0022\u003ESafety after disposal: \u003Ccode\u003Eusing\u003C/code\u003E and \u003Ccode\u003EdoWork\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EWhen an async job finishes, the component may have been disposed and its fields cleared. \u003Ccode\u003Eusing(promise, onfulfilled?, onrejected?)\u003C/code\u003E passes the result to the handlers only if the component is alive, and returns nothing (see \u003Ca href=\u0022/docs/using\u0022\u003EAsync Results with using\u003C/a\u003E). \u003Ccode\u003EdoWork(promise)\u003C/code\u003E returns a promise; if the component has been disposed, a \u003Ccode\u003EMotifError\u003C/code\u003E with the code \u003Ccode\u003EMJX108\u003C/code\u003E arrives in place of the value or the rejection (see \u003Ca href=\u0022/docs/do-work\u0022\u003EAsync Results with doWork\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022leak-monitor\u0022\u003ELeak tracking\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useReactiveMonitor({ enabled: true, threshold: 200, name: \u0026quot;notes\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useReactiveMonitor({ enabled: true, threshold: 200, name: \u0026quot;notes\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EWhen the number of effects tracking a single field of a reactive object reaches \u003Ccode\u003Ethreshold\u003C/code\u003E (200 if not given), an \u003Ccode\u003EMJX507\u003C/code\u003E warning is written; the warning also shows the most frequent setup stack. This usually means that the bindings of components that were never disposed are piling up. The warning is written only in development mode. Tracking is off by default; turn it on during development.\u003C/p\u003E\n\u003Ch2 id=\u0022disposable-tracker\u0022\u003ECounting live components — \u003Ccode\u003EdisposableCore.disposableTracker\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EEvery component is a \u003Ccode\u003EDisposable\u003C/code\u003E: its constructor calls \u003Ccode\u003EtrackDisposable\u003C/code\u003E, and the disposal chain calls \u003Ccode\u003EmarkAsDisposed\u003C/code\u003E. By attaching a tracker to \u003Ccode\u003EdisposableCore.disposableTracker\u003C/code\u003E, the number of live components is measured; it is used in round-trip tests (\u0026quot;after building and tearing down N times, did the counter go back to where it started?\u0026quot;):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eimport { disposableCore, ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\n\nlet alive = 0;\ndisposableCore.disposableTracker = {\n  trackDisposable(x) { if (x instanceof ComponentBase) alive\u002B\u002B; },\n  markAsDisposed(x) { if (x instanceof ComponentBase) alive--; },\n  setParent() { },\n  markAsSingleton() { },\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eimport { disposableCore, ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\n\nlet alive = 0;\ndisposableCore.disposableTracker = {\n  trackDisposable(x) { if (x instanceof ComponentBase) alive\u002B\u002B; },\n  markAsDisposed(x) { if (x instanceof ComponentBase) alive--; },\n  setParent() { },\n  markAsSingleton() { },\n};\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ENext to components, the tracker also receives stores and \u003Ccode\u003EtoDisposable\u003C/code\u003E objects; the \u003Ccode\u003Einstanceof\u003C/code\u003E check in the example counts components only. \u003Ccode\u003EmarkAsDisposed\u003C/code\u003E arrives once per object; it is not reported again even if \u003Ccode\u003Edispose()\u003C/code\u003E is called again. To inspect the dependency maps of reactive objects, use \u003Ccode\u003EdebugGetDeps(target)\u003C/code\u003E and \u003Ccode\u003EdebugGetDepMap()\u003C/code\u003E from the \u003Ccode\u003E@motifx/core/devtools\u003C/code\u003E subpath (\u003Ccode\u003Eimport { debugGetDeps } from \u0026quot;@motifx/core/devtools\u0026quot;\u003C/code\u003E). In development mode, \u003Ccode\u003E__MOTIF_DEVTOOLS__.getCounters().components.notInTree\u003C/code\u003E counts components that are alive but not in the tree; if it does not drop after leaving a page, those components are being held somewhere (\u003Ca href=\u0022/docs/devtools#counters\u0022\u003EThe DevTools Contract\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022best-practices\u0022\u003EBest practices\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EThe events, bindings and children a component sets up itself are released on their own; no cleanup is written for them.\u003C/li\u003E\n\u003Cli\u003EEvery resource opened outside the component (a timer, a document or window listener, an observer, a connection) is tied to the component with \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E or \u003Ccode\u003Emotif.register\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EFor a reactive watcher that belongs to a component, use \u003Ccode\u003Ebindings.watch\u003C/code\u003E instead of \u003Ccode\u003Eeffect\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EHandle async results with \u003Ca href=\u0022/docs/using\u0022\u003Eusing\u003C/a\u003E or \u003Ca href=\u0022/docs/do-work\u0022\u003EdoWork\u003C/a\u003E.\u003C/li\u003E\n\u003Cli\u003EA component added by hand with \u003Ccode\u003Econtrols.add\u003C/code\u003E is disposed together with its container; to remove it earlier, use \u003Ccode\u003Econtrols.remove\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn how errors are thrown, reported and caught, go on to \u003Ca href=\u0022/docs/error-handling\u0022\u003EError Handling\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"auto-cleanup","text":"What is released on its own","level":2},{"id":"manual-resources","text":"Resources tied by hand","level":2},{"id":"register","text":"motif.setDisposable(fn) and motif.register(object)","level":3},{"id":"app-event-unsubscribe","text":"Application event subscriptions","level":3},{"id":"effect-cleanup","text":"Cleaning up an effect","level":2},{"id":"dispose-methods","text":"The dispose methods","level":2},{"id":"detach","text":"Moving without disposing","level":3},{"id":"disposable-store","text":"DisposableStore — cleaning up a group","level":2},{"id":"using-dowork","text":"Safety after disposal: using and doWork","level":2},{"id":"leak-monitor","text":"Leak tracking","level":2},{"id":"disposable-tracker","text":"Counting live components — disposableCore.disposableTracker","level":2},{"id":"best-practices","text":"Best practices","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"styling-and-transitions","title":"Styling and Animation"},"next":{"slug":"error-handling","title":"Error Handling"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Application structure</p>
+        <h1>Memory Management and Disposal</h1>
+        <p>What is released on its own, motif.setDisposable/register, the dispose methods, detach/silentDetach/silentUnlink, DisposableStore, using/doWork, leak tracking and counting live components.</p>
+<p>In MotifJS every element is a live component: it holds its own event listeners, bindings, reactive subscriptions and children. When the component is disposed, these are released together with it. Resources opened outside the component (a timer, a listener added to the document, an observer, a connection), on the other hand, you tie to the component yourself.</p>
+<h2 id="auto-cleanup">What is released on its own</h2>
+<p>While a component is being disposed, MotifJS does the following itself:</p>
+<ul>
+<li>Removes the DOM listeners attached with <code>motif.on</code>.</li>
+<li>Stops the bindings (<code>bindings</code>: text, attributes, <code>watch</code>, <code>method</code> …).</li>
+<li>Releases the <code>context.on</code> and <code>context.onRouterChanged</code> subscriptions.</li>
+<li>Runs the functions registered with <code>motif.setDisposable</code> and disposes the objects tied with <code>motif.register</code>.</li>
+<li>Disposes the child components the same way.</li>
+<li>Takes the element out of the document; if a leave transition is defined, after the transition finishes.</li>
+<li>Clears the component's fields: <code>element</code>, <code>props</code>, <code>class</code>, <code>attr</code> and the fields you added to the component become <code>undefined</code>. For children this step is skipped with <code>dispose({ deep: false })</code>.</li>
+</ul>
+<p>No manual cleanup is needed for the events, bindings and children the component sets up itself.</p>
+<h2 id="manual-resources">Resources tied by hand</h2>
+<p>The component does not know about a resource opened outside it: <code>setInterval</code>, a <code>document</code> or <code>window</code> listener, <code>ResizeObserver</code>, <code>WebSocket</code>. These are tied to the component's lifetime through the <code>motif</code> namespace; <code>this.motif</code> in a class and in Options, and the root's <code>motif</code> in a function component.</p>
+<h3 id="register"><code>motif.setDisposable(fn)</code> and <code>motif.register(object)</code></h3>
+<p>A note row's date is written with <code>formatDay(note.updatedAt, now)</code>: the time for today, &quot;Yesterday&quot; for yesterday, and the day for anything older. The component in the example refreshes <code>now</code> once a minute so the text changes when the day turns over; the timer stops when the component is disposed:</p>
+<div class="doc-code" data-file="src/parts/NoteTime.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteTime.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteTime extends Component&lt;HTMLTimeElement, { note: Note }&gt; {
+  state = reactive({ now: Date.now() });
+
+  override onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  override view() {
+    return &lt;&gt;{() =&gt; formatDay(this.props.note.updatedAt, this.state.now)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteTime.ts"><code>import { Component, ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteTime extends Component&lt;HTMLTimeElement, { note: Note }&gt; {
+  static override elementTag = &quot;time&quot;;
+  state = reactive({ now: Date.now() });
+
+  override onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  override view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; formatDay(this.props.note.updatedAt, this.state.now)));
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteTime.tsx"><code>import { reactive, type ComponentBase } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteTime(props: { note: Note }) {
+  const state = reactive({ now: Date.now() });
+
+  const start = (time: ComponentBase) =&gt; {
+    const timer = setInterval(() =&gt; (state.now = Date.now()), 60_000);
+    time.motif.setDisposable(() =&gt; clearInterval(timer));
+  };
+
+  return &lt;time onConfig={start}&gt;{() =&gt; formatDay(props.note.updatedAt, state.now)}&lt;/time&gt;;
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteTime.ts"><code>import { motifComponent, reactive, type ComponentBase } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteTime(props: { note: Note }) {
+  const state = reactive({ now: Date.now() });
+
+  return motifComponent(&quot;time&quot;, (time: ComponentBase) =&gt; {
+    const timer = setInterval(() =&gt; (state.now = Date.now()), 60_000);
+    time.motif.setDisposable(() =&gt; clearInterval(timer));
+    time.bindings.text(() =&gt; formatDay(props.note.updatedAt, state.now));
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteTime.tsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteTime = (props: { note: Note }) =&gt; motifOptions({
+  el: &quot;time&quot;,
+  state: reactive({ now: Date.now() }),
+
+  onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; formatDay(props.note.updatedAt, this.state.now)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteTime.ts"><code>import { ComponentBase, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteTime = (props: { note: Note }) =&gt; motifOptions({
+  el: &quot;time&quot;,
+  state: reactive({ now: Date.now() }),
+
+  onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; formatDay(props.note.updatedAt, this.state.now)));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteTime.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+
+export class NoteTime extends Component {
+  static elementTag = &quot;time&quot;;
+  state = reactive({ now: Date.now() });
+
+  onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  view() {
+    return &lt;&gt;{() =&gt; formatDay(this.props.note.updatedAt, this.state.now)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteTime.js"><code>import { Component, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+
+export class NoteTime extends Component {
+  static elementTag = &quot;time&quot;;
+  state = reactive({ now: Date.now() });
+
+  onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; formatDay(this.props.note.updatedAt, this.state.now)));
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteTime.jsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+
+export function NoteTime(props) {
+  const state = reactive({ now: Date.now() });
+
+  const start = (time) =&gt; {
+    const timer = setInterval(() =&gt; (state.now = Date.now()), 60_000);
+    time.motif.setDisposable(() =&gt; clearInterval(timer));
+  };
+
+  return &lt;time onConfig={start}&gt;{() =&gt; formatDay(props.note.updatedAt, state.now)}&lt;/time&gt;;
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteTime.js"><code>import { motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+
+export function NoteTime(props) {
+  const state = reactive({ now: Date.now() });
+
+  return motifComponent(&quot;time&quot;, (time) =&gt; {
+    const timer = setInterval(() =&gt; (state.now = Date.now()), 60_000);
+    time.motif.setDisposable(() =&gt; clearInterval(timer));
+    time.bindings.text(() =&gt; formatDay(props.note.updatedAt, state.now));
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteTime.jsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+
+export const NoteTime = (props) =&gt; motifOptions({
+  el: &quot;time&quot;,
+  state: reactive({ now: Date.now() }),
+
+  onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; formatDay(props.note.updatedAt, this.state.now)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteTime.js"><code>import { motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { formatDay } from &quot;../format&quot;;
+
+export const NoteTime = (props) =&gt; motifOptions({
+  el: &quot;time&quot;,
+  state: reactive({ now: Date.now() }),
+
+  onConfigured() {
+    const timer = setInterval(() =&gt; (this.state.now = Date.now()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; formatDay(props.note.updatedAt, this.state.now)));
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>The row places the date with <code>&lt;NoteTime note={note} /&gt;</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>The row places the date with <code>new NoteTime({ note })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>The row places the date with <code>motifComponent(NoteTime, { note })</code>.</p>
+</div>
+<ul>
+<li><code>motif.setDisposable(fn)</code>: <code>fn</code> runs once, while the component is being disposed.</li>
+<li><code>motif.register(object)</code>: ties an object that has a <code>dispose()</code> method (<code>IDisposable</code>) to the component's lifetime; the object is disposed together with the component. <code>disposableCore.toDisposable(fn)</code> turns a function into such an object: <code>motif.register(disposableCore.toDisposable(() =&gt; clearInterval(timer)))</code> does the same job as <code>setDisposable</code>.</li>
+</ul>
+<h3 id="app-event-unsubscribe">Application event subscriptions</h3>
+<p>A subscription the component opens with <code>context.on(...)</code> is tied to the component's lifetime on its own and goes away when the component is disposed. To release it earlier, call the function it returns:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const off = this.context.on(&quot;notes-imported&quot;, () =&gt; (this.state.query = &quot;&quot;));
+off();</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const off = list.context.on(&quot;notes-imported&quot;, () =&gt; (state.query = &quot;&quot;));
+off();</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>const off = this.context.on(&quot;notes-imported&quot;, () =&gt; (this.state.query = &quot;&quot;));
+off();</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>const off = list.context.on(&quot;notes-imported&quot;, () =&gt; (state.query = &quot;&quot;));
+off();</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In a function component the calls on this page are made on the component itself (<code>list</code> in the examples): in JSX, the component that reaches the root's <code>onConfig</code> hook or <code>ref</code>, and without JSX, the component received by the function of the <code>motifComponent</code> call that builds the root.</p>
+</div>
+<p>A subscription opened outside the component, through the application (<code>app.on(...)</code>, <code>Application.main.on(...)</code>), is not tied to any component; give the function it returns to a component with <code>motif.setDisposable</code>, or call it yourself.</p>
+<h2 id="effect-cleanup">Cleaning up an <code>effect</code></h2>
+<p><code>effect(...)</code> is not tied to any component; to stop it, call the function it returns. For a watcher that belongs to a component, <code>bindings.watch</code> does the same job and stops together with the component:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>this.bindings.watch(() =&gt; localStorage.setItem(&quot;notes.query&quot;, this.state.query));
+
+const stop = effect(() =&gt; localStorage.setItem(&quot;notes.query&quot;, this.state.query));
+this.motif.setDisposable(stop);</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>list.bindings.watch(() =&gt; localStorage.setItem(&quot;notes.query&quot;, state.query));
+
+const stop = effect(() =&gt; localStorage.setItem(&quot;notes.query&quot;, state.query));
+list.motif.setDisposable(stop);</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>this.bindings.watch(() =&gt; localStorage.setItem(&quot;notes.query&quot;, this.state.query));
+
+const stop = effect(() =&gt; localStorage.setItem(&quot;notes.query&quot;, this.state.query));
+this.motif.setDisposable(stop);</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>list.bindings.watch(() =&gt; localStorage.setItem(&quot;notes.query&quot;, state.query));
+
+const stop = effect(() =&gt; localStorage.setItem(&quot;notes.query&quot;, state.query));
+list.motif.setDisposable(stop);</code></pre>
+</div>
+<p>The two forms give the same result: in the first, the component releases the watcher, and in the second, you hand the stop function to the component yourself.</p>
+<h2 id="dispose-methods">The dispose methods</h2>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>await this.dispose();                                 // with the leave transition; references in the subtree are cleared too
+await this.dispose({ skipLeaveTransition: true });    // without playing the leave transition
+await this.dispose({ deep: false });                  // reference cleanup in the children is skipped
+await this.disposeAsync();                            // the leave transition is not played, running animations are stopped</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>await list.dispose();                                 // with the leave transition; references in the subtree are cleared too
+await list.dispose({ skipLeaveTransition: true });    // without playing the leave transition
+await list.dispose({ deep: false });                  // reference cleanup in the children is skipped
+await list.disposeAsync();                            // the leave transition is not played, running animations are stopped</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>await this.dispose();                                 // with the leave transition; references in the subtree are cleared too
+await this.dispose({ skipLeaveTransition: true });    // without playing the leave transition
+await this.dispose({ deep: false });                  // reference cleanup in the children is skipped
+await this.disposeAsync();                            // the leave transition is not played, running animations are stopped</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>await list.dispose();                                 // with the leave transition; references in the subtree are cleared too
+await list.dispose({ skipLeaveTransition: true });    // without playing the leave transition
+await list.dispose({ deep: false });                  // reference cleanup in the children is skipped
+await list.disposeAsync();                            // the leave transition is not played, running animations are stopped</code></pre>
+</div>
+<p>For details of the options, see <a href="/docs/lifecycle#dispose">Disposal</a>. <code>isDisposed</code> tells whether the component has been disposed; calling <code>dispose()</code> again on a disposed component does nothing, and <code>motif</code> calls do not throw.</p>
+<p>Children are disposed through <code>controls</code> as well:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>this.controls.remove(child);   // removes child and disposes it
+this.controls.clear();         // disposes every child
+await this.motif.clear();      // disposes every child, resolves when all are done</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>list.controls.remove(child);   // removes child and disposes it
+list.controls.clear();         // disposes every child
+await list.motif.clear();      // disposes every child, resolves when all are done</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>this.controls.remove(child);   // removes child and disposes it
+this.controls.clear();         // disposes every child
+await this.motif.clear();      // disposes every child, resolves when all are done</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>list.controls.remove(child);   // removes child and disposes it
+list.controls.clear();         // disposes every child
+await list.motif.clear();      // disposes every child, resolves when all are done</code></pre>
+</div>
+<p><code>motif.clear()</code> does nothing if <code>motif.options.disableDisposal</code> is on; <code>controls.clear()</code> ignores this setting.</p>
+<h3 id="detach">Moving without disposing</h3>
+<p><code>remove()</code> and <code>clear()</code> dispose the child: its bindings, watchers, listeners and DOM go away. To move a component somewhere else without disposing it, or to reuse it later, use one of these three:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Collection</th>
+<th>Leave animation</th>
+<th>DOM</th>
+<th>Notification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>detach(child)</code></td>
+<td>removes</td>
+<td><strong>plays it</strong>: the element's own leave if the root is an element; if the root is a fragment, the leaves of its visible element children (nested fragments included) together</td>
+<td>removes it when the leave finishes (for a fragment root, the whole range from opening to closing; if hidden, the placeholder); synchronous if no transition is defined</td>
+<td><code>controlremoved</code> on the parent after the leave finishes and the DOM is removed</td>
+</tr>
+<tr>
+<td><code>silentDetach(child)</code></td>
+<td>removes</td>
+<td>does not play</td>
+<td>removes synchronously</td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>silentUnlink(child)</code></td>
+<td>removes</td>
+<td>does not play</td>
+<td>does not touch</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p>All three leave the component and its children alive. <code>detach</code> and <code>silentDetach</code> send <code>onDeactivated</code> to the component and its visible subtree when the DOM is removed, and <code>onActivated</code> when the component is placed again with <code>controls.add</code>; <code>silentUnlink</code> does not touch the DOM, so it sends no notification (<a href="/docs/lifecycle">Lifecycle</a>). <code>detach</code> returns a <code>Promise</code>; if there is a transition it resolves when the removal is finished, otherwise it comes back already resolved:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>await this.controls.detach(child);   // leave has played, the DOM is detached
+other.controls.add(child);           // moved to its new place</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>await list.controls.detach(child);   // leave has played, the DOM is detached
+other.controls.add(child);           // moved to its new place</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>await this.controls.detach(child);   // leave has played, the DOM is detached
+other.controls.add(child);           // moved to its new place</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>await list.controls.detach(child);   // leave has played, the DOM is detached
+other.controls.add(child);           // moved to its new place</code></pre>
+</div>
+<p>Writing <code>other.controls.add(child)</code> without waiting is safe too: <code>detach</code> from the old parent happens on its own, the collection and <code>parent</code> are updated right away, and the DOM is attached to the new parent when the leave finishes. The other ways of removing with animation are <code>motif.hide()</code> and <code>dispose()</code>.</p>
+<h2 id="disposable-store"><code>DisposableStore</code> — cleaning up a group</h2>
+<p>Several resources are collected in a <code>DisposableStore</code> and disposed together:</p>
+<div class="doc-code" data-file="src/services/sync.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/sync.ts"><code>import { DisposableStore, disposableCore } from &quot;@motifx/core&quot;;
+
+const store = new DisposableStore();
+const timer = setInterval(() =&gt; (state.now = Date.now()), 60_000);
+const tick = store.add(disposableCore.toDisposable(() =&gt; clearInterval(timer)));   // add returns what it added
+const observer = new ResizeObserver(() =&gt; autosize(area));
+store.add(disposableCore.toDisposable(() =&gt; observer.disconnect()));
+
+store.delete(tick);   // removes one and disposes it
+store.detach(tick);   // removes one, does not dispose it
+store.clear();        // disposes them all, the store stays open
+store.dispose();      // disposes them all and closes the store
+store.isDisposed;     // true</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/sync.js"><code>import { DisposableStore, disposableCore } from &quot;@motifx/core&quot;;
+
+const store = new DisposableStore();
+const timer = setInterval(() =&gt; (state.now = Date.now()), 60_000);
+const tick = store.add(disposableCore.toDisposable(() =&gt; clearInterval(timer)));   // add returns what it added
+const observer = new ResizeObserver(() =&gt; autosize(area));
+store.add(disposableCore.toDisposable(() =&gt; observer.disconnect()));
+
+store.delete(tick);   // removes one and disposes it
+store.detach(tick);   // removes one, does not dispose it
+store.clear();        // disposes them all, the store stays open
+store.dispose();      // disposes them all and closes the store
+store.isDisposed;     // true</code></pre>
+</div>
+<p>If you <code>add</code> to a store that has been closed, the added object does not enter the store and is not disposed (it leaks); in development mode an <code>MJX504</code> warning is written. If several items throw during <code>clear</code>/<code>dispose</code>, all of them are gathered in an <code>AggregateError</code> in the <code>cause</code> of a single <code>MJX503</code> error; a single error is thrown as it is.</p>
+<p>A store is tied to a component with <code>motif.register(store)</code>.</p>
+<h2 id="using-dowork">Safety after disposal: <code>using</code> and <code>doWork</code></h2>
+<p>When an async job finishes, the component may have been disposed and its fields cleared. <code>using(promise, onfulfilled?, onrejected?)</code> passes the result to the handlers only if the component is alive, and returns nothing (see <a href="/docs/using">Async Results with using</a>). <code>doWork(promise)</code> returns a promise; if the component has been disposed, a <code>MotifError</code> with the code <code>MJX108</code> arrives in place of the value or the rejection (see <a href="/docs/do-work">Async Results with doWork</a>).</p>
+<h2 id="leak-monitor">Leak tracking</h2>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useReactiveMonitor({ enabled: true, threshold: 200, name: &quot;notes&quot; });</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useReactiveMonitor({ enabled: true, threshold: 200, name: &quot;notes&quot; });</code></pre>
+</div>
+<p>When the number of effects tracking a single field of a reactive object reaches <code>threshold</code> (200 if not given), an <code>MJX507</code> warning is written; the warning also shows the most frequent setup stack. This usually means that the bindings of components that were never disposed are piling up. The warning is written only in development mode. Tracking is off by default; turn it on during development.</p>
+<h2 id="disposable-tracker">Counting live components — <code>disposableCore.disposableTracker</code></h2>
+<p>Every component is a <code>Disposable</code>: its constructor calls <code>trackDisposable</code>, and the disposal chain calls <code>markAsDisposed</code>. By attaching a tracker to <code>disposableCore.disposableTracker</code>, the number of live components is measured; it is used in round-trip tests (&quot;after building and tearing down N times, did the counter go back to where it started?&quot;):</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>import { disposableCore, ComponentBase } from &quot;@motifx/core&quot;;
+
+let alive = 0;
+disposableCore.disposableTracker = {
+  trackDisposable(x) { if (x instanceof ComponentBase) alive++; },
+  markAsDisposed(x) { if (x instanceof ComponentBase) alive--; },
+  setParent() { },
+  markAsSingleton() { },
+};</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>import { disposableCore, ComponentBase } from &quot;@motifx/core&quot;;
+
+let alive = 0;
+disposableCore.disposableTracker = {
+  trackDisposable(x) { if (x instanceof ComponentBase) alive++; },
+  markAsDisposed(x) { if (x instanceof ComponentBase) alive--; },
+  setParent() { },
+  markAsSingleton() { },
+};</code></pre>
+</div>
+<p>Next to components, the tracker also receives stores and <code>toDisposable</code> objects; the <code>instanceof</code> check in the example counts components only. <code>markAsDisposed</code> arrives once per object; it is not reported again even if <code>dispose()</code> is called again. To inspect the dependency maps of reactive objects, use <code>debugGetDeps(target)</code> and <code>debugGetDepMap()</code> from the <code>@motifx/core/devtools</code> subpath (<code>import { debugGetDeps } from &quot;@motifx/core/devtools&quot;</code>). In development mode, <code>__MOTIF_DEVTOOLS__.getCounters().components.notInTree</code> counts components that are alive but not in the tree; if it does not drop after leaving a page, those components are being held somewhere (<a href="/docs/devtools#counters">The DevTools Contract</a>).</p>
+<h2 id="best-practices">Best practices</h2>
+<ul>
+<li>The events, bindings and children a component sets up itself are released on their own; no cleanup is written for them.</li>
+<li>Every resource opened outside the component (a timer, a document or window listener, an observer, a connection) is tied to the component with <code>motif.setDisposable</code> or <code>motif.register</code>.</li>
+<li>For a reactive watcher that belongs to a component, use <code>bindings.watch</code> instead of <code>effect</code>.</li>
+<li>Handle async results with <a href="/docs/using">using</a> or <a href="/docs/do-work">doWork</a>.</li>
+<li>A component added by hand with <code>controls.add</code> is disposed together with its container; to remove it earlier, use <code>controls.remove</code>.</li>
+</ul>
+<h2 id="next">Next step</h2>
+<p>To learn how errors are thrown, reported and caught, go on to <a href="/docs/error-handling">Error Handling</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

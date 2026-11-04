@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="MotifJS bileşenleri, servisleri ya da sarmalayıcıları içeren bir npm paketi hazırlama; paket biçimi, derleme, tipler, CSS, prop sözleşmesi, test ve yayın denetimi.">
+    <title>MotifJS için npm Kütüphanesi Yayımlama — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/publishing-libraries">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/publishing-libraries">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/publishing-libraries">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/publishing-libraries">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/publishing-libraries">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="MotifJS için npm Kütüphanesi Yayımlama">
+    <meta property="og:description" content="MotifJS bileşenleri, servisleri ya da sarmalayıcıları içeren bir npm paketi hazırlama; paket biçimi, derleme, tipler, CSS, prop sözleşmesi, test ve yayın denetimi.">
+    <script type="application/json" id="doc-data">{"slug":"publishing-libraries","locale":"tr","title":"MotifJS için npm Kütüphanesi Yayımlama","description":"MotifJS bileşenleri, servisleri ya da sarmalayıcıları içeren bir npm paketi hazırlama; paket biçimi, derleme, tipler, CSS, prop sözleşmesi, test ve yayın denetimi.","category":{"id":"6","title":"Rehberler"},"html":"\u003Cp\u003EBir UI kütüphanesi, bir sarmalayıcı ya da bir servis seti yazıp başkalarının \u003Ccode\u003Enpm install\u003C/code\u003E ile kullanmasını istiyorsanız bu bölüm size göredir. Paket, uygulamanın kullandığı aynı \u003Ccode\u003E@motifx/core\u003C/code\u003E örneğine bağlanmalı, JSX\u0027i \u003Cstrong\u003Eönceden derlenmiş\u003C/strong\u003E olarak taşımalı ve tüketicinin build ayarına bir şey dayatmamalıdır. Aşağıdaki kurulum bunu sağlar.\u003C/p\u003E\n\u003Ch2 id=\u0022boundary\u0022\u003EPaketin sınırı\u003C/h2\u003E\n\u003Cp\u003Eİki tür paket vardır; ayar farkı küçüktür:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EPaket\u003C/th\u003E\n\u003Cth\u003Eİçerik\u003C/th\u003E\n\u003Cth\u003EDerleyici gerekir mi?\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Cstrong\u003EJSX\u0027siz paket\u003C/strong\u003E\u003C/td\u003E\n\u003Ctd\u003EJSX kullanmayan \u003Ccode\u003E.ts\u003C/code\u003E bileşenleri (\u003Ccode\u003Esuper(\u0027canvas\u0027)\u003C/code\u003E, \u003Ccode\u003Econtrols.add\u003C/code\u003E, \u003Ccode\u003Ebindings.*\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003EKök eleman \u003Ccode\u003Estatic elementTag\u003C/code\u003E ya da \u003Ccode\u003Esuper(...)\u003C/code\u003E ile bildiriliyor ve dekoratör kullanılmıyorsa hayır; \u003Ccode\u003Etsc\u003C/code\u003E ya da herhangi bir paketleyici yeter. Kök eleman generic\u0027ten üretilecekse derleyici eklentisi gerekir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Cstrong\u003EJSX kütüphanesi\u003C/strong\u003E (UI kit)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E.tsx\u003C/code\u003E bileşenleri\u003C/td\u003E\n\u003Ctd\u003EEvet; paket yayımlanmadan önce \u003Ccode\u003E@motifx/compiler\u003C/code\u003E ile derlenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EHer iki durumda da \u003Ccode\u003E@motifx/core\u003C/code\u003E bir \u003Cstrong\u003Epeer bağımlılıktır\u003C/strong\u003E: paket onu kendi içine almaz, tüketicinin kurduğu kopyayı kullanır. İki kopya iki reaktivite motoru demektir ve bu hata sessizdir (bkz. \u003Ca href=\u0022/docs/wrapping-libraries#single-copy\u0022\u003ETek kopya kuralı\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022package-json\u0022\u003Epackage.json\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022package.json\u0022\u003E\n\u003Cpre data-lang=\u0022jsonc\u0022 data-file=\u0022package.json\u0022\u003E\u003Ccode\u003E{\n  \u0026quot;name\u0026quot;: \u0026quot;@sirket/motif-ui\u0026quot;,\n  \u0026quot;version\u0026quot;: \u0026quot;0.1.0\u0026quot;,\n  \u0026quot;type\u0026quot;: \u0026quot;module\u0026quot;,\n  \u0026quot;sideEffects\u0026quot;: false,\n  \u0026quot;main\u0026quot;: \u0026quot;./dist/index.cjs\u0026quot;,\n  \u0026quot;module\u0026quot;: \u0026quot;./dist/index.js\u0026quot;,\n  \u0026quot;types\u0026quot;: \u0026quot;./dist/types/index.d.ts\u0026quot;,\n  \u0026quot;exports\u0026quot;: {\n    \u0026quot;.\u0026quot;: {\n      \u0026quot;types\u0026quot;: \u0026quot;./dist/types/index.d.ts\u0026quot;,\n      \u0026quot;import\u0026quot;: \u0026quot;./dist/index.js\u0026quot;,\n      \u0026quot;require\u0026quot;: \u0026quot;./dist/index.cjs\u0026quot;\n    },\n    \u0026quot;./style.css\u0026quot;: \u0026quot;./dist/style.css\u0026quot;,\n    \u0026quot;./package.json\u0026quot;: \u0026quot;./package.json\u0026quot;\n  },\n  \u0026quot;files\u0026quot;: [\u0026quot;dist\u0026quot;, \u0026quot;README.md\u0026quot;],\n  \u0026quot;scripts\u0026quot;: {\n    \u0026quot;dev\u0026quot;: \u0026quot;vite\u0026quot;,\n    \u0026quot;build\u0026quot;: \u0026quot;vite build \u0026amp;\u0026amp; tsc -p tsconfig.build.json\u0026quot;,\n    \u0026quot;typecheck\u0026quot;: \u0026quot;tsc --noEmit\u0026quot;,\n    \u0026quot;test\u0026quot;: \u0026quot;vitest run\u0026quot;,\n    \u0026quot;prepublishOnly\u0026quot;: \u0026quot;npm run build\u0026quot;\n  },\n  \u0026quot;peerDependencies\u0026quot;: {\n    \u0026quot;@motifx/core\u0026quot;: \u0026quot;^1.0.0\u0026quot;\n  },\n  \u0026quot;devDependencies\u0026quot;: {\n    \u0026quot;@motifx/core\u0026quot;: \u0026quot;^1.0.0\u0026quot;,\n    \u0026quot;@motifx/compiler\u0026quot;: \u0026quot;^1.0.0\u0026quot;,\n    \u0026quot;jsdom\u0026quot;: \u0026quot;^26.0.0\u0026quot;,\n    \u0026quot;typescript\u0026quot;: \u0026quot;^5.4.0\u0026quot;,\n    \u0026quot;vite\u0026quot;: \u0026quot;^5.4.0\u0026quot;,\n    \u0026quot;vitest\u0026quot;: \u0026quot;^3.0.0\u0026quot;\n  },\n  \u0026quot;keywords\u0026quot;: [\u0026quot;motifjs\u0026quot;, \u0026quot;motifx\u0026quot;],\n  \u0026quot;publishConfig\u0026quot;: { \u0026quot;access\u0026quot;: \u0026quot;public\u0026quot; }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003EpeerDependencies\u003C/code\u003E ile \u003Ccode\u003EdevDependencies\u003C/code\u003E\u0027te aynı \u003Ccode\u003E@motifx/core\u003C/code\u003E major\u0027ı: biri tüketiciye koşul, diğeri sizin derleme ve testiniz için.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003E@motifx/compiler\u003C/code\u003E yalnız \u003Ccode\u003EdevDependencies\u003C/code\u003E\u0027tedir; tüketici onu kurmak zorunda kalmaz çünkü paket derlenmiş kod taşır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EsideEffects: false\u003C/code\u003E tree-shaking\u0027i açar; o zaman içe aktarıldığında iş yapan modül (genel CSS enjeksiyonu, genel kayıt) \u003Cstrong\u003Ebulundurmayın\u003C/strong\u003E. Böyle bir şey gerekiyorsa açık bir fonksiyon (\u003Ccode\u003EregisterX(app)\u003C/code\u003E) olarak dışa aktarın.\u003C/li\u003E\n\u003Cli\u003ESarmaladığınız üçüncü parti kütüphane (\u003Ccode\u003Echart.js\u003C/code\u003E gibi) de peer bağımlılık olur; \u003Ccode\u003Eexternal\u003C/code\u003E listesine onu da ekleyin.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022build\u0022\u003EDerleme\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022vite.config.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022vite.config.ts\u0022\u003E\u003Ccode\u003E/// \u0026lt;reference types=\u0026quot;vitest/config\u0026quot; /\u0026gt;\nimport { fileURLToPath, URL } from \u0027node:url\u0027;\nimport { defineConfig } from \u0027vite\u0027;\nimport compiler from \u0027@motifx/compiler\u0027;\n\nexport default defineConfig({\n  plugins: [compiler()],\n  build: {\n    lib: {\n      entry: fileURLToPath(new URL(\u0027./src/index.ts\u0027, import.meta.url)),\n      formats: [\u0027es\u0027, \u0027cjs\u0027],\n      fileName: (format) =\u0026gt; (format === \u0027es\u0027 ? \u0027index.js\u0027 : \u0027index.cjs\u0027),\n    },\n    rollupOptions: {\n      external: [\u0027@motifx/core\u0027],\n    },\n    sourcemap: true,\n    minify: false,\n    target: \u0027es2020\u0027,\n  },\n  test: {\n    environment: \u0027jsdom\u0027,\n    include: [\u0027src/**/*.test.{ts,tsx}\u0027],\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022vite.config.js\u0022\u003E\u003Ccode\u003E/// \u0026lt;reference types=\u0026quot;vitest/config\u0026quot; /\u0026gt;\nimport { fileURLToPath, URL } from \u0027node:url\u0027;\nimport { defineConfig } from \u0027vite\u0027;\nimport compiler from \u0027@motifx/compiler\u0027;\n\nexport default defineConfig({\n  plugins: [compiler()],\n  build: {\n    lib: {\n      entry: fileURLToPath(new URL(\u0027./src/index.ts\u0027, import.meta.url)),\n      formats: [\u0027es\u0027, \u0027cjs\u0027],\n      fileName: (format) =\u0026gt; (format === \u0027es\u0027 ? \u0027index.js\u0027 : \u0027index.cjs\u0027),\n    },\n    rollupOptions: {\n      external: [\u0027@motifx/core\u0027],\n    },\n    sourcemap: true,\n    minify: false,\n    target: \u0027es2020\u0027,\n  },\n  test: {\n    environment: \u0027jsdom\u0027,\n    include: [\u0027src/**/*.test.{ts,tsx}\u0027],\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022tsconfig.json\u0022\u003E\n\u003Cpre data-lang=\u0022jsonc\u0022 data-file=\u0022tsconfig.json\u0022\u003E\u003Ccode\u003E{\n  \u0026quot;compilerOptions\u0026quot;: {\n    \u0026quot;target\u0026quot;: \u0026quot;ES2021\u0026quot;,\n    \u0026quot;module\u0026quot;: \u0026quot;esnext\u0026quot;,\n    \u0026quot;moduleResolution\u0026quot;: \u0026quot;bundler\u0026quot;,\n    \u0026quot;strict\u0026quot;: true,\n    \u0026quot;jsx\u0026quot;: \u0026quot;preserve\u0026quot;,\n    \u0026quot;useDefineForClassFields\u0026quot;: true,\n    \u0026quot;noImplicitOverride\u0026quot;: true,\n    \u0026quot;declaration\u0026quot;: true,\n    \u0026quot;declarationMap\u0026quot;: true,\n    \u0026quot;noEmit\u0026quot;: true,\n    \u0026quot;skipLibCheck\u0026quot;: true,\n    \u0026quot;lib\u0026quot;: [\u0026quot;ESNext\u0026quot;, \u0026quot;DOM\u0026quot;, \u0026quot;DOM.Iterable\u0026quot;]\n  },\n  \u0026quot;include\u0026quot;: [\u0026quot;./src/**/*\u0026quot;, \u0026quot;./vite.config.ts\u0026quot;]\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022tsconfig.build.json\u0022\u003E\n\u003Cpre data-lang=\u0022jsonc\u0022 data-file=\u0022tsconfig.build.json\u0022\u003E\u003Ccode\u003E{\n  \u0026quot;extends\u0026quot;: \u0026quot;./tsconfig.json\u0026quot;,\n  \u0026quot;compilerOptions\u0026quot;: {\n    \u0026quot;noEmit\u0026quot;: false,\n    \u0026quot;emitDeclarationOnly\u0026quot;: true,\n    \u0026quot;outDir\u0026quot;: \u0026quot;./dist/types\u0026quot;,\n    \u0026quot;rootDir\u0026quot;: \u0026quot;./src\u0026quot;\n  },\n  \u0026quot;include\u0026quot;: [\u0026quot;./src/**/*\u0026quot;],\n  \u0026quot;exclude\u0026quot;: [\u0026quot;./src/**/*.test.ts\u0026quot;, \u0026quot;./src/**/*.test.tsx\u0026quot;]\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ENe olur:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Evite build\u003C/code\u003E kütüphane kipinde çalışır; \u003Ccode\u003E@motifx/compiler\u003C/code\u003E her \u003Ccode\u003E.tsx\u003C/code\u003E dosyasındaki JSX\u0027i \u003Ccode\u003Ebindings.*\u003C/code\u003E çağrılarına indirger. Çıktı düz JavaScript\u0027tir, JSX kalmaz; \u003Ccode\u003E@motifx/core\u003C/code\u003E içe aktarımları (\u003Ccode\u003EmotifComponent\u003C/code\u003E, \u003Ccode\u003EmotifCompiled\u003C/code\u003E …) \u003Ccode\u003Eexternal\u003C/code\u003E olduğu için paketin dışında kalır ve tüketicinin kopyasına bağlanır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Etsc -p tsconfig.build.json\u003C/code\u003E yalnız \u003Ccode\u003E.d.ts\u003C/code\u003E üretir; derleyici tiplere dokunmaz. \u003Ccode\u003EComponent\u0026lt;HTMLDivElement\u0026gt;\u003C/code\u003E generic\u0027inden üretilen \u003Ccode\u003Estatic elementTag\u003C/code\u003E derlenmiş JS\u0027te vardır; tip tarafında görünmez, görünmesi de gerekmez.\u003C/li\u003E\n\u003Cli\u003EDerlenmiş kod bir \u003Cstrong\u003Ederleyici sözleşmesine\u003C/strong\u003E bağlıdır. Çekirdek desteklediği sözleşmeleri tanır; desteklenmeyen bir sözleşmeyle derlenmiş kodda tüketici geliştirme modunda \u003Ccode\u003EMJX121\u003C/code\u003E uyarısı görür. \u003Ccode\u003EpeerDependencies\u003C/code\u003E aralığını paketi derlediğiniz çekirdeğin major sürümüne göre (\u003Ccode\u003E^1.0.0\u003C/code\u003E) verin; çekirdeğin major sürümü yükselince paketi yeniden derleyip yayımlayın.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EnoImplicitOverride\u003C/code\u003E: bileşen sınıflarınız \u003Ccode\u003EComponentBase\u003C/code\u003E\u0027in bir üyesini (\u003Ccode\u003Edispose\u003C/code\u003E, \u003Ccode\u003Econtrols\u003C/code\u003E, \u003Ccode\u003Eprops\u003C/code\u003E, \u003Ccode\u003Eelement\u003C/code\u003E …) kazara gölgelerse derleme hatası alırsınız.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EJSX kullanmayan bir sarmalayıcıda \u003Ccode\u003Ejsx\u003C/code\u003E satırları gereksizdir. \u003Ccode\u003Eplugins: [compiler()]\u003C/code\u003E yine gerekir: \u003Ccode\u003E.ts\u003C/code\u003E dosyalarında eleman türünü generic\u0027ten üreten ve dekoratörleri dönüştüren odur. Elemanı \u003Ccode\u003Estatic elementTag\u003C/code\u003E ile kendiniz yazıyor ve dekoratör kullanmıyorsanız onu da çıkarabilirsiniz; gerisi aynıdır.\u003C/p\u003E\n\u003Ch2 id=\u0022entry\u0022\u003EGiriş noktası ve dışa aktarımlar\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/index.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/index.ts\u0022\u003E\u003Ccode\u003Eexport { Button } from \u0027./Button\u0027;\nexport { Dialog } from \u0027./Dialog\u0027;\nexport type { ButtonProps } from \u0027./Button\u0027;\nexport { registerUiServices } from \u0027./services\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/index.js\u0022\u003E\u003Ccode\u003Eexport { Button } from \u0027./Button\u0027;\nexport { Dialog } from \u0027./Dialog\u0027;\nexport { registerUiServices } from \u0027./services\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EBileşenleri ve prop tiplerini \u003Cstrong\u003Eadlı\u003C/strong\u003E dışa aktarın; \u003Ccode\u003Edefault export\u003C/code\u003E yalnız \u003Ccode\u003ELazy\u003C/code\u003E/rota tembel yüklemesine uygun tekil bileşenler için anlamlıdır.\u003C/li\u003E\n\u003Cli\u003EAğır bileşenleri (editör, grafik, harita) ayrı alt yollardan sunabilirsiniz: \u003Ccode\u003Eexports[\u0026quot;./editor\u0026quot;]\u003C/code\u003E \u002B \u003Ccode\u003Ebuild.lib.entry\u003C/code\u003E nesnesi. Tüketici \u003Ccode\u003ELazy({ caller: () =\u0026gt; import(\u0027@sirket/motif-ui/editor\u0027) })\u003C/code\u003E ile yalnız gerekeni yükler (bkz. \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022prop-contract\u0022\u003EProp sözleşmesi\u003C/h2\u003E\n\u003Cp\u003EPaketin bileşenleri başkalarının kodunda kullanılacak; derleyicinin kurallarına uyan bir prop yüzeyi tanımlayın:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport class Button extends Component\u0026lt;HTMLButtonElement, ButtonProps\u0026gt; {\n  override onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  override view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(this.props.label)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/Button.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport class Button extends Component\u0026lt;HTMLButtonElement, ButtonProps\u0026gt; {\n  static override elementTag = \u0026quot;button\u0026quot;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; read(this.props.label)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\u003Ccode\u003Eimport { read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport function Button(props: ButtonProps) {\n  return (\n    \u0026lt;button\n      type=\u0026quot;button\u0026quot;\n      class={() =\u0026gt; \u0060mf-button mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060}\n      disabled={() =\u0026gt; read(props.disabled) ?? false}\n      onclick={(e) =\u0026gt; props.onPress?.(e)}\n    \u0026gt;\n      {() =\u0026gt; read(props.label)}\n    \u0026lt;/button\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/Button.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport function Button(props: ButtonProps) {\n  return motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    button.motif.on(\u0026quot;click\u0026quot;, (_button: ComponentBase, e: MouseEvent) =\u0026gt; props.onPress?.(e));\n    button.bindings.text(() =\u0026gt; read(props.label));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/Button.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport const Button = (props: ButtonProps) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(props.label)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/Button.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, read, type Bind } from \u0026quot;@motifx/core\u0026quot;;\n\nexport interface ButtonProps {\n  label: Bind\u0026lt;string\u0026gt;;\n  tone?: Bind\u0026lt;\u0026quot;default\u0026quot; | \u0026quot;accent\u0026quot; | \u0026quot;danger\u0026quot;\u0026gt;;\n  disabled?: Bind\u0026lt;boolean\u0026gt;;\n  onPress?: (e: MouseEvent) =\u0026gt; void;\n}\n\nexport const Button = (props: ButtonProps) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e: MouseEvent) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; read(props.label)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/Button.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class Button extends Component {\n  static elementTag = \u0026quot;button\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(this.props.label)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/Button.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class Button extends Component {\n  static elementTag = \u0026quot;button\u0026quot;;\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(this.props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(this.props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; this.props.onPress?.(e));\n  }\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; read(this.props.label)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/Button.jsx\u0022\u003E\u003Ccode\u003Eimport { read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function Button(props) {\n  return (\n    \u0026lt;button\n      type=\u0026quot;button\u0026quot;\n      class={() =\u0026gt; \u0060mf-button mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060}\n      disabled={() =\u0026gt; read(props.disabled) ?? false}\n      onclick={(e) =\u0026gt; props.onPress?.(e)}\n    \u0026gt;\n      {() =\u0026gt; read(props.label)}\n    \u0026lt;/button\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/Button.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function Button(props) {\n  return motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    button.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    button.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; props.onPress?.(e));\n    button.bindings.text(() =\u0026gt; read(props.label));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/Button.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const Button = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; read(props.label)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/Button.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, read } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const Button = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n\n  onConfigured() {\n    this.class.add(\u0026quot;mf-button\u0026quot;, () =\u0026gt; \u0060mf-button--${read(props.tone) ?? \u0026quot;default\u0026quot;}\u0060);\n    this.attr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; read(props.disabled) ?? false });\n    this.motif.on(\u0026quot;click\u0026quot;, (_button, e) =\u0026gt; props.onPress?.(e));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; read(props.label)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ETüketici bileşeni kendi yazımıyla kullanır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;Yeni not\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; this.create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;Yeni not\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst newNote = new Button({ label: \u0026quot;Yeni not\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;Yeni not\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;Yeni not\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;Yeni not\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; this.create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Button label=\u0026quot;Yeni not\u0026quot; tone=\u0026quot;accent\u0026quot; onPress={() =\u0026gt; create()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst newNote = new Button({ label: \u0026quot;Yeni not\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;Yeni not\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; this.create() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst newNote = motifComponent(Button, { label: \u0026quot;Yeni not\u0026quot;, tone: \u0026quot;accent\u0026quot;, onPress: () =\u0026gt; create() });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Ecreate\u003C/code\u003E, düzen fonksiyonunun içindeki yerel fonksiyondur.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class\u0022\u003E\n\u003Cp\u003ESınıfta \u003Ccode\u003Eview()\u003C/code\u003E kökü değil içeriği döndürür. Kök eleman generic\u0027ten (\u003Ccode\u003EComponent\u0026lt;HTMLButtonElement\u0026gt;\u003C/code\u003E), \u003Ccode\u003Estatic elementTag\u003C/code\u003E\u0027den ya da \u003Ccode\u003Esuper(\u0026quot;button\u0026quot;)\u003C/code\u003E çağrısından gelir; kökün sınıfı, öznitelikleri ve olayları \u003Ccode\u003EonConfigured\u003C/code\u003E\u0027da bağlanır. \u003Ccode\u003Eview()\u003C/code\u003E içinde yeniden \u003Ccode\u003E\u0026lt;button\u0026gt;\u003C/code\u003E yazmak iç içe iki eleman üretir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022options\u0022\u003E\n\u003Cp\u003EOptions\u0027ta \u003Ccode\u003Eview()\u003C/code\u003E kökü değil içeriği döndürür. Kök eleman \u003Ccode\u003Eel\u003C/code\u003E alanıdır; kökün sınıfı, öznitelikleri ve olayları \u003Ccode\u003EonConfigured\u003C/code\u003E\u0027da bağlanır. \u003Ccode\u003Eview()\u003C/code\u003E içinde yeniden \u003Ccode\u003E\u0026lt;button\u0026gt;\u003C/code\u003E yazmak iç içe iki eleman üretir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde döndürülen eleman köktür; sınıf, öznitelik ve olaylar doğrudan onun üzerine yazılır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EKurallar:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EDeğişebilen her prop \u003Ccode\u003EBind\u0026lt;T\u0026gt;\u003C/code\u003E\u0027dir\u003C/strong\u003E ve \u003Ccode\u003Eread()\u003C/code\u003E ile okunur. Tüketici \u003Ccode\u003Elabel=\u0026quot;Kaydet\u0026quot;\u003C/code\u003E de yazabilir, \u003Ccode\u003Elabel={() =\u0026gt; state.text}\u003C/code\u003E de; derleyici öznitelikteki üçlü operatörü zaten getter\u0027a sarar (bkz. \u003Ca href=\u0022/docs/jsx#attribute-ternary\u0022\u003EÖzniteliklerde ternary\u003C/a\u003E). Prop \u003Ccode\u003Eread()\u003C/code\u003E olmadan okunursa getter biçimi çalışmaz.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EOrtak öznitelikler köke düşer.\u003C/strong\u003E \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Etabindex\u003C/code\u003E, \u003Ccode\u003Erole\u003C/code\u003E, \u003Ccode\u003Earia-*\u003C/code\u003E, \u003Ccode\u003Edata-*\u003C/code\u003E bileşen etiketinden kök elemana otomatik uygulanır; bunları prop olarak tanımlayıp elle kopyalamayın (bkz. \u003Ca href=\u0022/docs/jsx#attribute-fallthrough\u0022\u003EAttribute fallthrough\u003C/a\u003E). Kökün kendi \u003Ccode\u003Eclass\u003C/code\u003E\u0027ı tüketicininkiyle birleşir.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EAyrılmış adları kullanmayın:\u003C/strong\u003E \u003Ccode\u003Eoptions\u003C/code\u003E, \u003Ccode\u003Eref\u003C/code\u003E, \u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Etransition\u003C/code\u003E, \u003Ccode\u003Echilds\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E ve yaşam döngüsü kancalarının adları (\u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E …) çerçeveye gider (bkz. \u003Ca href=\u0022/docs/wrapping-libraries#prop-names\u0022\u003EProp adlarında dikkat\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EDOM olay adıyla çakışan geri çağrı adı vermeyin.\u003C/strong\u003E \u003Ccode\u003EonChange\u003C/code\u003E, \u003Ccode\u003EonSelect\u003C/code\u003E, \u003Ccode\u003EonResize\u003C/code\u003E, \u003Ccode\u003EonReset\u003C/code\u003E, \u003Ccode\u003EonCopy\u003C/code\u003E, \u003Ccode\u003EonContextMenu\u003C/code\u003E gibi bir prop bileşen etiketinde kök elemana DOM dinleyicisi olarak bağlanır ve prop\u0027lara hiç ulaşmaz; derleyici \u003Ccode\u003EMJX002\u003C/code\u003E ile uyarır. \u003Ccode\u003EonPress\u003C/code\u003E, \u003Ccode\u003EonValueChange\u003C/code\u003E, \u003Ccode\u003EonCommit\u003C/code\u003E gibi adlar güvenlidir.\u003C/li\u003E\n\u003Cli\u003ETüketicinin bileşen örneğine \u003Ccode\u003Eref\u003C/code\u003E ile ulaşacağını varsayın; dışa açmak istediğiniz davranışı bir metot olarak verin (\u003Ccode\u003Edialog.open()\u003C/code\u003E), iç alanları kapalı tutun.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class\u0022\u003E\n\u003Cp\u003EÇocuk içerik \u003Ccode\u003Echilds\u003C/code\u003E ile gelir; kök elemanı generic ya da \u003Ccode\u003Estatic elementTag\u003C/code\u003E ile bildirilmiş ve \u003Ccode\u003Eview()\u003C/code\u003E yazmamış bir sınıfta \u003Ccode\u003E\u0026lt;Card\u0026gt;…\u0026lt;/Card\u0026gt;\u003C/code\u003E biçimi doğrudan çalışır. Kökü \u003Ccode\u003Esuper(\u0026quot;div\u0026quot;, props)\u003C/code\u003E ile kuran sınıfta çocukları siz yerleştirirsiniz (bkz. \u003Ca href=\u0022/docs/component-props#childs\u0022\u003EÇocuk bileşenler\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EÇocuk içerik \u003Ccode\u003Eprops.childs\u003C/code\u003E ile gelir ve döndürülen kökün içine yerleştirilir (bkz. \u003Ca href=\u0022/docs/component-props#childs\u0022\u003EÇocuk bileşenler\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022options\u0022\u003E\n\u003Cp\u003EÇocuk içerik \u003Ccode\u003Echilds\u003C/code\u003E ile gelir; \u003Ccode\u003Eview()\u003C/code\u003E yazmayan bir Options bileşeninde \u003Ccode\u003E\u0026lt;Card\u0026gt;…\u0026lt;/Card\u0026gt;\u003C/code\u003E biçimi doğrudan çalışır, çocuklar \u003Ccode\u003Eel\u003C/code\u003E elemanına eklenir. \u003Ccode\u003Eview()\u003C/code\u003E yazan Options onları \u003Ccode\u003Ethis.childs\u003C/code\u003E ile kendisi yerleştirir (bkz. \u003Ca href=\u0022/docs/component-props#childs\u0022\u003EÇocuk bileşenler\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022css\u0022\u003EStil ve CSS\u003C/h2\u003E\n\u003Cp\u003EPaket CSS\u0027ini \u003Cstrong\u003Etek bir dosya\u003C/strong\u003E olarak sunun ve tüketici onu bilinçli olarak içe aktarsın:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003E// tüketici\nimport \u0027@sirket/motif-ui/style.css\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003E// tüketici\nimport \u0027@sirket/motif-ui/style.css\u0027;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EKütüphane kipinde \u003Ccode\u003Esrc/index.ts\u003C/code\u003E içinden içe aktarılan CSS Vite 5\u0027te \u003Ccode\u003Edist/style.css\u003C/code\u003E olarak yazılır (Vite 6\u0027da adı \u003Ccode\u003Ebuild.lib.cssFileName: \u0027style\u0027\u003C/code\u003E ile verin); \u003Ccode\u003Eexports[\u0026quot;./style.css\u0026quot;]\u003C/code\u003E onu adreslenebilir yapar. Girişten içe aktarmak \u003Ccode\u003EsideEffects: false\u003C/code\u003E ile çelişmez: CSS dosyaları paketleyici tarafından yan etkili sayılır.\u003C/li\u003E\n\u003Cli\u003EKuralları bir \u003Ccode\u003E@layer\u003C/code\u003E içine koyun (\u003Ccode\u003E@layer mf.base, mf.components;\u003C/code\u003E). Katmansız kurallar bütün katmanları özgüllükten bağımsız ezdiği için tüketicinin tek satırlık bir ezmesi daima kazanır; tema değerlerini \u003Ccode\u003E--mf-*\u003C/code\u003E gibi önekli CSS değişkenleriyle verin.\u003C/li\u003E\n\u003Cli\u003EBileşen içinde \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E etiketi (bkz. \u003Ca href=\u0022/docs/styling-and-transitions#inline-style-tag\u0022\u003ESatır içi style\u003C/a\u003E) küçük, kendine yeten bileşenlerde işe yarar ama her örnekte bir \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E düğümü üretir ve kapsamlı değildir; kütüphane ölçeğinde dosya tercih edin.\u003C/li\u003E\n\u003Cli\u003EGeçişler için sınıf adlarını belgeleyin: \u003Ccode\u003Etransition=\u0026quot;mf-fade\u0026quot;\u003C/code\u003E yazan tüketici \u003Ccode\u003Emf-fade-enter-from/active/to\u003C/code\u003E kurallarını sizden bekler (bkz. \u003Ca href=\u0022/docs/styling-and-transitions#transition-prop\u0022\u003EGeçiş prop\u0027u\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022services\u0022\u003EServisler\u003C/h2\u003E\n\u003Cp\u003EPaket bir servis (tema, bildirim kuyruğu, dil) taşıyorsa \u003Ccode\u003E@Injectable\u003C/code\u003E ile işaretleyin; sınıf modülü yüklendiği anda işaretlenir ve uygulama \u003Ccode\u003Ebuild()\u003C/code\u003E edilirken kaydedilir. Modülü \u003Ccode\u003Ebuild()\u003C/code\u003E\u0027den sonra yüklenen sınıf ilk çözümlemede kaydedilir (bkz. \u003Ca href=\u0022/docs/service-registration#injectable-decorator\u0022\u003EDekoratörlerle otomatik kayıt\u003C/a\u003E). Derleyici eklentisi dekoratörleri \u003Ccode\u003E.ts\u003C/code\u003E dosyalarında da derler; eklentisiz bir sarmalayıcıda TypeScript standart dekoratörü kendisi derler.\u003C/p\u003E\n\u003Cp\u003ETüketicinin yaşam süresini seçmesi gerekiyorsa açık bir kayıt fonksiyonu daha nettir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services.ts\u0022\u003E\u003Ccode\u003Eimport { ServiceCollection } from \u0027@motifx/core\u0027;\nimport { ThemeService } from \u0027./ThemeService\u0027;\n\nexport function registerUiServices(services: ServiceCollection) {\n  services.addSingleton(ThemeService, ThemeService);\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services.js\u0022\u003E\u003Ccode\u003Eimport { ThemeService } from \u0027./ThemeService\u0027;\n\nexport function registerUiServices(services) {\n  services.addSingleton(ThemeService, ThemeService);\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003E// tüketici\nconst builder = Application.CreateBuilder();\nregisterUiServices(builder.services);\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003E// tüketici\nconst builder = Application.CreateBuilder();\nregisterUiServices(builder.services);\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EAçık kayıt dekoratörü ezer; ikisini birlikte vermek güvenlidir.\u003C/p\u003E\n\u003Ch2 id=\u0022testing\u0022\u003ETest ve geliştirme\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Evitest\u003C/code\u003E \u002B \u003Ccode\u003Ejsdom\u003C/code\u003E, \u003Ccode\u003Evite.config.ts\u003C/code\u003E\u0027teki aynı eklentiyle çalışır; testlerde JSX için ek ayar gerekmez. \u003Ccode\u003Edocument\u003C/code\u003E\u0027a ekleyip \u003Ccode\u003EonMounted\u003C/code\u003E davranışını da sınayın.\u003C/li\u003E\n\u003Cli\u003EHer bileşen için bir \u003Cstrong\u003Etur testi\u003C/strong\u003E yazın: kur, DOM\u0027a ekle, \u003Ccode\u003Edispose()\u003C/code\u003E, canlı bileşen sayısının başa döndüğünü doğrulayın (bkz. \u003Ca href=\u0022/docs/wrapping-libraries#prove-cleanup\u0022\u003ETemizliği kanıtlayın\u003C/a\u003E). Sızıntı ancak böyle görülür.\u003C/li\u003E\n\u003Cli\u003EGeliştirme için paketin köküne bir \u003Ccode\u003Eindex.html\u003C/code\u003E ve \u003Ccode\u003Esrc/showcase/\u003C/code\u003E koyun; \u003Ccode\u003Evite\u003C/code\u003E ile bileşenleri gerçek tarayıcıda görün. Vitrin, \u003Ccode\u003Eexports\u003C/code\u003E dışında kaldığı için pakete girmez.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Emotif-lint\u003C/code\u003E (\u003Ccode\u003E@motifx/compiler\u003C/code\u003E ile gelir) prop tiplerine karşı JSX\u0027i denetler; \u003Ccode\u003Epackage.json\u003C/code\u003E\u0027a \u003Ccode\u003E\u0026quot;lint:jsx\u0026quot;: \u0026quot;motif-lint\u0026quot;\u003C/code\u003E ekleyin (bkz. \u003Ca href=\u0022/docs/jsx#motif-lint\u0022\u003Emotif-lint\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022release-checklist\u0022\u003EYayın öncesi denetim\u003C/h2\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Ccode\u003Enpm run build\u003C/code\u003E → \u003Ccode\u003Edist/index.js\u003C/code\u003E, \u003Ccode\u003Edist/index.cjs\u003C/code\u003E, \u003Ccode\u003Edist/types/index.d.ts\u003C/code\u003E, \u003Ccode\u003Edist/style.css\u003C/code\u003E oluştu mu?\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Edist/index.js\u003C/code\u003E içinde \u003Ccode\u003Ejsx(\u003C/code\u003E/\u003Ccode\u003EcreateElement(\u003C/code\u003E yok, \u003Ccode\u003Efrom \u0026quot;@motifx/core\u0026quot;\u003C/code\u003E var mı? (Derleyici çalıştı ve çekirdek dışarıda kaldı.)\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Enpx publint\u003C/code\u003E ve \u003Ccode\u003Enpx @arethetypeswrong/cli --pack\u003C/code\u003E: \u003Ccode\u003Eexports\u003C/code\u003E/\u003Ccode\u003Etypes\u003C/code\u003E tutarlı mı, CJS tüketici tipleri görüyor mu?\u003C/li\u003E\n\u003Cli\u003EBoş bir Vite uygulamasında \u003Ccode\u003Enpm pack\u003C/code\u003E çıktısını kurup bir bileşeni kullanın; \u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E ile \u003Ccode\u003EMJX121\u003C/code\u003E ya da \u003Ccode\u003EMJX002\u003C/code\u003E uyarısı çıkmadığını görün.\u003C/li\u003E\n\u003Cli\u003EMonorepo\u0027da \u003Ccode\u003Efile:\u003C/code\u003E/\u003Ccode\u003Elink:\u003C/code\u003E ile bağlı test ederken tüketicide \u003Ccode\u003Eresolve: { dedupe: [\u0027@motifx/core\u0027] }\u003C/code\u003E verin; yayımlanan pakette bu gerekmez.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EREADME\u003C/code\u003E\u0027de peer bağımlılıkları, \u003Ccode\u003Estyle.css\u003C/code\u003E içe aktarımını, prop tablosunu ve geçiş sınıf adlarını yazın.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EPaket geliştirirken bileşen ağacını, reaktiviteyi ve sayaçları incelemek için \u003Ca href=\u0022/docs/devtools\u0022\u003EDevTools sözleşmesi\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"boundary","text":"Paketin sınırı","level":2},{"id":"package-json","text":"package.json","level":2},{"id":"build","text":"Derleme","level":2},{"id":"entry","text":"Giriş noktası ve dışa aktarımlar","level":2},{"id":"prop-contract","text":"Prop sözleşmesi","level":2},{"id":"css","text":"Stil ve CSS","level":2},{"id":"services","text":"Servisler","level":2},{"id":"testing","text":"Test ve geliştirme","level":2},{"id":"release-checklist","text":"Yayın öncesi denetim","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"wrapping-libraries","title":"Üçüncü Parti Kütüphane Sarmalama"},"next":{"slug":"devtools","title":"DevTools sözleşmesi"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Rehberler</p>
+        <h1>MotifJS için npm Kütüphanesi Yayımlama</h1>
+        <p>MotifJS bileşenleri, servisleri ya da sarmalayıcıları içeren bir npm paketi hazırlama; paket biçimi, derleme, tipler, CSS, prop sözleşmesi, test ve yayın denetimi.</p>
+<p>Bir UI kütüphanesi, bir sarmalayıcı ya da bir servis seti yazıp başkalarının <code>npm install</code> ile kullanmasını istiyorsanız bu bölüm size göredir. Paket, uygulamanın kullandığı aynı <code>@motifx/core</code> örneğine bağlanmalı, JSX'i <strong>önceden derlenmiş</strong> olarak taşımalı ve tüketicinin build ayarına bir şey dayatmamalıdır. Aşağıdaki kurulum bunu sağlar.</p>
+<h2 id="boundary">Paketin sınırı</h2>
+<p>İki tür paket vardır; ayar farkı küçüktür:</p>
+<table>
+<thead>
+<tr>
+<th>Paket</th>
+<th>İçerik</th>
+<th>Derleyici gerekir mi?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JSX'siz paket</strong></td>
+<td>JSX kullanmayan <code>.ts</code> bileşenleri (<code>super('canvas')</code>, <code>controls.add</code>, <code>bindings.*</code>)</td>
+<td>Kök eleman <code>static elementTag</code> ya da <code>super(...)</code> ile bildiriliyor ve dekoratör kullanılmıyorsa hayır; <code>tsc</code> ya da herhangi bir paketleyici yeter. Kök eleman generic'ten üretilecekse derleyici eklentisi gerekir.</td>
+</tr>
+<tr>
+<td><strong>JSX kütüphanesi</strong> (UI kit)</td>
+<td><code>.tsx</code> bileşenleri</td>
+<td>Evet; paket yayımlanmadan önce <code>@motifx/compiler</code> ile derlenir.</td>
+</tr>
+</tbody>
+</table>
+<p>Her iki durumda da <code>@motifx/core</code> bir <strong>peer bağımlılıktır</strong>: paket onu kendi içine almaz, tüketicinin kurduğu kopyayı kullanır. İki kopya iki reaktivite motoru demektir ve bu hata sessizdir (bkz. <a href="/tr/docs/wrapping-libraries#single-copy">Tek kopya kuralı</a>).</p>
+<h2 id="package-json">package.json</h2>
+<div class="doc-code" data-file="package.json">
+<pre data-lang="jsonc" data-file="package.json"><code>{
+  &quot;name&quot;: &quot;@sirket/motif-ui&quot;,
+  &quot;version&quot;: &quot;0.1.0&quot;,
+  &quot;type&quot;: &quot;module&quot;,
+  &quot;sideEffects&quot;: false,
+  &quot;main&quot;: &quot;./dist/index.cjs&quot;,
+  &quot;module&quot;: &quot;./dist/index.js&quot;,
+  &quot;types&quot;: &quot;./dist/types/index.d.ts&quot;,
+  &quot;exports&quot;: {
+    &quot;.&quot;: {
+      &quot;types&quot;: &quot;./dist/types/index.d.ts&quot;,
+      &quot;import&quot;: &quot;./dist/index.js&quot;,
+      &quot;require&quot;: &quot;./dist/index.cjs&quot;
+    },
+    &quot;./style.css&quot;: &quot;./dist/style.css&quot;,
+    &quot;./package.json&quot;: &quot;./package.json&quot;
+  },
+  &quot;files&quot;: [&quot;dist&quot;, &quot;README.md&quot;],
+  &quot;scripts&quot;: {
+    &quot;dev&quot;: &quot;vite&quot;,
+    &quot;build&quot;: &quot;vite build &amp;&amp; tsc -p tsconfig.build.json&quot;,
+    &quot;typecheck&quot;: &quot;tsc --noEmit&quot;,
+    &quot;test&quot;: &quot;vitest run&quot;,
+    &quot;prepublishOnly&quot;: &quot;npm run build&quot;
+  },
+  &quot;peerDependencies&quot;: {
+    &quot;@motifx/core&quot;: &quot;^1.0.0&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;@motifx/core&quot;: &quot;^1.0.0&quot;,
+    &quot;@motifx/compiler&quot;: &quot;^1.0.0&quot;,
+    &quot;jsdom&quot;: &quot;^26.0.0&quot;,
+    &quot;typescript&quot;: &quot;^5.4.0&quot;,
+    &quot;vite&quot;: &quot;^5.4.0&quot;,
+    &quot;vitest&quot;: &quot;^3.0.0&quot;
+  },
+  &quot;keywords&quot;: [&quot;motifjs&quot;, &quot;motifx&quot;],
+  &quot;publishConfig&quot;: { &quot;access&quot;: &quot;public&quot; }
+}</code></pre>
+</div>
+<ul>
+<li><code>peerDependencies</code> ile <code>devDependencies</code>'te aynı <code>@motifx/core</code> major'ı: biri tüketiciye koşul, diğeri sizin derleme ve testiniz için.</li>
+<li><code>@motifx/compiler</code> yalnız <code>devDependencies</code>'tedir; tüketici onu kurmak zorunda kalmaz çünkü paket derlenmiş kod taşır.</li>
+<li><code>sideEffects: false</code> tree-shaking'i açar; o zaman içe aktarıldığında iş yapan modül (genel CSS enjeksiyonu, genel kayıt) <strong>bulundurmayın</strong>. Böyle bir şey gerekiyorsa açık bir fonksiyon (<code>registerX(app)</code>) olarak dışa aktarın.</li>
+<li>Sarmaladığınız üçüncü parti kütüphane (<code>chart.js</code> gibi) de peer bağımlılık olur; <code>external</code> listesine onu da ekleyin.</li>
+</ul>
+<h2 id="build">Derleme</h2>
+<div class="doc-code" data-file="vite.config.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="vite.config.ts"><code>/// &lt;reference types=&quot;vitest/config&quot; /&gt;
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
+import compiler from '@motifx/compiler';
+
+export default defineConfig({
+  plugins: [compiler()],
+  build: {
+    lib: {
+      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      formats: ['es', 'cjs'],
+      fileName: (format) =&gt; (format === 'es' ? 'index.js' : 'index.cjs'),
+    },
+    rollupOptions: {
+      external: ['@motifx/core'],
+    },
+    sourcemap: true,
+    minify: false,
+    target: 'es2020',
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.{ts,tsx}'],
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="vite.config.js"><code>/// &lt;reference types=&quot;vitest/config&quot; /&gt;
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite';
+import compiler from '@motifx/compiler';
+
+export default defineConfig({
+  plugins: [compiler()],
+  build: {
+    lib: {
+      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      formats: ['es', 'cjs'],
+      fileName: (format) =&gt; (format === 'es' ? 'index.js' : 'index.cjs'),
+    },
+    rollupOptions: {
+      external: ['@motifx/core'],
+    },
+    sourcemap: true,
+    minify: false,
+    target: 'es2020',
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.{ts,tsx}'],
+  },
+});</code></pre>
+</div>
+<div class="doc-code" data-file="tsconfig.json">
+<pre data-lang="jsonc" data-file="tsconfig.json"><code>{
+  &quot;compilerOptions&quot;: {
+    &quot;target&quot;: &quot;ES2021&quot;,
+    &quot;module&quot;: &quot;esnext&quot;,
+    &quot;moduleResolution&quot;: &quot;bundler&quot;,
+    &quot;strict&quot;: true,
+    &quot;jsx&quot;: &quot;preserve&quot;,
+    &quot;useDefineForClassFields&quot;: true,
+    &quot;noImplicitOverride&quot;: true,
+    &quot;declaration&quot;: true,
+    &quot;declarationMap&quot;: true,
+    &quot;noEmit&quot;: true,
+    &quot;skipLibCheck&quot;: true,
+    &quot;lib&quot;: [&quot;ESNext&quot;, &quot;DOM&quot;, &quot;DOM.Iterable&quot;]
+  },
+  &quot;include&quot;: [&quot;./src/**/*&quot;, &quot;./vite.config.ts&quot;]
+}</code></pre>
+</div>
+<div class="doc-code" data-file="tsconfig.build.json">
+<pre data-lang="jsonc" data-file="tsconfig.build.json"><code>{
+  &quot;extends&quot;: &quot;./tsconfig.json&quot;,
+  &quot;compilerOptions&quot;: {
+    &quot;noEmit&quot;: false,
+    &quot;emitDeclarationOnly&quot;: true,
+    &quot;outDir&quot;: &quot;./dist/types&quot;,
+    &quot;rootDir&quot;: &quot;./src&quot;
+  },
+  &quot;include&quot;: [&quot;./src/**/*&quot;],
+  &quot;exclude&quot;: [&quot;./src/**/*.test.ts&quot;, &quot;./src/**/*.test.tsx&quot;]
+}</code></pre>
+</div>
+<p>Ne olur:</p>
+<ul>
+<li><code>vite build</code> kütüphane kipinde çalışır; <code>@motifx/compiler</code> her <code>.tsx</code> dosyasındaki JSX'i <code>bindings.*</code> çağrılarına indirger. Çıktı düz JavaScript'tir, JSX kalmaz; <code>@motifx/core</code> içe aktarımları (<code>motifComponent</code>, <code>motifCompiled</code> …) <code>external</code> olduğu için paketin dışında kalır ve tüketicinin kopyasına bağlanır.</li>
+<li><code>tsc -p tsconfig.build.json</code> yalnız <code>.d.ts</code> üretir; derleyici tiplere dokunmaz. <code>Component&lt;HTMLDivElement&gt;</code> generic'inden üretilen <code>static elementTag</code> derlenmiş JS'te vardır; tip tarafında görünmez, görünmesi de gerekmez.</li>
+<li>Derlenmiş kod bir <strong>derleyici sözleşmesine</strong> bağlıdır. Çekirdek desteklediği sözleşmeleri tanır; desteklenmeyen bir sözleşmeyle derlenmiş kodda tüketici geliştirme modunda <code>MJX121</code> uyarısı görür. <code>peerDependencies</code> aralığını paketi derlediğiniz çekirdeğin major sürümüne göre (<code>^1.0.0</code>) verin; çekirdeğin major sürümü yükselince paketi yeniden derleyip yayımlayın.</li>
+<li><code>noImplicitOverride</code>: bileşen sınıflarınız <code>ComponentBase</code>'in bir üyesini (<code>dispose</code>, <code>controls</code>, <code>props</code>, <code>element</code> …) kazara gölgelerse derleme hatası alırsınız.</li>
+</ul>
+<p>JSX kullanmayan bir sarmalayıcıda <code>jsx</code> satırları gereksizdir. <code>plugins: [compiler()]</code> yine gerekir: <code>.ts</code> dosyalarında eleman türünü generic'ten üreten ve dekoratörleri dönüştüren odur. Elemanı <code>static elementTag</code> ile kendiniz yazıyor ve dekoratör kullanmıyorsanız onu da çıkarabilirsiniz; gerisi aynıdır.</p>
+<h2 id="entry">Giriş noktası ve dışa aktarımlar</h2>
+<div class="doc-code" data-file="src/index.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/index.ts"><code>export { Button } from './Button';
+export { Dialog } from './Dialog';
+export type { ButtonProps } from './Button';
+export { registerUiServices } from './services';</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/index.js"><code>export { Button } from './Button';
+export { Dialog } from './Dialog';
+export { registerUiServices } from './services';</code></pre>
+</div>
+<ul>
+<li>Bileşenleri ve prop tiplerini <strong>adlı</strong> dışa aktarın; <code>default export</code> yalnız <code>Lazy</code>/rota tembel yüklemesine uygun tekil bileşenler için anlamlıdır.</li>
+<li>Ağır bileşenleri (editör, grafik, harita) ayrı alt yollardan sunabilirsiniz: <code>exports[&quot;./editor&quot;]</code> + <code>build.lib.entry</code> nesnesi. Tüketici <code>Lazy({ caller: () =&gt; import('@sirket/motif-ui/editor') })</code> ile yalnız gerekeni yükler (bkz. <a href="/tr/docs/lazy">Lazy</a>).</li>
+</ul>
+<h2 id="prop-contract">Prop sözleşmesi</h2>
+<p>Paketin bileşenleri başkalarının kodunda kullanılacak; derleyicinin kurallarına uyan bir prop yüzeyi tanımlayın:</p>
+<div class="doc-code" data-file="src/Button.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/Button.tsx"><code>import { Component, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export class Button extends Component&lt;HTMLButtonElement, ButtonProps&gt; {
+  override onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; this.props.onPress?.(e));
+  }
+
+  override view() {
+    return &lt;&gt;{() =&gt; read(this.props.label)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/Button.ts"><code>import { Component, ComponentBase, motifComponent, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export class Button extends Component&lt;HTMLButtonElement, ButtonProps&gt; {
+  static override elementTag = &quot;button&quot;;
+
+  override onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; this.props.onPress?.(e));
+  }
+
+  override view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; read(this.props.label)));
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/Button.tsx"><code>import { read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export function Button(props: ButtonProps) {
+  return (
+    &lt;button
+      type=&quot;button&quot;
+      class={() =&gt; `mf-button mf-button--${read(props.tone) ?? &quot;default&quot;}`}
+      disabled={() =&gt; read(props.disabled) ?? false}
+      onclick={(e) =&gt; props.onPress?.(e)}
+    &gt;
+      {() =&gt; read(props.label)}
+    &lt;/button&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/Button.ts"><code>import { ComponentBase, motifComponent, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export function Button(props: ButtonProps) {
+  return motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    button.motif.on(&quot;click&quot;, (_button: ComponentBase, e: MouseEvent) =&gt; props.onPress?.(e));
+    button.bindings.text(() =&gt; read(props.label));
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/Button.tsx"><code>import { motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export const Button = (props: ButtonProps) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; read(props.label)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/Button.ts"><code>import { ComponentBase, motifComponent, motifOptions, read, type Bind } from &quot;@motifx/core&quot;;
+
+export interface ButtonProps {
+  label: Bind&lt;string&gt;;
+  tone?: Bind&lt;&quot;default&quot; | &quot;accent&quot; | &quot;danger&quot;&gt;;
+  disabled?: Bind&lt;boolean&gt;;
+  onPress?: (e: MouseEvent) =&gt; void;
+}
+
+export const Button = (props: ButtonProps) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e: MouseEvent) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; read(props.label)));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/Button.jsx"><code>import { Component, read } from &quot;@motifx/core&quot;;
+
+export class Button extends Component {
+  static elementTag = &quot;button&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; this.props.onPress?.(e));
+  }
+
+  view() {
+    return &lt;&gt;{() =&gt; read(this.props.label)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/Button.js"><code>import { Component, motifComponent, read } from &quot;@motifx/core&quot;;
+
+export class Button extends Component {
+  static elementTag = &quot;button&quot;;
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(this.props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(this.props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; this.props.onPress?.(e));
+  }
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; read(this.props.label)));
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/Button.jsx"><code>import { read } from &quot;@motifx/core&quot;;
+
+export function Button(props) {
+  return (
+    &lt;button
+      type=&quot;button&quot;
+      class={() =&gt; `mf-button mf-button--${read(props.tone) ?? &quot;default&quot;}`}
+      disabled={() =&gt; read(props.disabled) ?? false}
+      onclick={(e) =&gt; props.onPress?.(e)}
+    &gt;
+      {() =&gt; read(props.label)}
+    &lt;/button&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/Button.js"><code>import { motifComponent, read } from &quot;@motifx/core&quot;;
+
+export function Button(props) {
+  return motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    button.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    button.motif.on(&quot;click&quot;, (_button, e) =&gt; props.onPress?.(e));
+    button.bindings.text(() =&gt; read(props.label));
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/Button.jsx"><code>import { motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const Button = (props) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; read(props.label)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/Button.js"><code>import { motifComponent, motifOptions, read } from &quot;@motifx/core&quot;;
+
+export const Button = (props) =&gt; motifOptions({
+  el: &quot;button&quot;,
+
+  onConfigured() {
+    this.class.add(&quot;mf-button&quot;, () =&gt; `mf-button--${read(props.tone) ?? &quot;default&quot;}`);
+    this.attr.add({ type: &quot;button&quot;, disabled: () =&gt; read(props.disabled) ?? false });
+    this.motif.on(&quot;click&quot;, (_button, e) =&gt; props.onPress?.(e));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; read(props.label)));
+  },
+});</code></pre>
+</div>
+<p>Tüketici bileşeni kendi yazımıyla kullanır:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;Button label=&quot;Yeni not&quot; tone=&quot;accent&quot; onPress={() =&gt; this.create()} /&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;Button label=&quot;Yeni not&quot; tone=&quot;accent&quot; onPress={() =&gt; create()} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/NotesLayout.ts"><code>const newNote = new Button({ label: &quot;Yeni not&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const newNote = motifComponent(Button, { label: &quot;Yeni not&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const newNote = motifComponent(Button, { label: &quot;Yeni not&quot;, tone: &quot;accent&quot;, onPress: () =&gt; create() });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;Button label=&quot;Yeni not&quot; tone=&quot;accent&quot; onPress={() =&gt; this.create()} /&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;Button label=&quot;Yeni not&quot; tone=&quot;accent&quot; onPress={() =&gt; create()} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/NotesLayout.js"><code>const newNote = new Button({ label: &quot;Yeni not&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>const newNote = motifComponent(Button, { label: &quot;Yeni not&quot;, tone: &quot;accent&quot;, onPress: () =&gt; this.create() });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>const newNote = motifComponent(Button, { label: &quot;Yeni not&quot;, tone: &quot;accent&quot;, onPress: () =&gt; create() });</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>create</code>, düzen fonksiyonunun içindeki yerel fonksiyondur.</p>
+</div>
+<div class="doc-variant" data-variant="class">
+<p>Sınıfta <code>view()</code> kökü değil içeriği döndürür. Kök eleman generic'ten (<code>Component&lt;HTMLButtonElement&gt;</code>), <code>static elementTag</code>'den ya da <code>super(&quot;button&quot;)</code> çağrısından gelir; kökün sınıfı, öznitelikleri ve olayları <code>onConfigured</code>'da bağlanır. <code>view()</code> içinde yeniden <code>&lt;button&gt;</code> yazmak iç içe iki eleman üretir.</p>
+</div>
+<div class="doc-variant" data-variant="options">
+<p>Options'ta <code>view()</code> kökü değil içeriği döndürür. Kök eleman <code>el</code> alanıdır; kökün sınıfı, öznitelikleri ve olayları <code>onConfigured</code>'da bağlanır. <code>view()</code> içinde yeniden <code>&lt;button&gt;</code> yazmak iç içe iki eleman üretir.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde döndürülen eleman köktür; sınıf, öznitelik ve olaylar doğrudan onun üzerine yazılır.</p>
+</div>
+<p>Kurallar:</p>
+<ul>
+<li><strong>Değişebilen her prop <code>Bind&lt;T&gt;</code>'dir</strong> ve <code>read()</code> ile okunur. Tüketici <code>label=&quot;Kaydet&quot;</code> de yazabilir, <code>label={() =&gt; state.text}</code> de; derleyici öznitelikteki üçlü operatörü zaten getter'a sarar (bkz. <a href="/tr/docs/jsx#attribute-ternary">Özniteliklerde ternary</a>). Prop <code>read()</code> olmadan okunursa getter biçimi çalışmaz.</li>
+<li><strong>Ortak öznitelikler köke düşer.</strong> <code>class</code>, <code>style</code>, <code>id</code>, <code>tabindex</code>, <code>role</code>, <code>aria-*</code>, <code>data-*</code> bileşen etiketinden kök elemana otomatik uygulanır; bunları prop olarak tanımlayıp elle kopyalamayın (bkz. <a href="/tr/docs/jsx#attribute-fallthrough">Attribute fallthrough</a>). Kökün kendi <code>class</code>'ı tüketicininkiyle birleşir.</li>
+<li><strong>Ayrılmış adları kullanmayın:</strong> <code>options</code>, <code>ref</code>, <code>key</code>, <code>transition</code>, <code>childs</code>, <code>initializeComponent</code> ve yaşam döngüsü kancalarının adları (<code>onBuilt</code>, <code>onMounted</code> …) çerçeveye gider (bkz. <a href="/tr/docs/wrapping-libraries#prop-names">Prop adlarında dikkat</a>).</li>
+<li><strong>DOM olay adıyla çakışan geri çağrı adı vermeyin.</strong> <code>onChange</code>, <code>onSelect</code>, <code>onResize</code>, <code>onReset</code>, <code>onCopy</code>, <code>onContextMenu</code> gibi bir prop bileşen etiketinde kök elemana DOM dinleyicisi olarak bağlanır ve prop'lara hiç ulaşmaz; derleyici <code>MJX002</code> ile uyarır. <code>onPress</code>, <code>onValueChange</code>, <code>onCommit</code> gibi adlar güvenlidir.</li>
+<li>Tüketicinin bileşen örneğine <code>ref</code> ile ulaşacağını varsayın; dışa açmak istediğiniz davranışı bir metot olarak verin (<code>dialog.open()</code>), iç alanları kapalı tutun.</li>
+</ul>
+<div class="doc-variant" data-variant="class">
+<p>Çocuk içerik <code>childs</code> ile gelir; kök elemanı generic ya da <code>static elementTag</code> ile bildirilmiş ve <code>view()</code> yazmamış bir sınıfta <code>&lt;Card&gt;…&lt;/Card&gt;</code> biçimi doğrudan çalışır. Kökü <code>super(&quot;div&quot;, props)</code> ile kuran sınıfta çocukları siz yerleştirirsiniz (bkz. <a href="/tr/docs/component-props#childs">Çocuk bileşenler</a>).</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Çocuk içerik <code>props.childs</code> ile gelir ve döndürülen kökün içine yerleştirilir (bkz. <a href="/tr/docs/component-props#childs">Çocuk bileşenler</a>).</p>
+</div>
+<div class="doc-variant" data-variant="options">
+<p>Çocuk içerik <code>childs</code> ile gelir; <code>view()</code> yazmayan bir Options bileşeninde <code>&lt;Card&gt;…&lt;/Card&gt;</code> biçimi doğrudan çalışır, çocuklar <code>el</code> elemanına eklenir. <code>view()</code> yazan Options onları <code>this.childs</code> ile kendisi yerleştirir (bkz. <a href="/tr/docs/component-props#childs">Çocuk bileşenler</a>).</p>
+</div>
+<h2 id="css">Stil ve CSS</h2>
+<p>Paket CSS'ini <strong>tek bir dosya</strong> olarak sunun ve tüketici onu bilinçli olarak içe aktarsın:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>// tüketici
+import '@sirket/motif-ui/style.css';</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>// tüketici
+import '@sirket/motif-ui/style.css';</code></pre>
+</div>
+<ul>
+<li>Kütüphane kipinde <code>src/index.ts</code> içinden içe aktarılan CSS Vite 5'te <code>dist/style.css</code> olarak yazılır (Vite 6'da adı <code>build.lib.cssFileName: 'style'</code> ile verin); <code>exports[&quot;./style.css&quot;]</code> onu adreslenebilir yapar. Girişten içe aktarmak <code>sideEffects: false</code> ile çelişmez: CSS dosyaları paketleyici tarafından yan etkili sayılır.</li>
+<li>Kuralları bir <code>@layer</code> içine koyun (<code>@layer mf.base, mf.components;</code>). Katmansız kurallar bütün katmanları özgüllükten bağımsız ezdiği için tüketicinin tek satırlık bir ezmesi daima kazanır; tema değerlerini <code>--mf-*</code> gibi önekli CSS değişkenleriyle verin.</li>
+<li>Bileşen içinde <code>&lt;style&gt;</code> etiketi (bkz. <a href="/tr/docs/styling-and-transitions#inline-style-tag">Satır içi style</a>) küçük, kendine yeten bileşenlerde işe yarar ama her örnekte bir <code>&lt;style&gt;</code> düğümü üretir ve kapsamlı değildir; kütüphane ölçeğinde dosya tercih edin.</li>
+<li>Geçişler için sınıf adlarını belgeleyin: <code>transition=&quot;mf-fade&quot;</code> yazan tüketici <code>mf-fade-enter-from/active/to</code> kurallarını sizden bekler (bkz. <a href="/tr/docs/styling-and-transitions#transition-prop">Geçiş prop'u</a>).</li>
+</ul>
+<h2 id="services">Servisler</h2>
+<p>Paket bir servis (tema, bildirim kuyruğu, dil) taşıyorsa <code>@Injectable</code> ile işaretleyin; sınıf modülü yüklendiği anda işaretlenir ve uygulama <code>build()</code> edilirken kaydedilir. Modülü <code>build()</code>'den sonra yüklenen sınıf ilk çözümlemede kaydedilir (bkz. <a href="/tr/docs/service-registration#injectable-decorator">Dekoratörlerle otomatik kayıt</a>). Derleyici eklentisi dekoratörleri <code>.ts</code> dosyalarında da derler; eklentisiz bir sarmalayıcıda TypeScript standart dekoratörü kendisi derler.</p>
+<p>Tüketicinin yaşam süresini seçmesi gerekiyorsa açık bir kayıt fonksiyonu daha nettir:</p>
+<div class="doc-code" data-file="src/services.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services.ts"><code>import { ServiceCollection } from '@motifx/core';
+import { ThemeService } from './ThemeService';
+
+export function registerUiServices(services: ServiceCollection) {
+  services.addSingleton(ThemeService, ThemeService);
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services.js"><code>import { ThemeService } from './ThemeService';
+
+export function registerUiServices(services) {
+  services.addSingleton(ThemeService, ThemeService);
+}</code></pre>
+</div>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>// tüketici
+const builder = Application.CreateBuilder();
+registerUiServices(builder.services);
+const app = builder.build();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>// tüketici
+const builder = Application.CreateBuilder();
+registerUiServices(builder.services);
+const app = builder.build();</code></pre>
+</div>
+<p>Açık kayıt dekoratörü ezer; ikisini birlikte vermek güvenlidir.</p>
+<h2 id="testing">Test ve geliştirme</h2>
+<ul>
+<li><code>vitest</code> + <code>jsdom</code>, <code>vite.config.ts</code>'teki aynı eklentiyle çalışır; testlerde JSX için ek ayar gerekmez. <code>document</code>'a ekleyip <code>onMounted</code> davranışını da sınayın.</li>
+<li>Her bileşen için bir <strong>tur testi</strong> yazın: kur, DOM'a ekle, <code>dispose()</code>, canlı bileşen sayısının başa döndüğünü doğrulayın (bkz. <a href="/tr/docs/wrapping-libraries#prove-cleanup">Temizliği kanıtlayın</a>). Sızıntı ancak böyle görülür.</li>
+<li>Geliştirme için paketin köküne bir <code>index.html</code> ve <code>src/showcase/</code> koyun; <code>vite</code> ile bileşenleri gerçek tarayıcıda görün. Vitrin, <code>exports</code> dışında kaldığı için pakete girmez.</li>
+<li><code>motif-lint</code> (<code>@motifx/compiler</code> ile gelir) prop tiplerine karşı JSX'i denetler; <code>package.json</code>'a <code>&quot;lint:jsx&quot;: &quot;motif-lint&quot;</code> ekleyin (bkz. <a href="/tr/docs/jsx#motif-lint">motif-lint</a>).</li>
+</ul>
+<h2 id="release-checklist">Yayın öncesi denetim</h2>
+<ol>
+<li><code>npm run build</code> → <code>dist/index.js</code>, <code>dist/index.cjs</code>, <code>dist/types/index.d.ts</code>, <code>dist/style.css</code> oluştu mu?</li>
+<li><code>dist/index.js</code> içinde <code>jsx(</code>/<code>createElement(</code> yok, <code>from &quot;@motifx/core&quot;</code> var mı? (Derleyici çalıştı ve çekirdek dışarıda kaldı.)</li>
+<li><code>npx publint</code> ve <code>npx @arethetypeswrong/cli --pack</code>: <code>exports</code>/<code>types</code> tutarlı mı, CJS tüketici tipleri görüyor mu?</li>
+<li>Boş bir Vite uygulamasında <code>npm pack</code> çıktısını kurup bir bileşeni kullanın; <code>app.useDevelopment(true)</code> ile <code>MJX121</code> ya da <code>MJX002</code> uyarısı çıkmadığını görün.</li>
+<li>Monorepo'da <code>file:</code>/<code>link:</code> ile bağlı test ederken tüketicide <code>resolve: { dedupe: ['@motifx/core'] }</code> verin; yayımlanan pakette bu gerekmez.</li>
+<li><code>README</code>'de peer bağımlılıkları, <code>style.css</code> içe aktarımını, prop tablosunu ve geçiş sınıf adlarını yazın.</li>
+</ol>
+<h2 id="next">Sonraki adım</h2>
+<p>Paket geliştirirken bileşen ağacını, reaktiviteyi ve sayaçları incelemek için <a href="/tr/docs/devtools">DevTools sözleşmesi</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

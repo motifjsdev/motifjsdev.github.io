@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Writing by hand the motifComponent calls that JSX comes down to; call shapes, new Component, props keys, text nodes, preconfig, fragments for branches and lists, class components in files without JSX, reading the compiled output.">
+    <title>Views without JSX — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/imperative">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/imperative">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/imperative">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/imperative">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/imperative">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Views without JSX">
+    <meta property="og:description" content="Writing by hand the motifComponent calls that JSX comes down to; call shapes, new Component, props keys, text nodes, preconfig, fragments for branches and lists, class components in files without JSX, reading the compiled output.">
+    <script type="application/json" id="doc-data">{"slug":"imperative","locale":"en","title":"Views without JSX","description":"Writing by hand the motifComponent calls that JSX comes down to; call shapes, new Component, props keys, text nodes, preconfig, fragments for branches and lists, class components in files without JSX, reading the compiled output.","category":{"id":"2","title":"Core concepts"},"html":"\u003Cp\u003EThe compiler turns every JSX element into a \u003Ccode\u003EmotifComponent(tag, setup)\u003C/code\u003E call, and the tree is built with \u003Ccode\u003Esender.controls.add(...)\u003C/code\u003E. A project that does not use JSX (\u003Ccode\u003E.ts\u003C/code\u003E / \u003Ccode\u003E.js\u003C/code\u003E) writes the same calls by hand: the hand-written version of the code the compiler produces. The runtime, the bindings, the lifecycle and the rules are the same; only the way of writing changes. This page is for projects without JSX, for libraries that should not depend on the compiler, for views generated in code, and for reading compiled output. Which call each JSX form comes down to is given next to every example on the \u003Ca href=\u0022/docs/jsx\u0022\u003EJSX and Templates\u003C/a\u003E page; here the calls themselves are explained.\u003C/p\u003E\n\u003Cp\u003EThe examples are slices of the version without JSX of the notes application in the starter template: the sidebar (\u003Ccode\u003EMainLayout\u003C/code\u003E), the notes list (\u003Ccode\u003ENotesLayout\u003C/code\u003E), the list row (\u003Ccode\u003ENoteRow\u003C/code\u003E) and the editor (\u003Ccode\u003ENotePage\u003C/code\u003E). \u003Ccode\u003ENote\u003C/code\u003E, \u003Ccode\u003EFolder\u003C/code\u003E and \u003Ccode\u003ENotesService\u003C/code\u003E are the ones in the \u003Ccode\u003Esrc/services/notes.ts\u003C/code\u003E file on the \u003Ca href=\u0022/docs/components\u0022\u003EComponents\u003C/a\u003E page. In TypeScript the parameter of a setup function is written as \u003Ccode\u003EComponentBase\u003C/code\u003E; \u003Ccode\u003EmotifComponent\u003C/code\u003E returns \u003Ccode\u003Eany\u003C/code\u003E, so you declare the types yourself (see \u003Ca href=\u0022#pitfalls\u0022\u003EPitfalls\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022call-shapes\u0022\u003ECall shapes\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EJSX\u003C/th\u003E\n\u003Cth\u003EWritten by hand\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;div class=\u0026quot;app\u0026quot;\u0026gt;…\u0026lt;/div\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; { div.class.add(\u0026quot;app\u0026quot;); div.controls.add(…); })\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ENotes\u003C/code\u003E (plain text)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;))\u003C/code\u003E — a text node\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{note.title}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enode.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)\u003C/code\u003E on a text node\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{() =\u0026gt; note.title.trim() \\|\\| \u0026quot;Untitled\u0026quot;}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Espan.bindings.text(() =\u0026gt; note.title.trim() \\|\\| \u0026quot;Untitled\u0026quot;)\u003C/code\u003E; the compiler writes \u003Ccode\u003Ebindings.method(fn)\u003C/code\u003E, which does the same job and also accepts a component result\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etype=\u0026quot;button\u0026quot; aria-pressed={() =\u0026gt; note.pinned} aria-current={() =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null)}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebutton.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null) })\u003C/code\u003E — a function is a live getter, a plain value is written once, and \u003Ccode\u003Efalse\u003C/code\u003E/\u003Ccode\u003Enull\u003C/code\u003E remove the attribute. On \u003Ccode\u003Eaction\u003C/code\u003E and \u003Ccode\u003Eformaction\u003C/code\u003E, the function returned by the getter becomes the form\u0027s submit handler: \u003Ccode\u003Eform.attr.add({ action: () =\u0026gt; (data: FormData) =\u0026gt; … })\u003C/code\u003E (see \u003Ca href=\u0022/docs/forms#action\u0022\u003ESubmitting with a function \u003Ccode\u003Eaction\u003C/code\u003E\u003C/a\u003E)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass={() =\u0026gt; (note.pinned ? \u0026quot;note pinned\u0026quot; : \u0026quot;note\u0026quot;)}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eli.class.add(() =\u0026gt; (note.pinned ? \u0026quot;note pinned\u0026quot; : \u0026quot;note\u0026quot;))\u003C/code\u003E; a string, a \u003Ccode\u003E{ pinned: () =\u0026gt; note.pinned }\u003C/code\u003E object and arrays of these work too\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eonclick={() =\u0026gt; …}\u003C/code\u003E, \u003Ccode\u003Eonsubmit:prevent={…}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebutton.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; …)\u003C/code\u003E, \u003Ccode\u003Eform.motif.on(\u0026quot;submit:prevent\u0026quot;, fn)\u003C/code\u003E; modifiers chain (\u003Ccode\u003E\u0026quot;click:once:prevent\u0026quot;\u003C/code\u003E). The typed signature is \u003Ccode\u003E(sender, e)\u003C/code\u003E: if you need the event, \u003Ccode\u003E(_sender: ComponentBase, e: Event) =\u0026gt; …\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;input x-model={() =\u0026gt; state.query} /\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Efield.bindings.model(() =\u0026gt; state.query, (value: string) =\u0026gt; (state.query = value))\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;p x-display={() =\u0026gt; cond}\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;p\u0026quot;, { preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; cond), initializeComponent: (p) =\u0026gt; { … } })\u003C/code\u003E; \u003Ccode\u003Ex-wait\u003C/code\u003E → \u003Ccode\u003Ebindings.wait\u003C/code\u003E (see \u003Ca href=\u0022#preconfig\u0022\u003E\u003Ccode\u003Epreconfig\u003C/code\u003E\u003C/a\u003E)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{cond ? \u0026lt;A/\u0026gt; : \u0026lt;B/\u0026gt;}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Epane.bindings.ternary(() =\u0026gt; cond, (frame) =\u0026gt; frame.navigate(a), (frame) =\u0026gt; frame.navigate(b))\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{cond \u0026amp;\u0026amp; \u0026lt;X/\u0026gt;}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Epane.bindings.when(() =\u0026gt; cond, () =\u0026gt; x)\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{visible.map((note) =\u0026gt; \u0026lt;NoteRow key={note.id} note={note} folder={folder} /\u0026gt;)}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Ea holder without an element: \u003Ccode\u003EmotifComponent({ initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; visible, (note) =\u0026gt; motifComponent(NoteRow, { indexkey: () =\u0026gt; note.id, note, folder })) })\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;input ref={(c) =\u0026gt; (search = c)} /\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;input\u0026quot;, { ref: (c) =\u0026gt; (search = c), initializeComponent: (c) =\u0026gt; { … } })\u003C/code\u003E; the node is \u003Ccode\u003Esearch.element\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;Notes\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(RouterLink, { to: \u0026quot;/notes\u0026quot;, activeClass: \u0026quot;active\u0026quot;, childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Notes\u0026quot;))] })\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;RouterView class=\u0026quot;outlet\u0026quot; /\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(RouterView, { class: \u0026quot;outlet\u0026quot; })\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;a rel=\u0026quot;router\u0026quot; href=\u0026quot;/notes\u0026quot;\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;a\u0026quot;, (a) =\u0026gt; a.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0026quot;/notes\u0026quot; }))\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={folder} /\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder })\u003C/code\u003E: a class is built with the props, a function part is called with the props\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;svg viewBox=\u0026quot;0 0 10 10\u0026quot;\u0026gt;\u0026lt;path d=\u0026quot;M0 0h10\u0026quot; /\u0026gt;\u0026lt;/svg\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;svg\u0026quot;, { options: { isSvg: true }, initializeComponent: (svg) =\u0026gt; { svg.attr.add({ viewBox: \u0026quot;0 0 10 10\u0026quot; }); svg.controls.add(motifComponent(\u0026quot;path\u0026quot;, { options: { isSvg: true }, initializeComponent: (p) =\u0026gt; p.attr.add({ d: \u0026quot;M0 0h10\u0026quot; }) })); } })\u003C/code\u003E — every SVG child carries \u003Ccode\u003EisSvg\u003C/code\u003E too\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonMounted={(c) =\u0026gt; …}\u003C/code\u003E (on a tag)\u003C/td\u003E\n\u003Ctd\u003Ethe \u003Ccode\u003EonMounted\u003C/code\u003E key in the object form (and the same for the other hooks; the signature is \u003Ccode\u003E(sender, e)\u003C/code\u003E), or \u003Ccode\u003Ec.motif.on(\u0026quot;x:mounted\u0026quot;, …)\u003C/code\u003E during setup\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022motif-component\u0022\u003E\u003Ccode\u003EmotifComponent(element, props?)\u003C/code\u003E\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifComponent(\u0026quot;div\u0026quot;, fn)\u003C/code\u003E: \u003Ccode\u003Efn\u003C/code\u003E is the component\u0027s \u003Ccode\u003EinitializeComponent\u003C/code\u003E. It runs once while the component is being built (\u003Ccode\u003Ebuild()\u003C/code\u003E), just before the children are built, and never again; \u003Ccode\u003Ethis\u003C/code\u003E is not bound, so use the parameter.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifComponent(\u0026quot;div\u0026quot;, { … })\u003C/code\u003E: the object form. The framework keys are \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003Epreconfig\u003C/code\u003E, \u003Ccode\u003Eref\u003C/code\u003E, \u003Ccode\u003Echilds\u003C/code\u003E, \u003Ccode\u003Eoptions\u003C/code\u003E (\u003Ccode\u003EisSvg\u003C/code\u003E, \u003Ccode\u003EhideStrategy\u003C/code\u003E, \u003Ccode\u003EdisableDisposal\u003C/code\u003E), \u003Ccode\u003Etransition\u003C/code\u003E, \u003Ccode\u003Ekey\u003C/code\u003E / \u003Ccode\u003Eindexkey\u003C/code\u003E and the lifecycle hooks (\u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonConfigured\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E, …). On a plain tag the other keys are applied like a spread: \u003Ccode\u003E{ type: \u0026quot;button\u0026quot;, class: \u0026quot;row\u0026quot;, onclick: fn, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; note.pinned }\u003C/code\u003E go to attributes, classes and events, and getters stay live. The compiler writes attributes with \u003Ccode\u003Eattr.add\u003C/code\u003E in the setup function, and that is also the readable choice when writing by hand.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifComponent(SomeClass, props)\u003C/code\u003E: \u003Ccode\u003Enew SomeClass(props)\u003C/code\u003E. The framework keys of the object form (\u003Ccode\u003Epreconfig\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E, \u003Ccode\u003Echilds\u003C/code\u003E, \u003Ccode\u003Eref\u003C/code\u003E …) are applied to a class component too.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifComponent(functionPart, props)\u003C/code\u003E: the function is called with \u003Ccode\u003Eprops\u003C/code\u003E, and the framework keys of the object form are applied to the root it returns, as with a class: \u003Ccode\u003Eref\u003C/code\u003E, the common attributes (\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003Erole\u003C/code\u003E, \u003Ccode\u003Earia-*\u003C/code\u003E, \u003Ccode\u003Edata-*\u003C/code\u003E; see \u003Ca href=\u0022/docs/jsx#attribute-fallthrough\u0022\u003Eattribute fallthrough\u003C/a\u003E), \u003Ccode\u003Eoptions\u003C/code\u003E, \u003Ccode\u003Etransition\u003C/code\u003E, \u003Ccode\u003Ekey\u003C/code\u003E / \u003Ccode\u003Eindexkey\u003C/code\u003E, \u003Ccode\u003Epreconfig\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, the lifecycle hooks and the \u003Ccode\u003Ex-\u003C/code\u003E keys. The hook and \u003Ccode\u003Ex-\u003C/code\u003E keys are not part of the \u003Ccode\u003Eprops\u003C/code\u003E the function receives, nor of a class\u0027s \u003Ccode\u003Ethis.props\u003C/code\u003E; callback props such as \u003Ccode\u003EonSave\u003C/code\u003E stay.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifComponent(instance)\u003C/code\u003E: returns a ready component instance as it is.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifComponent({ initializeComponent: (holder) =\u0026gt; … })\u003C/code\u003E (an object without a tag): a component \u003Cstrong\u003Ewithout an element\u003C/strong\u003E. In the DOM it sits between \u003Ccode\u003E\u0026lt;!--[--\u0026gt;\u003C/code\u003E … \u003Ccode\u003E\u0026lt;!--]--\u0026gt;\u003C/code\u003E markers, and its children land inside the parent. This is the holder the compiler uses for lists.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Enew Component(\u0026quot;div\u0026quot;, { initializeComponent })\u003C/code\u003E is the same as the string form; you can also build with \u003Ccode\u003Enew Component(\u0026quot;div\u0026quot;)\u003C/code\u003E and call \u003Ccode\u003Econtrols.add\u003C/code\u003E later.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifFragment({ initializeComponent: (f) =\u0026gt; f.controls.add(a, b) })\u003C/code\u003E: a fragment for a branch or a slot with several roots; in the DOM there are only comment markers, and no attributes or events can be written (see \u003Ca href=\u0022/docs/jsx#fragment\u0022\u003EFragment\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003ETiming: on a plain tag the configuration phase (\u003Ccode\u003Epreconfig\u003C/code\u003E, \u003Ccode\u003EonConfig\u003C/code\u003E) ends inside the \u003Ccode\u003EmotifComponent\u003C/code\u003E call, while the component is being created; \u003Ccode\u003EonConfigured\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E and \u003Ccode\u003EonBuilt\u003C/code\u003E run when the component is added to a built parent (\u003Ccode\u003Ebuild()\u003C/code\u003E), and \u003Ccode\u003EonMounted\u003C/code\u003E when it is attached to the document. In a class component the configuration phase is postponed to the start of \u003Ccode\u003Ebuild()\u003C/code\u003E (see \u003Ca href=\u0022/docs/lifecycle#hooks\u0022\u003ELifecycle\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003EThe third argument seen in the compiler output (\u003Ccode\u003E, 1\u003C/code\u003E) and the \u003Ccode\u003E__childExpr\u003C/code\u003E and \u003Ccode\u003E__isSvgElement\u003C/code\u003E keys are compiler markers; hand-written code does not write them and does not call \u003Ccode\u003EmotifCompiled\u003C/code\u003E / \u003Ccode\u003EmotifReport\u003C/code\u003E (see \u003Ca href=\u0022#reading-compiled-output\u0022\u003EReading the compiled output\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022new-component\u0022\u003E\u003Ccode\u003Enew Component(element, props?)\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EThe constructor\u0027s first argument decides the component\u0027s element, and the second is the props object:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EFirst argument\u003C/th\u003E\n\u003Cth\u003EResult\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA tag name: \u003Ccode\u003Enew Component(\u0026quot;li\u0026quot;, props)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA new element with that tag is created. \u003Ccode\u003E\u0026quot;text\u0026quot;\u003C/code\u003E produces a text node. For an SVG element, write \u003Ccode\u003Eoptions: { isSvg: true }\u003C/code\u003E in the props.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA DOM node: \u003Ccode\u003Enew Component(node, props)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe existing node becomes the component\u0027s element, and no new element is created. \u003Ccode\u003Eapp.run(\u0026quot;#app\u0026quot;)\u003C/code\u003E wraps the \u003Ccode\u003E#app\u003C/code\u003E element on the page this way.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA props object, or nothing: \u003Ccode\u003Enew Component({ … })\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ENo element is created, and the component\u0027s root is a comment node. In a subclass that declares \u003Ccode\u003Estatic elementTag\u003C/code\u003E, an element with that tag is created.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAn array: \u003Ccode\u003Enew Component([title, body])\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA component without an element. Each item in the array is turned into a component by the same rules and added as a child.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA class or a function: \u003Ccode\u003Enew Component(NoteRow, props)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA class is built with \u003Ccode\u003Eprops\u003C/code\u003E and a function is called with \u003Ccode\u003Eprops\u003C/code\u003E; the \u003Ccode\u003Enew\u003C/code\u003E expression gives the returned component. The framework keys of the props are applied to the root the function returns, as with \u003Ccode\u003EmotifComponent\u003C/code\u003E (see the function part item above). If the function returns an Options object, the component is built from that object.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA ready component: \u003Ccode\u003Enew Component(row)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe same component is returned; no new one is created.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EHow it differs from \u003Ccode\u003EmotifComponent\u003C/code\u003E:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EThe second argument is read only as a props object. \u003Ccode\u003Enew Component(\u0026quot;li\u0026quot;, (li) =\u0026gt; …)\u003C/code\u003E does not run the function; setup code goes under the \u003Ccode\u003EinitializeComponent\u003C/code\u003E key.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EmotifComponent\u003C/code\u003E is the one that takes an Options object directly (\u003Ccode\u003EmotifComponent({ el: \u0026quot;section\u0026quot;, … })\u003C/code\u003E). \u003Ccode\u003Enew Component\u003C/code\u003E treats the object as props and you end up with a component without an element; it does recognize a function that returns an Options object, though.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EOn a plain \u003Ccode\u003EComponent\u003C/code\u003E, the keys in the props object that are not framework keys are written to the element: \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, events (\u003Ccode\u003Eonclick\u003C/code\u003E …) and attributes; \u003Ccode\u003Evalue\u003C/code\u003E, \u003Ccode\u003Echecked\u003C/code\u003E and \u003Ccode\u003Eselected\u003C/code\u003E are set up as bindings, and a function value without parameters becomes a live getter; on \u003Ccode\u003Eaction\u003C/code\u003E and \u003Ccode\u003Eformaction\u003C/code\u003E, the function returned by the getter is the form\u0027s submit handler. In a subclass these keys stay in \u003Ccode\u003Ethis.props\u003C/code\u003E, and only the common attributes fall through to the element. \u003Ccode\u003EinnerHTML\u003C/code\u003E and \u003Ccode\u003Esrcdoc\u003C/code\u003E are not written this way (\u003Ccode\u003EMJX124\u003C/code\u003E); a \u003Ccode\u003Ejavascript:\u003C/code\u003E address in an \u003Ccode\u003Ehref\u003C/code\u003E, \u003Ccode\u003Esrc\u003C/code\u003E, \u003Ccode\u003Eaction\u003C/code\u003E or \u003Ccode\u003Eformaction\u003C/code\u003E value is blocked (\u003Ccode\u003EMJX125\u003C/code\u003E).\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EmotifFragment(props)\u003C/code\u003E is the same as \u003Ccode\u003Enew FragmentNode(props)\u003C/code\u003E: while being built, it adds the components in the \u003Ccode\u003Echilds\u003C/code\u003E and \u003Ccode\u003Enodes\u003C/code\u003E arrays of the props as children. \u003Ccode\u003EFNComponent(view)\u003C/code\u003E turns a view function into a function component; when the returned function is called with props, it builds a component without an element, gives it the props and adds the component returned by \u003Ccode\u003Eview(props)\u003C/code\u003E as a child. That is the \u003Ccode\u003E_mfc\u003C/code\u003E import in the compiler output; function components written in JSX are not wrapped in it.\u003C/p\u003E\n\u003Ch2 id=\u0022props-keys\u0022\u003EKeys of the props object\u003C/h2\u003E\n\u003Cp\u003EMotifJS handles these keys itself; they are not written to the element as attributes.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EKey\u003C/th\u003E\n\u003Cth\u003EWhat it does\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EinitializeComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe component\u0027s setup code. Runs once while the component is being built, before its children; its parameter is the component itself.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EoninitializeComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERuns right after \u003Ccode\u003EinitializeComponent\u003C/code\u003E (see \u003Ca href=\u0022/docs/lifecycle#on-initialize-component\u0022\u003ELifecycle\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Epreconfig\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERuns in the configuration phase, before \u003Ccode\u003EonConfig\u003C/code\u003E (see \u003Ca href=\u0022#preconfig\u0022\u003E\u003Ccode\u003Epreconfig\u003C/code\u003E\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonConfigured\u003C/code\u003E, \u003Ccode\u003EonInitializing\u003C/code\u003E, \u003Ccode\u003EonInitialized\u003C/code\u003E, \u003Ccode\u003EonBuilding\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E, \u003Ccode\u003EonVisibilityChanged\u003C/code\u003E, \u003Ccode\u003EonActivated\u003C/code\u003E, \u003Ccode\u003EonDeactivated\u003C/code\u003E, \u003Ccode\u003EonDisposing\u003C/code\u003E, \u003Ccode\u003EonDisposed\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ELifecycle hooks: a function or an array of functions, with the signature \u003Ccode\u003E(sender, e)\u003C/code\u003E (see \u003Ca href=\u0022/docs/lifecycle#hooks\u0022\u003EHooks and run order\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-wait\u003C/code\u003E, \u003Ccode\u003Ex-display\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERegistered as \u003Ccode\u003Ebindings.wait\u003C/code\u003E and \u003Ccode\u003Ebindings.display\u003C/code\u003E. Other \u003Ccode\u003Ex-\u003C/code\u003E keys such as \u003Ccode\u003Ex-mounted\u003C/code\u003E are attached to the hook of the same name.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Echilds\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EChild components; nested arrays are flattened. A component without an element, and a class created without an element that writes no \u003Ccode\u003Eview()\u003C/code\u003E, add them as content; a class that writes \u003Ccode\u003Eview()\u003C/code\u003E places them itself. A component created by tag name does not add \u003Ccode\u003Echilds\u003C/code\u003E: \u003Ccode\u003Enew Component(\u0026quot;ul\u0026quot;, { childs })\u003C/code\u003E gives an empty \u003Ccode\u003E\u0026lt;ul\u0026gt;\u003C/code\u003E, and the children are added with \u003Ccode\u003Econtrols.add\u003C/code\u003E inside \u003Ccode\u003EinitializeComponent\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eref\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA function called with the component itself once the component is created.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eoptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EisSvg\u003C/code\u003E (an SVG element), \u003Ccode\u003EhideStrategy\u003C/code\u003E (see \u003Ca href=\u0022/docs/lifecycle#hide-strategy\u0022\u003EHide strategy\u003C/a\u003E) and \u003Ccode\u003EdisableDisposal\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etransition\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAn enter and leave transition with CSS classes (see \u003Ca href=\u0022/docs/styling-and-transitions#transition-prop\u0022\u003EThe \u003Ccode\u003Etransition\u003C/code\u003E prop\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonElementCreating\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA function that returns an element; the component uses it instead of the element from the first argument.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Eindexkey\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe identity of a list row; the compiler writes \u003Ccode\u003Ekey\u003C/code\u003E from JSX as \u003Ccode\u003Eindexkey\u003C/code\u003E. It is not written to the element and is used only in the \u003Ccode\u003EMJX202\u003C/code\u003E warning, which reports the same identity arriving twice.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EIn a function component row, \u003Ccode\u003Eindexkey\u003C/code\u003E is written to the props object of the root the function returns. If the function builds its root with the same props object on every call (a module-level constant: \u003Ccode\u003EmotifComponent(\u0026quot;li\u0026quot;, ROW_PROPS)\u003C/code\u003E), every row reads the key written to that object last. Even if the keys are unique, an \u003Ccode\u003EMJX202\u003C/code\u003E warning arrives the first time the list updates; the rendering is not affected. Give the root\u0027s props as a new object on every call: \u003Ccode\u003EmotifComponent(\u0026quot;li\u0026quot;, { class: \u0026quot;row\u0026quot; })\u003C/code\u003E. In JSX this does not happen, because the compiler produces a new object on every call.\u003C/p\u003E\n\u003Ch2 id=\u0022text-nodes\u0022\u003EText nodes\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003E\u0026quot;text\u0026quot;\u003C/code\u003E is a real tag: \u003Ccode\u003EmotifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;…\u0026quot;))\u003C/code\u003E produces a text node, and text next to an element becomes one more child in the same \u003Ccode\u003Econtrols.add\u003C/code\u003E call. A binding can be set up on a text node too: \u003Ccode\u003Enode.bindings.text(() =\u0026gt; …)\u003C/code\u003E for live text through a getter, and \u003Ccode\u003Enode.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)\u003C/code\u003E for a one-way binding to a single field. On an element whose only content is text, write \u003Ccode\u003Espan.setText(\u0026quot;…\u0026quot;)\u003C/code\u003E or \u003Ccode\u003Espan.bindings.text(fn)\u003C/code\u003E without creating a node. The runtime also turns strings and numbers given to \u003Ccode\u003Econtrols.add\u003C/code\u003E into text nodes, but the TypeScript signature of \u003Ccode\u003Econtrols.add\u003C/code\u003E takes components (\u003Ccode\u003EComponentBase[]\u003C/code\u003E), so in a TypeScript project write the \u003Ccode\u003E\u0026quot;text\u0026quot;\u003C/code\u003E call.\u003C/p\u003E\n\u003Cp\u003EThe folder link in the sidebar shows the number of notes in the folder next to its name. The name is a text node and the number is a badge bound with \u003Ccode\u003Ebindings.text\u003C/code\u003E; both are given to \u003Ccode\u003ERouterLink\u003C/code\u003E as \u003Ccode\u003Echilds\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eprivate folderLink(folder: Folder, label: string) {\n  const badge = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n    span.class.add(\u0026quot;badge\u0026quot;);\n    span.bindings.text(() =\u0026gt; String(this.notes.count(folder)));\n  });\n  return motifComponent(RouterLink, {\n    to: \u0060/${folder}\u0060,\n    activeClass: \u0026quot;active\u0026quot;,\n    childs: [motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0060${label} \u0060)), badge],\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eprivate folderLink(folder: Folder, label: string) {\n  const badge = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n    span.class.add(\u0026quot;badge\u0026quot;);\n    span.bindings.text(() =\u0026gt; String(notes.count(folder)));\n  });\n  return motifComponent(RouterLink, {\n    to: \u0060/${folder}\u0060,\n    activeClass: \u0026quot;active\u0026quot;,\n    childs: [motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0060${label} \u0060)), badge],\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003EfolderLink(folder, label) {\n  const badge = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n    span.class.add(\u0026quot;badge\u0026quot;);\n    span.bindings.text(() =\u0026gt; String(this.notes.count(folder)));\n  });\n  return motifComponent(RouterLink, {\n    to: \u0060/${folder}\u0060,\n    activeClass: \u0026quot;active\u0026quot;,\n    childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0060${label} \u0060)), badge],\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003EfolderLink(folder, label) {\n  const badge = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n    span.class.add(\u0026quot;badge\u0026quot;);\n    span.bindings.text(() =\u0026gt; String(notes.count(folder)));\n  });\n  return motifComponent(RouterLink, {\n    to: \u0060/${folder}\u0060,\n    activeClass: \u0026quot;active\u0026quot;,\n    childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0060${label} \u0060)), badge],\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the function component, \u003Ccode\u003Enotes\u003C/code\u003E is the service obtained with \u003Ccode\u003EFromService\u003C/code\u003E and \u003Ccode\u003Estate\u003C/code\u003E is the local state set up with \u003Ccode\u003Ereactive\u003C/code\u003E; \u003Ccode\u003Evisible()\u003C/code\u003E, \u003Ccode\u003Efolder()\u003C/code\u003E, \u003Ccode\u003Econfirmation\u003C/code\u003E, \u003Ccode\u003Eactions\u003C/code\u003E and \u003Ccode\u003Eremove\u003C/code\u003E are local functions inside the component function.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022preconfig\u0022\u003E\u003Ccode\u003Epreconfig\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Epreconfig: (c) =\u0026gt; …\u003C/code\u003E runs while the component is being configured, before \u003Ccode\u003EonConfig\u003C/code\u003E and \u003Ccode\u003Ebuild()\u003C/code\u003E; on a plain tag this is inside the \u003Ccode\u003EmotifComponent\u003C/code\u003E call. A \u003Ccode\u003Ebindings.display\u003C/code\u003E / \u003Ccode\u003Ebindings.wait\u003C/code\u003E registered there keeps an element that starts out hidden \u003Cstrong\u003Eunbuilt\u003C/strong\u003E: its subtree, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E and \u003Ccode\u003EonMounted\u003C/code\u003E wait until the condition holds. That is what \u003Ccode\u003Ex-wait\u003C/code\u003E / \u003Ccode\u003Ex-display\u003C/code\u003E are in JSX. \u003Ccode\u003Ewait\u003C/code\u003E holds the component for as long as the function returns \u003Ccode\u003Etrue\u003C/code\u003E, and \u003Ccode\u003Edisplay\u003C/code\u003E shows it while it is \u003Ccode\u003Etrue\u003C/code\u003E. If the same binding is registered inside \u003Ccode\u003EinitializeComponent\u003C/code\u003E, the element is built first and hidden afterwards.\u003C/p\u003E\n\u003Cp\u003EThe pin mark on a list row is visible only on a note that is pinned and not archived; the empty list message in the list pane appears when no visible notes are left:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;i\u0026quot;, {\n  preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n  initializeComponent: (i: ComponentBase) =\u0026gt; {\n    i.class.add(\u0026quot;pin\u0026quot;);\n    i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(\u0026quot;i\u0026quot;, {\n  preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n  initializeComponent: (i) =\u0026gt; {\n    i.class.add(\u0026quot;pin\u0026quot;);\n    i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;p\u0026quot;, {\n  preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; this.visible.length === 0),\n  initializeComponent: (p: ComponentBase) =\u0026gt; {\n    p.class.add(\u0026quot;list__empty\u0026quot;);\n    p.bindings.text(() =\u0026gt; (this.state.query.trim() ? \u0026quot;No notes match your search.\u0026quot; : FOLDERS[this.folder].empty));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;p\u0026quot;, {\n  preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; visible().length === 0),\n  initializeComponent: (p: ComponentBase) =\u0026gt; {\n    p.class.add(\u0026quot;list__empty\u0026quot;);\n    p.bindings.text(() =\u0026gt; (state.query.trim() ? \u0026quot;No notes match your search.\u0026quot; : FOLDERS[folder()].empty));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;p\u0026quot;, {\n  preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; this.visible.length === 0),\n  initializeComponent: (p) =\u0026gt; {\n    p.class.add(\u0026quot;list__empty\u0026quot;);\n    p.bindings.text(() =\u0026gt; (this.state.query.trim() ? \u0026quot;No notes match your search.\u0026quot; : FOLDERS[this.folder].empty));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst empty = motifComponent(\u0026quot;p\u0026quot;, {\n  preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; visible().length === 0),\n  initializeComponent: (p) =\u0026gt; {\n    p.class.add(\u0026quot;list__empty\u0026quot;);\n    p.bindings.text(() =\u0026gt; (state.query.trim() ? \u0026quot;No notes match your search.\u0026quot; : FOLDERS[folder()].empty));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ENeither is built when it starts out hidden; \u003Ccode\u003EinitializeComponent\u003C/code\u003E runs the first time it is shown. When the condition turns \u003Ccode\u003Efalse\u003C/code\u003E again, the element stays built and is hidden. \u003Ccode\u003Ewait\u003C/code\u003E is the reverse of the same binding: it holds the component for as long as the function returns \u003Ccode\u003Etrue\u003C/code\u003E and shows it when it turns \u003Ccode\u003Efalse\u003C/code\u003E. It is given to a component with the same key, and it is the same for class and function components: \u003Ccode\u003EmotifComponent(NoteRow, { note, folder, preconfig: (row: ComponentBase) =\u0026gt; row.bindings.display(() =\u0026gt; !note.archived) })\u003C/code\u003E. The difference between \u003Ccode\u003Edisplay\u003C/code\u003E and \u003Ccode\u003Ewait\u003C/code\u003E, and the hide strategy, are on the \u003Ca href=\u0022/docs/conditionals-and-lists#x-wait\u0022\u003EConditional Rendering and Lists\u003C/a\u003E and \u003Ca href=\u0022/docs/lifecycle#wait\u0022\u003ELifecycle\u003C/a\u003E pages.\u003C/p\u003E\n\u003Ch2 id=\u0022fragments\u0022\u003EFragments for branches and lists\u003C/h2\u003E\n\u003Cp\u003EIf a branch has a single root, give a component; if it has several roots, a \u003Ccode\u003EmotifFragment\u003C/code\u003E; if it is only text, a \u003Ccode\u003E\u0026quot;text\u0026quot;\u003C/code\u003E component; \u003Ccode\u003Eframe.flush()\u003C/code\u003E empties the spot. The editor\u0027s toolbar asks for confirmation before deleting a note. The confirmation is a question and two buttons, and since it has several roots it is given with \u003Ccode\u003EmotifFragment\u003C/code\u003E; \u003Ccode\u003Eactions(note)\u003C/code\u003E returns the pin, archive and delete buttons the same way:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Eprivate toolbar(note: Note) {\n  return motifComponent(\u0026quot;div\u0026quot;, (bar: ComponentBase) =\u0026gt; {\n    bar.class.add(\u0026quot;toolbar\u0026quot;);\n    bar.bindings.ternary(\n      () =\u0026gt; this.state.confirming,\n      (frame) =\u0026gt; frame.navigate(this.confirmation(note)),\n      (frame) =\u0026gt; frame.navigate(this.actions(note)),\n    );\n  });\n}\n\nprivate confirmation(note: Note) {\n  return motifFragment({\n    initializeComponent: (tools: ComponentBase) =\u0026gt; {\n      const question = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;confirm\u0026quot;);\n        span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Delete this note permanently?\u0026quot;)));\n      });\n      const remove = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm danger accent\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.remove(note));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Delete\u0026quot;)));\n      });\n      const cancel = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.state.confirming = false));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Cancel\u0026quot;)));\n      });\n      tools.controls.add(question, remove, cancel);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Eprivate toolbar(note: Note) {\n  return motifComponent(\u0026quot;div\u0026quot;, (bar: ComponentBase) =\u0026gt; {\n    bar.class.add(\u0026quot;toolbar\u0026quot;);\n    bar.bindings.ternary(\n      () =\u0026gt; state.confirming,\n      (frame) =\u0026gt; frame.navigate(confirmation(note)),\n      (frame) =\u0026gt; frame.navigate(actions(note)),\n    );\n  });\n}\n\nprivate confirmation(note: Note) {\n  return motifFragment({\n    initializeComponent: (tools: ComponentBase) =\u0026gt; {\n      const question = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;confirm\u0026quot;);\n        span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Delete this note permanently?\u0026quot;)));\n      });\n      const removeButton = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm danger accent\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; remove(note));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Delete\u0026quot;)));\n      });\n      const cancel = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (state.confirming = false));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Cancel\u0026quot;)));\n      });\n      tools.controls.add(question, removeButton, cancel);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Etoolbar(note) {\n  return motifComponent(\u0026quot;div\u0026quot;, (bar) =\u0026gt; {\n    bar.class.add(\u0026quot;toolbar\u0026quot;);\n    bar.bindings.ternary(\n      () =\u0026gt; this.state.confirming,\n      (frame) =\u0026gt; frame.navigate(this.confirmation(note)),\n      (frame) =\u0026gt; frame.navigate(this.actions(note)),\n    );\n  });\n}\n\nconfirmation(note) {\n  return motifFragment({\n    initializeComponent: (tools) =\u0026gt; {\n      const question = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n        span.class.add(\u0026quot;confirm\u0026quot;);\n        span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Delete this note permanently?\u0026quot;)));\n      });\n      const remove = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm danger accent\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.remove(note));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Delete\u0026quot;)));\n      });\n      const cancel = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (this.state.confirming = false));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Cancel\u0026quot;)));\n      });\n      tools.controls.add(question, remove, cancel);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Etoolbar(note) {\n  return motifComponent(\u0026quot;div\u0026quot;, (bar) =\u0026gt; {\n    bar.class.add(\u0026quot;toolbar\u0026quot;);\n    bar.bindings.ternary(\n      () =\u0026gt; state.confirming,\n      (frame) =\u0026gt; frame.navigate(confirmation(note)),\n      (frame) =\u0026gt; frame.navigate(actions(note)),\n    );\n  });\n}\n\nconfirmation(note) {\n  return motifFragment({\n    initializeComponent: (tools) =\u0026gt; {\n      const question = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n        span.class.add(\u0026quot;confirm\u0026quot;);\n        span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Delete this note permanently?\u0026quot;)));\n      });\n      const removeButton = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm danger accent\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; remove(note));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Delete\u0026quot;)));\n      });\n      const cancel = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;button\u0026quot; });\n        button.class.add(\u0026quot;button--sm ghost\u0026quot;);\n        button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; (state.confirming = false));\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Cancel\u0026quot;)));\n      });\n      tools.controls.add(question, removeButton, cancel);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EFor a list that changes, use a holder without an element and \u003Ccode\u003Ebindings.list\u003C/code\u003E; the row component declares its identity with \u003Ccode\u003Eindexkey\u003C/code\u003E (that is how the compiler writes \u003Ccode\u003Ekey\u003C/code\u003E). When the order changes the nodes are moved, not rebuilt. For fixed options a plain \u003Ccode\u003Efor\u003C/code\u003E loop is enough. The list pane lists the visible notes like this:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst list = motifComponent({\n  initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(\n    () =\u0026gt; this.visible,\n    (note: Note) =\u0026gt; motifComponent(NoteRow, { indexkey: () =\u0026gt; note.id, note, folder: this.folder }),\n  ),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst list = motifComponent({\n  initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(\n    () =\u0026gt; visible(),\n    (note: Note) =\u0026gt; motifComponent(NoteRow, { indexkey: () =\u0026gt; note.id, note, folder: folder() }),\n  ),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst list = motifComponent({\n  initializeComponent: (holder) =\u0026gt; holder.bindings.list(\n    () =\u0026gt; this.visible,\n    (note) =\u0026gt; motifComponent(NoteRow, { indexkey: () =\u0026gt; note.id, note, folder: this.folder }),\n  ),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst list = motifComponent({\n  initializeComponent: (holder) =\u0026gt; holder.bindings.list(\n    () =\u0026gt; visible(),\n    (note) =\u0026gt; motifComponent(NoteRow, { indexkey: () =\u0026gt; note.id, note, folder: folder() }),\n  ),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe behaviour of \u003Ccode\u003Ewhen\u003C/code\u003E, \u003Ccode\u003Eternary\u003C/code\u003E, \u003Ccode\u003Elist\u003C/code\u003E and \u003Ccode\u003EswitchCase\u003C/code\u003E is described on the \u003Ca href=\u0022/docs/conditionals-and-lists#binding-api\u0022\u003EConditional Rendering and Lists\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch2 id=\u0022class-in-ts\u0022\u003EClass components in files without JSX\u003C/h2\u003E\n\u003Cp\u003EThe Vite plugin processes \u003Ccode\u003E.ts\u003C/code\u003E, \u003Ccode\u003E.mts\u003C/code\u003E and \u003Ccode\u003E.cts\u003C/code\u003E files too: it adds \u003Ccode\u003Estatic elementTag = \u0026quot;div\u0026quot;\u003C/code\u003E to a class that writes \u003Ccode\u003Eextends Component\u0026lt;HTMLDivElement\u0026gt;\u003C/code\u003E, and the component gets an element of its own. In a \u003Ccode\u003E.js\u003C/code\u003E file no generic is written, so \u003Ccode\u003Estatic elementTag = \u0026quot;div\u0026quot;\u003C/code\u003E is written by hand. In a file the plugin does not process (a library compiled only with \u003Ccode\u003Etsc\u003C/code\u003E, a package in \u003Ccode\u003Enode_modules\u003C/code\u003E), write \u003Ccode\u003Estatic elementTag = \u0026quot;div\u0026quot;\u003C/code\u003E or call \u003Ccode\u003Esuper(\u0026quot;div\u0026quot;)\u003C/code\u003E as well. A class that declares no element type is a \u003Cstrong\u003Efragment\u003C/strong\u003E: \u003Ccode\u003Ethis.element\u003C/code\u003E is a comment marker; \u003Ccode\u003Ethis.class\u003C/code\u003E and \u003Ccode\u003Ethis.attr\u003C/code\u003E reach no element at all, \u003Ccode\u003Ethis.motif.on\u003C/code\u003E listens on the top-level elements of the content, and \u003Ccode\u003Ex-display\u003C/code\u003E and \u003Ccode\u003Ethis.motif.hide()\u003C/code\u003E hide the children. Returning a wrapper from \u003Ccode\u003Eview()\u003C/code\u003E does not give the component an element: the wrapper is the first child of the content, so write classes and attributes on it (see \u003Ca href=\u0022/docs/components#root-element\u0022\u003ERoot element\u003C/a\u003E). The layout of the notes list is a class without an element; \u003Ccode\u003Eview()\u003C/code\u003E returns the content:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, RouterView, motifComponent, reactive, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService)!;\n  nav = useNavigation();\n  state = reactive({ query: \u0026quot;\u0026quot; });\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  }\n\n  get visible() {\n    return this.notes.list(this.folder, this.state.query);\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      const detail = motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n        main.class.add(\u0026quot;detail\u0026quot;);\n        main.controls.add(motifComponent(RouterView, { class: \u0026quot;outlet\u0026quot; }));\n      });\n      root.controls.add(this.listPane(), detail);\n    });\n  }\n\n  private listPane() {\n    return motifComponent(\u0026quot;section\u0026quot;, (list: ComponentBase) =\u0026gt; {\n      list.class.add(\u0026quot;list\u0026quot;);\n      list.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Note list\u0026quot; });\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, motifComponent, reactive, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService);\n  nav = useNavigation();\n  state = reactive({ query: \u0026quot;\u0026quot; });\n\n  get folder() {\n    return this.nav.meta.folder;\n  }\n\n  get visible() {\n    return this.notes.list(this.folder, this.state.query);\n  }\n\n  view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      const detail = motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n        main.class.add(\u0026quot;detail\u0026quot;);\n        main.controls.add(motifComponent(RouterView, { class: \u0026quot;outlet\u0026quot; }));\n      });\n      root.controls.add(this.listPane(), detail);\n    });\n  }\n\n  listPane() {\n    return motifComponent(\u0026quot;section\u0026quot;, (list) =\u0026gt; {\n      list.class.add(\u0026quot;list\u0026quot;);\n      list.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Note list\u0026quot; });\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003ENotesLayout\u003C/code\u003E has no element of its own; \u003Ccode\u003E\u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\u003C/code\u003E is the first child of the content. The form with an element of its own is the \u003Ccode\u003EPinnedNotes\u003C/code\u003E class below: its element is \u003Ccode\u003E\u0026lt;aside class=\u0026quot;pinned\u0026quot;\u0026gt;\u003C/code\u003E, and \u003Ccode\u003Eview()\u003C/code\u003E returns only the children. A class\u0027s \u003Ccode\u003Eview()\u003C/code\u003E returns a single component (of type \u003Ccode\u003EComponentBase\u003C/code\u003E); for several roots write \u003Ccode\u003EmotifFragment\u003C/code\u003E. The \u003Ccode\u003Eview()\u003C/code\u003E of an Options API component can return an array as well.\u003C/p\u003E\n\u003Cp\u003EThe reading order stays as it is in JSX: the children as \u003Ccode\u003Econst\u003C/code\u003Es, a single \u003Ccode\u003Econtrols.add\u003C/code\u003E at the end, and private methods that each return a component for the parts. \u003Ccode\u003EPinnedNotes\u003C/code\u003E, added to the sidebar, lists the pinned notes, and each row has a button that unpins it; it is the same component in all three forms:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/PinnedNotes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript\u0022 data-file=\u0022src/parts/PinnedNotes.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class PinnedNotes extends Component\u0026lt;HTMLElement\u0026gt; {\n  static override elementTag = \u0026quot;aside\u0026quot;;\n  notes = this.getService(NotesService)!;\n\n  get pinned() {\n    return this.notes.list(\u0026quot;pinned\u0026quot;);\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;pinned\u0026quot;);\n  }\n\n  override view() {\n    const heading = motifComponent(\u0026quot;h3\u0026quot;, (h3: ComponentBase) =\u0026gt; h3.bindings.text(() =\u0026gt; \u0060Pinned (${this.pinned.length})\u0060));\n    const rows = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; {\n      ul.controls.add(motifComponent({\n        initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; this.pinned, (note: Note) =\u0026gt; this.row(note)),\n      }));\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; this.pinned.length === 0),\n      initializeComponent: (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;hint\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;No pinned notes.\u0026quot;)));\n      },\n    });\n    return motifFragment({ initializeComponent: (content: ComponentBase) =\u0026gt; content.controls.add(heading, rows, empty) });\n  }\n\n  private row(note: Note) {\n    return motifComponent(\u0026quot;li\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (li: ComponentBase) =\u0026gt; {\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        const unpin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot;, title: \u0026quot;Unpin\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.togglePin(note));\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;×\u0026quot;)));\n        });\n        li.controls.add(title, unpin);\n      },\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/PinnedNotes.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function PinnedNotes() {\n  const notes = FromService(NotesService)!;\n  const pinned = () =\u0026gt; notes.list(\u0026quot;pinned\u0026quot;);\n\n  const row = (note: Note) =\u0026gt;\n    motifComponent(\u0026quot;li\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (li: ComponentBase) =\u0026gt; {\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        const unpin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot;, title: \u0026quot;Unpin\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;×\u0026quot;)));\n        });\n        li.controls.add(title, unpin);\n      },\n    });\n\n  return motifComponent(\u0026quot;aside\u0026quot;, (aside: ComponentBase) =\u0026gt; {\n    aside.class.add(\u0026quot;pinned\u0026quot;);\n    const heading = motifComponent(\u0026quot;h3\u0026quot;, (h3: ComponentBase) =\u0026gt; h3.bindings.text(() =\u0026gt; \u0060Pinned (${pinned().length})\u0060));\n    const rows = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; {\n      ul.controls.add(motifComponent({\n        initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(pinned, (note: Note) =\u0026gt; row(note)),\n      }));\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; pinned().length === 0),\n      initializeComponent: (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;hint\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;No pinned notes.\u0026quot;)));\n      },\n    });\n    aside.controls.add(heading, rows, empty);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022options/typescript\u0022 data-file=\u0022src/parts/PinnedNotes.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const PinnedNotes = () =\u0026gt; motifOptions({\n  el: \u0026quot;aside\u0026quot;,\n\n  view() {\n    const notes = FromService(NotesService)!;\n    const pinned = () =\u0026gt; notes.list(\u0026quot;pinned\u0026quot;);\n    const row = (note: Note) =\u0026gt;\n      motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li: ComponentBase) =\u0026gt; {\n          const title = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n          const unpin = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot;, title: \u0026quot;Unpin\u0026quot; });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n            button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;×\u0026quot;)));\n          });\n          li.controls.add(title, unpin);\n        },\n      });\n\n    this.class.add(\u0026quot;pinned\u0026quot;);\n    const heading = motifComponent(\u0026quot;h3\u0026quot;, (h3: ComponentBase) =\u0026gt; h3.bindings.text(() =\u0026gt; \u0060Pinned (${pinned().length})\u0060));\n    const rows = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; {\n      ul.controls.add(motifComponent({\n        initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(pinned, (note: Note) =\u0026gt; row(note)),\n      }));\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; pinned().length === 0),\n      initializeComponent: (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;hint\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;No pinned notes.\u0026quot;)));\n      },\n    });\n    return [heading, rows, empty];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript\u0022 data-file=\u0022src/parts/PinnedNotes.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class PinnedNotes extends Component {\n  static elementTag = \u0026quot;aside\u0026quot;;\n  notes = this.getService(NotesService);\n\n  get pinned() {\n    return this.notes.list(\u0026quot;pinned\u0026quot;);\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;pinned\u0026quot;);\n  }\n\n  view() {\n    const heading = motifComponent(\u0026quot;h3\u0026quot;, (h3) =\u0026gt; h3.bindings.text(() =\u0026gt; \u0060Pinned (${this.pinned.length})\u0060));\n    const rows = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; {\n      ul.controls.add(motifComponent({\n        initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; this.pinned, (note) =\u0026gt; this.row(note)),\n      }));\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; this.pinned.length === 0),\n      initializeComponent: (p) =\u0026gt; {\n        p.class.add(\u0026quot;hint\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;No pinned notes.\u0026quot;)));\n      },\n    });\n    return motifFragment({ initializeComponent: (content) =\u0026gt; content.controls.add(heading, rows, empty) });\n  }\n\n  row(note) {\n    return motifComponent(\u0026quot;li\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (li) =\u0026gt; {\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        const unpin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot;, title: \u0026quot;Unpin\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.notes.togglePin(note));\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;×\u0026quot;)));\n        });\n        li.controls.add(title, unpin);\n      },\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/PinnedNotes.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function PinnedNotes() {\n  const notes = FromService(NotesService);\n  const pinned = () =\u0026gt; notes.list(\u0026quot;pinned\u0026quot;);\n\n  const row = (note) =\u0026gt;\n    motifComponent(\u0026quot;li\u0026quot;, {\n      indexkey: () =\u0026gt; note.id,\n      initializeComponent: (li) =\u0026gt; {\n        const title = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n        const unpin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n          button.attr.add({ type: \u0026quot;button\u0026quot;, title: \u0026quot;Unpin\u0026quot; });\n          button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n          button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;×\u0026quot;)));\n        });\n        li.controls.add(title, unpin);\n      },\n    });\n\n  return motifComponent(\u0026quot;aside\u0026quot;, (aside) =\u0026gt; {\n    aside.class.add(\u0026quot;pinned\u0026quot;);\n    const heading = motifComponent(\u0026quot;h3\u0026quot;, (h3) =\u0026gt; h3.bindings.text(() =\u0026gt; \u0060Pinned (${pinned().length})\u0060));\n    const rows = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; {\n      ul.controls.add(motifComponent({\n        initializeComponent: (holder) =\u0026gt; holder.bindings.list(pinned, (note) =\u0026gt; row(note)),\n      }));\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; pinned().length === 0),\n      initializeComponent: (p) =\u0026gt; {\n        p.class.add(\u0026quot;hint\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;No pinned notes.\u0026quot;)));\n      },\n    });\n    aside.controls.add(heading, rows, empty);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022options/javascript\u0022 data-file=\u0022src/parts/PinnedNotes.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const PinnedNotes = () =\u0026gt; motifOptions({\n  el: \u0026quot;aside\u0026quot;,\n\n  view() {\n    const notes = FromService(NotesService);\n    const pinned = () =\u0026gt; notes.list(\u0026quot;pinned\u0026quot;);\n    const row = (note) =\u0026gt;\n      motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li) =\u0026gt; {\n          const title = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n          const unpin = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot;, title: \u0026quot;Unpin\u0026quot; });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; notes.togglePin(note));\n            button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;×\u0026quot;)));\n          });\n          li.controls.add(title, unpin);\n        },\n      });\n\n    this.class.add(\u0026quot;pinned\u0026quot;);\n    const heading = motifComponent(\u0026quot;h3\u0026quot;, (h3) =\u0026gt; h3.bindings.text(() =\u0026gt; \u0060Pinned (${pinned().length})\u0060));\n    const rows = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; {\n      ul.controls.add(motifComponent({\n        initializeComponent: (holder) =\u0026gt; holder.bindings.list(pinned, (note) =\u0026gt; row(note)),\n      }));\n    });\n    const empty = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; pinned().length === 0),\n      initializeComponent: (p) =\u0026gt; {\n        p.class.add(\u0026quot;hint\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;No pinned notes.\u0026quot;)));\n      },\n    });\n    return [heading, rows, empty];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe component is built the way it would be written as a tag: \u003Ccode\u003EmotifComponent(PinnedNotes)\u003C/code\u003E; in all three forms the common attributes fall through to the root (\u003Ccode\u003EmotifComponent(PinnedNotes, { class: \u0026quot;sidebar__pinned\u0026quot; })\u003C/code\u003E). In a file without JSX, \u003Ccode\u003E@Injectable\u003C/code\u003E and the other decorators, DI, the router, \u003Ccode\u003EuseNavigation()\u003C/code\u003E, transitions and \u003Ccode\u003EVirtualization\u003C/code\u003E work just the same; an override that does not reach \u003Ccode\u003Esuper\u003C/code\u003E (\u003Ccode\u003EMJX015\u003C/code\u003E) is reported during the Vite plugin\u0027s build, while \u003Ccode\u003Emotif-lint\u003C/code\u003E only looks at JSX files.\u003C/p\u003E\n\u003Ch2 id=\u0022reading-compiled-output\u0022\u003EReading the compiled output\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Enpx motif-explain file.tsx\u003C/code\u003E prints which call an expression comes down to (see \u003Ca href=\u0022/docs/jsx#explain\u0022\u003EWhat did this expression compile to?\u003C/a\u003E). For the whole file, use the \u003Ccode\u003ECompiler\u003C/code\u003E class in the \u003Ccode\u003E@motifx/compiler\u003C/code\u003E package: \u003Ccode\u003Enew Compiler().motifCompile(code, \u0026quot;NoteRow.tsx\u0026quot;)?.code\u003C/code\u003E returns the compiled code. This JSX:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;li\u0026gt;\n  \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n  \u0026lt;span\u0026gt;{note.title}\u0026lt;/span\u0026gt;\n\u0026lt;/li\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/parts/NoteRow.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;li\u0026gt;\n  \u0026lt;i class=\u0026quot;pin\u0026quot; x-display={() =\u0026gt; note.pinned} /\u0026gt;\n  \u0026lt;span\u0026gt;{note.title}\u0026lt;/span\u0026gt;\n\u0026lt;/li\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003Ecompiles to this code:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022dist/NoteRow.js\u0022\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-file=\u0022dist/NoteRow.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent as _mc, FNComponent as _mfc, motifCompiled as _mv } from \u0026quot;@motifx/core\u0026quot;;\n/*#__PURE__*/_mv(1);\n_mc(\u0026quot;li\u0026quot;, {\n  initializeComponent: sender =\u0026gt; {\n    const _comp2 = _mc(\u0026quot;i\u0026quot;, {\n      preconfig: sender =\u0026gt; {\n        sender.bindings.display(() =\u0026gt; note.pinned);\n      },\n      initializeComponent: sender =\u0026gt; {\n        sender.class.add(\u0026quot;pin\u0026quot;);\n      }\n    });\n    sender.controls.add(_comp2);\n    const _comp3 = _mc(\u0026quot;span\u0026quot;, {\n      initializeComponent: sender =\u0026gt; {\n        const _comp = _mc(\u0026quot;text\u0026quot;, {\n          initializeComponent: sender =\u0026gt; {\n            sender.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;);\n          },\n          __childExpr: () =\u0026gt; note.title\n        });\n        sender.controls.add(_comp);\n      }\n    }, 1);\n    sender.controls.add(_comp3);\n  }\n}, 1);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe hand-written version:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;li\u0026quot;, (li: ComponentBase) =\u0026gt; {\n  const pin = motifComponent(\u0026quot;i\u0026quot;, {\n    preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n    initializeComponent: (i: ComponentBase) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n  });\n  const title = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n    span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n  });\n  li.controls.add(pin, title);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;li\u0026quot;, (li) =\u0026gt; {\n  const pin = motifComponent(\u0026quot;i\u0026quot;, {\n    preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned),\n    initializeComponent: (i) =\u0026gt; i.class.add(\u0026quot;pin\u0026quot;),\n  });\n  const title = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n    span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n  });\n  li.controls.add(pin, title);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EA key for reading the output:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EIn the output\u003C/th\u003E\n\u003Cth\u003EWhen writing by hand\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E_mc(\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E_mf(\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifFragment(\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E_mfc\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EFNComponent\u003C/code\u003E; the compiler\u0027s import, not used by hand-written code\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E_mv(1)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifCompiled\u003C/code\u003E; the contract mark between the compiler and the runtime, absent from hand-written code\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etry { … } catch (__e) { _mr(__e); }\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifReport\u003C/code\u003E; this is how the compiler reports the error of a child expression. A hand-written getter does not need \u003Ccode\u003Etry\u003C/code\u003E/\u003Ccode\u003Ecatch\u003C/code\u003E: the runtime reports the error with \u003Ccode\u003EMJX208\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Epreconfig: sender =\u0026gt; { sender.bindings.display(…) }\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-display\u003C/code\u003E / \u003Ccode\u003Ex-wait\u003C/code\u003E; written the same way\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eindexkey: () =\u0026gt; n.id\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E__isSvgElement: true\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eoptions: { isSvg: true }\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E__childExpr: () =\u0026gt; note.title\u003C/code\u003E, \u003Ccode\u003Echilds: []\u003C/code\u003E, the third argument \u003Ccode\u003E, 1\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Ecompiler markers; drop them\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.method(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.text(fn)\u003C/code\u003E, or \u003Ccode\u003Emethod\u003C/code\u003E as it is\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Esender\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eany parameter name you like (\u003Ccode\u003E(li: ComponentBase)\u003C/code\u003E)\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022pitfalls\u0022\u003EPitfalls of hand-written views\u003C/h2\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Cstrong\u003EAn accidental fragment.\u003C/strong\u003E A class that declares no element type is a fragment, and so is a \u003Ccode\u003EComponent\u0026lt;HTMLDivElement\u0026gt;\u003C/code\u003E class in a file the Vite plugin does not process. Write \u003Ccode\u003Estatic elementTag\u003C/code\u003E or call \u003Ccode\u003Esuper(\u0026quot;div\u0026quot;)\u003C/code\u003E. Returning a wrapper from \u003Ccode\u003Eview()\u003C/code\u003E does not give the component an element.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EAn error inside \u003Ccode\u003EinitializeComponent\u003C/code\u003E is swallowed.\u003C/strong\u003E If the setup function throws, the element stays empty; the only trace is the entry that lands in \u003Ccode\u003Econsole.error\u003C/code\u003E with \u003Ccode\u003EMJX122\u003C/code\u003E. A common cause: a \u003Ccode\u003Econst\u003C/code\u003E that calls a function with the same name in its own setup. Setup runs in \u003Ccode\u003Ebuild()\u003C/code\u003E, so at that moment the name holds the component: in \u003Ccode\u003Econst title = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.controls.add(title(\u0026quot;…\u0026quot;)))\u003C/code\u003E, \u003Ccode\u003Etitle(\u0026quot;…\u0026quot;)\u003C/code\u003E tries to call the component. \u003Ccode\u003EmotifComponent\u003C/code\u003E returns \u003Ccode\u003Eany\u003C/code\u003E, so type checking does not catch it; check the rendered text in a test, or watch \u003Ccode\u003Econsole.error\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003Edisplay\u003C/code\u003E / \u003Ccode\u003Ewait\u003C/code\u003E in the wrong hook.\u003C/strong\u003E If registered inside \u003Ccode\u003EinitializeComponent\u003C/code\u003E, the hidden element is built once; register it inside \u003Ccode\u003Epreconfig\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003ENo compiler, no diagnostics.\u003C/strong\u003E \u003Ccode\u003EMJX001\u003C/code\u003E–\u003Ccode\u003EMJX005\u003C/code\u003E and \u003Ccode\u003EMJX016\u003C/code\u003E are only for JSX; there is no warning for a list without \u003Ccode\u003Eindexkey\u003C/code\u003E or for a plain value that should have been a getter. A plain value is a snapshot, as in JSX: for \u003Ca href=\u0022/docs/jsx#attribute-fallthrough\u0022\u003E\u003Ccode\u003ECountBadge\u003C/code\u003E\u003C/a\u003E, \u003Ccode\u003EmotifComponent(CountBadge, { count: notes.count(\u0026quot;pinned\u0026quot;) })\u003C/code\u003E reads the count once; to keep it live, write \u003Ccode\u003Ecount: () =\u0026gt; notes.count(\u0026quot;pinned\u0026quot;)\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe types are yours.\u003C/strong\u003E You write the setup parameter (\u003Ccode\u003E(c: ComponentBase)\u003C/code\u003E), the \u003Ccode\u003Eref\u003C/code\u003E field (\u003Ccode\u003Esearch!: Component\u0026lt;HTMLInputElement\u0026gt;\u003C/code\u003E) and the \u003Ccode\u003Emotif.on\u003C/code\u003E handler (\u003Ccode\u003E(_sender: ComponentBase, e: KeyboardEvent)\u003C/code\u003E) yourself.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003Econtrols.add\u003C/code\u003E is immediate\u003C/strong\u003E, so there is nothing to wait for; reactive \u003Cem\u003Eupdates\u003C/em\u003E, on the other hand, are applied on a microtask, as in JSX (\u003Ccode\u003Eawait Promise.resolve()\u003C/code\u003E in a test).\u003C/li\u003E\n\u003C/ol\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ca href=\u0022/docs/reactivity\u0022\u003EReactivity\u003C/a\u003E: \u003Ccode\u003Ereactive\u003C/code\u003E, \u003Ccode\u003EcreateSignal\u003C/code\u003E and \u003Ccode\u003Eeffect\u003C/code\u003E, which bindings track.\u003C/li\u003E\n\u003Cli\u003E\u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EConditional Rendering and Lists\u003C/a\u003E: the behaviour of \u003Ccode\u003Ewait\u003C/code\u003E/\u003Ccode\u003Edisplay\u003C/code\u003E, \u003Ccode\u003Ewhen\u003C/code\u003E, \u003Ccode\u003Eternary\u003C/code\u003E, \u003Ccode\u003Elist\u003C/code\u003E and \u003Ccode\u003EswitchCase\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Ca href=\u0022/docs/events\u0022\u003EEvents\u003C/a\u003E: \u003Ccode\u003Emotif.on\u003C/code\u003E signatures, modifiers and application events.\u003C/li\u003E\n\u003Cli\u003E\u003Ca href=\u0022/docs/lifecycle#initialize-component\u0022\u003ELifecycle\u003C/a\u003E: \u003Ccode\u003EinitializeComponent\u003C/code\u003E and the order of the hooks.\u003C/li\u003E\n\u003C/ul\u003E\n","headings":[{"id":"call-shapes","text":"Call shapes","level":2},{"id":"motif-component","text":"motifComponent(element, props?)","level":2},{"id":"new-component","text":"new Component(element, props?)","level":2},{"id":"props-keys","text":"Keys of the props object","level":2},{"id":"text-nodes","text":"Text nodes","level":2},{"id":"preconfig","text":"preconfig","level":2},{"id":"fragments","text":"Fragments for branches and lists","level":2},{"id":"class-in-ts","text":"Class components in files without JSX","level":2},{"id":"reading-compiled-output","text":"Reading the compiled output","level":2},{"id":"pitfalls","text":"Pitfalls of hand-written views","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"jsx","title":"JSX and Templates"},"next":{"slug":"reactivity","title":"Reactivity"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Core concepts</p>
+        <h1>Views without JSX</h1>
+        <p>Writing by hand the motifComponent calls that JSX comes down to; call shapes, new Component, props keys, text nodes, preconfig, fragments for branches and lists, class components in files without JSX, reading the compiled output.</p>
+<p>The compiler turns every JSX element into a <code>motifComponent(tag, setup)</code> call, and the tree is built with <code>sender.controls.add(...)</code>. A project that does not use JSX (<code>.ts</code> / <code>.js</code>) writes the same calls by hand: the hand-written version of the code the compiler produces. The runtime, the bindings, the lifecycle and the rules are the same; only the way of writing changes. This page is for projects without JSX, for libraries that should not depend on the compiler, for views generated in code, and for reading compiled output. Which call each JSX form comes down to is given next to every example on the <a href="/docs/jsx">JSX and Templates</a> page; here the calls themselves are explained.</p>
+<p>The examples are slices of the version without JSX of the notes application in the starter template: the sidebar (<code>MainLayout</code>), the notes list (<code>NotesLayout</code>), the list row (<code>NoteRow</code>) and the editor (<code>NotePage</code>). <code>Note</code>, <code>Folder</code> and <code>NotesService</code> are the ones in the <code>src/services/notes.ts</code> file on the <a href="/docs/components">Components</a> page. In TypeScript the parameter of a setup function is written as <code>ComponentBase</code>; <code>motifComponent</code> returns <code>any</code>, so you declare the types yourself (see <a href="#pitfalls">Pitfalls</a>).</p>
+<h2 id="call-shapes">Call shapes</h2>
+<table>
+<thead>
+<tr>
+<th>JSX</th>
+<th>Written by hand</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;div class=&quot;app&quot;&gt;…&lt;/div&gt;</code></td>
+<td><code>motifComponent(&quot;div&quot;, (div) =&gt; { div.class.add(&quot;app&quot;); div.controls.add(…); })</code></td>
+</tr>
+<tr>
+<td><code>Notes</code> (plain text)</td>
+<td><code>motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Notes&quot;))</code> — a text node</td>
+</tr>
+<tr>
+<td><code>{note.title}</code></td>
+<td><code>node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)</code> on a text node</td>
+</tr>
+<tr>
+<td><code>{() =&gt; note.title.trim() \|\| &quot;Untitled&quot;}</code></td>
+<td><code>span.bindings.text(() =&gt; note.title.trim() \|\| &quot;Untitled&quot;)</code>; the compiler writes <code>bindings.method(fn)</code>, which does the same job and also accepts a component result</td>
+</tr>
+<tr>
+<td><code>type=&quot;button&quot; aria-pressed={() =&gt; note.pinned} aria-current={() =&gt; (open() ? &quot;page&quot; : null)}</code></td>
+<td><code>button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; note.pinned, &quot;aria-current&quot;: () =&gt; (open() ? &quot;page&quot; : null) })</code> — a function is a live getter, a plain value is written once, and <code>false</code>/<code>null</code> remove the attribute. On <code>action</code> and <code>formaction</code>, the function returned by the getter becomes the form's submit handler: <code>form.attr.add({ action: () =&gt; (data: FormData) =&gt; … })</code> (see <a href="/docs/forms#action">Submitting with a function <code>action</code></a>)</td>
+</tr>
+<tr>
+<td><code>class={() =&gt; (note.pinned ? &quot;note pinned&quot; : &quot;note&quot;)}</code></td>
+<td><code>li.class.add(() =&gt; (note.pinned ? &quot;note pinned&quot; : &quot;note&quot;))</code>; a string, a <code>{ pinned: () =&gt; note.pinned }</code> object and arrays of these work too</td>
+</tr>
+<tr>
+<td><code>onclick={() =&gt; …}</code>, <code>onsubmit:prevent={…}</code></td>
+<td><code>button.motif.on(&quot;click&quot;, () =&gt; …)</code>, <code>form.motif.on(&quot;submit:prevent&quot;, fn)</code>; modifiers chain (<code>&quot;click:once:prevent&quot;</code>). The typed signature is <code>(sender, e)</code>: if you need the event, <code>(_sender: ComponentBase, e: Event) =&gt; …</code></td>
+</tr>
+<tr>
+<td><code>&lt;input x-model={() =&gt; state.query} /&gt;</code></td>
+<td><code>field.bindings.model(() =&gt; state.query, (value: string) =&gt; (state.query = value))</code></td>
+</tr>
+<tr>
+<td><code>&lt;p x-display={() =&gt; cond}&gt;</code></td>
+<td><code>motifComponent(&quot;p&quot;, { preconfig: (p) =&gt; p.bindings.display(() =&gt; cond), initializeComponent: (p) =&gt; { … } })</code>; <code>x-wait</code> → <code>bindings.wait</code> (see <a href="#preconfig"><code>preconfig</code></a>)</td>
+</tr>
+<tr>
+<td><code>{cond ? &lt;A/&gt; : &lt;B/&gt;}</code></td>
+<td><code>pane.bindings.ternary(() =&gt; cond, (frame) =&gt; frame.navigate(a), (frame) =&gt; frame.navigate(b))</code></td>
+</tr>
+<tr>
+<td><code>{cond &amp;&amp; &lt;X/&gt;}</code></td>
+<td><code>pane.bindings.when(() =&gt; cond, () =&gt; x)</code></td>
+</tr>
+<tr>
+<td><code>{visible.map((note) =&gt; &lt;NoteRow key={note.id} note={note} folder={folder} /&gt;)}</code></td>
+<td>a holder without an element: <code>motifComponent({ initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; visible, (note) =&gt; motifComponent(NoteRow, { indexkey: () =&gt; note.id, note, folder })) })</code></td>
+</tr>
+<tr>
+<td><code>&lt;input ref={(c) =&gt; (search = c)} /&gt;</code></td>
+<td><code>motifComponent(&quot;input&quot;, { ref: (c) =&gt; (search = c), initializeComponent: (c) =&gt; { … } })</code>; the node is <code>search.element</code></td>
+</tr>
+<tr>
+<td><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;Notes&lt;/RouterLink&gt;</code></td>
+<td><code>motifComponent(RouterLink, { to: &quot;/notes&quot;, activeClass: &quot;active&quot;, childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Notes&quot;))] })</code></td>
+</tr>
+<tr>
+<td><code>&lt;RouterView class=&quot;outlet&quot; /&gt;</code></td>
+<td><code>motifComponent(RouterView, { class: &quot;outlet&quot; })</code></td>
+</tr>
+<tr>
+<td><code>&lt;a rel=&quot;router&quot; href=&quot;/notes&quot;&gt;</code></td>
+<td><code>motifComponent(&quot;a&quot;, (a) =&gt; a.attr.add({ rel: &quot;router&quot;, href: &quot;/notes&quot; }))</code></td>
+</tr>
+<tr>
+<td><code>&lt;NoteRow note={note} folder={folder} /&gt;</code></td>
+<td><code>motifComponent(NoteRow, { note, folder })</code>: a class is built with the props, a function part is called with the props</td>
+</tr>
+<tr>
+<td><code>&lt;svg viewBox=&quot;0 0 10 10&quot;&gt;&lt;path d=&quot;M0 0h10&quot; /&gt;&lt;/svg&gt;</code></td>
+<td><code>motifComponent(&quot;svg&quot;, { options: { isSvg: true }, initializeComponent: (svg) =&gt; { svg.attr.add({ viewBox: &quot;0 0 10 10&quot; }); svg.controls.add(motifComponent(&quot;path&quot;, { options: { isSvg: true }, initializeComponent: (p) =&gt; p.attr.add({ d: &quot;M0 0h10&quot; }) })); } })</code> — every SVG child carries <code>isSvg</code> too</td>
+</tr>
+<tr>
+<td><code>onMounted={(c) =&gt; …}</code> (on a tag)</td>
+<td>the <code>onMounted</code> key in the object form (and the same for the other hooks; the signature is <code>(sender, e)</code>), or <code>c.motif.on(&quot;x:mounted&quot;, …)</code> during setup</td>
+</tr>
+</tbody>
+</table>
+<h2 id="motif-component"><code>motifComponent(element, props?)</code></h2>
+<ul>
+<li><code>motifComponent(&quot;div&quot;, fn)</code>: <code>fn</code> is the component's <code>initializeComponent</code>. It runs once while the component is being built (<code>build()</code>), just before the children are built, and never again; <code>this</code> is not bound, so use the parameter.</li>
+<li><code>motifComponent(&quot;div&quot;, { … })</code>: the object form. The framework keys are <code>initializeComponent</code>, <code>preconfig</code>, <code>ref</code>, <code>childs</code>, <code>options</code> (<code>isSvg</code>, <code>hideStrategy</code>, <code>disableDisposal</code>), <code>transition</code>, <code>key</code> / <code>indexkey</code> and the lifecycle hooks (<code>onConfig</code>, <code>onConfigured</code>, <code>onBuilt</code>, <code>onMounted</code>, …). On a plain tag the other keys are applied like a spread: <code>{ type: &quot;button&quot;, class: &quot;row&quot;, onclick: fn, &quot;aria-pressed&quot;: () =&gt; note.pinned }</code> go to attributes, classes and events, and getters stay live. The compiler writes attributes with <code>attr.add</code> in the setup function, and that is also the readable choice when writing by hand.</li>
+<li><code>motifComponent(SomeClass, props)</code>: <code>new SomeClass(props)</code>. The framework keys of the object form (<code>preconfig</code>, <code>initializeComponent</code>, <code>onMounted</code>, <code>childs</code>, <code>ref</code> …) are applied to a class component too.</li>
+<li><code>motifComponent(functionPart, props)</code>: the function is called with <code>props</code>, and the framework keys of the object form are applied to the root it returns, as with a class: <code>ref</code>, the common attributes (<code>class</code>, <code>id</code>, <code>style</code>, <code>role</code>, <code>aria-*</code>, <code>data-*</code>; see <a href="/docs/jsx#attribute-fallthrough">attribute fallthrough</a>), <code>options</code>, <code>transition</code>, <code>key</code> / <code>indexkey</code>, <code>preconfig</code>, <code>initializeComponent</code>, the lifecycle hooks and the <code>x-</code> keys. The hook and <code>x-</code> keys are not part of the <code>props</code> the function receives, nor of a class's <code>this.props</code>; callback props such as <code>onSave</code> stay.</li>
+<li><code>motifComponent(instance)</code>: returns a ready component instance as it is.</li>
+<li><code>motifComponent({ initializeComponent: (holder) =&gt; … })</code> (an object without a tag): a component <strong>without an element</strong>. In the DOM it sits between <code>&lt;!--[--&gt;</code> … <code>&lt;!--]--&gt;</code> markers, and its children land inside the parent. This is the holder the compiler uses for lists.</li>
+<li><code>new Component(&quot;div&quot;, { initializeComponent })</code> is the same as the string form; you can also build with <code>new Component(&quot;div&quot;)</code> and call <code>controls.add</code> later.</li>
+<li><code>motifFragment({ initializeComponent: (f) =&gt; f.controls.add(a, b) })</code>: a fragment for a branch or a slot with several roots; in the DOM there are only comment markers, and no attributes or events can be written (see <a href="/docs/jsx#fragment">Fragment</a>).</li>
+</ul>
+<p>Timing: on a plain tag the configuration phase (<code>preconfig</code>, <code>onConfig</code>) ends inside the <code>motifComponent</code> call, while the component is being created; <code>onConfigured</code>, <code>initializeComponent</code> and <code>onBuilt</code> run when the component is added to a built parent (<code>build()</code>), and <code>onMounted</code> when it is attached to the document. In a class component the configuration phase is postponed to the start of <code>build()</code> (see <a href="/docs/lifecycle#hooks">Lifecycle</a>).</p>
+<p>The third argument seen in the compiler output (<code>, 1</code>) and the <code>__childExpr</code> and <code>__isSvgElement</code> keys are compiler markers; hand-written code does not write them and does not call <code>motifCompiled</code> / <code>motifReport</code> (see <a href="#reading-compiled-output">Reading the compiled output</a>).</p>
+<h2 id="new-component"><code>new Component(element, props?)</code></h2>
+<p>The constructor's first argument decides the component's element, and the second is the props object:</p>
+<table>
+<thead>
+<tr>
+<th>First argument</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A tag name: <code>new Component(&quot;li&quot;, props)</code></td>
+<td>A new element with that tag is created. <code>&quot;text&quot;</code> produces a text node. For an SVG element, write <code>options: { isSvg: true }</code> in the props.</td>
+</tr>
+<tr>
+<td>A DOM node: <code>new Component(node, props)</code></td>
+<td>The existing node becomes the component's element, and no new element is created. <code>app.run(&quot;#app&quot;)</code> wraps the <code>#app</code> element on the page this way.</td>
+</tr>
+<tr>
+<td>A props object, or nothing: <code>new Component({ … })</code></td>
+<td>No element is created, and the component's root is a comment node. In a subclass that declares <code>static elementTag</code>, an element with that tag is created.</td>
+</tr>
+<tr>
+<td>An array: <code>new Component([title, body])</code></td>
+<td>A component without an element. Each item in the array is turned into a component by the same rules and added as a child.</td>
+</tr>
+<tr>
+<td>A class or a function: <code>new Component(NoteRow, props)</code></td>
+<td>A class is built with <code>props</code> and a function is called with <code>props</code>; the <code>new</code> expression gives the returned component. The framework keys of the props are applied to the root the function returns, as with <code>motifComponent</code> (see the function part item above). If the function returns an Options object, the component is built from that object.</td>
+</tr>
+<tr>
+<td>A ready component: <code>new Component(row)</code></td>
+<td>The same component is returned; no new one is created.</td>
+</tr>
+</tbody>
+</table>
+<p>How it differs from <code>motifComponent</code>:</p>
+<ul>
+<li>The second argument is read only as a props object. <code>new Component(&quot;li&quot;, (li) =&gt; …)</code> does not run the function; setup code goes under the <code>initializeComponent</code> key.</li>
+<li><code>motifComponent</code> is the one that takes an Options object directly (<code>motifComponent({ el: &quot;section&quot;, … })</code>). <code>new Component</code> treats the object as props and you end up with a component without an element; it does recognize a function that returns an Options object, though.</li>
+</ul>
+<p>On a plain <code>Component</code>, the keys in the props object that are not framework keys are written to the element: <code>class</code>, <code>style</code>, events (<code>onclick</code> …) and attributes; <code>value</code>, <code>checked</code> and <code>selected</code> are set up as bindings, and a function value without parameters becomes a live getter; on <code>action</code> and <code>formaction</code>, the function returned by the getter is the form's submit handler. In a subclass these keys stay in <code>this.props</code>, and only the common attributes fall through to the element. <code>innerHTML</code> and <code>srcdoc</code> are not written this way (<code>MJX124</code>); a <code>javascript:</code> address in an <code>href</code>, <code>src</code>, <code>action</code> or <code>formaction</code> value is blocked (<code>MJX125</code>).</p>
+<p><code>motifFragment(props)</code> is the same as <code>new FragmentNode(props)</code>: while being built, it adds the components in the <code>childs</code> and <code>nodes</code> arrays of the props as children. <code>FNComponent(view)</code> turns a view function into a function component; when the returned function is called with props, it builds a component without an element, gives it the props and adds the component returned by <code>view(props)</code> as a child. That is the <code>_mfc</code> import in the compiler output; function components written in JSX are not wrapped in it.</p>
+<h2 id="props-keys">Keys of the props object</h2>
+<p>MotifJS handles these keys itself; they are not written to the element as attributes.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>initializeComponent</code></td>
+<td>The component's setup code. Runs once while the component is being built, before its children; its parameter is the component itself.</td>
+</tr>
+<tr>
+<td><code>oninitializeComponent</code></td>
+<td>Runs right after <code>initializeComponent</code> (see <a href="/docs/lifecycle#on-initialize-component">Lifecycle</a>).</td>
+</tr>
+<tr>
+<td><code>preconfig</code></td>
+<td>Runs in the configuration phase, before <code>onConfig</code> (see <a href="#preconfig"><code>preconfig</code></a>).</td>
+</tr>
+<tr>
+<td><code>onConfig</code>, <code>onConfigured</code>, <code>onInitializing</code>, <code>onInitialized</code>, <code>onBuilding</code>, <code>onBuilt</code>, <code>onMounted</code>, <code>onVisibilityChanged</code>, <code>onActivated</code>, <code>onDeactivated</code>, <code>onDisposing</code>, <code>onDisposed</code></td>
+<td>Lifecycle hooks: a function or an array of functions, with the signature <code>(sender, e)</code> (see <a href="/docs/lifecycle#hooks">Hooks and run order</a>).</td>
+</tr>
+<tr>
+<td><code>x-wait</code>, <code>x-display</code></td>
+<td>Registered as <code>bindings.wait</code> and <code>bindings.display</code>. Other <code>x-</code> keys such as <code>x-mounted</code> are attached to the hook of the same name.</td>
+</tr>
+<tr>
+<td><code>childs</code></td>
+<td>Child components; nested arrays are flattened. A component without an element, and a class created without an element that writes no <code>view()</code>, add them as content; a class that writes <code>view()</code> places them itself. A component created by tag name does not add <code>childs</code>: <code>new Component(&quot;ul&quot;, { childs })</code> gives an empty <code>&lt;ul&gt;</code>, and the children are added with <code>controls.add</code> inside <code>initializeComponent</code>.</td>
+</tr>
+<tr>
+<td><code>ref</code></td>
+<td>A function called with the component itself once the component is created.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><code>isSvg</code> (an SVG element), <code>hideStrategy</code> (see <a href="/docs/lifecycle#hide-strategy">Hide strategy</a>) and <code>disableDisposal</code>.</td>
+</tr>
+<tr>
+<td><code>transition</code></td>
+<td>An enter and leave transition with CSS classes (see <a href="/docs/styling-and-transitions#transition-prop">The <code>transition</code> prop</a>).</td>
+</tr>
+<tr>
+<td><code>onElementCreating</code></td>
+<td>A function that returns an element; the component uses it instead of the element from the first argument.</td>
+</tr>
+<tr>
+<td><code>key</code>, <code>indexkey</code></td>
+<td>The identity of a list row; the compiler writes <code>key</code> from JSX as <code>indexkey</code>. It is not written to the element and is used only in the <code>MJX202</code> warning, which reports the same identity arriving twice.</td>
+</tr>
+</tbody>
+</table>
+<p>In a function component row, <code>indexkey</code> is written to the props object of the root the function returns. If the function builds its root with the same props object on every call (a module-level constant: <code>motifComponent(&quot;li&quot;, ROW_PROPS)</code>), every row reads the key written to that object last. Even if the keys are unique, an <code>MJX202</code> warning arrives the first time the list updates; the rendering is not affected. Give the root's props as a new object on every call: <code>motifComponent(&quot;li&quot;, { class: &quot;row&quot; })</code>. In JSX this does not happen, because the compiler produces a new object on every call.</p>
+<h2 id="text-nodes">Text nodes</h2>
+<p><code>&quot;text&quot;</code> is a real tag: <code>motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;…&quot;))</code> produces a text node, and text next to an element becomes one more child in the same <code>controls.add</code> call. A binding can be set up on a text node too: <code>node.bindings.text(() =&gt; …)</code> for live text through a getter, and <code>node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)</code> for a one-way binding to a single field. On an element whose only content is text, write <code>span.setText(&quot;…&quot;)</code> or <code>span.bindings.text(fn)</code> without creating a node. The runtime also turns strings and numbers given to <code>controls.add</code> into text nodes, but the TypeScript signature of <code>controls.add</code> takes components (<code>ComponentBase[]</code>), so in a TypeScript project write the <code>&quot;text&quot;</code> call.</p>
+<p>The folder link in the sidebar shows the number of notes in the folder next to its name. The name is a text node and the number is a badge bound with <code>bindings.text</code>; both are given to <code>RouterLink</code> as <code>childs</code>:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/MainLayout.ts"><code>private folderLink(folder: Folder, label: string) {
+  const badge = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+    span.class.add(&quot;badge&quot;);
+    span.bindings.text(() =&gt; String(this.notes.count(folder)));
+  });
+  return motifComponent(RouterLink, {
+    to: `/${folder}`,
+    activeClass: &quot;active&quot;,
+    childs: [motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(`${label} `)), badge],
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/MainLayout.ts"><code>private folderLink(folder: Folder, label: string) {
+  const badge = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+    span.class.add(&quot;badge&quot;);
+    span.bindings.text(() =&gt; String(notes.count(folder)));
+  });
+  return motifComponent(RouterLink, {
+    to: `/${folder}`,
+    activeClass: &quot;active&quot;,
+    childs: [motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(`${label} `)), badge],
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/MainLayout.js"><code>folderLink(folder, label) {
+  const badge = motifComponent(&quot;span&quot;, (span) =&gt; {
+    span.class.add(&quot;badge&quot;);
+    span.bindings.text(() =&gt; String(this.notes.count(folder)));
+  });
+  return motifComponent(RouterLink, {
+    to: `/${folder}`,
+    activeClass: &quot;active&quot;,
+    childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.setText(`${label} `)), badge],
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/MainLayout.js"><code>folderLink(folder, label) {
+  const badge = motifComponent(&quot;span&quot;, (span) =&gt; {
+    span.class.add(&quot;badge&quot;);
+    span.bindings.text(() =&gt; String(notes.count(folder)));
+  });
+  return motifComponent(RouterLink, {
+    to: `/${folder}`,
+    activeClass: &quot;active&quot;,
+    childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.setText(`${label} `)), badge],
+  });
+}</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the function component, <code>notes</code> is the service obtained with <code>FromService</code> and <code>state</code> is the local state set up with <code>reactive</code>; <code>visible()</code>, <code>folder()</code>, <code>confirmation</code>, <code>actions</code> and <code>remove</code> are local functions inside the component function.</p>
+</div>
+<h2 id="preconfig"><code>preconfig</code></h2>
+<p><code>preconfig: (c) =&gt; …</code> runs while the component is being configured, before <code>onConfig</code> and <code>build()</code>; on a plain tag this is inside the <code>motifComponent</code> call. A <code>bindings.display</code> / <code>bindings.wait</code> registered there keeps an element that starts out hidden <strong>unbuilt</strong>: its subtree, <code>initializeComponent</code>, <code>onBuilt</code> and <code>onMounted</code> wait until the condition holds. That is what <code>x-wait</code> / <code>x-display</code> are in JSX. <code>wait</code> holds the component for as long as the function returns <code>true</code>, and <code>display</code> shows it while it is <code>true</code>. If the same binding is registered inside <code>initializeComponent</code>, the element is built first and hidden afterwards.</p>
+<p>The pin mark on a list row is visible only on a note that is pinned and not archived; the empty list message in the list pane appears when no visible notes are left:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/parts/NoteRow.ts"><code>const pin = motifComponent(&quot;i&quot;, {
+  preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+  initializeComponent: (i: ComponentBase) =&gt; {
+    i.class.add(&quot;pin&quot;);
+    i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/parts/NoteRow.js"><code>const pin = motifComponent(&quot;i&quot;, {
+  preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+  initializeComponent: (i) =&gt; {
+    i.class.add(&quot;pin&quot;);
+    i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+  },
+});</code></pre>
+</div>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const empty = motifComponent(&quot;p&quot;, {
+  preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; this.visible.length === 0),
+  initializeComponent: (p: ComponentBase) =&gt; {
+    p.class.add(&quot;list__empty&quot;);
+    p.bindings.text(() =&gt; (this.state.query.trim() ? &quot;No notes match your search.&quot; : FOLDERS[this.folder].empty));
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const empty = motifComponent(&quot;p&quot;, {
+  preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; visible().length === 0),
+  initializeComponent: (p: ComponentBase) =&gt; {
+    p.class.add(&quot;list__empty&quot;);
+    p.bindings.text(() =&gt; (state.query.trim() ? &quot;No notes match your search.&quot; : FOLDERS[folder()].empty));
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>const empty = motifComponent(&quot;p&quot;, {
+  preconfig: (p) =&gt; p.bindings.display(() =&gt; this.visible.length === 0),
+  initializeComponent: (p) =&gt; {
+    p.class.add(&quot;list__empty&quot;);
+    p.bindings.text(() =&gt; (this.state.query.trim() ? &quot;No notes match your search.&quot; : FOLDERS[this.folder].empty));
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>const empty = motifComponent(&quot;p&quot;, {
+  preconfig: (p) =&gt; p.bindings.display(() =&gt; visible().length === 0),
+  initializeComponent: (p) =&gt; {
+    p.class.add(&quot;list__empty&quot;);
+    p.bindings.text(() =&gt; (state.query.trim() ? &quot;No notes match your search.&quot; : FOLDERS[folder()].empty));
+  },
+});</code></pre>
+</div>
+<p>Neither is built when it starts out hidden; <code>initializeComponent</code> runs the first time it is shown. When the condition turns <code>false</code> again, the element stays built and is hidden. <code>wait</code> is the reverse of the same binding: it holds the component for as long as the function returns <code>true</code> and shows it when it turns <code>false</code>. It is given to a component with the same key, and it is the same for class and function components: <code>motifComponent(NoteRow, { note, folder, preconfig: (row: ComponentBase) =&gt; row.bindings.display(() =&gt; !note.archived) })</code>. The difference between <code>display</code> and <code>wait</code>, and the hide strategy, are on the <a href="/docs/conditionals-and-lists#x-wait">Conditional Rendering and Lists</a> and <a href="/docs/lifecycle#wait">Lifecycle</a> pages.</p>
+<h2 id="fragments">Fragments for branches and lists</h2>
+<p>If a branch has a single root, give a component; if it has several roots, a <code>motifFragment</code>; if it is only text, a <code>&quot;text&quot;</code> component; <code>frame.flush()</code> empties the spot. The editor's toolbar asks for confirmation before deleting a note. The confirmation is a question and two buttons, and since it has several roots it is given with <code>motifFragment</code>; <code>actions(note)</code> returns the pin, archive and delete buttons the same way:</p>
+<div class="doc-code" data-file="src/pages/NotePage.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/pages/NotePage.ts"><code>private toolbar(note: Note) {
+  return motifComponent(&quot;div&quot;, (bar: ComponentBase) =&gt; {
+    bar.class.add(&quot;toolbar&quot;);
+    bar.bindings.ternary(
+      () =&gt; this.state.confirming,
+      (frame) =&gt; frame.navigate(this.confirmation(note)),
+      (frame) =&gt; frame.navigate(this.actions(note)),
+    );
+  });
+}
+
+private confirmation(note: Note) {
+  return motifFragment({
+    initializeComponent: (tools: ComponentBase) =&gt; {
+      const question = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+        span.class.add(&quot;confirm&quot;);
+        span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Delete this note permanently?&quot;)));
+      });
+      const remove = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm danger accent&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; this.remove(note));
+        button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Delete&quot;)));
+      });
+      const cancel = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm ghost&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; (this.state.confirming = false));
+        button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Cancel&quot;)));
+      });
+      tools.controls.add(question, remove, cancel);
+    },
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/pages/NotePage.ts"><code>private toolbar(note: Note) {
+  return motifComponent(&quot;div&quot;, (bar: ComponentBase) =&gt; {
+    bar.class.add(&quot;toolbar&quot;);
+    bar.bindings.ternary(
+      () =&gt; state.confirming,
+      (frame) =&gt; frame.navigate(confirmation(note)),
+      (frame) =&gt; frame.navigate(actions(note)),
+    );
+  });
+}
+
+private confirmation(note: Note) {
+  return motifFragment({
+    initializeComponent: (tools: ComponentBase) =&gt; {
+      const question = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+        span.class.add(&quot;confirm&quot;);
+        span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Delete this note permanently?&quot;)));
+      });
+      const removeButton = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm danger accent&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; remove(note));
+        button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Delete&quot;)));
+      });
+      const cancel = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm ghost&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; (state.confirming = false));
+        button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Cancel&quot;)));
+      });
+      tools.controls.add(question, removeButton, cancel);
+    },
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/pages/NotePage.js"><code>toolbar(note) {
+  return motifComponent(&quot;div&quot;, (bar) =&gt; {
+    bar.class.add(&quot;toolbar&quot;);
+    bar.bindings.ternary(
+      () =&gt; this.state.confirming,
+      (frame) =&gt; frame.navigate(this.confirmation(note)),
+      (frame) =&gt; frame.navigate(this.actions(note)),
+    );
+  });
+}
+
+confirmation(note) {
+  return motifFragment({
+    initializeComponent: (tools) =&gt; {
+      const question = motifComponent(&quot;span&quot;, (span) =&gt; {
+        span.class.add(&quot;confirm&quot;);
+        span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Delete this note permanently?&quot;)));
+      });
+      const remove = motifComponent(&quot;button&quot;, (button) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm danger accent&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; this.remove(note));
+        button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Delete&quot;)));
+      });
+      const cancel = motifComponent(&quot;button&quot;, (button) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm ghost&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; (this.state.confirming = false));
+        button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Cancel&quot;)));
+      });
+      tools.controls.add(question, remove, cancel);
+    },
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/pages/NotePage.js"><code>toolbar(note) {
+  return motifComponent(&quot;div&quot;, (bar) =&gt; {
+    bar.class.add(&quot;toolbar&quot;);
+    bar.bindings.ternary(
+      () =&gt; state.confirming,
+      (frame) =&gt; frame.navigate(confirmation(note)),
+      (frame) =&gt; frame.navigate(actions(note)),
+    );
+  });
+}
+
+confirmation(note) {
+  return motifFragment({
+    initializeComponent: (tools) =&gt; {
+      const question = motifComponent(&quot;span&quot;, (span) =&gt; {
+        span.class.add(&quot;confirm&quot;);
+        span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Delete this note permanently?&quot;)));
+      });
+      const removeButton = motifComponent(&quot;button&quot;, (button) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm danger accent&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; remove(note));
+        button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Delete&quot;)));
+      });
+      const cancel = motifComponent(&quot;button&quot;, (button) =&gt; {
+        button.attr.add({ type: &quot;button&quot; });
+        button.class.add(&quot;button--sm ghost&quot;);
+        button.motif.on(&quot;click&quot;, () =&gt; (state.confirming = false));
+        button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Cancel&quot;)));
+      });
+      tools.controls.add(question, removeButton, cancel);
+    },
+  });
+}</code></pre>
+</div>
+<p>For a list that changes, use a holder without an element and <code>bindings.list</code>; the row component declares its identity with <code>indexkey</code> (that is how the compiler writes <code>key</code>). When the order changes the nodes are moved, not rebuilt. For fixed options a plain <code>for</code> loop is enough. The list pane lists the visible notes like this:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const list = motifComponent({
+  initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(
+    () =&gt; this.visible,
+    (note: Note) =&gt; motifComponent(NoteRow, { indexkey: () =&gt; note.id, note, folder: this.folder }),
+  ),
+});</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const list = motifComponent({
+  initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(
+    () =&gt; visible(),
+    (note: Note) =&gt; motifComponent(NoteRow, { indexkey: () =&gt; note.id, note, folder: folder() }),
+  ),
+});</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>const list = motifComponent({
+  initializeComponent: (holder) =&gt; holder.bindings.list(
+    () =&gt; this.visible,
+    (note) =&gt; motifComponent(NoteRow, { indexkey: () =&gt; note.id, note, folder: this.folder }),
+  ),
+});</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>const list = motifComponent({
+  initializeComponent: (holder) =&gt; holder.bindings.list(
+    () =&gt; visible(),
+    (note) =&gt; motifComponent(NoteRow, { indexkey: () =&gt; note.id, note, folder: folder() }),
+  ),
+});</code></pre>
+</div>
+<p>The behaviour of <code>when</code>, <code>ternary</code>, <code>list</code> and <code>switchCase</code> is described on the <a href="/docs/conditionals-and-lists#binding-api">Conditional Rendering and Lists</a> page.</p>
+<h2 id="class-in-ts">Class components in files without JSX</h2>
+<p>The Vite plugin processes <code>.ts</code>, <code>.mts</code> and <code>.cts</code> files too: it adds <code>static elementTag = &quot;div&quot;</code> to a class that writes <code>extends Component&lt;HTMLDivElement&gt;</code>, and the component gets an element of its own. In a <code>.js</code> file no generic is written, so <code>static elementTag = &quot;div&quot;</code> is written by hand. In a file the plugin does not process (a library compiled only with <code>tsc</code>, a package in <code>node_modules</code>), write <code>static elementTag = &quot;div&quot;</code> or call <code>super(&quot;div&quot;)</code> as well. A class that declares no element type is a <strong>fragment</strong>: <code>this.element</code> is a comment marker; <code>this.class</code> and <code>this.attr</code> reach no element at all, <code>this.motif.on</code> listens on the top-level elements of the content, and <code>x-display</code> and <code>this.motif.hide()</code> hide the children. Returning a wrapper from <code>view()</code> does not give the component an element: the wrapper is the first child of the content, so write classes and attributes on it (see <a href="/docs/components#root-element">Root element</a>). The layout of the notes list is a class without an element; <code>view()</code> returns the content:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/layouts/NotesLayout.ts"><code>import { Component, ComponentBase, RouterView, motifComponent, reactive, useNavigation } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService)!;
+  nav = useNavigation();
+  state = reactive({ query: &quot;&quot; });
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  }
+
+  get visible() {
+    return this.notes.list(this.folder, this.state.query);
+  }
+
+  override view() {
+    return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      const detail = motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+        main.class.add(&quot;detail&quot;);
+        main.controls.add(motifComponent(RouterView, { class: &quot;outlet&quot; }));
+      });
+      root.controls.add(this.listPane(), detail);
+    });
+  }
+
+  private listPane() {
+    return motifComponent(&quot;section&quot;, (list: ComponentBase) =&gt; {
+      list.class.add(&quot;list&quot;);
+      list.attr.add({ &quot;aria-label&quot;: &quot;Note list&quot; });
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/layouts/NotesLayout.js"><code>import { Component, RouterView, motifComponent, reactive, useNavigation } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService);
+  nav = useNavigation();
+  state = reactive({ query: &quot;&quot; });
+
+  get folder() {
+    return this.nav.meta.folder;
+  }
+
+  get visible() {
+    return this.notes.list(this.folder, this.state.query);
+  }
+
+  view() {
+    return motifComponent(&quot;div&quot;, (root) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      const detail = motifComponent(&quot;main&quot;, (main) =&gt; {
+        main.class.add(&quot;detail&quot;);
+        main.controls.add(motifComponent(RouterView, { class: &quot;outlet&quot; }));
+      });
+      root.controls.add(this.listPane(), detail);
+    });
+  }
+
+  listPane() {
+    return motifComponent(&quot;section&quot;, (list) =&gt; {
+      list.class.add(&quot;list&quot;);
+      list.attr.add({ &quot;aria-label&quot;: &quot;Note list&quot; });
+    });
+  }
+}</code></pre>
+</div>
+<p><code>NotesLayout</code> has no element of its own; <code>&lt;div class=&quot;notes&quot;&gt;</code> is the first child of the content. The form with an element of its own is the <code>PinnedNotes</code> class below: its element is <code>&lt;aside class=&quot;pinned&quot;&gt;</code>, and <code>view()</code> returns only the children. A class's <code>view()</code> returns a single component (of type <code>ComponentBase</code>); for several roots write <code>motifFragment</code>. The <code>view()</code> of an Options API component can return an array as well.</p>
+<p>The reading order stays as it is in JSX: the children as <code>const</code>s, a single <code>controls.add</code> at the end, and private methods that each return a component for the parts. <code>PinnedNotes</code>, added to the sidebar, lists the pinned notes, and each row has a button that unpins it; it is the same component in all three forms:</p>
+<div class="doc-code" data-file="src/parts/PinnedNotes.ts">
+<pre data-lang="ts" data-variant="class/typescript" data-file="src/parts/PinnedNotes.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export class PinnedNotes extends Component&lt;HTMLElement&gt; {
+  static override elementTag = &quot;aside&quot;;
+  notes = this.getService(NotesService)!;
+
+  get pinned() {
+    return this.notes.list(&quot;pinned&quot;);
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;pinned&quot;);
+  }
+
+  override view() {
+    const heading = motifComponent(&quot;h3&quot;, (h3: ComponentBase) =&gt; h3.bindings.text(() =&gt; `Pinned (${this.pinned.length})`));
+    const rows = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; {
+      ul.controls.add(motifComponent({
+        initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; this.pinned, (note: Note) =&gt; this.row(note)),
+      }));
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; this.pinned.length === 0),
+      initializeComponent: (p: ComponentBase) =&gt; {
+        p.class.add(&quot;hint&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;No pinned notes.&quot;)));
+      },
+    });
+    return motifFragment({ initializeComponent: (content: ComponentBase) =&gt; content.controls.add(heading, rows, empty) });
+  }
+
+  private row(note: Note) {
+    return motifComponent(&quot;li&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (li: ComponentBase) =&gt; {
+        const title = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        const unpin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+          button.attr.add({ type: &quot;button&quot;, title: &quot;Unpin&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; this.notes.togglePin(note));
+          button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;×&quot;)));
+        });
+        li.controls.add(title, unpin);
+      },
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/PinnedNotes.ts"><code>import { ComponentBase, FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export function PinnedNotes() {
+  const notes = FromService(NotesService)!;
+  const pinned = () =&gt; notes.list(&quot;pinned&quot;);
+
+  const row = (note: Note) =&gt;
+    motifComponent(&quot;li&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (li: ComponentBase) =&gt; {
+        const title = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        const unpin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+          button.attr.add({ type: &quot;button&quot;, title: &quot;Unpin&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+          button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;×&quot;)));
+        });
+        li.controls.add(title, unpin);
+      },
+    });
+
+  return motifComponent(&quot;aside&quot;, (aside: ComponentBase) =&gt; {
+    aside.class.add(&quot;pinned&quot;);
+    const heading = motifComponent(&quot;h3&quot;, (h3: ComponentBase) =&gt; h3.bindings.text(() =&gt; `Pinned (${pinned().length})`));
+    const rows = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; {
+      ul.controls.add(motifComponent({
+        initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(pinned, (note: Note) =&gt; row(note)),
+      }));
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; pinned().length === 0),
+      initializeComponent: (p: ComponentBase) =&gt; {
+        p.class.add(&quot;hint&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;No pinned notes.&quot;)));
+      },
+    });
+    aside.controls.add(heading, rows, empty);
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="options/typescript" data-file="src/parts/PinnedNotes.ts"><code>import { ComponentBase, FromService, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Note } from &quot;../services/notes&quot;;
+
+export const PinnedNotes = () =&gt; motifOptions({
+  el: &quot;aside&quot;,
+
+  view() {
+    const notes = FromService(NotesService)!;
+    const pinned = () =&gt; notes.list(&quot;pinned&quot;);
+    const row = (note: Note) =&gt;
+      motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li: ComponentBase) =&gt; {
+          const title = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+          const unpin = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+            button.attr.add({ type: &quot;button&quot;, title: &quot;Unpin&quot; });
+            button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+            button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;×&quot;)));
+          });
+          li.controls.add(title, unpin);
+        },
+      });
+
+    this.class.add(&quot;pinned&quot;);
+    const heading = motifComponent(&quot;h3&quot;, (h3: ComponentBase) =&gt; h3.bindings.text(() =&gt; `Pinned (${pinned().length})`));
+    const rows = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; {
+      ul.controls.add(motifComponent({
+        initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(pinned, (note: Note) =&gt; row(note)),
+      }));
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; pinned().length === 0),
+      initializeComponent: (p: ComponentBase) =&gt; {
+        p.class.add(&quot;hint&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;No pinned notes.&quot;)));
+      },
+    });
+    return [heading, rows, empty];
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="class/javascript" data-file="src/parts/PinnedNotes.js"><code>import { Component, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class PinnedNotes extends Component {
+  static elementTag = &quot;aside&quot;;
+  notes = this.getService(NotesService);
+
+  get pinned() {
+    return this.notes.list(&quot;pinned&quot;);
+  }
+
+  onConfigured() {
+    this.class.add(&quot;pinned&quot;);
+  }
+
+  view() {
+    const heading = motifComponent(&quot;h3&quot;, (h3) =&gt; h3.bindings.text(() =&gt; `Pinned (${this.pinned.length})`));
+    const rows = motifComponent(&quot;ul&quot;, (ul) =&gt; {
+      ul.controls.add(motifComponent({
+        initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; this.pinned, (note) =&gt; this.row(note)),
+      }));
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p) =&gt; p.bindings.display(() =&gt; this.pinned.length === 0),
+      initializeComponent: (p) =&gt; {
+        p.class.add(&quot;hint&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;No pinned notes.&quot;)));
+      },
+    });
+    return motifFragment({ initializeComponent: (content) =&gt; content.controls.add(heading, rows, empty) });
+  }
+
+  row(note) {
+    return motifComponent(&quot;li&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (li) =&gt; {
+        const title = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        const unpin = motifComponent(&quot;button&quot;, (button) =&gt; {
+          button.attr.add({ type: &quot;button&quot;, title: &quot;Unpin&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; this.notes.togglePin(note));
+          button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;×&quot;)));
+        });
+        li.controls.add(title, unpin);
+      },
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/PinnedNotes.js"><code>import { FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function PinnedNotes() {
+  const notes = FromService(NotesService);
+  const pinned = () =&gt; notes.list(&quot;pinned&quot;);
+
+  const row = (note) =&gt;
+    motifComponent(&quot;li&quot;, {
+      indexkey: () =&gt; note.id,
+      initializeComponent: (li) =&gt; {
+        const title = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+        const unpin = motifComponent(&quot;button&quot;, (button) =&gt; {
+          button.attr.add({ type: &quot;button&quot;, title: &quot;Unpin&quot; });
+          button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+          button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;×&quot;)));
+        });
+        li.controls.add(title, unpin);
+      },
+    });
+
+  return motifComponent(&quot;aside&quot;, (aside) =&gt; {
+    aside.class.add(&quot;pinned&quot;);
+    const heading = motifComponent(&quot;h3&quot;, (h3) =&gt; h3.bindings.text(() =&gt; `Pinned (${pinned().length})`));
+    const rows = motifComponent(&quot;ul&quot;, (ul) =&gt; {
+      ul.controls.add(motifComponent({
+        initializeComponent: (holder) =&gt; holder.bindings.list(pinned, (note) =&gt; row(note)),
+      }));
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p) =&gt; p.bindings.display(() =&gt; pinned().length === 0),
+      initializeComponent: (p) =&gt; {
+        p.class.add(&quot;hint&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;No pinned notes.&quot;)));
+      },
+    });
+    aside.controls.add(heading, rows, empty);
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="options/javascript" data-file="src/parts/PinnedNotes.js"><code>import { FromService, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const PinnedNotes = () =&gt; motifOptions({
+  el: &quot;aside&quot;,
+
+  view() {
+    const notes = FromService(NotesService);
+    const pinned = () =&gt; notes.list(&quot;pinned&quot;);
+    const row = (note) =&gt;
+      motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li) =&gt; {
+          const title = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+          const unpin = motifComponent(&quot;button&quot;, (button) =&gt; {
+            button.attr.add({ type: &quot;button&quot;, title: &quot;Unpin&quot; });
+            button.motif.on(&quot;click&quot;, () =&gt; notes.togglePin(note));
+            button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;×&quot;)));
+          });
+          li.controls.add(title, unpin);
+        },
+      });
+
+    this.class.add(&quot;pinned&quot;);
+    const heading = motifComponent(&quot;h3&quot;, (h3) =&gt; h3.bindings.text(() =&gt; `Pinned (${pinned().length})`));
+    const rows = motifComponent(&quot;ul&quot;, (ul) =&gt; {
+      ul.controls.add(motifComponent({
+        initializeComponent: (holder) =&gt; holder.bindings.list(pinned, (note) =&gt; row(note)),
+      }));
+    });
+    const empty = motifComponent(&quot;p&quot;, {
+      preconfig: (p) =&gt; p.bindings.display(() =&gt; pinned().length === 0),
+      initializeComponent: (p) =&gt; {
+        p.class.add(&quot;hint&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;No pinned notes.&quot;)));
+      },
+    });
+    return [heading, rows, empty];
+  },
+});</code></pre>
+</div>
+<p>The component is built the way it would be written as a tag: <code>motifComponent(PinnedNotes)</code>; in all three forms the common attributes fall through to the root (<code>motifComponent(PinnedNotes, { class: &quot;sidebar__pinned&quot; })</code>). In a file without JSX, <code>@Injectable</code> and the other decorators, DI, the router, <code>useNavigation()</code>, transitions and <code>Virtualization</code> work just the same; an override that does not reach <code>super</code> (<code>MJX015</code>) is reported during the Vite plugin's build, while <code>motif-lint</code> only looks at JSX files.</p>
+<h2 id="reading-compiled-output">Reading the compiled output</h2>
+<p><code>npx motif-explain file.tsx</code> prints which call an expression comes down to (see <a href="/docs/jsx#explain">What did this expression compile to?</a>). For the whole file, use the <code>Compiler</code> class in the <code>@motifx/compiler</code> package: <code>new Compiler().motifCompile(code, &quot;NoteRow.tsx&quot;)?.code</code> returns the compiled code. This JSX:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.tsx">
+<pre data-lang="tsx" data-variant="typescript" data-file="src/parts/NoteRow.tsx"><code>&lt;li&gt;
+  &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+  &lt;span&gt;{note.title}&lt;/span&gt;
+&lt;/li&gt;</code></pre>
+<pre data-lang="jsx" data-variant="javascript" data-file="src/parts/NoteRow.jsx"><code>&lt;li&gt;
+  &lt;i class=&quot;pin&quot; x-display={() =&gt; note.pinned} /&gt;
+  &lt;span&gt;{note.title}&lt;/span&gt;
+&lt;/li&gt;</code></pre>
+</div>
+<p>compiles to this code:</p>
+<div class="doc-code" data-file="dist/NoteRow.js">
+<pre data-lang="js" data-file="dist/NoteRow.js"><code>import { motifComponent as _mc, FNComponent as _mfc, motifCompiled as _mv } from &quot;@motifx/core&quot;;
+/*#__PURE__*/_mv(1);
+_mc(&quot;li&quot;, {
+  initializeComponent: sender =&gt; {
+    const _comp2 = _mc(&quot;i&quot;, {
+      preconfig: sender =&gt; {
+        sender.bindings.display(() =&gt; note.pinned);
+      },
+      initializeComponent: sender =&gt; {
+        sender.class.add(&quot;pin&quot;);
+      }
+    });
+    sender.controls.add(_comp2);
+    const _comp3 = _mc(&quot;span&quot;, {
+      initializeComponent: sender =&gt; {
+        const _comp = _mc(&quot;text&quot;, {
+          initializeComponent: sender =&gt; {
+            sender.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;);
+          },
+          __childExpr: () =&gt; note.title
+        });
+        sender.controls.add(_comp);
+      }
+    }, 1);
+    sender.controls.add(_comp3);
+  }
+}, 1);</code></pre>
+</div>
+<p>The hand-written version:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/parts/NoteRow.ts"><code>motifComponent(&quot;li&quot;, (li: ComponentBase) =&gt; {
+  const pin = motifComponent(&quot;i&quot;, {
+    preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned),
+    initializeComponent: (i: ComponentBase) =&gt; i.class.add(&quot;pin&quot;),
+  });
+  const title = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+    span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+  });
+  li.controls.add(pin, title);
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/parts/NoteRow.js"><code>motifComponent(&quot;li&quot;, (li) =&gt; {
+  const pin = motifComponent(&quot;i&quot;, {
+    preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned),
+    initializeComponent: (i) =&gt; i.class.add(&quot;pin&quot;),
+  });
+  const title = motifComponent(&quot;span&quot;, (span) =&gt; {
+    span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+  });
+  li.controls.add(pin, title);
+});</code></pre>
+</div>
+<p>A key for reading the output:</p>
+<table>
+<thead>
+<tr>
+<th>In the output</th>
+<th>When writing by hand</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_mc(</code></td>
+<td><code>motifComponent(</code></td>
+</tr>
+<tr>
+<td><code>_mf(</code></td>
+<td><code>motifFragment(</code></td>
+</tr>
+<tr>
+<td><code>_mfc</code></td>
+<td><code>FNComponent</code>; the compiler's import, not used by hand-written code</td>
+</tr>
+<tr>
+<td><code>_mv(1)</code></td>
+<td><code>motifCompiled</code>; the contract mark between the compiler and the runtime, absent from hand-written code</td>
+</tr>
+<tr>
+<td><code>try { … } catch (__e) { _mr(__e); }</code></td>
+<td><code>motifReport</code>; this is how the compiler reports the error of a child expression. A hand-written getter does not need <code>try</code>/<code>catch</code>: the runtime reports the error with <code>MJX208</code></td>
+</tr>
+<tr>
+<td><code>preconfig: sender =&gt; { sender.bindings.display(…) }</code></td>
+<td><code>x-display</code> / <code>x-wait</code>; written the same way</td>
+</tr>
+<tr>
+<td><code>indexkey: () =&gt; n.id</code></td>
+<td><code>key</code></td>
+</tr>
+<tr>
+<td><code>__isSvgElement: true</code></td>
+<td><code>options: { isSvg: true }</code></td>
+</tr>
+<tr>
+<td><code>__childExpr: () =&gt; note.title</code>, <code>childs: []</code>, the third argument <code>, 1</code></td>
+<td>compiler markers; drop them</td>
+</tr>
+<tr>
+<td><code>bindings.method(fn)</code></td>
+<td><code>bindings.text(fn)</code>, or <code>method</code> as it is</td>
+</tr>
+<tr>
+<td><code>sender</code></td>
+<td>any parameter name you like (<code>(li: ComponentBase)</code>)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pitfalls">Pitfalls of hand-written views</h2>
+<ol>
+<li><strong>An accidental fragment.</strong> A class that declares no element type is a fragment, and so is a <code>Component&lt;HTMLDivElement&gt;</code> class in a file the Vite plugin does not process. Write <code>static elementTag</code> or call <code>super(&quot;div&quot;)</code>. Returning a wrapper from <code>view()</code> does not give the component an element.</li>
+<li><strong>An error inside <code>initializeComponent</code> is swallowed.</strong> If the setup function throws, the element stays empty; the only trace is the entry that lands in <code>console.error</code> with <code>MJX122</code>. A common cause: a <code>const</code> that calls a function with the same name in its own setup. Setup runs in <code>build()</code>, so at that moment the name holds the component: in <code>const title = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.controls.add(title(&quot;…&quot;)))</code>, <code>title(&quot;…&quot;)</code> tries to call the component. <code>motifComponent</code> returns <code>any</code>, so type checking does not catch it; check the rendered text in a test, or watch <code>console.error</code>.</li>
+<li><strong><code>display</code> / <code>wait</code> in the wrong hook.</strong> If registered inside <code>initializeComponent</code>, the hidden element is built once; register it inside <code>preconfig</code>.</li>
+<li><strong>No compiler, no diagnostics.</strong> <code>MJX001</code>–<code>MJX005</code> and <code>MJX016</code> are only for JSX; there is no warning for a list without <code>indexkey</code> or for a plain value that should have been a getter. A plain value is a snapshot, as in JSX: for <a href="/docs/jsx#attribute-fallthrough"><code>CountBadge</code></a>, <code>motifComponent(CountBadge, { count: notes.count(&quot;pinned&quot;) })</code> reads the count once; to keep it live, write <code>count: () =&gt; notes.count(&quot;pinned&quot;)</code>.</li>
+<li><strong>The types are yours.</strong> You write the setup parameter (<code>(c: ComponentBase)</code>), the <code>ref</code> field (<code>search!: Component&lt;HTMLInputElement&gt;</code>) and the <code>motif.on</code> handler (<code>(_sender: ComponentBase, e: KeyboardEvent)</code>) yourself.</li>
+<li><strong><code>controls.add</code> is immediate</strong>, so there is nothing to wait for; reactive <em>updates</em>, on the other hand, are applied on a microtask, as in JSX (<code>await Promise.resolve()</code> in a test).</li>
+</ol>
+<h2 id="next">Next step</h2>
+<ul>
+<li><a href="/docs/reactivity">Reactivity</a>: <code>reactive</code>, <code>createSignal</code> and <code>effect</code>, which bindings track.</li>
+<li><a href="/docs/conditionals-and-lists">Conditional Rendering and Lists</a>: the behaviour of <code>wait</code>/<code>display</code>, <code>when</code>, <code>ternary</code>, <code>list</code> and <code>switchCase</code>.</li>
+<li><a href="/docs/events">Events</a>: <code>motif.on</code> signatures, modifiers and application events.</li>
+<li><a href="/docs/lifecycle#initialize-component">Lifecycle</a>: <code>initializeComponent</code> and the order of the hooks.</li>
+</ul>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

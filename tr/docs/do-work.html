@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Bir sözü bileşenin ömrüne bağlayan `doWork`: dönen söz, MJX108, `catch` ve `finally`, `using` ile farkı.">
+    <title>doWork ile Asenkron Sonuç — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/do-work">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/do-work">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/do-work">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/do-work">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/do-work">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="doWork ile Asenkron Sonuç">
+    <meta property="og:description" content="Bir sözü bileşenin ömrüne bağlayan `doWork`: dönen söz, MJX108, `catch` ve `finally`, `using` ile farkı.">
+    <script type="application/json" id="doc-data">{"slug":"do-work","locale":"tr","title":"doWork ile Asenkron Sonuç","description":"Bir sözü bileşenin ömrüne bağlayan \u0060doWork\u0060: dönen söz, MJX108, \u0060catch\u0060 ve \u0060finally\u0060, \u0060using\u0060 ile farkı.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Cp\u003E\u003Ccode\u003EdoWork(söz)\u003C/code\u003E verilen sözü bileşenin ömrüne bağlar ve yeni bir söz döndürür. Bileşen yaşarken bu söz verilenin kendisi gibi davranır: değer \u003Ccode\u003Ethen\u003C/code\u003E\u0027e, ret \u003Ccode\u003Ecatch\u003C/code\u003E\u0027e gider. Bileşen serbest bırakıldıktan sonra söz reddedilmez; değerin ya da reddin yerine \u003Ccode\u003EMJX108\u003C/code\u003E kodlu bir \u003Ccode\u003EMotifError\u003C/code\u003E gelir. \u003Ca href=\u0022/docs/using\u0022\u003Eusing\u003C/a\u003E\u0027den farkı bir söz döndürmesidir: sonucu zincirleyebilir, \u003Ccode\u003Ecatch\u003C/code\u003E ve \u003Ccode\u003Efinally\u003C/code\u003E ekleyebilir, çağırana geri verebilirsiniz.\u003C/p\u003E\n\u003Ch2 id=\u0022result\u0022\u003EDönen söz\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EVerilen söz\u003C/th\u003E\n\u003Cth\u003EBileşen yaşıyorsa\u003C/th\u003E\n\u003Cth\u003EBileşen serbest bırakılmışsa\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003Eçözülür\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ethen\u003C/code\u003E değeri alır.\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ethen\u003C/code\u003E bir \u003Ccode\u003EMotifError\u003C/code\u003E (\u003Ccode\u003EMJX108\u003C/code\u003E) alır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003Ereddedilir\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecatch\u003C/code\u003E nedeni alır.\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ethen\u003C/code\u003E bir \u003Ccode\u003EMotifError\u003C/code\u003E (\u003Ccode\u003EMJX108\u003C/code\u003E) alır, ret bu hatanın \u003Ccode\u003Ecause\u003C/code\u003E\u0027undadır; \u003Ccode\u003Ecatch\u003C/code\u003E çalışmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003EMJX108\u003C/code\u003E bir dönüş değeridir: \u003Ccode\u003EerrorHandler\u003C/code\u003E\u0027a bildirilmez, konsola yazılmaz. Değeri kullanmadan önce \u003Ccode\u003Einstanceof Error\u003C/code\u003E denetimi yazılır; denetim tutarsa bileşen yoktur, \u003Ccode\u003Ethen\u003C/code\u003E hiçbir şey yapmadan döner.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Efinally\u003C/code\u003E iki durumda da çalışır. İçinde bileşenin alanına dokunan kod, bileşen serbest bırakılmışsa boşaltılmış alana yazar; bu tür işleri \u003Ccode\u003Ethen\u003C/code\u003E ve \u003Ccode\u003Ecatch\u003C/code\u003E\u0027e koyun.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ethen\u003C/code\u003E\u0027in içinde fırlatılan hata zincirdeki sonraki \u003Ccode\u003Ecatch\u003C/code\u003E\u0027e gider; bu, sözlerin olağan davranışıdır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ethen\u003C/code\u003E metodu olan herhangi bir nesne verilebilir.\u003C/li\u003E\n\u003Cli\u003EBileşenin yaşayıp yaşamadığına sonuç geldiği anda \u003Ccode\u003EisDisposed\u003C/code\u003E ile bakılır; bayrak serbest bırakma bitince \u003Ccode\u003Etrue\u003C/code\u003E olur (bkz. \u003Ca href=\u0022/docs/using#timing\u0022\u003EDenetimin zamanı\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022typescript\u0022\u003E\n\u003Cp\u003EDönen sözün tipi \u003Ccode\u003EPromise\u0026lt;T | MotifError\u0026gt;\u003C/code\u003E\u0027dır. \u003Ccode\u003Einstanceof Error\u003C/code\u003E (ya da \u003Ccode\u003Einstanceof MotifError\u003C/code\u003E) denetiminden sonra değer \u003Ccode\u003ET\u003C/code\u003E\u0027ye daralır; denetimsiz kullanım derlenmez.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022example\u0022\u003EBir örnek\u003C/h2\u003E\n\u003Cp\u003ENot sayfasındaki \u0026quot;Paylaş\u0026quot; düğmesi sunucudan bir paylaşım bağlantısı ister. İstek sürerken düğme kapalıdır; bağlantı gelince görünür, istek başarısız olursa bir uyarı çıkar. Kullanıcı yanıt gelmeden sayfadan ayrılırsa \u003Ccode\u003Ethen\u003C/code\u003E \u003Ccode\u003EMJX108\u003C/code\u003E alır ve hiçbir şey yazmadan döner, \u003Ccode\u003Ecatch\u003C/code\u003E çalışmaz:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/ShareButton.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/ShareButton.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\ntype ShareLink = { url: string };\n\nexport class ShareButton extends Component\u0026lt;HTMLDivElement, { note: Note }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n  state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  share() {\n    this.state.busy = true;\n    this.state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${this.props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json() as Promise\u0026lt;ShareLink\u0026gt;))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        this.state.url = link.url;\n        this.state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        this.state.failed = true;\n        this.state.busy = false;\n      });\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  }\n\n  override view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; disabled={() =\u0026gt; this.state.busy} onclick={() =\u0026gt; this.share()}\u0026gt;Paylaş\u0026lt;/button\u0026gt;\n        \u0026lt;a x-display={() =\u0026gt; this.state.url !== \u0026quot;\u0026quot;} href={() =\u0026gt; this.state.url}\u0026gt;Paylaşım bağlantısı\u0026lt;/a\u0026gt;\n        \u0026lt;small x-display={() =\u0026gt; this.state.failed}\u0026gt;Paylaşılamadı.\u0026lt;/small\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/ShareButton.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\ntype ShareLink = { url: string };\n\nexport class ShareButton extends Component\u0026lt;HTMLDivElement, { note: Note }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n  state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  share() {\n    this.state.busy = true;\n    this.state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${this.props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json() as Promise\u0026lt;ShareLink\u0026gt;))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        this.state.url = link.url;\n        this.state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        this.state.failed = true;\n        this.state.busy = false;\n      });\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  }\n\n  override view() {\n    const button = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.bindings.add(\u0026quot;disabled\u0026quot;, () =\u0026gt; this.state.busy);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.share());\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Paylaş\u0026quot;)));\n    });\n    const link = motifComponent(\u0026quot;a\u0026quot;, {\n      preconfig: (a: ComponentBase) =\u0026gt; a.bindings.display(() =\u0026gt; this.state.url !== \u0026quot;\u0026quot;),\n      initializeComponent: (a: ComponentBase) =\u0026gt; {\n        a.bindings.add(\u0026quot;href\u0026quot;, () =\u0026gt; this.state.url);\n        a.setText(\u0026quot;Paylaşım bağlantısı\u0026quot;);\n      },\n    });\n    const failed = motifComponent(\u0026quot;small\u0026quot;, {\n      preconfig: (small: ComponentBase) =\u0026gt; small.bindings.display(() =\u0026gt; this.state.failed),\n      initializeComponent: (small: ComponentBase) =\u0026gt; small.setText(\u0026quot;Paylaşılamadı.\u0026quot;),\n    });\n    return motifFragment({ childs: [button, link, failed] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/ShareButton.tsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\ntype ShareLink = { url: string };\n\nexport function ShareButton(props: { note: Note }) {\n  const state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  const share = () =\u0026gt; {\n    state.busy = true;\n    state.failed = false;\n    box.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json() as Promise\u0026lt;ShareLink\u0026gt;))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  };\n\n  const box = (\n    \u0026lt;div class=\u0026quot;share\u0026quot;\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; disabled={() =\u0026gt; state.busy} onclick={() =\u0026gt; share()}\u0026gt;Paylaş\u0026lt;/button\u0026gt;\n      \u0026lt;a x-display={() =\u0026gt; state.url !== \u0026quot;\u0026quot;} href={() =\u0026gt; state.url}\u0026gt;Paylaşım bağlantısı\u0026lt;/a\u0026gt;\n      \u0026lt;small x-display={() =\u0026gt; state.failed}\u0026gt;Paylaşılamadı.\u0026lt;/small\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n\n  return box;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/ShareButton.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\ntype ShareLink = { url: string };\n\nexport function ShareButton(props: { note: Note }) {\n  const state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  const share = () =\u0026gt; {\n    state.busy = true;\n    state.failed = false;\n    box.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json() as Promise\u0026lt;ShareLink\u0026gt;))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  };\n\n  const box: ComponentBase = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n    div.class.add(\u0026quot;share\u0026quot;);\n    const button = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.bindings.add(\u0026quot;disabled\u0026quot;, () =\u0026gt; state.busy);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; share());\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Paylaş\u0026quot;)));\n    });\n    const link = motifComponent(\u0026quot;a\u0026quot;, {\n      preconfig: (a: ComponentBase) =\u0026gt; a.bindings.display(() =\u0026gt; state.url !== \u0026quot;\u0026quot;),\n      initializeComponent: (a: ComponentBase) =\u0026gt; {\n        a.bindings.add(\u0026quot;href\u0026quot;, () =\u0026gt; state.url);\n        a.setText(\u0026quot;Paylaşım bağlantısı\u0026quot;);\n      },\n    });\n    const failed = motifComponent(\u0026quot;small\u0026quot;, {\n      preconfig: (small: ComponentBase) =\u0026gt; small.bindings.display(() =\u0026gt; state.failed),\n      initializeComponent: (small: ComponentBase) =\u0026gt; small.setText(\u0026quot;Paylaşılamadı.\u0026quot;),\n    });\n    div.controls.add(button, link, failed);\n  });\n\n  return box;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/ShareButton.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\ntype ShareLink = { url: string };\n\nexport const ShareButton = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false }),\n\n  share() {\n    const state = this.data;\n    state.busy = true;\n    state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json() as Promise\u0026lt;ShareLink\u0026gt;))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  },\n\n  view() {\n    const state = this.data;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; disabled={() =\u0026gt; state.busy} onclick={() =\u0026gt; this.share()}\u0026gt;Paylaş\u0026lt;/button\u0026gt;\n        \u0026lt;a x-display={() =\u0026gt; state.url !== \u0026quot;\u0026quot;} href={() =\u0026gt; state.url}\u0026gt;Paylaşım bağlantısı\u0026lt;/a\u0026gt;\n        \u0026lt;small x-display={() =\u0026gt; state.failed}\u0026gt;Paylaşılamadı.\u0026lt;/small\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/ShareButton.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifFragment, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\ntype ShareLink = { url: string };\n\nexport const ShareButton = (props: { note: Note }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false }),\n\n  share() {\n    const state = this.data;\n    state.busy = true;\n    state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json() as Promise\u0026lt;ShareLink\u0026gt;))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  },\n\n  view() {\n    const state = this.data;\n    const button = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.bindings.add(\u0026quot;disabled\u0026quot;, () =\u0026gt; state.busy);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.share());\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Paylaş\u0026quot;)));\n    });\n    const link = motifComponent(\u0026quot;a\u0026quot;, {\n      preconfig: (a: ComponentBase) =\u0026gt; a.bindings.display(() =\u0026gt; state.url !== \u0026quot;\u0026quot;),\n      initializeComponent: (a: ComponentBase) =\u0026gt; {\n        a.bindings.add(\u0026quot;href\u0026quot;, () =\u0026gt; state.url);\n        a.setText(\u0026quot;Paylaşım bağlantısı\u0026quot;);\n      },\n    });\n    const failed = motifComponent(\u0026quot;small\u0026quot;, {\n      preconfig: (small: ComponentBase) =\u0026gt; small.bindings.display(() =\u0026gt; state.failed),\n      initializeComponent: (small: ComponentBase) =\u0026gt; small.setText(\u0026quot;Paylaşılamadı.\u0026quot;),\n    });\n    return motifFragment({ childs: [button, link, failed] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/ShareButton.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ShareButton extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  share() {\n    this.state.busy = true;\n    this.state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${this.props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json()))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        this.state.url = link.url;\n        this.state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        this.state.failed = true;\n        this.state.busy = false;\n      });\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  }\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; disabled={() =\u0026gt; this.state.busy} onclick={() =\u0026gt; this.share()}\u0026gt;Paylaş\u0026lt;/button\u0026gt;\n        \u0026lt;a x-display={() =\u0026gt; this.state.url !== \u0026quot;\u0026quot;} href={() =\u0026gt; this.state.url}\u0026gt;Paylaşım bağlantısı\u0026lt;/a\u0026gt;\n        \u0026lt;small x-display={() =\u0026gt; this.state.failed}\u0026gt;Paylaşılamadı.\u0026lt;/small\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/ShareButton.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class ShareButton extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  share() {\n    this.state.busy = true;\n    this.state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${this.props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json()))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        this.state.url = link.url;\n        this.state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        this.state.failed = true;\n        this.state.busy = false;\n      });\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  }\n\n  view() {\n    const button = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.bindings.add(\u0026quot;disabled\u0026quot;, () =\u0026gt; this.state.busy);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.share());\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Paylaş\u0026quot;)));\n    });\n    const link = motifComponent(\u0026quot;a\u0026quot;, {\n      preconfig: (a) =\u0026gt; a.bindings.display(() =\u0026gt; this.state.url !== \u0026quot;\u0026quot;),\n      initializeComponent: (a) =\u0026gt; {\n        a.bindings.add(\u0026quot;href\u0026quot;, () =\u0026gt; this.state.url);\n        a.setText(\u0026quot;Paylaşım bağlantısı\u0026quot;);\n      },\n    });\n    const failed = motifComponent(\u0026quot;small\u0026quot;, {\n      preconfig: (small) =\u0026gt; small.bindings.display(() =\u0026gt; this.state.failed),\n      initializeComponent: (small) =\u0026gt; small.setText(\u0026quot;Paylaşılamadı.\u0026quot;),\n    });\n    return motifFragment({ childs: [button, link, failed] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/ShareButton.jsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ShareButton(props) {\n  const state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  const share = () =\u0026gt; {\n    state.busy = true;\n    state.failed = false;\n    box.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json()))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  };\n\n  const box = (\n    \u0026lt;div class=\u0026quot;share\u0026quot;\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; disabled={() =\u0026gt; state.busy} onclick={() =\u0026gt; share()}\u0026gt;Paylaş\u0026lt;/button\u0026gt;\n      \u0026lt;a x-display={() =\u0026gt; state.url !== \u0026quot;\u0026quot;} href={() =\u0026gt; state.url}\u0026gt;Paylaşım bağlantısı\u0026lt;/a\u0026gt;\n      \u0026lt;small x-display={() =\u0026gt; state.failed}\u0026gt;Paylaşılamadı.\u0026lt;/small\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n\n  return box;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/ShareButton.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function ShareButton(props) {\n  const state = reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false });\n\n  const share = () =\u0026gt; {\n    state.busy = true;\n    state.failed = false;\n    box.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json()))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  };\n\n  const box = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n    div.class.add(\u0026quot;share\u0026quot;);\n    const button = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.bindings.add(\u0026quot;disabled\u0026quot;, () =\u0026gt; state.busy);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; share());\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Paylaş\u0026quot;)));\n    });\n    const link = motifComponent(\u0026quot;a\u0026quot;, {\n      preconfig: (a) =\u0026gt; a.bindings.display(() =\u0026gt; state.url !== \u0026quot;\u0026quot;),\n      initializeComponent: (a) =\u0026gt; {\n        a.bindings.add(\u0026quot;href\u0026quot;, () =\u0026gt; state.url);\n        a.setText(\u0026quot;Paylaşım bağlantısı\u0026quot;);\n      },\n    });\n    const failed = motifComponent(\u0026quot;small\u0026quot;, {\n      preconfig: (small) =\u0026gt; small.bindings.display(() =\u0026gt; state.failed),\n      initializeComponent: (small) =\u0026gt; small.setText(\u0026quot;Paylaşılamadı.\u0026quot;),\n    });\n    div.controls.add(button, link, failed);\n  });\n\n  return box;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/ShareButton.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ShareButton = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false }),\n\n  share() {\n    const state = this.data;\n    state.busy = true;\n    state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json()))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  },\n\n  view() {\n    const state = this.data;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; disabled={() =\u0026gt; state.busy} onclick={() =\u0026gt; this.share()}\u0026gt;Paylaş\u0026lt;/button\u0026gt;\n        \u0026lt;a x-display={() =\u0026gt; state.url !== \u0026quot;\u0026quot;} href={() =\u0026gt; state.url}\u0026gt;Paylaşım bağlantısı\u0026lt;/a\u0026gt;\n        \u0026lt;small x-display={() =\u0026gt; state.failed}\u0026gt;Paylaşılamadı.\u0026lt;/small\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/ShareButton.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const ShareButton = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: reactive({ busy: false, url: \u0026quot;\u0026quot;, failed: false }),\n\n  share() {\n    const state = this.data;\n    state.busy = true;\n    state.failed = false;\n    this.doWork(fetch(\u0060/api/notes/${props.note.id}/share\u0060, { method: \u0026quot;POST\u0026quot; }).then((r) =\u0026gt; r.json()))\n      .then((link) =\u0026gt; {\n        if (link instanceof Error) return;\n        state.url = link.url;\n        state.busy = false;\n      })\n      .catch(() =\u0026gt; {\n        state.failed = true;\n        state.busy = false;\n      });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;share\u0026quot;);\n  },\n\n  view() {\n    const state = this.data;\n    const button = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.bindings.add(\u0026quot;disabled\u0026quot;, () =\u0026gt; state.busy);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.share());\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Paylaş\u0026quot;)));\n    });\n    const link = motifComponent(\u0026quot;a\u0026quot;, {\n      preconfig: (a) =\u0026gt; a.bindings.display(() =\u0026gt; state.url !== \u0026quot;\u0026quot;),\n      initializeComponent: (a) =\u0026gt; {\n        a.bindings.add(\u0026quot;href\u0026quot;, () =\u0026gt; state.url);\n        a.setText(\u0026quot;Paylaşım bağlantısı\u0026quot;);\n      },\n    });\n    const failed = motifComponent(\u0026quot;small\u0026quot;, {\n      preconfig: (small) =\u0026gt; small.bindings.display(() =\u0026gt; state.failed),\n      initializeComponent: (small) =\u0026gt; small.setText(\u0026quot;Paylaşılamadı.\u0026quot;),\n    });\n    return motifFragment({ childs: [button, link, failed] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Eshare()\u003C/code\u003E bileşenin bir metodudur; \u003Ccode\u003EdoWork\u003C/code\u003E da öyle, \u003Ccode\u003Ethis.doWork(…)\u003C/code\u003E olarak çağrılır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Ethis\u003C/code\u003E yoktur; \u003Ccode\u003EdoWork\u003C/code\u003E dönen kökün metodudur. \u003Ccode\u003Eshare\u003C/code\u003E kökü \u003Ccode\u003Ebox\u003C/code\u003E adıyla kullanır; düğmeye tıklandığında kök çoktan kurulmuştur.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003ENot sayfası düğmeyi açık notla yerleştirir: \u003Ccode\u003E\u0026lt;ShareButton note={note} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003ENot sayfası düğmeyi açık notla yerleştirir: \u003Ccode\u003Enew ShareButton({ note })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003ENot sayfası düğmeyi açık notla yerleştirir: \u003Ccode\u003EmotifComponent(ShareButton, { note })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022vs-using\u0022\u003E\u003Ccode\u003Eusing\u003C/code\u003E\u0027den farkı\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EdoWork\u003C/code\u003E sonucu bir söz olarak geri verir; \u003Ca href=\u0022/docs/using\u0022\u003Eusing\u003C/a\u003E ise sonucu kendisine verilen işleyicilerde bitirir ve hiçbir şey döndürmez. Aşağıdaki ayrıntıların hepsi bu farktan doğar:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003E\u003C/th\u003E\n\u003Cth\u003E\u003Ccode\u003EdoWork\u003C/code\u003E\u003C/th\u003E\n\u003Cth\u003E\u003Ccode\u003Eusing\u003C/code\u003E\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EDöndürdüğü\u003C/td\u003E\n\u003Ctd\u003EBir söz; \u003Ccode\u003Ethen\u003C/code\u003E, \u003Ccode\u003Ecatch\u003C/code\u003E, \u003Ccode\u003Efinally\u003C/code\u003E eklenir, çağırana döndürülebilir.\u003C/td\u003E\n\u003Ctd\u003EHiçbir şey; iş, çağrıda verilen işleyicilerde biter.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EGelen değer\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ethen\u003C/code\u003E ya değeri ya \u003Ccode\u003EMJX108\u003C/code\u003E\u0027i alır; değeri kullanmadan önce \u003Ccode\u003Einstanceof Error\u003C/code\u003E denetimi gerekir.\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eonfulfilled\u003C/code\u003E değerin kendisini alır; denetim gerekmez.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ESerbest bırakıldıktan sonra\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ethen\u003C/code\u003E \u003Ccode\u003EMJX108\u003C/code\u003E alır, \u003Ccode\u003Ecatch\u003C/code\u003E çalışmaz, \u003Ccode\u003Efinally\u003C/code\u003E çalışır.\u003C/td\u003E\n\u003Ctd\u003EHiçbir işleyici çalışmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EBileşen yaşarken ret\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecatch\u003C/code\u003E\u0027e gider; \u003Ccode\u003Ecatch\u003C/code\u003E yoksa yakalanmamış söz reddi olur.\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eonrejected\u003C/code\u003E\u0027a gider; o yoksa sessizce yutulur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003Eİşleyicinin fırlattığı hata\u003C/td\u003E\n\u003Ctd\u003EZincirdeki sonraki \u003Ccode\u003Ecatch\u003C/code\u003E\u0027e gider; o yoksa yakalanmamış söz reddi olur.\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX129\u003C/code\u003E ile \u003Ccode\u003EerrorHandler\u003C/code\u003E\u0027a bildirilir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022when\u0022\u003EHangisini ne zaman\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EdoWork\u003C/code\u003E şu durumlarda seçilir:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EBir işin ardından başka bir iş gelecekse; örneğin notu kaydedip ardından listeyi yeniden yüklemek. \u003Ccode\u003Ethen\u003C/code\u003E ikinci isteği yine \u003Ccode\u003EdoWork\u003C/code\u003E ile başlatıp döndürür; ilk adımda \u003Ccode\u003EMJX108\u003C/code\u003E gelirse \u003Ccode\u003Ethen\u003C/code\u003E \u003Ccode\u003Einstanceof Error\u003C/code\u003E denetimiyle erken döner ve ikinci istek hiç gitmez. Zincirin sonundaki tek \u003Ccode\u003Ecatch\u003C/code\u003E iki adımın reddini de yakalar.\u003C/li\u003E\n\u003Cli\u003EBirden çok isteğin birlikte bitmesi bekleniyorsa: \u003Ccode\u003EdoWork(Promise.all([…]))\u003C/code\u003E sonuçları bir dizi olarak verir; bileşen serbest bırakılmışsa tek bir \u003Ccode\u003EMJX108\u003C/code\u003E gelir.\u003C/li\u003E\n\u003Cli\u003Eİşi başlatan metot sözü döndürecekse; üst bileşen, bir kısayol tuşu ya da bir test işin bitmesini bekleyebilir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Efinally\u003C/code\u003E ya da zincir boyunca taşınan bir hata gerekiyorsa. \u003Ccode\u003Efinally\u003C/code\u003E bileşen serbest bırakıldıktan sonra da çalışır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003ESonuç yalnız bu bileşenin durumuna yazılacaksa ve işin bitişini kimse beklemiyorsa \u003Ca href=\u0022/docs/using#when\u0022\u003Eusing\u003C/a\u003E daha kısadır: \u003Ccode\u003Einstanceof Error\u003C/code\u003E denetimi ve \u003Ccode\u003Ecatch\u003C/code\u003E gerekmez, işleyicinin fırlattığı hata \u003Ccode\u003EerrorHandler\u003C/code\u003E\u0027a kendiliğinden gider.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EdoWork\u003C/code\u003E de isteği durdurmaz; bileşen serbest bırakılınca isteği iptal etmek için \u003Ca href=\u0022/docs/using#request-keeps-running\u0022\u003Eİstek sürer\u003C/a\u003E bölümüne bakın.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBileşenlerin görünümünü yazmanın ayrıntıları için \u003Ca href=\u0022/docs/jsx\u0022\u003EJSX ve Şablonlar\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"result","text":"Dönen söz","level":2},{"id":"example","text":"Bir örnek","level":2},{"id":"vs-using","text":"using\u0027den farkı","level":2},{"id":"when","text":"Hangisini ne zaman","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"using","title":"using ile Asenkron Sonuç"},"next":{"slug":"jsx","title":"JSX ve Şablonlar"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>doWork ile Asenkron Sonuç</h1>
+        <p>Bir sözü bileşenin ömrüne bağlayan `doWork`: dönen söz, MJX108, `catch` ve `finally`, `using` ile farkı.</p>
+<p><code>doWork(söz)</code> verilen sözü bileşenin ömrüne bağlar ve yeni bir söz döndürür. Bileşen yaşarken bu söz verilenin kendisi gibi davranır: değer <code>then</code>'e, ret <code>catch</code>'e gider. Bileşen serbest bırakıldıktan sonra söz reddedilmez; değerin ya da reddin yerine <code>MJX108</code> kodlu bir <code>MotifError</code> gelir. <a href="/tr/docs/using">using</a>'den farkı bir söz döndürmesidir: sonucu zincirleyebilir, <code>catch</code> ve <code>finally</code> ekleyebilir, çağırana geri verebilirsiniz.</p>
+<h2 id="result">Dönen söz</h2>
+<table>
+<thead>
+<tr>
+<th>Verilen söz</th>
+<th>Bileşen yaşıyorsa</th>
+<th>Bileşen serbest bırakılmışsa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>çözülür</td>
+<td><code>then</code> değeri alır.</td>
+<td><code>then</code> bir <code>MotifError</code> (<code>MJX108</code>) alır.</td>
+</tr>
+<tr>
+<td>reddedilir</td>
+<td><code>catch</code> nedeni alır.</td>
+<td><code>then</code> bir <code>MotifError</code> (<code>MJX108</code>) alır, ret bu hatanın <code>cause</code>'undadır; <code>catch</code> çalışmaz.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>MJX108</code> bir dönüş değeridir: <code>errorHandler</code>'a bildirilmez, konsola yazılmaz. Değeri kullanmadan önce <code>instanceof Error</code> denetimi yazılır; denetim tutarsa bileşen yoktur, <code>then</code> hiçbir şey yapmadan döner.</li>
+<li><code>finally</code> iki durumda da çalışır. İçinde bileşenin alanına dokunan kod, bileşen serbest bırakılmışsa boşaltılmış alana yazar; bu tür işleri <code>then</code> ve <code>catch</code>'e koyun.</li>
+<li><code>then</code>'in içinde fırlatılan hata zincirdeki sonraki <code>catch</code>'e gider; bu, sözlerin olağan davranışıdır.</li>
+<li><code>then</code> metodu olan herhangi bir nesne verilebilir.</li>
+<li>Bileşenin yaşayıp yaşamadığına sonuç geldiği anda <code>isDisposed</code> ile bakılır; bayrak serbest bırakma bitince <code>true</code> olur (bkz. <a href="/tr/docs/using#timing">Denetimin zamanı</a>).</li>
+</ul>
+<div class="doc-variant" data-variant="typescript">
+<p>Dönen sözün tipi <code>Promise&lt;T | MotifError&gt;</code>'dır. <code>instanceof Error</code> (ya da <code>instanceof MotifError</code>) denetiminden sonra değer <code>T</code>'ye daralır; denetimsiz kullanım derlenmez.</p>
+</div>
+<h2 id="example">Bir örnek</h2>
+<p>Not sayfasındaki &quot;Paylaş&quot; düğmesi sunucudan bir paylaşım bağlantısı ister. İstek sürerken düğme kapalıdır; bağlantı gelince görünür, istek başarısız olursa bir uyarı çıkar. Kullanıcı yanıt gelmeden sayfadan ayrılırsa <code>then</code> <code>MJX108</code> alır ve hiçbir şey yazmadan döner, <code>catch</code> çalışmaz:</p>
+<div class="doc-code" data-file="src/parts/ShareButton.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/ShareButton.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+type ShareLink = { url: string };
+
+export class ShareButton extends Component&lt;HTMLDivElement, { note: Note }&gt; {
+  static override elementTag = &quot;div&quot;;
+  state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  share() {
+    this.state.busy = true;
+    this.state.failed = false;
+    this.doWork(fetch(`/api/notes/${this.props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json() as Promise&lt;ShareLink&gt;))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        this.state.url = link.url;
+        this.state.busy = false;
+      })
+      .catch(() =&gt; {
+        this.state.failed = true;
+        this.state.busy = false;
+      });
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;share&quot;);
+  }
+
+  override view() {
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; disabled={() =&gt; this.state.busy} onclick={() =&gt; this.share()}&gt;Paylaş&lt;/button&gt;
+        &lt;a x-display={() =&gt; this.state.url !== &quot;&quot;} href={() =&gt; this.state.url}&gt;Paylaşım bağlantısı&lt;/a&gt;
+        &lt;small x-display={() =&gt; this.state.failed}&gt;Paylaşılamadı.&lt;/small&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/ShareButton.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment, reactive } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+type ShareLink = { url: string };
+
+export class ShareButton extends Component&lt;HTMLDivElement, { note: Note }&gt; {
+  static override elementTag = &quot;div&quot;;
+  state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  share() {
+    this.state.busy = true;
+    this.state.failed = false;
+    this.doWork(fetch(`/api/notes/${this.props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json() as Promise&lt;ShareLink&gt;))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        this.state.url = link.url;
+        this.state.busy = false;
+      })
+      .catch(() =&gt; {
+        this.state.failed = true;
+        this.state.busy = false;
+      });
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;share&quot;);
+  }
+
+  override view() {
+    const button = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.bindings.add(&quot;disabled&quot;, () =&gt; this.state.busy);
+      button.motif.on(&quot;click&quot;, () =&gt; this.share());
+      button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Paylaş&quot;)));
+    });
+    const link = motifComponent(&quot;a&quot;, {
+      preconfig: (a: ComponentBase) =&gt; a.bindings.display(() =&gt; this.state.url !== &quot;&quot;),
+      initializeComponent: (a: ComponentBase) =&gt; {
+        a.bindings.add(&quot;href&quot;, () =&gt; this.state.url);
+        a.setText(&quot;Paylaşım bağlantısı&quot;);
+      },
+    });
+    const failed = motifComponent(&quot;small&quot;, {
+      preconfig: (small: ComponentBase) =&gt; small.bindings.display(() =&gt; this.state.failed),
+      initializeComponent: (small: ComponentBase) =&gt; small.setText(&quot;Paylaşılamadı.&quot;),
+    });
+    return motifFragment({ childs: [button, link, failed] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/ShareButton.tsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+type ShareLink = { url: string };
+
+export function ShareButton(props: { note: Note }) {
+  const state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  const share = () =&gt; {
+    state.busy = true;
+    state.failed = false;
+    box.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json() as Promise&lt;ShareLink&gt;))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  };
+
+  const box = (
+    &lt;div class=&quot;share&quot;&gt;
+      &lt;button type=&quot;button&quot; disabled={() =&gt; state.busy} onclick={() =&gt; share()}&gt;Paylaş&lt;/button&gt;
+      &lt;a x-display={() =&gt; state.url !== &quot;&quot;} href={() =&gt; state.url}&gt;Paylaşım bağlantısı&lt;/a&gt;
+      &lt;small x-display={() =&gt; state.failed}&gt;Paylaşılamadı.&lt;/small&gt;
+    &lt;/div&gt;
+  );
+
+  return box;
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/ShareButton.ts"><code>import { ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+type ShareLink = { url: string };
+
+export function ShareButton(props: { note: Note }) {
+  const state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  const share = () =&gt; {
+    state.busy = true;
+    state.failed = false;
+    box.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json() as Promise&lt;ShareLink&gt;))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  };
+
+  const box: ComponentBase = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+    div.class.add(&quot;share&quot;);
+    const button = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.bindings.add(&quot;disabled&quot;, () =&gt; state.busy);
+      button.motif.on(&quot;click&quot;, () =&gt; share());
+      button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Paylaş&quot;)));
+    });
+    const link = motifComponent(&quot;a&quot;, {
+      preconfig: (a: ComponentBase) =&gt; a.bindings.display(() =&gt; state.url !== &quot;&quot;),
+      initializeComponent: (a: ComponentBase) =&gt; {
+        a.bindings.add(&quot;href&quot;, () =&gt; state.url);
+        a.setText(&quot;Paylaşım bağlantısı&quot;);
+      },
+    });
+    const failed = motifComponent(&quot;small&quot;, {
+      preconfig: (small: ComponentBase) =&gt; small.bindings.display(() =&gt; state.failed),
+      initializeComponent: (small: ComponentBase) =&gt; small.setText(&quot;Paylaşılamadı.&quot;),
+    });
+    div.controls.add(button, link, failed);
+  });
+
+  return box;
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/ShareButton.tsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+type ShareLink = { url: string };
+
+export const ShareButton = (props: { note: Note }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ busy: false, url: &quot;&quot;, failed: false }),
+
+  share() {
+    const state = this.data;
+    state.busy = true;
+    state.failed = false;
+    this.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json() as Promise&lt;ShareLink&gt;))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;share&quot;);
+  },
+
+  view() {
+    const state = this.data;
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; disabled={() =&gt; state.busy} onclick={() =&gt; this.share()}&gt;Paylaş&lt;/button&gt;
+        &lt;a x-display={() =&gt; state.url !== &quot;&quot;} href={() =&gt; state.url}&gt;Paylaşım bağlantısı&lt;/a&gt;
+        &lt;small x-display={() =&gt; state.failed}&gt;Paylaşılamadı.&lt;/small&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/ShareButton.ts"><code>import { ComponentBase, motifComponent, motifFragment, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+type ShareLink = { url: string };
+
+export const ShareButton = (props: { note: Note }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ busy: false, url: &quot;&quot;, failed: false }),
+
+  share() {
+    const state = this.data;
+    state.busy = true;
+    state.failed = false;
+    this.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json() as Promise&lt;ShareLink&gt;))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;share&quot;);
+  },
+
+  view() {
+    const state = this.data;
+    const button = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.bindings.add(&quot;disabled&quot;, () =&gt; state.busy);
+      button.motif.on(&quot;click&quot;, () =&gt; this.share());
+      button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Paylaş&quot;)));
+    });
+    const link = motifComponent(&quot;a&quot;, {
+      preconfig: (a: ComponentBase) =&gt; a.bindings.display(() =&gt; state.url !== &quot;&quot;),
+      initializeComponent: (a: ComponentBase) =&gt; {
+        a.bindings.add(&quot;href&quot;, () =&gt; state.url);
+        a.setText(&quot;Paylaşım bağlantısı&quot;);
+      },
+    });
+    const failed = motifComponent(&quot;small&quot;, {
+      preconfig: (small: ComponentBase) =&gt; small.bindings.display(() =&gt; state.failed),
+      initializeComponent: (small: ComponentBase) =&gt; small.setText(&quot;Paylaşılamadı.&quot;),
+    });
+    return motifFragment({ childs: [button, link, failed] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/ShareButton.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+
+export class ShareButton extends Component {
+  static elementTag = &quot;div&quot;;
+  state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  share() {
+    this.state.busy = true;
+    this.state.failed = false;
+    this.doWork(fetch(`/api/notes/${this.props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json()))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        this.state.url = link.url;
+        this.state.busy = false;
+      })
+      .catch(() =&gt; {
+        this.state.failed = true;
+        this.state.busy = false;
+      });
+  }
+
+  onConfigured() {
+    this.class.add(&quot;share&quot;);
+  }
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; disabled={() =&gt; this.state.busy} onclick={() =&gt; this.share()}&gt;Paylaş&lt;/button&gt;
+        &lt;a x-display={() =&gt; this.state.url !== &quot;&quot;} href={() =&gt; this.state.url}&gt;Paylaşım bağlantısı&lt;/a&gt;
+        &lt;small x-display={() =&gt; this.state.failed}&gt;Paylaşılamadı.&lt;/small&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/ShareButton.js"><code>import { Component, motifComponent, motifFragment, reactive } from &quot;@motifx/core&quot;;
+
+export class ShareButton extends Component {
+  static elementTag = &quot;div&quot;;
+  state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  share() {
+    this.state.busy = true;
+    this.state.failed = false;
+    this.doWork(fetch(`/api/notes/${this.props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json()))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        this.state.url = link.url;
+        this.state.busy = false;
+      })
+      .catch(() =&gt; {
+        this.state.failed = true;
+        this.state.busy = false;
+      });
+  }
+
+  onConfigured() {
+    this.class.add(&quot;share&quot;);
+  }
+
+  view() {
+    const button = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.bindings.add(&quot;disabled&quot;, () =&gt; this.state.busy);
+      button.motif.on(&quot;click&quot;, () =&gt; this.share());
+      button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Paylaş&quot;)));
+    });
+    const link = motifComponent(&quot;a&quot;, {
+      preconfig: (a) =&gt; a.bindings.display(() =&gt; this.state.url !== &quot;&quot;),
+      initializeComponent: (a) =&gt; {
+        a.bindings.add(&quot;href&quot;, () =&gt; this.state.url);
+        a.setText(&quot;Paylaşım bağlantısı&quot;);
+      },
+    });
+    const failed = motifComponent(&quot;small&quot;, {
+      preconfig: (small) =&gt; small.bindings.display(() =&gt; this.state.failed),
+      initializeComponent: (small) =&gt; small.setText(&quot;Paylaşılamadı.&quot;),
+    });
+    return motifFragment({ childs: [button, link, failed] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/ShareButton.jsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export function ShareButton(props) {
+  const state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  const share = () =&gt; {
+    state.busy = true;
+    state.failed = false;
+    box.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json()))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  };
+
+  const box = (
+    &lt;div class=&quot;share&quot;&gt;
+      &lt;button type=&quot;button&quot; disabled={() =&gt; state.busy} onclick={() =&gt; share()}&gt;Paylaş&lt;/button&gt;
+      &lt;a x-display={() =&gt; state.url !== &quot;&quot;} href={() =&gt; state.url}&gt;Paylaşım bağlantısı&lt;/a&gt;
+      &lt;small x-display={() =&gt; state.failed}&gt;Paylaşılamadı.&lt;/small&gt;
+    &lt;/div&gt;
+  );
+
+  return box;
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/ShareButton.js"><code>import { motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export function ShareButton(props) {
+  const state = reactive({ busy: false, url: &quot;&quot;, failed: false });
+
+  const share = () =&gt; {
+    state.busy = true;
+    state.failed = false;
+    box.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json()))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  };
+
+  const box = motifComponent(&quot;div&quot;, (div) =&gt; {
+    div.class.add(&quot;share&quot;);
+    const button = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.bindings.add(&quot;disabled&quot;, () =&gt; state.busy);
+      button.motif.on(&quot;click&quot;, () =&gt; share());
+      button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Paylaş&quot;)));
+    });
+    const link = motifComponent(&quot;a&quot;, {
+      preconfig: (a) =&gt; a.bindings.display(() =&gt; state.url !== &quot;&quot;),
+      initializeComponent: (a) =&gt; {
+        a.bindings.add(&quot;href&quot;, () =&gt; state.url);
+        a.setText(&quot;Paylaşım bağlantısı&quot;);
+      },
+    });
+    const failed = motifComponent(&quot;small&quot;, {
+      preconfig: (small) =&gt; small.bindings.display(() =&gt; state.failed),
+      initializeComponent: (small) =&gt; small.setText(&quot;Paylaşılamadı.&quot;),
+    });
+    div.controls.add(button, link, failed);
+  });
+
+  return box;
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/ShareButton.jsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ShareButton = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ busy: false, url: &quot;&quot;, failed: false }),
+
+  share() {
+    const state = this.data;
+    state.busy = true;
+    state.failed = false;
+    this.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json()))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;share&quot;);
+  },
+
+  view() {
+    const state = this.data;
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; disabled={() =&gt; state.busy} onclick={() =&gt; this.share()}&gt;Paylaş&lt;/button&gt;
+        &lt;a x-display={() =&gt; state.url !== &quot;&quot;} href={() =&gt; state.url}&gt;Paylaşım bağlantısı&lt;/a&gt;
+        &lt;small x-display={() =&gt; state.failed}&gt;Paylaşılamadı.&lt;/small&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/ShareButton.js"><code>import { motifComponent, motifFragment, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const ShareButton = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: reactive({ busy: false, url: &quot;&quot;, failed: false }),
+
+  share() {
+    const state = this.data;
+    state.busy = true;
+    state.failed = false;
+    this.doWork(fetch(`/api/notes/${props.note.id}/share`, { method: &quot;POST&quot; }).then((r) =&gt; r.json()))
+      .then((link) =&gt; {
+        if (link instanceof Error) return;
+        state.url = link.url;
+        state.busy = false;
+      })
+      .catch(() =&gt; {
+        state.failed = true;
+        state.busy = false;
+      });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;share&quot;);
+  },
+
+  view() {
+    const state = this.data;
+    const button = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.bindings.add(&quot;disabled&quot;, () =&gt; state.busy);
+      button.motif.on(&quot;click&quot;, () =&gt; this.share());
+      button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Paylaş&quot;)));
+    });
+    const link = motifComponent(&quot;a&quot;, {
+      preconfig: (a) =&gt; a.bindings.display(() =&gt; state.url !== &quot;&quot;),
+      initializeComponent: (a) =&gt; {
+        a.bindings.add(&quot;href&quot;, () =&gt; state.url);
+        a.setText(&quot;Paylaşım bağlantısı&quot;);
+      },
+    });
+    const failed = motifComponent(&quot;small&quot;, {
+      preconfig: (small) =&gt; small.bindings.display(() =&gt; state.failed),
+      initializeComponent: (small) =&gt; small.setText(&quot;Paylaşılamadı.&quot;),
+    });
+    return motifFragment({ childs: [button, link, failed] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="class,options">
+<p><code>share()</code> bileşenin bir metodudur; <code>doWork</code> da öyle, <code>this.doWork(…)</code> olarak çağrılır.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>this</code> yoktur; <code>doWork</code> dönen kökün metodudur. <code>share</code> kökü <code>box</code> adıyla kullanır; düğmeye tıklandığında kök çoktan kurulmuştur.</p>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Not sayfası düğmeyi açık notla yerleştirir: <code>&lt;ShareButton note={note} /&gt;</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Not sayfası düğmeyi açık notla yerleştirir: <code>new ShareButton({ note })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Not sayfası düğmeyi açık notla yerleştirir: <code>motifComponent(ShareButton, { note })</code>.</p>
+</div>
+<h2 id="vs-using"><code>using</code>'den farkı</h2>
+<p><code>doWork</code> sonucu bir söz olarak geri verir; <a href="/tr/docs/using">using</a> ise sonucu kendisine verilen işleyicilerde bitirir ve hiçbir şey döndürmez. Aşağıdaki ayrıntıların hepsi bu farktan doğar:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>doWork</code></th>
+<th><code>using</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Döndürdüğü</td>
+<td>Bir söz; <code>then</code>, <code>catch</code>, <code>finally</code> eklenir, çağırana döndürülebilir.</td>
+<td>Hiçbir şey; iş, çağrıda verilen işleyicilerde biter.</td>
+</tr>
+<tr>
+<td>Gelen değer</td>
+<td><code>then</code> ya değeri ya <code>MJX108</code>'i alır; değeri kullanmadan önce <code>instanceof Error</code> denetimi gerekir.</td>
+<td><code>onfulfilled</code> değerin kendisini alır; denetim gerekmez.</td>
+</tr>
+<tr>
+<td>Serbest bırakıldıktan sonra</td>
+<td><code>then</code> <code>MJX108</code> alır, <code>catch</code> çalışmaz, <code>finally</code> çalışır.</td>
+<td>Hiçbir işleyici çalışmaz.</td>
+</tr>
+<tr>
+<td>Bileşen yaşarken ret</td>
+<td><code>catch</code>'e gider; <code>catch</code> yoksa yakalanmamış söz reddi olur.</td>
+<td><code>onrejected</code>'a gider; o yoksa sessizce yutulur.</td>
+</tr>
+<tr>
+<td>İşleyicinin fırlattığı hata</td>
+<td>Zincirdeki sonraki <code>catch</code>'e gider; o yoksa yakalanmamış söz reddi olur.</td>
+<td><code>MJX129</code> ile <code>errorHandler</code>'a bildirilir.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="when">Hangisini ne zaman</h2>
+<p><code>doWork</code> şu durumlarda seçilir:</p>
+<ul>
+<li>Bir işin ardından başka bir iş gelecekse; örneğin notu kaydedip ardından listeyi yeniden yüklemek. <code>then</code> ikinci isteği yine <code>doWork</code> ile başlatıp döndürür; ilk adımda <code>MJX108</code> gelirse <code>then</code> <code>instanceof Error</code> denetimiyle erken döner ve ikinci istek hiç gitmez. Zincirin sonundaki tek <code>catch</code> iki adımın reddini de yakalar.</li>
+<li>Birden çok isteğin birlikte bitmesi bekleniyorsa: <code>doWork(Promise.all([…]))</code> sonuçları bir dizi olarak verir; bileşen serbest bırakılmışsa tek bir <code>MJX108</code> gelir.</li>
+<li>İşi başlatan metot sözü döndürecekse; üst bileşen, bir kısayol tuşu ya da bir test işin bitmesini bekleyebilir.</li>
+<li><code>finally</code> ya da zincir boyunca taşınan bir hata gerekiyorsa. <code>finally</code> bileşen serbest bırakıldıktan sonra da çalışır.</li>
+</ul>
+<p>Sonuç yalnız bu bileşenin durumuna yazılacaksa ve işin bitişini kimse beklemiyorsa <a href="/tr/docs/using#when">using</a> daha kısadır: <code>instanceof Error</code> denetimi ve <code>catch</code> gerekmez, işleyicinin fırlattığı hata <code>errorHandler</code>'a kendiliğinden gider.</p>
+<p><code>doWork</code> de isteği durdurmaz; bileşen serbest bırakılınca isteği iptal etmek için <a href="/tr/docs/using#request-keeps-running">İstek sürer</a> bölümüne bakın.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Bileşenlerin görünümünü yazmanın ayrıntıları için <a href="/tr/docs/jsx">JSX ve Şablonlar</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

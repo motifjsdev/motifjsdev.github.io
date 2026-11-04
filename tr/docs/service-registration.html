@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="ServiceCollection kayıt biçimleri, başlangıçta oluşturulan singleton&#x27;lar, @Injectable ile otomatik kayıt ve seçenekleri.">
+    <title>Servis Kaydı — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/service-registration">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-registration">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-registration">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-registration">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/service-registration">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Servis Kaydı">
+    <meta property="og:description" content="ServiceCollection kayıt biçimleri, başlangıçta oluşturulan singleton&#x27;lar, @Injectable ile otomatik kayıt ve seçenekleri.">
+    <script type="application/json" id="doc-data">{"slug":"service-registration","locale":"tr","title":"Servis Kaydı","description":"ServiceCollection kayıt biçimleri, başlangıçta oluşturulan singleton\u0027lar, @Injectable ile otomatik kayıt ve seçenekleri.","category":{"id":"5","title":"Bağımlılık Enjeksiyonu"},"html":"\u003Ch2 id=\u0022registration\u0022\u003EServis kaydı\u003C/h2\u003E\n\u003Cp\u003EServisler \u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E\u0027ın döndürdüğü kurucunun \u003Ccode\u003Eservices\u003C/code\u003E koleksiyonuna (\u003Ccode\u003EServiceCollection\u003C/code\u003E), \u003Ccode\u003Ebuild()\u003C/code\u003E\u0027den önce kaydedilir. Her kayıt bir token\u0027ı (çoğunlukla sınıfın kendisi; dizge ya da sembol de olabilir) bir uygulamaya ve bir yaşam süresine bağlar; yaşam süreleri \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003EYaşam Süreleri ve Kapsamlar\u003C/a\u003E sayfasındadır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Econst builder = Application.CreateBuilder();\n\nbuilder.services.addSingleton(NotesService, NotesService);   // uygulama boyunca tek örnek\nbuilder.services.addScoped(NoteDraft, NoteDraft);            // gezinme başına bir örnek\nbuilder.services.addTransient(SearchIndex, SearchIndex);     // her çözümlemede yeni örnek\n\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Econst builder = Application.CreateBuilder();\n\nbuilder.services.addSingleton(NotesService, NotesService);   // uygulama boyunca tek örnek\nbuilder.services.addScoped(NoteDraft, NoteDraft);            // gezinme başına bir örnek\nbuilder.services.addTransient(SearchIndex, SearchIndex);     // her çözümlemede yeni örnek\n\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022registration-forms\u0022\u003EKayıt biçimleri\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Eadd*(token, impl)\u003C/code\u003E metotlarında \u003Ccode\u003Eimpl\u003C/code\u003E şunlardan biri olabilir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003E// 1) Sınıf (useClass)\nbuilder.services.addSingleton(NotesService, NotesService);\n\n// 2) Hazır değer (useValue): sınıf olmayan bir nesne olduğu gibi kaydedilir\nbuilder.services.addSingleton(\u0026quot;config\u0026quot;, { apiUrl: \u0026quot;/api/notes\u0026quot; });\n\n// 3) Fabrika / descriptor nesnesi: \u0060deps\u0060 verilirse fabrika (…bağımlılıklar, sağlayıcı) ile çağrılır\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes: NotesService) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n});\n\n// deps\u0027siz fabrika yalnızca sağlayıcıyı alır\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) });\n\n// 4) Async değer (Promise): async fabrikaya sarılır; \u0060get\u0060 değil \u0060getAsync\u0060 ile çözümlenir\nbuilder.services.addSingleton(SyncService, import(\u0026quot;./services/sync\u0026quot;).then((m) =\u0026gt; new m.SyncService()));\nconst sync = await app.provider.getAsync(SyncService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003E// 1) Sınıf (useClass)\nbuilder.services.addSingleton(NotesService, NotesService);\n\n// 2) Hazır değer (useValue): sınıf olmayan bir nesne olduğu gibi kaydedilir\nbuilder.services.addSingleton(\u0026quot;config\u0026quot;, { apiUrl: \u0026quot;/api/notes\u0026quot; });\n\n// 3) Fabrika / descriptor nesnesi: \u0060deps\u0060 verilirse fabrika (…bağımlılıklar, sağlayıcı) ile çağrılır\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n});\n\n// deps\u0027siz fabrika yalnızca sağlayıcıyı alır\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) });\n\n// 4) Async değer (Promise): async fabrikaya sarılır; \u0060get\u0060 değil \u0060getAsync\u0060 ile çözümlenir\nbuilder.services.addSingleton(SyncService, import(\u0026quot;./services/sync\u0026quot;).then((m) =\u0026gt; new m.SyncService()));\nconst sync = await app.provider.getAsync(SyncService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Edeps\u003C/code\u003E dizisi hem sınıf hem fabrika kayıtlarında geçerlidir: sıralı olarak çözümlenir ve yapıcıya/fabrikaya aynı sırada geçirilir; fabrikada son parametre her zaman \u003Ccode\u003EServiceProvider\u003C/code\u003E\u0027dır.\u003C/p\u003E\n\u003Cp\u003ESağlayıcı yalnız sınıf kaydını (\u003Ccode\u003EuseClass\u003C/code\u003E) \u003Ccode\u003Enew\u003C/code\u003E ile kurar. \u003Ccode\u003EuseValue\u003C/code\u003E ile verilen değer ve fabrikanın döndürdüğü değer olduğu gibi verilir; \u003Ccode\u003Eget\u003C/code\u003E ve \u003Ccode\u003EgetAsync\u003C/code\u003E aynı değeri döndürür. Bir fonksiyonu ya da sınıfın kendisini servis olarak vermek için \u003Ccode\u003E{ useValue: fn }\u003C/code\u003E veya onu döndüren bir fabrika kullanın; örnek isteyen fabrika \u003Ccode\u003Enew\u003C/code\u003E\u0027i kendisi yazar.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eadd*(token, impl)\u003C/code\u003E\u0027e doğrudan verilen bir fonksiyon sınıf olarak kurulur. Kurulamayan bir fonksiyon (ok fonksiyonu, \u003Ccode\u003Easync\u003C/code\u003E fonksiyon, nesne metodu) TypeScript\u0027te derleme hatası verir, çalışma zamanında da kayıt satırında \u003Ccode\u003EMJX413\u003C/code\u003E fırlatır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(\u0027formatter\u0027, (x: number) =\u0026gt; x.toFixed(2));             // hata: MJX413\nbuilder.services.addSingleton(\u0027formatter\u0027, { useValue: (x: number) =\u0026gt; x.toFixed(2) }); // fonksiyonun kendisi\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) }); // fabrika\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(\u0027formatter\u0027, (x) =\u0026gt; x.toFixed(2));             // hata: MJX413\nbuilder.services.addSingleton(\u0027formatter\u0027, { useValue: (x) =\u0026gt; x.toFixed(2) }); // fonksiyonun kendisi\nbuilder.services.addSingleton(SearchIndex, { useFactory: (sp) =\u0026gt; new SearchIndex(sp.get(NotesService)) }); // fabrika\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EServiceCollection\u003C/code\u003E metotları:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMetot\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EaddSingleton/addScoped/addTransient(token, impl)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKayıt.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtryAddSingleton/tryAddScoped/tryAddTransient(token, impl)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYalnızca kayıtlı değilse ekler; \u003Ccode\u003Eboolean\u003C/code\u003E döner.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereplace(token, impl, lifetime?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EVar olan kaydı değiştirir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eremove(token)\u003C/code\u003E / \u003Ccode\u003Ehas(token)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKaldır / kontrol et.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereset()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETümünü temizle.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EbuildServiceProvider()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EServiceProvider\u003C/code\u003E üretir (\u003Ccode\u003Ebuild()\u003C/code\u003E bunu otomatik yapar).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch3 id=\u0022startup\u0022\u003EBaşlangıçta oluşturulan singleton\u0027lar\u003C/h3\u003E\n\u003Cp\u003EBir singleton\u0027ın hiçbir yerden istenmeden uygulama başlarken oluşturulması için kayda \u003Ccode\u003Estartup: true\u003C/code\u003E verilir. Kurucusu kendi başına iş yapan servisler (belgeye öznitelik yazan, dinleyici takan, bağlantı açan) böyle kaydedilir. Örnekteki servis kurulurken bir \u003Ccode\u003Eeffect\u003C/code\u003E açar ve seçili temayı \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E elemanına yazar; hiçbir bileşen onu istemese de çalışması gerekir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot;, startup: true })\nexport class SettingsService {\n  readonly state = reactive({ theme: \u0026quot;system\u0026quot; as Theme });\n\n  constructor() {\n    effect(() =\u0026gt; {\n      const root = document.documentElement;\n      if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n      else root.dataset.theme = this.state.theme;\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/settings.js\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot;, startup: true })\nexport class SettingsService {\n  state = reactive({ theme: \u0026quot;system\u0026quot; });\n\n  constructor() {\n    effect(() =\u0026gt; {\n      const root = document.documentElement;\n      if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n      else root.dataset.theme = this.state.theme;\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EAçık kayıtta \u003Ccode\u003Estartup\u003C/code\u003E nesne biçiminde verilir; \u003Ccode\u003EuseClass\u003C/code\u003E ve \u003Ccode\u003EuseFactory\u003C/code\u003E ile çalışır, \u003Ccode\u003EtryAddSingleton\u003C/code\u003E aynı biçimi alır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes: NotesService) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n  startup: true,\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Ebuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nbuilder.services.addSingleton(SearchIndex, {\n  useFactory: (notes) =\u0026gt; new SearchIndex(notes),\n  deps: [NotesService],\n  startup: true,\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EServisler \u003Ccode\u003Eapp.run()\u003C/code\u003E içinde, kabuk ve ilk sayfa kurulmadan önce oluşturulur; \u003Ccode\u003Ebuild()\u003C/code\u003E oluşturmaz. \u003Ccode\u003Erun()\u003C/code\u003E\u0027dan önce çağrılan \u003Ccode\u003EuseDevelopment\u003C/code\u003E ve \u003Ccode\u003EuseLogging\u003C/code\u003E ayarları kurucuda geçerlidir.\u003C/li\u003E\n\u003Cli\u003EOluşturma sırası kayıt sırasıdır: \u003Ccode\u003Ebuild()\u003C/code\u003E\u0027den önceki \u003Ccode\u003Eadd*\u003C/code\u003E çağrıları yazıldıkları sırayla, ardından \u003Ccode\u003E@Injectable\u003C/code\u003E sınıfları. Bağımlılıklar her zamanki gibi önce kurulur.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Erun()\u003C/code\u003E\u0027dan önce \u003Ccode\u003Eget\u003C/code\u003E ile çözülmüş bir servis yeniden oluşturulmaz; bileşenler, \u003Ccode\u003EFromService\u003C/code\u003E ve \u003Ccode\u003Einject\u003C/code\u003E aynı örneği alır.\u003C/li\u003E\n\u003Cli\u003EKurucu hata fırlatırsa \u003Ccode\u003Erun()\u003C/code\u003E aynı hatayı fırlatır ve uygulama başlamaz.\u003C/li\u003E\n\u003Cli\u003EServisler \u003Ccode\u003Eget\u003C/code\u003E ile, senkron oluşturulur: async fabrika ya da Promise ile kaydedilmiş bir serviste \u003Ccode\u003Erun()\u003C/code\u003E \u003Ccode\u003EMJX402\u003C/code\u003E fırlatır. Bu servislere \u003Ccode\u003Estartup\u003C/code\u003E vermeyin, \u003Ccode\u003Eawait app.provider.getAsync(token)\u003C/code\u003E ile başlatın.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Estartup\u003C/code\u003E yalnız \u003Ccode\u003Esingleton\u003C/code\u003E kayıtta geçerlidir. \u003Ccode\u003Etransient\u003C/code\u003E ve \u003Ccode\u003Escoped\u003C/code\u003E kayıtta yok sayılır, geliştirme modunda \u003Ccode\u003EMJX415\u003C/code\u003E uyarısı yazılır; servis ilk çözümlemede oluşturulur.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003E@Injectable\u003C/code\u003E sınıflarından \u003Ccode\u003Erun()\u003C/code\u003E anında modülü yüklenmiş olanlar oluşturulur. Modülü \u003Ccode\u003Erun()\u003C/code\u003E\u0027dan sonra yüklenen bir sınıf (yalnız tembel bir sayfanın içe aktardığı servis) yüklendiğinde oluşturulmaz, ilk çözümlemede oluşturulur.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ereplace(token, impl)\u003C/code\u003E yeni kayıtta \u003Ccode\u003Estartup\u003C/code\u003E yazılmamışsa önceki kaydın \u003Ccode\u003Estartup\u003C/code\u003E değerini korur; \u003Ccode\u003Estartup: false\u003C/code\u003E kapatır.\u003C/li\u003E\n\u003Cli\u003EUygulama çalışırken \u003Ccode\u003Ebuilder.rebuild()\u003C/code\u003E yeni bir sağlayıcı kurar ve \u003Ccode\u003Estartup\u003C/code\u003E singleton\u0027larını o sağlayıcıda hemen yeniden oluşturur; kurucu hata fırlatırsa \u003Ccode\u003Erebuild()\u003C/code\u003E aynı hatayı fırlatır. Bileşenler, \u003Ccode\u003Eapp.provider\u003C/code\u003E ve \u003Ccode\u003EServiceProvider\u003C/code\u003E token\u0027ı yeni sağlayıcıyı verir. Eski sağlayıcı serbest bırakılır; \u003Ccode\u003Erebuild()\u003C/code\u003E bu serbest bırakmayı beklemez. \u003Ccode\u003Erun()\u003C/code\u003E\u0027dan önce çağrılan \u003Ccode\u003Erebuild()\u003C/code\u003E servisleri oluşturmaz, \u003Ccode\u003Erun()\u003C/code\u003E oluşturur.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022injectable-decorator\u0022\u003EDekoratörlerle otomatik kayıt\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003E@Injectable\u003C/code\u003E, bir sınıfı otomatik kayıt için işaretler; açık bir \u003Ccode\u003Eadd*\u003C/code\u003E satırı gerekmez. Uygulama build edilirken (\u003Ccode\u003Ebuilder.build()\u003C/code\u003E içinde \u003Ccode\u003EautoRegisterInjectables\u003C/code\u003E çağrılır) işaretli sınıflar seçenekleriyle kaydedilir.\u003C/p\u003E\n\u003Cp\u003EModülü \u003Ccode\u003Ebuild()\u003C/code\u003E\u0027den \u003Cstrong\u003Esonra\u003C/strong\u003E yüklenen sınıflar da (yalnızca tembel bir sayfanın içe aktardığı servisler) kaydedilir: tanımlayıcı bulunamadığında kayıt ilk çözümleme anında yapılır. Açık kayıt (\u003Ccode\u003EaddSingleton\u003C/code\u003E/\u003Ccode\u003EaddScoped\u003C/code\u003E/\u003Ccode\u003EaddTransient\u003C/code\u003E) her zaman dekoratörü ezer, dekoratör açık kaydı ezemez.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\u003Ccode\u003Eimport { Injectable, inject, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  readonly state = reactive({ items: [] as Note[] });\n}\n\n@Injectable()   // varsayılan lifetime: \u0027transient\u0027\nexport class SearchIndex {\n  private notes = inject(NotesService);\n\n  count() {\n    return this.notes.state.items.length;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/search.js\u0022\u003E\u003Ccode\u003Eimport { Injectable, inject, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class NotesService {\n  state = reactive({ items: [] });\n}\n\n@Injectable()   // varsayılan lifetime: \u0027transient\u0027\nexport class SearchIndex {\n  notes = inject(NotesService);\n\n  count() {\n    return this.notes.state.items.length;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003E@Injectable\u003C/code\u003E standart (TC39) bir sınıf dekoratörüdür; \u003Ccode\u003Etsconfig.json\u003C/code\u003E\u0027da ya da Vite\u0027ın \u003Ccode\u003Eesbuild\u003C/code\u003E ayarında ek bir ayar gerektirmez. \u003Ccode\u003E@motifx/compiler\u003C/code\u003E dekoratörleri \u003Ccode\u003E.tsx\u003C/code\u003E dosyalarında olduğu gibi \u003Ccode\u003E.ts\u003C/code\u003E ve \u003Ccode\u003E.js\u003C/code\u003E dosyalarında da derler; \u003Ccode\u003Evite dev\u003C/code\u003E ve \u003Ccode\u003Evite build\u003C/code\u003E aynı sonucu verir. En yakın \u003Ccode\u003Etsconfig.json\u003C/code\u003E\u0027unda \u003Ccode\u003EexperimentalDecorators: true\u003C/code\u003E olan dosyalar TypeScript\u0027in eski dekoratör dönüşümüne bırakılır; \u003Ccode\u003E@Injectable\u003C/code\u003E o biçimde de çalışır.\u003C/p\u003E\n\u003Ch3 id=\u0022injectable-options\u0022\u003E\u003Ccode\u003E@Injectable\u003C/code\u003E seçenekleri\u003C/h3\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESeçenek\u003C/th\u003E\n\u003Cth\u003EAnlam\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Elifetime\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027singleton\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027scoped\u0027\u003C/code\u003E ya da \u003Ccode\u003E\u0027transient\u0027\u003C/code\u003E; verilmezse \u003Ccode\u003E\u0027transient\u0027\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edeps\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYapıcı parametreleri olarak sırayla çözülen token\u0027lar (bkz. \u003Ca href=\u0022/docs/service-resolution#deps\u0022\u003E\u003Ccode\u003Edeps\u003C/code\u003E\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estartup\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYalnız singleton\u0027da: servis \u003Ccode\u003Erun()\u003C/code\u003E içinde, istenmeden oluşturulur (bkz. \u003Ca href=\u0022#startup\u0022\u003EBaşlangıçta oluşturulan singleton\u0027lar\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBir servisin ne kadar yaşadığını öğrenmek için \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003EYaşam Süreleri ve Kapsamlar\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"registration","text":"Servis kaydı","level":2},{"id":"registration-forms","text":"Kayıt biçimleri","level":3},{"id":"startup","text":"Başlangıçta oluşturulan singleton\u0027lar","level":3},{"id":"injectable-decorator","text":"Dekoratörlerle otomatik kayıt","level":2},{"id":"injectable-options","text":"@Injectable seçenekleri","level":3},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"dependency-injection","title":"Bağımlılık Enjeksiyonuna Giriş"},"next":{"slug":"service-lifetimes","title":"Yaşam Süreleri ve Kapsamlar"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Bağımlılık Enjeksiyonu</p>
+        <h1>Servis Kaydı</h1>
+        <p>ServiceCollection kayıt biçimleri, başlangıçta oluşturulan singleton&#x27;lar, @Injectable ile otomatik kayıt ve seçenekleri.</p>
+<h2 id="registration">Servis kaydı</h2>
+<p>Servisler <code>Application.CreateBuilder()</code>'ın döndürdüğü kurucunun <code>services</code> koleksiyonuna (<code>ServiceCollection</code>), <code>build()</code>'den önce kaydedilir. Her kayıt bir token'ı (çoğunlukla sınıfın kendisi; dizge ya da sembol de olabilir) bir uygulamaya ve bir yaşam süresine bağlar; yaşam süreleri <a href="/tr/docs/service-lifetimes">Yaşam Süreleri ve Kapsamlar</a> sayfasındadır:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>const builder = Application.CreateBuilder();
+
+builder.services.addSingleton(NotesService, NotesService);   // uygulama boyunca tek örnek
+builder.services.addScoped(NoteDraft, NoteDraft);            // gezinme başına bir örnek
+builder.services.addTransient(SearchIndex, SearchIndex);     // her çözümlemede yeni örnek
+
+const app = builder.build();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>const builder = Application.CreateBuilder();
+
+builder.services.addSingleton(NotesService, NotesService);   // uygulama boyunca tek örnek
+builder.services.addScoped(NoteDraft, NoteDraft);            // gezinme başına bir örnek
+builder.services.addTransient(SearchIndex, SearchIndex);     // her çözümlemede yeni örnek
+
+const app = builder.build();</code></pre>
+</div>
+<h3 id="registration-forms">Kayıt biçimleri</h3>
+<p><code>add*(token, impl)</code> metotlarında <code>impl</code> şunlardan biri olabilir:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>// 1) Sınıf (useClass)
+builder.services.addSingleton(NotesService, NotesService);
+
+// 2) Hazır değer (useValue): sınıf olmayan bir nesne olduğu gibi kaydedilir
+builder.services.addSingleton(&quot;config&quot;, { apiUrl: &quot;/api/notes&quot; });
+
+// 3) Fabrika / descriptor nesnesi: `deps` verilirse fabrika (…bağımlılıklar, sağlayıcı) ile çağrılır
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes: NotesService) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+});
+
+// deps'siz fabrika yalnızca sağlayıcıyı alır
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) });
+
+// 4) Async değer (Promise): async fabrikaya sarılır; `get` değil `getAsync` ile çözümlenir
+builder.services.addSingleton(SyncService, import(&quot;./services/sync&quot;).then((m) =&gt; new m.SyncService()));
+const sync = await app.provider.getAsync(SyncService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>// 1) Sınıf (useClass)
+builder.services.addSingleton(NotesService, NotesService);
+
+// 2) Hazır değer (useValue): sınıf olmayan bir nesne olduğu gibi kaydedilir
+builder.services.addSingleton(&quot;config&quot;, { apiUrl: &quot;/api/notes&quot; });
+
+// 3) Fabrika / descriptor nesnesi: `deps` verilirse fabrika (…bağımlılıklar, sağlayıcı) ile çağrılır
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+});
+
+// deps'siz fabrika yalnızca sağlayıcıyı alır
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) });
+
+// 4) Async değer (Promise): async fabrikaya sarılır; `get` değil `getAsync` ile çözümlenir
+builder.services.addSingleton(SyncService, import(&quot;./services/sync&quot;).then((m) =&gt; new m.SyncService()));
+const sync = await app.provider.getAsync(SyncService);</code></pre>
+</div>
+<p><code>deps</code> dizisi hem sınıf hem fabrika kayıtlarında geçerlidir: sıralı olarak çözümlenir ve yapıcıya/fabrikaya aynı sırada geçirilir; fabrikada son parametre her zaman <code>ServiceProvider</code>'dır.</p>
+<p>Sağlayıcı yalnız sınıf kaydını (<code>useClass</code>) <code>new</code> ile kurar. <code>useValue</code> ile verilen değer ve fabrikanın döndürdüğü değer olduğu gibi verilir; <code>get</code> ve <code>getAsync</code> aynı değeri döndürür. Bir fonksiyonu ya da sınıfın kendisini servis olarak vermek için <code>{ useValue: fn }</code> veya onu döndüren bir fabrika kullanın; örnek isteyen fabrika <code>new</code>'i kendisi yazar.</p>
+<p><code>add*(token, impl)</code>'e doğrudan verilen bir fonksiyon sınıf olarak kurulur. Kurulamayan bir fonksiyon (ok fonksiyonu, <code>async</code> fonksiyon, nesne metodu) TypeScript'te derleme hatası verir, çalışma zamanında da kayıt satırında <code>MJX413</code> fırlatır:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>builder.services.addSingleton('formatter', (x: number) =&gt; x.toFixed(2));             // hata: MJX413
+builder.services.addSingleton('formatter', { useValue: (x: number) =&gt; x.toFixed(2) }); // fonksiyonun kendisi
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) }); // fabrika</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>builder.services.addSingleton('formatter', (x) =&gt; x.toFixed(2));             // hata: MJX413
+builder.services.addSingleton('formatter', { useValue: (x) =&gt; x.toFixed(2) }); // fonksiyonun kendisi
+builder.services.addSingleton(SearchIndex, { useFactory: (sp) =&gt; new SearchIndex(sp.get(NotesService)) }); // fabrika</code></pre>
+</div>
+<p><code>ServiceCollection</code> metotları:</p>
+<table>
+<thead>
+<tr>
+<th>Metot</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>addSingleton/addScoped/addTransient(token, impl)</code></td>
+<td>Kayıt.</td>
+</tr>
+<tr>
+<td><code>tryAddSingleton/tryAddScoped/tryAddTransient(token, impl)</code></td>
+<td>Yalnızca kayıtlı değilse ekler; <code>boolean</code> döner.</td>
+</tr>
+<tr>
+<td><code>replace(token, impl, lifetime?)</code></td>
+<td>Var olan kaydı değiştirir.</td>
+</tr>
+<tr>
+<td><code>remove(token)</code> / <code>has(token)</code></td>
+<td>Kaldır / kontrol et.</td>
+</tr>
+<tr>
+<td><code>reset()</code></td>
+<td>Tümünü temizle.</td>
+</tr>
+<tr>
+<td><code>buildServiceProvider()</code></td>
+<td><code>ServiceProvider</code> üretir (<code>build()</code> bunu otomatik yapar).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="startup">Başlangıçta oluşturulan singleton'lar</h3>
+<p>Bir singleton'ın hiçbir yerden istenmeden uygulama başlarken oluşturulması için kayda <code>startup: true</code> verilir. Kurucusu kendi başına iş yapan servisler (belgeye öznitelik yazan, dinleyici takan, bağlantı açan) böyle kaydedilir. Örnekteki servis kurulurken bir <code>effect</code> açar ve seçili temayı <code>&lt;html&gt;</code> elemanına yazar; hiçbir bileşen onu istemese de çalışması gerekir:</p>
+<div class="doc-code" data-file="src/services/settings.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/settings.ts"><code>@Injectable({ lifetime: &quot;singleton&quot;, startup: true })
+export class SettingsService {
+  readonly state = reactive({ theme: &quot;system&quot; as Theme });
+
+  constructor() {
+    effect(() =&gt; {
+      const root = document.documentElement;
+      if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+      else root.dataset.theme = this.state.theme;
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/settings.js"><code>@Injectable({ lifetime: &quot;singleton&quot;, startup: true })
+export class SettingsService {
+  state = reactive({ theme: &quot;system&quot; });
+
+  constructor() {
+    effect(() =&gt; {
+      const root = document.documentElement;
+      if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+      else root.dataset.theme = this.state.theme;
+    });
+  }
+}</code></pre>
+</div>
+<p>Açık kayıtta <code>startup</code> nesne biçiminde verilir; <code>useClass</code> ve <code>useFactory</code> ile çalışır, <code>tryAddSingleton</code> aynı biçimi alır:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes: NotesService) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+  startup: true,
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+builder.services.addSingleton(SearchIndex, {
+  useFactory: (notes) =&gt; new SearchIndex(notes),
+  deps: [NotesService],
+  startup: true,
+});</code></pre>
+</div>
+<ul>
+<li>Servisler <code>app.run()</code> içinde, kabuk ve ilk sayfa kurulmadan önce oluşturulur; <code>build()</code> oluşturmaz. <code>run()</code>'dan önce çağrılan <code>useDevelopment</code> ve <code>useLogging</code> ayarları kurucuda geçerlidir.</li>
+<li>Oluşturma sırası kayıt sırasıdır: <code>build()</code>'den önceki <code>add*</code> çağrıları yazıldıkları sırayla, ardından <code>@Injectable</code> sınıfları. Bağımlılıklar her zamanki gibi önce kurulur.</li>
+<li><code>run()</code>'dan önce <code>get</code> ile çözülmüş bir servis yeniden oluşturulmaz; bileşenler, <code>FromService</code> ve <code>inject</code> aynı örneği alır.</li>
+<li>Kurucu hata fırlatırsa <code>run()</code> aynı hatayı fırlatır ve uygulama başlamaz.</li>
+<li>Servisler <code>get</code> ile, senkron oluşturulur: async fabrika ya da Promise ile kaydedilmiş bir serviste <code>run()</code> <code>MJX402</code> fırlatır. Bu servislere <code>startup</code> vermeyin, <code>await app.provider.getAsync(token)</code> ile başlatın.</li>
+<li><code>startup</code> yalnız <code>singleton</code> kayıtta geçerlidir. <code>transient</code> ve <code>scoped</code> kayıtta yok sayılır, geliştirme modunda <code>MJX415</code> uyarısı yazılır; servis ilk çözümlemede oluşturulur.</li>
+<li><code>@Injectable</code> sınıflarından <code>run()</code> anında modülü yüklenmiş olanlar oluşturulur. Modülü <code>run()</code>'dan sonra yüklenen bir sınıf (yalnız tembel bir sayfanın içe aktardığı servis) yüklendiğinde oluşturulmaz, ilk çözümlemede oluşturulur.</li>
+<li><code>replace(token, impl)</code> yeni kayıtta <code>startup</code> yazılmamışsa önceki kaydın <code>startup</code> değerini korur; <code>startup: false</code> kapatır.</li>
+<li>Uygulama çalışırken <code>builder.rebuild()</code> yeni bir sağlayıcı kurar ve <code>startup</code> singleton'larını o sağlayıcıda hemen yeniden oluşturur; kurucu hata fırlatırsa <code>rebuild()</code> aynı hatayı fırlatır. Bileşenler, <code>app.provider</code> ve <code>ServiceProvider</code> token'ı yeni sağlayıcıyı verir. Eski sağlayıcı serbest bırakılır; <code>rebuild()</code> bu serbest bırakmayı beklemez. <code>run()</code>'dan önce çağrılan <code>rebuild()</code> servisleri oluşturmaz, <code>run()</code> oluşturur.</li>
+</ul>
+<h2 id="injectable-decorator">Dekoratörlerle otomatik kayıt</h2>
+<p><code>@Injectable</code>, bir sınıfı otomatik kayıt için işaretler; açık bir <code>add*</code> satırı gerekmez. Uygulama build edilirken (<code>builder.build()</code> içinde <code>autoRegisterInjectables</code> çağrılır) işaretli sınıflar seçenekleriyle kaydedilir.</p>
+<p>Modülü <code>build()</code>'den <strong>sonra</strong> yüklenen sınıflar da (yalnızca tembel bir sayfanın içe aktardığı servisler) kaydedilir: tanımlayıcı bulunamadığında kayıt ilk çözümleme anında yapılır. Açık kayıt (<code>addSingleton</code>/<code>addScoped</code>/<code>addTransient</code>) her zaman dekoratörü ezer, dekoratör açık kaydı ezemez.</p>
+<div class="doc-code" data-file="src/services/search.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/search.ts"><code>import { Injectable, inject, reactive } from &quot;@motifx/core&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  readonly state = reactive({ items: [] as Note[] });
+}
+
+@Injectable()   // varsayılan lifetime: 'transient'
+export class SearchIndex {
+  private notes = inject(NotesService);
+
+  count() {
+    return this.notes.state.items.length;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/search.js"><code>import { Injectable, inject, reactive } from &quot;@motifx/core&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class NotesService {
+  state = reactive({ items: [] });
+}
+
+@Injectable()   // varsayılan lifetime: 'transient'
+export class SearchIndex {
+  notes = inject(NotesService);
+
+  count() {
+    return this.notes.state.items.length;
+  }
+}</code></pre>
+</div>
+<p><code>@Injectable</code> standart (TC39) bir sınıf dekoratörüdür; <code>tsconfig.json</code>'da ya da Vite'ın <code>esbuild</code> ayarında ek bir ayar gerektirmez. <code>@motifx/compiler</code> dekoratörleri <code>.tsx</code> dosyalarında olduğu gibi <code>.ts</code> ve <code>.js</code> dosyalarında da derler; <code>vite dev</code> ve <code>vite build</code> aynı sonucu verir. En yakın <code>tsconfig.json</code>'unda <code>experimentalDecorators: true</code> olan dosyalar TypeScript'in eski dekoratör dönüşümüne bırakılır; <code>@Injectable</code> o biçimde de çalışır.</p>
+<h3 id="injectable-options"><code>@Injectable</code> seçenekleri</h3>
+<table>
+<thead>
+<tr>
+<th>Seçenek</th>
+<th>Anlam</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lifetime</code></td>
+<td><code>'singleton'</code>, <code>'scoped'</code> ya da <code>'transient'</code>; verilmezse <code>'transient'</code>.</td>
+</tr>
+<tr>
+<td><code>deps</code></td>
+<td>Yapıcı parametreleri olarak sırayla çözülen token'lar (bkz. <a href="/tr/docs/service-resolution#deps"><code>deps</code></a>).</td>
+</tr>
+<tr>
+<td><code>startup</code></td>
+<td>Yalnız singleton'da: servis <code>run()</code> içinde, istenmeden oluşturulur (bkz. <a href="#startup">Başlangıçta oluşturulan singleton'lar</a>).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Sonraki adım</h2>
+<p>Bir servisin ne kadar yaşadığını öğrenmek için <a href="/tr/docs/service-lifetimes">Yaşam Süreleri ve Kapsamlar</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

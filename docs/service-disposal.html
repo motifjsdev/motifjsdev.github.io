@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Cleaning up services with app.dispose and provider.dispose, closing the navigation scope, tracking transient instances.">
+    <title>Disposing Services — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/service-disposal">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-disposal">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-disposal">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-disposal">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/service-disposal">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Disposing Services">
+    <meta property="og:description" content="Cleaning up services with app.dispose and provider.dispose, closing the navigation scope, tracking transient instances.">
+    <script type="application/json" id="doc-data">{"slug":"service-disposal","locale":"en","title":"Disposing Services","description":"Cleaning up services with app.dispose and provider.dispose, closing the navigation scope, tracking transient instances.","category":{"id":"5","title":"Dependency Injection"},"html":"\u003Ch2 id=\u0022service-disposal\u0022\u003EDisposing services\u003C/h2\u003E\n\u003Cp\u003EThe provider disposes the instances it built itself. If a service holds a resource such as a timer, a listener or a connection, write a \u003Ccode\u003Edispose()\u003C/code\u003E method that releases it; calling it is the provider\u0027s job:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class SyncService {\n  private timer = setInterval(() =\u0026gt; this.pull(), 60_000);\n\n  async pull() {\n    const response = await fetch(\u0026quot;/api/notes\u0026quot;);\n    return response.json();\n  }\n\n  dispose() {\n    clearInterval(this.timer);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/sync.js\u0022\u003E\u003Ccode\u003E@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class SyncService {\n  timer = setInterval(() =\u0026gt; this.pull(), 60_000);\n\n  async pull() {\n    const response = await fetch(\u0026quot;/api/notes\u0026quot;);\n    return response.json();\n  }\n\n  dispose() {\n    clearInterval(this.timer);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Cstrong\u003EWhen they are disposed:\u003C/strong\u003E\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eapp.dispose()\u003C/code\u003E disposes the services after the component tree has been torn down (leave animations included); until then, every component\u0027s \u003Ccode\u003EonDisposing\u003C/code\u003E / \u003Ccode\u003EonDisposed\u003C/code\u003E sees the same services, and \u003Ccode\u003Eawait app.dispose()\u003C/code\u003E also waits for async \u003Ccode\u003Edispose\u003C/code\u003Es.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eapp.dispose()\u003C/code\u003E and \u003Ccode\u003Eprovider.dispose()\u003C/code\u003E dispose the instances the provider built: the singleton cache, the \u003Ccode\u003Escoped\u003C/code\u003E instances of scopes, and the navigation scopes.\u003C/li\u003E\n\u003Cli\u003EA navigation scope closes when a new navigation takes its place or when the navigation is cancelled, and its \u003Ccode\u003Escoped\u003C/code\u003E instances are disposed. If a page tied to the scope is still alive (a leaving page whose disposal is in progress, a page in the \u003Ccode\u003EkeepAlive\u003C/code\u003E cache or kept in the stack), the scope stays open until that page is disposed or shown again.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003E\u003Cstrong\u003EHow:\u003C/strong\u003E on every instance, \u003Ccode\u003Edispose()\u003C/code\u003E, \u003Ccode\u003Eclose()\u003C/code\u003E, \u003Ccode\u003E[Symbol.dispose]()\u003C/code\u003E and \u003Ccode\u003E[Symbol.asyncDispose]()\u003C/code\u003E are called in order if they exist; an error thrown by one does not stop the others.\u003C/p\u003E\n\u003Cp\u003EOnly instances that have been built are disposed: a singleton that was never asked for was never built, so it is not disposed either; a value given with \u003Ccode\u003EuseValue\u003C/code\u003E goes through this only if it has been resolved at least once.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Etransient\u003C/code\u003E instances are not tracked by default; when \u003Ccode\u003Eprovider.enableAutoDisposeTransients()\u003C/code\u003E is turned on, transient instances produced in a child scope (\u003Ccode\u003EcreateScope\u003C/code\u003E, a navigation scope) are disposed together with that scope. Transients resolved from the root provider are still not tracked.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eprovider.getAllServices()\u003C/code\u003E gives the \u003Ccode\u003EServiceCollection\u003C/code\u003E the provider uses.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003EFor the mechanisms that writing packages on MotifJS relies on, go on to \u003Ca href=\u0022/docs/package-authoring\u0022\u003EWriting Packages on Motif\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"service-disposal","text":"Disposing services","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"service-resolution","title":"Resolving Services"},"next":{"slug":"package-authoring","title":"Writing Packages on Motif"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Dependency Injection</p>
+        <h1>Disposing Services</h1>
+        <p>Cleaning up services with app.dispose and provider.dispose, closing the navigation scope, tracking transient instances.</p>
+<h2 id="service-disposal">Disposing services</h2>
+<p>The provider disposes the instances it built itself. If a service holds a resource such as a timer, a listener or a connection, write a <code>dispose()</code> method that releases it; calling it is the provider's job:</p>
+<div class="doc-code" data-file="src/services/sync.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/sync.ts"><code>@Injectable({ lifetime: &quot;singleton&quot; })
+export class SyncService {
+  private timer = setInterval(() =&gt; this.pull(), 60_000);
+
+  async pull() {
+    const response = await fetch(&quot;/api/notes&quot;);
+    return response.json();
+  }
+
+  dispose() {
+    clearInterval(this.timer);
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/sync.js"><code>@Injectable({ lifetime: &quot;singleton&quot; })
+export class SyncService {
+  timer = setInterval(() =&gt; this.pull(), 60_000);
+
+  async pull() {
+    const response = await fetch(&quot;/api/notes&quot;);
+    return response.json();
+  }
+
+  dispose() {
+    clearInterval(this.timer);
+  }
+}</code></pre>
+</div>
+<p><strong>When they are disposed:</strong></p>
+<ul>
+<li><code>app.dispose()</code> disposes the services after the component tree has been torn down (leave animations included); until then, every component's <code>onDisposing</code> / <code>onDisposed</code> sees the same services, and <code>await app.dispose()</code> also waits for async <code>dispose</code>s.</li>
+<li><code>app.dispose()</code> and <code>provider.dispose()</code> dispose the instances the provider built: the singleton cache, the <code>scoped</code> instances of scopes, and the navigation scopes.</li>
+<li>A navigation scope closes when a new navigation takes its place or when the navigation is cancelled, and its <code>scoped</code> instances are disposed. If a page tied to the scope is still alive (a leaving page whose disposal is in progress, a page in the <code>keepAlive</code> cache or kept in the stack), the scope stays open until that page is disposed or shown again.</li>
+</ul>
+<p><strong>How:</strong> on every instance, <code>dispose()</code>, <code>close()</code>, <code>[Symbol.dispose]()</code> and <code>[Symbol.asyncDispose]()</code> are called in order if they exist; an error thrown by one does not stop the others.</p>
+<p>Only instances that have been built are disposed: a singleton that was never asked for was never built, so it is not disposed either; a value given with <code>useValue</code> goes through this only if it has been resolved at least once.</p>
+<p><code>transient</code> instances are not tracked by default; when <code>provider.enableAutoDisposeTransients()</code> is turned on, transient instances produced in a child scope (<code>createScope</code>, a navigation scope) are disposed together with that scope. Transients resolved from the root provider are still not tracked.</p>
+<p><code>provider.getAllServices()</code> gives the <code>ServiceCollection</code> the provider uses.</p>
+<h2 id="next">Next step</h2>
+<p>For the mechanisms that writing packages on MotifJS relies on, go on to <a href="/docs/package-authoring">Writing Packages on Motif</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

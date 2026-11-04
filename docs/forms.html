@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="One-way value&#x2B;oninput, two-way binding with bindings.model and x-model, select, form submission with onsubmit and a function action, a validation pattern; with and without JSX.">
+    <title>Forms and Two-Way Binding — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/forms">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/forms">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/forms">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/forms">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/forms">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Forms and Two-Way Binding">
+    <meta property="og:description" content="One-way value&#x2B;oninput, two-way binding with bindings.model and x-model, select, form submission with onsubmit and a function action, a validation pattern; with and without JSX.">
+    <script type="application/json" id="doc-data">{"slug":"forms","locale":"en","title":"Forms and Two-Way Binding","description":"One-way value\u002Boninput, two-way binding with bindings.model and x-model, select, form submission with onsubmit and a function action, a validation pattern; with and without JSX.","category":{"id":"2","title":"Core concepts"},"html":"\u003Cp\u003EMotifJS handles form input in two ways:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003EReactive read \u002B event write (one-way, explicit): \u003Ccode\u003Evalue={() =\u0026gt; note.title}\u003C/code\u003E \u002B \u003Ccode\u003Eoninput\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EA two-way binding (\u003Ccode\u003Ebindings.model\u003C/code\u003E, \u003Ccode\u003Ex-model\u003C/code\u003E in JSX): the input and the model stay in sync automatically. For a one-way binding to a specific DOM property, use \u003Ccode\u003Ebindings.add\u003C/code\u003E.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EThe examples are slices of the notes application. \u003Ccode\u003ENote\u003C/code\u003E and \u003Ccode\u003ENotesService\u003C/code\u003E are the ones in the \u003Ccode\u003Esrc/services/notes.ts\u003C/code\u003E file on the \u003Ca href=\u0022/docs/components\u0022\u003EComponents\u003C/a\u003E page, and \u003Ccode\u003ESettingsService\u003C/code\u003E and \u003Ccode\u003ETHEMES\u003C/code\u003E come from the \u003Ccode\u003Esrc/services/settings.ts\u003C/code\u003E file on the \u003Ca href=\u0022/docs/getting-started\u0022\u003EGetting Started\u003C/a\u003E page; \u003Ccode\u003Enote\u003C/code\u003E is the note being edited.\u003C/p\u003E\n\u003Ch2 id=\u0022one-way\u0022\u003EThe one-way (explicit) approach\u003C/h2\u003E\n\u003Cp\u003EYou read the value reactively and write the change to the model with an event. This is the route to take when a change involves extra work (conversion, validation, a side effect):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;form\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; value={() =\u0026gt; note.title} oninput={(e) =\u0026gt; (note.title = (e.target as HTMLInputElement).value)} /\u0026gt;\n  \u0026lt;input type=\u0026quot;checkbox\u0026quot; checked={() =\u0026gt; note.pinned} onchange={(e) =\u0026gt; (note.pinned = (e.target as HTMLInputElement).checked)} /\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  const title = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n    input.attr.add({ type: \u0026quot;text\u0026quot; });\n    input.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; note.title);\n    input.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (note.title = (e.target as HTMLInputElement).value));\n  });\n  const pinned = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n    input.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n    input.bindings.add(\u0026quot;checked\u0026quot;, () =\u0026gt; note.pinned);\n    input.motif.on(\u0026quot;change\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (note.pinned = (e.target as HTMLInputElement).checked));\n  });\n  form.controls.add(title, pinned);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;form\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; value={() =\u0026gt; note.title} oninput={(e) =\u0026gt; (note.title = e.target.value)} /\u0026gt;\n  \u0026lt;input type=\u0026quot;checkbox\u0026quot; checked={() =\u0026gt; note.pinned} onchange={(e) =\u0026gt; (note.pinned = e.target.checked)} /\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  const title = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n    input.attr.add({ type: \u0026quot;text\u0026quot; });\n    input.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; note.title);\n    input.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (note.title = e.target.value));\n  });\n  const pinned = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n    input.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n    input.bindings.add(\u0026quot;checked\u0026quot;, () =\u0026gt; note.pinned);\n    input.motif.on(\u0026quot;change\u0026quot;, (_sender, e) =\u0026gt; (note.pinned = e.target.checked));\n  });\n  form.controls.add(title, pinned);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Evalue\u003C/code\u003E and \u003Ccode\u003Echecked\u003C/code\u003E are property bindings: a \u003Ccode\u003Evalue={() =\u0026gt; …}\u003C/code\u003E written on a tag in JSX compiles to a \u003Ccode\u003Ebindings.add(\u0026quot;value\u0026quot;, getter)\u003C/code\u003E call, and no attribute is written.\u003C/p\u003E\n\u003Ch2 id=\u0022model\u0022\u003ETwo-way binding — \u003Ccode\u003Ebindings.model\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Ebindings.model\u003C/code\u003E picks the right DOM property automatically based on the type of the element and binds it to the model in both directions:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EElement\u003C/th\u003E\n\u003Cth\u003EBound property\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;checkbox\u0026quot;\u0026gt;\u003C/code\u003E, \u003Ccode\u003E\u0026lt;input type=\u0026quot;radio\u0026quot;\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Echecked\u003C/code\u003E (boolean)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;input\u0026gt;\u003C/code\u003E (others)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Evalue\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;select\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Evalue\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;textarea\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Evalue\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026lt;img\u0026gt;\u003C/code\u003E, \u003Ccode\u003E\u0026lt;audio\u0026gt;\u003C/code\u003E, \u003Ccode\u003E\u0026lt;video\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Esrc\u003C/code\u003E (one-way: model → element only)\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EOn inputs, the choice between \u003Ccode\u003Echecked\u003C/code\u003E and \u003Ccode\u003Evalue\u003C/code\u003E is made not when the binding is set up but on every read and write, based on the element\u0027s current \u003Ccode\u003Etype\u003C/code\u003E: when \u003Ccode\u003EonConfig\u003C/code\u003E sets up the binding, the \u003Ccode\u003Etype\u003C/code\u003E attribute may not have been applied yet.\u003C/p\u003E\n\u003Cp\u003EThe type of the value written to the model is also decided by the element:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EInput\u003C/th\u003E\n\u003Cth\u003EWritten to the model\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Echeckbox\u003C/code\u003E, \u003Ccode\u003Eradio\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E, \u003Ccode\u003Erange\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E (\u003Ccode\u003Enull\u003C/code\u003E if the input is emptied)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003Eeverything else (\u003Ccode\u003Etext\u003C/code\u003E, \u003Ccode\u003Edate\u003C/code\u003E, \u003Ccode\u003Eselect\u003C/code\u003E, \u003Ccode\u003Etextarea\u003C/code\u003E…)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Estring\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EDate types stay strings on purpose: their natural model is the \u003Ccode\u003E\u00272026-10-16\u0027\u003C/code\u003E form.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; onConfig={(field) =\u0026gt; field.bindings.model(note, \u0026quot;title\u0026quot;)} /\u0026gt;\n  \u0026lt;input type=\u0026quot;checkbox\u0026quot; onConfig={(box) =\u0026gt; box.bindings.model(note, \u0026quot;pinned\u0026quot;)} /\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;text\u0026quot; });\n  field.bindings.model(note, \u0026quot;title\u0026quot;);\n});\nconst pinned = motifComponent(\u0026quot;input\u0026quot;, (box: ComponentBase) =\u0026gt; {\n  box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n  box.bindings.model(note, \u0026quot;pinned\u0026quot;);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; onConfig={(field) =\u0026gt; field.bindings.model(note, \u0026quot;title\u0026quot;)} /\u0026gt;\n  \u0026lt;input type=\u0026quot;checkbox\u0026quot; onConfig={(box) =\u0026gt; box.bindings.model(note, \u0026quot;pinned\u0026quot;)} /\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;text\u0026quot; });\n  field.bindings.model(note, \u0026quot;title\u0026quot;);\n});\nconst pinned = motifComponent(\u0026quot;input\u0026quot;, (box) =\u0026gt; {\n  box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n  box.bindings.model(note, \u0026quot;pinned\u0026quot;);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EIn JSX the binding is set up in \u003Ccode\u003EonConfig\u003C/code\u003E: it is added while the component is being configured. Without JSX, the setup function itself is that place.\u003C/p\u003E\n\u003Cp\u003ESignatures:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ECall\u003C/th\u003E\n\u003Cth\u003EBound value\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(dataSource, dataMember)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003EdataMember\u003C/code\u003E field on \u003Ccode\u003EdataSource\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(dataSource, dataMember, formatString)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe same field, formatted with \u003Ccode\u003EformatString\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(dataSource, dataMember, formatString, formatInfo)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe same field; locale and currency come from \u003Ccode\u003EformatInfo\u003C/code\u003E (\u003Ccode\u003E{ locale, currency }\u003C/code\u003E)\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(getter, setter)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReads with \u003Ccode\u003Egetter()\u003C/code\u003E, writes with \u003Ccode\u003Esetter(value)\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emodel(binding)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA ready binding object\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EEvery form returns the added binding (\u003Ccode\u003EIBaseBinding\u003C/code\u003E).\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EdataMember\u003C/code\u003E can also be a dotted path (\u003Ccode\u003E\u0026quot;meta.category\u0026quot;\u003C/code\u003E). In a call with one argument, an object is interpreted as an \u003Ccode\u003EIBaseBinding\u003C/code\u003E, while a function given as the single argument only reads, binding one-way. \u003Ccode\u003Emodel(dataSource, dataMember)\u003C/code\u003E keeps the \u003Ccode\u003EdataSource\u003C/code\u003E object as it was at the time of the call; if that object can be replaced as a whole, use \u003Ccode\u003Ex-model\u003C/code\u003E or the getter/setter form.\u003C/p\u003E\n\u003Ch3 id=\u0022x-model\u0022\u003EThe \u003Ccode\u003Ex-model\u003C/code\u003E shorthand\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Ex-model\u003C/code\u003E compiles to a \u003Ccode\u003Ebindings.model(getter, setter)\u003C/code\u003E call and is two-way; without JSX you write the getter and the setter yourself:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;\n  \u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; note.pinned} /\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n});\nconst pinned = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n  input.bindings.model(() =\u0026gt; note.pinned, (value: boolean) =\u0026gt; (note.pinned = value));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;\n  \u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; note.pinned} /\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n});\nconst pinned = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n  input.bindings.model(() =\u0026gt; note.pinned, (value) =\u0026gt; (note.pinned = value));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe setter the compiler produces reads the object that owns the member again on every write (\u003Ccode\u003Enote\u003C/code\u003E for \u003Ccode\u003Enote.title\u003C/code\u003E, \u003Ccode\u003Erow.note\u003C/code\u003E for \u003Ccode\u003Erow.note.title\u003C/code\u003E, \u003Ccode\u003Estate.selected\u003C/code\u003E for \u003Ccode\u003Estate.selected.title\u003C/code\u003E). That way the binding does not break when the object is replaced as a whole (\u003Ccode\u003Estate.selected = otherNote\u003C/code\u003E) or when list rows change places:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/TitleList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/TitleList.tsx\u0022\u003E\u003Ccode\u003E{notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;input key={note.id} type=\u0026quot;text\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;)}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/TitleList.ts\u0022\u003E\u003Ccode\u003EmotifComponent({\n  initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(\u0026quot;notes\u0026quot;), (note: Note) =\u0026gt; motifComponent(\u0026quot;input\u0026quot;, {\n    indexkey: () =\u0026gt; note.id,\n    initializeComponent: (field: ComponentBase) =\u0026gt; {\n      field.attr.add({ type: \u0026quot;text\u0026quot; });\n      field.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n    },\n  })),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/TitleList.jsx\u0022\u003E\u003Ccode\u003E{notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;input key={note.id} type=\u0026quot;text\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;)}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/TitleList.js\u0022\u003E\u003Ccode\u003EmotifComponent({\n  initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(\u0026quot;notes\u0026quot;), (note) =\u0026gt; motifComponent(\u0026quot;input\u0026quot;, {\n    indexkey: () =\u0026gt; note.id,\n    initializeComponent: (field) =\u0026gt; {\n      field.attr.add({ type: \u0026quot;text\u0026quot; });\n      field.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n    },\n  })),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe write is skipped while the owner is \u003Ccode\u003Enull\u003C/code\u003E/\u003Ccode\u003Eundefined\u003C/code\u003E (\u003Ccode\u003Ex-model={() =\u0026gt; state.selected?.title}\u003C/code\u003E) and while the member holds a function (a getter prop). An expression without member access (\u003Ccode\u003E() =\u0026gt; a \u002B b\u003C/code\u003E, \u003Ccode\u003E() =\u0026gt; fn(x)\u003C/code\u003E) is only read and stays one-way; \u003Ccode\u003Emotif-explain\u003C/code\u003E shows which case applies.\u003C/p\u003E\n\u003Ch3 id=\u0022component-model\u0022\u003E\u003Ccode\u003Ex-model\u003C/code\u003E on your own component\u003C/h3\u003E\n\u003Cp\u003EA component whose element is not a form element can also be used with \u003Ccode\u003Ex-model\u003C/code\u003E. The bound value is written to the component\u0027s \u003Ccode\u003Evalue\u003C/code\u003E property; if the component defines its own \u003Ccode\u003Evalue\u003C/code\u003E property, the value goes to the component even when its element is something with a \u003Ccode\u003Evalue\u003C/code\u003E field of its own, such as a \u003Ccode\u003E\u0026lt;button\u0026gt;\u003C/code\u003E. The component writes the new value back to the model with \u003Ccode\u003Ebindings.writeModel(value)\u003C/code\u003E (\u003Ccode\u003Ethis.bindings\u003C/code\u003E in a class and in Options, the \u003Ccode\u003Ebindings\u003C/code\u003E of the \u003Ca href=\u0022/docs/components#function-root\u0022\u003Eroot component\u003C/a\u003E in a function component). \u003Ccode\u003EPinSwitch\u003C/code\u003E is a button that turns pinning a note on and off: in the class and in Options, \u003Ccode\u003Evalue\u003C/code\u003E is an accessor (\u003Ccode\u003Eget\u003C/code\u003E/\u003Ccode\u003Eset\u003C/code\u003E), and in the function the accessor is set up with \u003Ccode\u003EObject.defineProperty\u003C/code\u003E in the root\u0027s \u003Ccode\u003EinitializeComponent\u003C/code\u003E hook:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/PinSwitch.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/PinSwitch.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PinSwitch extends Component\u0026lt;HTMLButtonElement\u0026gt; {\n  state = reactive({ on: false });\n\n  set value(v: boolean) { this.state.on = !!v; }\n  get value() { return this.state.on; }\n\n  override onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.state.on));\n  }\n\n  override view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; (this.state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/PinSwitch.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PinSwitch extends Component\u0026lt;HTMLButtonElement\u0026gt; {\n  static override elementTag = \u0026quot;button\u0026quot;;\n  state = reactive({ on: false });\n\n  set value(v: boolean) { this.state.on = !!v; }\n  get value() { return this.state.on; }\n\n  override onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.state.on));\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; (this.state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/PinSwitch.tsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PinSwitch() {\n  const state = reactive({ on: false });\n  return (\n    \u0026lt;button\n      type=\u0026quot;button\u0026quot;\n      class=\u0026quot;switch\u0026quot;\n      initializeComponent={(root) =\u0026gt; Object.defineProperty(root, \u0026quot;value\u0026quot;, { get: () =\u0026gt; state.on, set: (v: boolean) =\u0026gt; (state.on = !!v), configurable: true })}\n      onclick={(root, _e) =\u0026gt; root.bindings.writeModel(!state.on)}\n    \u0026gt;\n      {() =\u0026gt; (state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)}\n    \u0026lt;/button\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/PinSwitch.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PinSwitch() {\n  const state = reactive({ on: false });\n  return motifComponent(\u0026quot;button\u0026quot;, (root: ComponentBase) =\u0026gt; {\n    Object.defineProperty(root, \u0026quot;value\u0026quot;, { get: () =\u0026gt; state.on, set: (v: boolean) =\u0026gt; (state.on = !!v), configurable: true });\n    root.attr.add({ type: \u0026quot;button\u0026quot; });\n    root.class.add(\u0026quot;switch\u0026quot;);\n    root.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; root.bindings.writeModel(!state.on));\n    root.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; (state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;))));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/PinSwitch.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PinSwitch = () =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n  data: reactive({ on: false }),\n\n  set value(v: boolean) { this.data.on = !!v; },\n  get value() { return this.data.on; },\n\n  onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.data.on));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; (this.data.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/PinSwitch.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PinSwitch = () =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n  data: reactive({ on: false }),\n\n  set value(v: boolean) { this.data.on = !!v; },\n  get value() { return this.data.on; },\n\n  onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.data.on));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; (this.data.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/PinSwitch.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PinSwitch extends Component {\n  static elementTag = \u0026quot;button\u0026quot;;\n  state = reactive({ on: false });\n\n  set value(v) { this.state.on = !!v; }\n  get value() { return this.state.on; }\n\n  onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.state.on));\n  }\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; (this.state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/PinSwitch.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class PinSwitch extends Component {\n  static elementTag = \u0026quot;button\u0026quot;;\n  state = reactive({ on: false });\n\n  set value(v) { this.state.on = !!v; }\n  get value() { return this.state.on; }\n\n  onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.state.on));\n  }\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; (this.state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/PinSwitch.jsx\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PinSwitch() {\n  const state = reactive({ on: false });\n  return (\n    \u0026lt;button\n      type=\u0026quot;button\u0026quot;\n      class=\u0026quot;switch\u0026quot;\n      initializeComponent={(root) =\u0026gt; Object.defineProperty(root, \u0026quot;value\u0026quot;, { get: () =\u0026gt; state.on, set: (v) =\u0026gt; (state.on = !!v), configurable: true })}\n      onclick={(root, _e) =\u0026gt; root.bindings.writeModel(!state.on)}\n    \u0026gt;\n      {() =\u0026gt; (state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)}\n    \u0026lt;/button\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/PinSwitch.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function PinSwitch() {\n  const state = reactive({ on: false });\n  return motifComponent(\u0026quot;button\u0026quot;, (root) =\u0026gt; {\n    Object.defineProperty(root, \u0026quot;value\u0026quot;, { get: () =\u0026gt; state.on, set: (v) =\u0026gt; (state.on = !!v), configurable: true });\n    root.attr.add({ type: \u0026quot;button\u0026quot; });\n    root.class.add(\u0026quot;switch\u0026quot;);\n    root.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; root.bindings.writeModel(!state.on));\n    root.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; (state.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;))));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/PinSwitch.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PinSwitch = () =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n  data: reactive({ on: false }),\n\n  set value(v) { this.data.on = !!v; },\n  get value() { return this.data.on; },\n\n  onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.data.on));\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; (this.data.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/PinSwitch.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const PinSwitch = () =\u0026gt; motifOptions({\n  el: \u0026quot;button\u0026quot;,\n  data: reactive({ on: false }),\n\n  set value(v) { this.data.on = !!v; },\n  get value() { return this.data.on; },\n\n  onConfigured() {\n    this.attr.add({ type: \u0026quot;button\u0026quot; });\n    this.class.add(\u0026quot;switch\u0026quot;);\n    this.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.bindings.writeModel(!this.data.on));\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; (this.data.on ? \u0026quot;Fixed\u0026quot; : \u0026quot;Free\u0026quot;)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;PinSwitch x-model={() =\u0026gt; note.pinned} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(PinSwitch);\npin.bindings.model(() =\u0026gt; note.pinned, (value: boolean) =\u0026gt; (note.pinned = value));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;PinSwitch x-model={() =\u0026gt; note.pinned} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Econst pin = motifComponent(PinSwitch);\npin.bindings.model(() =\u0026gt; note.pinned, (value) =\u0026gt; (note.pinned = value));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EwriteModel\u003C/code\u003E writes to every binding set up on the component with \u003Ccode\u003Ebindings.model\u003C/code\u003E or \u003Ccode\u003Ex-model\u003C/code\u003E; \u003Ccode\u003EconverterBack\u003C/code\u003E is applied if there is one, and the write path is the same as on form elements. If there is no binding, it writes nothing and returns \u003Ccode\u003Efalse\u003C/code\u003E, so the component can be used without \u003Ccode\u003Ex-model\u003C/code\u003E too. It does not touch bindings set up with \u003Ccode\u003Ebindings.add\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022bindings-add\u0022\u003EBinding a specific property with \u003Ccode\u003Ebindings.add\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EIf you want to specify which DOM property to bind yourself, use \u003Ccode\u003Ebindings.add\u003C/code\u003E. This binding is one-way (model → DOM); to write the user\u0027s change to the model, add an event handler:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;checkbox\u0026quot; onConfig={(box) =\u0026gt; box.bindings.add(\u0026quot;checked\u0026quot;, note, \u0026quot;pinned\u0026quot;)} onchange={(e) =\u0026gt; (note.pinned = (e.target as HTMLInputElement).checked)} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;input\u0026quot;, (box: ComponentBase) =\u0026gt; {\n  box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n  box.bindings.add(\u0026quot;checked\u0026quot;, note, \u0026quot;pinned\u0026quot;);\n  box.motif.on(\u0026quot;change\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (note.pinned = (e.target as HTMLInputElement).checked));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;checkbox\u0026quot; onConfig={(box) =\u0026gt; box.bindings.add(\u0026quot;checked\u0026quot;, note, \u0026quot;pinned\u0026quot;)} onchange={(e) =\u0026gt; (note.pinned = e.target.checked)} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;input\u0026quot;, (box) =\u0026gt; {\n  box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n  box.bindings.add(\u0026quot;checked\u0026quot;, note, \u0026quot;pinned\u0026quot;);\n  box.motif.on(\u0026quot;change\u0026quot;, (_sender, e) =\u0026gt; (note.pinned = e.target.checked));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EWhen \u003Ccode\u003Echecked\u003C/code\u003E, \u003Ccode\u003Eselected\u003C/code\u003E, \u003Ccode\u003Emuted\u003C/code\u003E, \u003Ccode\u003Eindeterminate\u003C/code\u003E and \u003Ccode\u003EsrcObject\u003C/code\u003E are written as attributes, they are assigned as element properties (\u003Ccode\u003E!!value\u003C/code\u003E), not as HTML attributes: \u003Ccode\u003E\u0026lt;input type=\u0026quot;checkbox\u0026quot; indeterminate={() =\u0026gt; selection.partial} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022text-value\u0022\u003EText input and \u003Ccode\u003Evalue\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EFor \u003Ccode\u003E\u0026lt;input\u0026gt;\u003C/code\u003E and \u003Ccode\u003E\u0026lt;textarea\u0026gt;\u003C/code\u003E the \u003Ccode\u003Evalue\u003C/code\u003E prop is recognized specially; it takes a reactive value or a getter:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; value={() =\u0026gt; note.title} oninput={(e) =\u0026gt; (note.title = (e.target as HTMLInputElement).value)} /\u0026gt;\n  \u0026lt;textarea value={() =\u0026gt; note.body} oninput={(e) =\u0026gt; (note.body = (e.target as HTMLTextAreaElement).value)} /\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; note.title);\n  input.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (note.title = (e.target as HTMLInputElement).value));\n});\nconst body = motifComponent(\u0026quot;textarea\u0026quot;, (area: ComponentBase) =\u0026gt; {\n  area.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; note.body);\n  area.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (note.body = (e.target as HTMLTextAreaElement).value));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; value={() =\u0026gt; note.title} oninput={(e) =\u0026gt; (note.title = e.target.value)} /\u0026gt;\n  \u0026lt;textarea value={() =\u0026gt; note.body} oninput={(e) =\u0026gt; (note.body = e.target.value)} /\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n  input.attr.add({ type: \u0026quot;text\u0026quot; });\n  input.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; note.title);\n  input.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (note.title = e.target.value));\n});\nconst body = motifComponent(\u0026quot;textarea\u0026quot;, (area) =\u0026gt; {\n  area.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; note.body);\n  area.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (note.body = e.target.value));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022select\u0022\u003EA \u003Ccode\u003E\u0026lt;select\u0026gt;\u003C/code\u003E example\u003C/h2\u003E\n\u003Cp\u003EThe theme choice is written to the settings service. The change goes through \u003Ccode\u003EsetTheme\u003C/code\u003E, because the service applies the theme to \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E and saves it:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/ThemeSelect.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/ThemeSelect.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;select value={() =\u0026gt; settings.state.theme} onchange={(e) =\u0026gt; settings.setTheme((e.target as HTMLSelectElement).value as Theme)}\u0026gt;\n  \u0026lt;option value=\u0026quot;system\u0026quot;\u0026gt;System\u0026lt;/option\u0026gt;\n  \u0026lt;option value=\u0026quot;light\u0026quot;\u0026gt;Light\u0026lt;/option\u0026gt;\n  \u0026lt;option value=\u0026quot;dark\u0026quot;\u0026gt;Dark\u0026lt;/option\u0026gt;\n\u0026lt;/select\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/ThemeSelect.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;select\u0026quot;, (select: ComponentBase) =\u0026gt; {\n  select.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; settings.state.theme);\n  select.motif.on(\u0026quot;change\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; settings.setTheme((e.target as HTMLSelectElement).value as Theme));\n  for (const [value, label] of [[\u0026quot;system\u0026quot;, \u0026quot;System\u0026quot;], [\u0026quot;light\u0026quot;, \u0026quot;Light\u0026quot;], [\u0026quot;dark\u0026quot;, \u0026quot;Dark\u0026quot;]]) {\n    select.controls.add(motifComponent(\u0026quot;option\u0026quot;, (option: ComponentBase) =\u0026gt; {\n      option.attr.add({ value });\n      option.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(label)));\n    }));\n  }\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/ThemeSelect.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;select value={() =\u0026gt; settings.state.theme} onchange={(e) =\u0026gt; settings.setTheme(e.target.value)}\u0026gt;\n  \u0026lt;option value=\u0026quot;system\u0026quot;\u0026gt;System\u0026lt;/option\u0026gt;\n  \u0026lt;option value=\u0026quot;light\u0026quot;\u0026gt;Light\u0026lt;/option\u0026gt;\n  \u0026lt;option value=\u0026quot;dark\u0026quot;\u0026gt;Dark\u0026lt;/option\u0026gt;\n\u0026lt;/select\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/ThemeSelect.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;select\u0026quot;, (select) =\u0026gt; {\n  select.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; settings.state.theme);\n  select.motif.on(\u0026quot;change\u0026quot;, (_sender, e) =\u0026gt; settings.setTheme(e.target.value));\n  for (const [value, label] of [[\u0026quot;system\u0026quot;, \u0026quot;System\u0026quot;], [\u0026quot;light\u0026quot;, \u0026quot;Light\u0026quot;], [\u0026quot;dark\u0026quot;, \u0026quot;Dark\u0026quot;]]) {\n    select.controls.add(motifComponent(\u0026quot;option\u0026quot;, (option) =\u0026gt; {\n      option.attr.add({ value });\n      option.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(label)));\n    }));\n  }\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003E\u0026lt;select x-model={() =\u0026gt; settings.state.theme}\u0026gt;\u003C/code\u003E binds both ways too, but it writes to the field directly and skips the applying and saving that \u003Ccode\u003EsetTheme\u003C/code\u003E does.\u003C/p\u003E\n\u003Ch2 id=\u0022submit\u0022\u003EForm submission\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003ENoteForm\u003C/code\u003E binds the fields of a new note to a draft with \u003Ccode\u003Ex-model\u003C/code\u003E and writes it to the service on submit. \u003Ccode\u003Eonsubmit:prevent\u003C/code\u003E keeps the page from reloading; without JSX the same modifier is given with \u003Ccode\u003Emotif.on(\u0026quot;submit:prevent\u0026quot;, …)\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteForm.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteForm.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteForm extends Component {\n  notes = this.getService(NotesService)!;\n  draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.draft.title;\n    note.body = this.draft.body;\n    note.pinned = this.draft.pinned;\n    this.draft.title = \u0026quot;\u0026quot;;\n    this.draft.body = \u0026quot;\u0026quot;;\n    this.draft.due = \u0026quot;\u0026quot;;\n  }\n\n  override view() {\n    return (\n      \u0026lt;form class=\u0026quot;note-form\u0026quot; onsubmit:prevent={() =\u0026gt; this.save()}\u0026gt;\n        \u0026lt;input type=\u0026quot;text\u0026quot; placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.draft.title} /\u0026gt;\n        \u0026lt;textarea placeholder=\u0026quot;Body\u0026quot; x-model={() =\u0026gt; this.draft.body} /\u0026gt;\n        \u0026lt;label\u0026gt;\u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; this.draft.pinned} /\u0026gt; Pin\u0026lt;/label\u0026gt;\n        \u0026lt;input type=\u0026quot;date\u0026quot; x-model={() =\u0026gt; this.draft.due} /\u0026gt;\n        \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !this.draft.title.trim()}\u0026gt;Save\u0026lt;/button\u0026gt;\n      \u0026lt;/form\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteForm.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteForm extends Component {\n  notes = this.getService(NotesService)!;\n  draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.draft.title;\n    note.body = this.draft.body;\n    note.pinned = this.draft.pinned;\n    this.draft.title = \u0026quot;\u0026quot;;\n    this.draft.body = \u0026quot;\u0026quot;;\n    this.draft.due = \u0026quot;\u0026quot;;\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n      form.class.add(\u0026quot;note-form\u0026quot;);\n      form.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; this.save());\n      const title = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n        input.attr.add({ type: \u0026quot;text\u0026quot;, placeholder: \u0026quot;Title\u0026quot; });\n        input.bindings.model(() =\u0026gt; this.draft.title, (value: string) =\u0026gt; (this.draft.title = value));\n      });\n      const body = motifComponent(\u0026quot;textarea\u0026quot;, (area: ComponentBase) =\u0026gt; {\n        area.attr.add({ placeholder: \u0026quot;Body\u0026quot; });\n        area.bindings.model(() =\u0026gt; this.draft.body, (value: string) =\u0026gt; (this.draft.body = value));\n      });\n      const pinned = motifComponent(\u0026quot;label\u0026quot;, (label: ComponentBase) =\u0026gt; {\n        label.controls.add(\n          motifComponent(\u0026quot;input\u0026quot;, (box: ComponentBase) =\u0026gt; {\n            box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n            box.bindings.model(() =\u0026gt; this.draft.pinned, (value: boolean) =\u0026gt; (this.draft.pinned = value));\n          }),\n          motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot; Pin\u0026quot;)),\n        );\n      });\n      const due = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n        input.attr.add({ type: \u0026quot;date\u0026quot; });\n        input.bindings.model(() =\u0026gt; this.draft.due, (value: string) =\u0026gt; (this.draft.due = value));\n      });\n      const submit = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !this.draft.title.trim() });\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n      });\n      form.controls.add(title, body, pinned, due, submit);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteForm.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteForm() {\n  const notes = FromService(NotesService)!;\n  const draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  const save = () =\u0026gt; {\n    const note = notes.create();\n    note.title = draft.title;\n    note.body = draft.body;\n    note.pinned = draft.pinned;\n    draft.title = \u0026quot;\u0026quot;;\n    draft.body = \u0026quot;\u0026quot;;\n    draft.due = \u0026quot;\u0026quot;;\n  };\n\n  return (\n    \u0026lt;form class=\u0026quot;note-form\u0026quot; onsubmit:prevent={save}\u0026gt;\n      \u0026lt;input type=\u0026quot;text\u0026quot; placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; draft.title} /\u0026gt;\n      \u0026lt;textarea placeholder=\u0026quot;Body\u0026quot; x-model={() =\u0026gt; draft.body} /\u0026gt;\n      \u0026lt;label\u0026gt;\u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; draft.pinned} /\u0026gt; Pin\u0026lt;/label\u0026gt;\n      \u0026lt;input type=\u0026quot;date\u0026quot; x-model={() =\u0026gt; draft.due} /\u0026gt;\n      \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !draft.title.trim()}\u0026gt;Save\u0026lt;/button\u0026gt;\n    \u0026lt;/form\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteForm.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteForm() {\n  const notes = FromService(NotesService)!;\n  const draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  const save = () =\u0026gt; {\n    const note = notes.create();\n    note.title = draft.title;\n    note.body = draft.body;\n    note.pinned = draft.pinned;\n    draft.title = \u0026quot;\u0026quot;;\n    draft.body = \u0026quot;\u0026quot;;\n    draft.due = \u0026quot;\u0026quot;;\n  };\n\n  return motifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n    form.class.add(\u0026quot;note-form\u0026quot;);\n    form.motif.on(\u0026quot;submit:prevent\u0026quot;, save);\n    const title = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;text\u0026quot;, placeholder: \u0026quot;Title\u0026quot; });\n      input.bindings.model(() =\u0026gt; draft.title, (value: string) =\u0026gt; (draft.title = value));\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, (area: ComponentBase) =\u0026gt; {\n      area.attr.add({ placeholder: \u0026quot;Body\u0026quot; });\n      area.bindings.model(() =\u0026gt; draft.body, (value: string) =\u0026gt; (draft.body = value));\n    });\n    const pinned = motifComponent(\u0026quot;label\u0026quot;, (label: ComponentBase) =\u0026gt; {\n      label.controls.add(\n        motifComponent(\u0026quot;input\u0026quot;, (box: ComponentBase) =\u0026gt; {\n          box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n          box.bindings.model(() =\u0026gt; draft.pinned, (value: boolean) =\u0026gt; (draft.pinned = value));\n        }),\n        motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot; Pin\u0026quot;)),\n      );\n    });\n    const due = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;date\u0026quot; });\n      input.bindings.model(() =\u0026gt; draft.due, (value: string) =\u0026gt; (draft.due = value));\n    });\n    const submit = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !draft.title.trim() });\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n    });\n    form.controls.add(title, body, pinned, due, submit);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteForm.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteForm = () =\u0026gt; motifOptions({\n  el: \u0026quot;form\u0026quot;,\n  data: reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; }),\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.data.title;\n    note.body = this.data.body;\n    note.pinned = this.data.pinned;\n    this.data.title = \u0026quot;\u0026quot;;\n    this.data.body = \u0026quot;\u0026quot;;\n    this.data.due = \u0026quot;\u0026quot;;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;note-form\u0026quot;);\n    this.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; this.save());\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input type=\u0026quot;text\u0026quot; placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.data.title} /\u0026gt;\n        \u0026lt;textarea placeholder=\u0026quot;Body\u0026quot; x-model={() =\u0026gt; this.data.body} /\u0026gt;\n        \u0026lt;label\u0026gt;\u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; this.data.pinned} /\u0026gt; Pin\u0026lt;/label\u0026gt;\n        \u0026lt;input type=\u0026quot;date\u0026quot; x-model={() =\u0026gt; this.data.due} /\u0026gt;\n        \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !this.data.title.trim()}\u0026gt;Save\u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteForm.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteForm = () =\u0026gt; motifOptions({\n  el: \u0026quot;form\u0026quot;,\n  data: reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; }),\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.data.title;\n    note.body = this.data.body;\n    note.pinned = this.data.pinned;\n    this.data.title = \u0026quot;\u0026quot;;\n    this.data.body = \u0026quot;\u0026quot;;\n    this.data.due = \u0026quot;\u0026quot;;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;note-form\u0026quot;);\n    this.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; this.save());\n  },\n\n  view() {\n    const title = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;text\u0026quot;, placeholder: \u0026quot;Title\u0026quot; });\n      input.bindings.model(() =\u0026gt; this.data.title, (value: string) =\u0026gt; (this.data.title = value));\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, (area: ComponentBase) =\u0026gt; {\n      area.attr.add({ placeholder: \u0026quot;Body\u0026quot; });\n      area.bindings.model(() =\u0026gt; this.data.body, (value: string) =\u0026gt; (this.data.body = value));\n    });\n    const pinned = motifComponent(\u0026quot;label\u0026quot;, (label: ComponentBase) =\u0026gt; {\n      label.controls.add(\n        motifComponent(\u0026quot;input\u0026quot;, (box: ComponentBase) =\u0026gt; {\n          box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n          box.bindings.model(() =\u0026gt; this.data.pinned, (value: boolean) =\u0026gt; (this.data.pinned = value));\n        }),\n        motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot; Pin\u0026quot;)),\n      );\n    });\n    const due = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;date\u0026quot; });\n      input.bindings.model(() =\u0026gt; this.data.due, (value: string) =\u0026gt; (this.data.due = value));\n    });\n    const submit = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !this.data.title.trim() });\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n    });\n    return [title, body, pinned, due, submit];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteForm.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteForm extends Component {\n  notes = this.getService(NotesService);\n  draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.draft.title;\n    note.body = this.draft.body;\n    note.pinned = this.draft.pinned;\n    this.draft.title = \u0026quot;\u0026quot;;\n    this.draft.body = \u0026quot;\u0026quot;;\n    this.draft.due = \u0026quot;\u0026quot;;\n  }\n\n  view() {\n    return (\n      \u0026lt;form class=\u0026quot;note-form\u0026quot; onsubmit:prevent={() =\u0026gt; this.save()}\u0026gt;\n        \u0026lt;input type=\u0026quot;text\u0026quot; placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.draft.title} /\u0026gt;\n        \u0026lt;textarea placeholder=\u0026quot;Body\u0026quot; x-model={() =\u0026gt; this.draft.body} /\u0026gt;\n        \u0026lt;label\u0026gt;\u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; this.draft.pinned} /\u0026gt; Pin\u0026lt;/label\u0026gt;\n        \u0026lt;input type=\u0026quot;date\u0026quot; x-model={() =\u0026gt; this.draft.due} /\u0026gt;\n        \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !this.draft.title.trim()}\u0026gt;Save\u0026lt;/button\u0026gt;\n      \u0026lt;/form\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteForm.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteForm extends Component {\n  notes = this.getService(NotesService);\n  draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.draft.title;\n    note.body = this.draft.body;\n    note.pinned = this.draft.pinned;\n    this.draft.title = \u0026quot;\u0026quot;;\n    this.draft.body = \u0026quot;\u0026quot;;\n    this.draft.due = \u0026quot;\u0026quot;;\n  }\n\n  view() {\n    return motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n      form.class.add(\u0026quot;note-form\u0026quot;);\n      form.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; this.save());\n      const title = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n        input.attr.add({ type: \u0026quot;text\u0026quot;, placeholder: \u0026quot;Title\u0026quot; });\n        input.bindings.model(() =\u0026gt; this.draft.title, (value) =\u0026gt; (this.draft.title = value));\n      });\n      const body = motifComponent(\u0026quot;textarea\u0026quot;, (area) =\u0026gt; {\n        area.attr.add({ placeholder: \u0026quot;Body\u0026quot; });\n        area.bindings.model(() =\u0026gt; this.draft.body, (value) =\u0026gt; (this.draft.body = value));\n      });\n      const pinned = motifComponent(\u0026quot;label\u0026quot;, (label) =\u0026gt; {\n        label.controls.add(\n          motifComponent(\u0026quot;input\u0026quot;, (box) =\u0026gt; {\n            box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n            box.bindings.model(() =\u0026gt; this.draft.pinned, (value) =\u0026gt; (this.draft.pinned = value));\n          }),\n          motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot; Pin\u0026quot;)),\n        );\n      });\n      const due = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n        input.attr.add({ type: \u0026quot;date\u0026quot; });\n        input.bindings.model(() =\u0026gt; this.draft.due, (value) =\u0026gt; (this.draft.due = value));\n      });\n      const submit = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n        button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !this.draft.title.trim() });\n        button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n      });\n      form.controls.add(title, body, pinned, due, submit);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteForm.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteForm() {\n  const notes = FromService(NotesService);\n  const draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  const save = () =\u0026gt; {\n    const note = notes.create();\n    note.title = draft.title;\n    note.body = draft.body;\n    note.pinned = draft.pinned;\n    draft.title = \u0026quot;\u0026quot;;\n    draft.body = \u0026quot;\u0026quot;;\n    draft.due = \u0026quot;\u0026quot;;\n  };\n\n  return (\n    \u0026lt;form class=\u0026quot;note-form\u0026quot; onsubmit:prevent={save}\u0026gt;\n      \u0026lt;input type=\u0026quot;text\u0026quot; placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; draft.title} /\u0026gt;\n      \u0026lt;textarea placeholder=\u0026quot;Body\u0026quot; x-model={() =\u0026gt; draft.body} /\u0026gt;\n      \u0026lt;label\u0026gt;\u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; draft.pinned} /\u0026gt; Pin\u0026lt;/label\u0026gt;\n      \u0026lt;input type=\u0026quot;date\u0026quot; x-model={() =\u0026gt; draft.due} /\u0026gt;\n      \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !draft.title.trim()}\u0026gt;Save\u0026lt;/button\u0026gt;\n    \u0026lt;/form\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteForm.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteForm() {\n  const notes = FromService(NotesService);\n  const draft = reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; });\n\n  const save = () =\u0026gt; {\n    const note = notes.create();\n    note.title = draft.title;\n    note.body = draft.body;\n    note.pinned = draft.pinned;\n    draft.title = \u0026quot;\u0026quot;;\n    draft.body = \u0026quot;\u0026quot;;\n    draft.due = \u0026quot;\u0026quot;;\n  };\n\n  return motifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n    form.class.add(\u0026quot;note-form\u0026quot;);\n    form.motif.on(\u0026quot;submit:prevent\u0026quot;, save);\n    const title = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;text\u0026quot;, placeholder: \u0026quot;Title\u0026quot; });\n      input.bindings.model(() =\u0026gt; draft.title, (value) =\u0026gt; (draft.title = value));\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, (area) =\u0026gt; {\n      area.attr.add({ placeholder: \u0026quot;Body\u0026quot; });\n      area.bindings.model(() =\u0026gt; draft.body, (value) =\u0026gt; (draft.body = value));\n    });\n    const pinned = motifComponent(\u0026quot;label\u0026quot;, (label) =\u0026gt; {\n      label.controls.add(\n        motifComponent(\u0026quot;input\u0026quot;, (box) =\u0026gt; {\n          box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n          box.bindings.model(() =\u0026gt; draft.pinned, (value) =\u0026gt; (draft.pinned = value));\n        }),\n        motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot; Pin\u0026quot;)),\n      );\n    });\n    const due = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;date\u0026quot; });\n      input.bindings.model(() =\u0026gt; draft.due, (value) =\u0026gt; (draft.due = value));\n    });\n    const submit = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !draft.title.trim() });\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n    });\n    form.controls.add(title, body, pinned, due, submit);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteForm.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteForm = () =\u0026gt; motifOptions({\n  el: \u0026quot;form\u0026quot;,\n  data: reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; }),\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.data.title;\n    note.body = this.data.body;\n    note.pinned = this.data.pinned;\n    this.data.title = \u0026quot;\u0026quot;;\n    this.data.body = \u0026quot;\u0026quot;;\n    this.data.due = \u0026quot;\u0026quot;;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;note-form\u0026quot;);\n    this.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; this.save());\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input type=\u0026quot;text\u0026quot; placeholder=\u0026quot;Title\u0026quot; x-model={() =\u0026gt; this.data.title} /\u0026gt;\n        \u0026lt;textarea placeholder=\u0026quot;Body\u0026quot; x-model={() =\u0026gt; this.data.body} /\u0026gt;\n        \u0026lt;label\u0026gt;\u0026lt;input type=\u0026quot;checkbox\u0026quot; x-model={() =\u0026gt; this.data.pinned} /\u0026gt; Pin\u0026lt;/label\u0026gt;\n        \u0026lt;input type=\u0026quot;date\u0026quot; x-model={() =\u0026gt; this.data.due} /\u0026gt;\n        \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !this.data.title.trim()}\u0026gt;Save\u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteForm.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteForm = () =\u0026gt; motifOptions({\n  el: \u0026quot;form\u0026quot;,\n  data: reactive({ title: \u0026quot;\u0026quot;, body: \u0026quot;\u0026quot;, pinned: false, due: \u0026quot;\u0026quot; }),\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  save() {\n    const note = this.notes.create();\n    note.title = this.data.title;\n    note.body = this.data.body;\n    note.pinned = this.data.pinned;\n    this.data.title = \u0026quot;\u0026quot;;\n    this.data.body = \u0026quot;\u0026quot;;\n    this.data.due = \u0026quot;\u0026quot;;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;note-form\u0026quot;);\n    this.motif.on(\u0026quot;submit:prevent\u0026quot;, () =\u0026gt; this.save());\n  },\n\n  view() {\n    const title = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;text\u0026quot;, placeholder: \u0026quot;Title\u0026quot; });\n      input.bindings.model(() =\u0026gt; this.data.title, (value) =\u0026gt; (this.data.title = value));\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, (area) =\u0026gt; {\n      area.attr.add({ placeholder: \u0026quot;Body\u0026quot; });\n      area.bindings.model(() =\u0026gt; this.data.body, (value) =\u0026gt; (this.data.body = value));\n    });\n    const pinned = motifComponent(\u0026quot;label\u0026quot;, (label) =\u0026gt; {\n      label.controls.add(\n        motifComponent(\u0026quot;input\u0026quot;, (box) =\u0026gt; {\n          box.attr.add({ type: \u0026quot;checkbox\u0026quot; });\n          box.bindings.model(() =\u0026gt; this.data.pinned, (value) =\u0026gt; (this.data.pinned = value));\n        }),\n        motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot; Pin\u0026quot;)),\n      );\n    });\n    const due = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; {\n      input.attr.add({ type: \u0026quot;date\u0026quot; });\n      input.bindings.model(() =\u0026gt; this.data.due, (value) =\u0026gt; (this.data.due = value));\n    });\n    const submit = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !this.data.title.trim() });\n      button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n    });\n    return [title, body, pinned, due, submit];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Eonsubmit={(sender, e) =\u0026gt; { e.preventDefault(); save(); }}\u003C/code\u003E does the same job with a block body. When element methods are written as JSX props, no attribute is written and the method is called: \u003Ccode\u003E\u0026lt;form requestSubmit={() =\u0026gt; draft.send}\u0026gt;\u003C/code\u003E, \u003Ccode\u003E\u0026lt;input focus={() =\u0026gt; draft.editing} /\u0026gt;\u003C/code\u003E (\u003Ccode\u003Efalse\u003C/code\u003E → \u003Ccode\u003Eblur()\u003C/code\u003E), \u003Ccode\u003E\u0026lt;input setSelectionRange={[0, 5]} /\u0026gt;\u003C/code\u003E. \u003Ccode\u003EreportValidity\u003C/code\u003E, \u003Ccode\u003EcheckValidity\u003C/code\u003E, \u003Ccode\u003Eselect\u003C/code\u003E, \u003Ccode\u003Ereset\u003C/code\u003E and \u003Ccode\u003Esubmit\u003C/code\u003E are in this group as well; for the full list and the value rules, see \u003Ca href=\u0022/docs/jsx#element-methods\u0022\u003EElement methods\u003C/a\u003E.\u003C/p\u003E\n\u003Ch3 id=\u0022action\u0022\u003ESubmitting with a function \u003Ccode\u003Eaction\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EWhen a function is given to the \u003Ccode\u003Eaction\u003C/code\u003E attribute instead of a URL, that function is called when the form is submitted and the page does not navigate. The search box is a form: on submit, \u003Ccode\u003Esearch\u003C/code\u003E receives the query, and the \u0026quot;Clear\u0026quot; button empties the query with its own \u003Ccode\u003EformAction\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteSearch.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteSearch.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;form class=\u0026quot;search\u0026quot; action={(data) =\u0026gt; this.search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;))}\u0026gt;\n  \u0026lt;input type=\u0026quot;search\u0026quot; name=\u0026quot;q\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; /\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot;\u0026gt;Search\u0026lt;/button\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; formAction={() =\u0026gt; this.search(\u0026quot;\u0026quot;)}\u0026gt;Clear\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteSearch.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;form class=\u0026quot;search\u0026quot; action={(data) =\u0026gt; search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;))}\u0026gt;\n  \u0026lt;input type=\u0026quot;search\u0026quot; name=\u0026quot;q\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; /\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot;\u0026gt;Search\u0026lt;/button\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; formAction={() =\u0026gt; search(\u0026quot;\u0026quot;)}\u0026gt;Clear\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteSearch.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.class.add(\u0026quot;search\u0026quot;);\n  form.attr.add({ action: () =\u0026gt; (data: FormData) =\u0026gt; this.search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;)) });\n  const field = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; input.attr.add({ type: \u0026quot;search\u0026quot;, name: \u0026quot;q\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; }));\n  const run = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot; });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Search\u0026quot;)));\n  });\n  const clear = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, formaction: () =\u0026gt; () =\u0026gt; this.search(\u0026quot;\u0026quot;) });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Clear\u0026quot;)));\n  });\n  form.controls.add(field, run, clear);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteSearch.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.class.add(\u0026quot;search\u0026quot;);\n  form.attr.add({ action: () =\u0026gt; (data: FormData) =\u0026gt; search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;)) });\n  const field = motifComponent(\u0026quot;input\u0026quot;, (input: ComponentBase) =\u0026gt; input.attr.add({ type: \u0026quot;search\u0026quot;, name: \u0026quot;q\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; }));\n  const run = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot; });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Search\u0026quot;)));\n  });\n  const clear = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, formaction: () =\u0026gt; () =\u0026gt; search(\u0026quot;\u0026quot;) });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Clear\u0026quot;)));\n  });\n  form.controls.add(field, run, clear);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteSearch.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;form class=\u0026quot;search\u0026quot; action={(data) =\u0026gt; this.search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;))}\u0026gt;\n  \u0026lt;input type=\u0026quot;search\u0026quot; name=\u0026quot;q\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; /\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot;\u0026gt;Search\u0026lt;/button\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; formAction={() =\u0026gt; this.search(\u0026quot;\u0026quot;)}\u0026gt;Clear\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteSearch.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;form class=\u0026quot;search\u0026quot; action={(data) =\u0026gt; search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;))}\u0026gt;\n  \u0026lt;input type=\u0026quot;search\u0026quot; name=\u0026quot;q\u0026quot; placeholder=\u0026quot;Search notes\u0026quot; /\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot;\u0026gt;Search\u0026lt;/button\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; formAction={() =\u0026gt; search(\u0026quot;\u0026quot;)}\u0026gt;Clear\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteSearch.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.class.add(\u0026quot;search\u0026quot;);\n  form.attr.add({ action: () =\u0026gt; (data) =\u0026gt; this.search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;)) });\n  const field = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; input.attr.add({ type: \u0026quot;search\u0026quot;, name: \u0026quot;q\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; }));\n  const run = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot; });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Search\u0026quot;)));\n  });\n  const clear = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, formaction: () =\u0026gt; () =\u0026gt; this.search(\u0026quot;\u0026quot;) });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Clear\u0026quot;)));\n  });\n  form.controls.add(field, run, clear);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteSearch.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.class.add(\u0026quot;search\u0026quot;);\n  form.attr.add({ action: () =\u0026gt; (data) =\u0026gt; search(String(data.get(\u0026quot;q\u0026quot;) ?? \u0026quot;\u0026quot;)) });\n  const field = motifComponent(\u0026quot;input\u0026quot;, (input) =\u0026gt; input.attr.add({ type: \u0026quot;search\u0026quot;, name: \u0026quot;q\u0026quot;, placeholder: \u0026quot;Search notes\u0026quot; }));\n  const run = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot; });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Search\u0026quot;)));\n  });\n  const clear = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, formaction: () =\u0026gt; () =\u0026gt; search(\u0026quot;\u0026quot;) });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Clear\u0026quot;)));\n  });\n  form.controls.add(field, run, clear);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the function component, \u003Ccode\u003Esearch\u003C/code\u003E and \u003Ccode\u003Erefresh\u003C/code\u003E are local functions inside the component function, and \u003Ccode\u003Estate\u003C/code\u003E is the local state set up with \u003Ccode\u003Ereactive\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EAs with every attribute, the value is read inside a getter. If the result is a function, no attribute is written and the function becomes the submit handler; if it is a string, it is written as the URL and stays live (\u003Ccode\u003Eaction=\u0026quot;/search\u0026quot;\u003C/code\u003E, \u003Ccode\u003Eaction={state.url}\u003C/code\u003E). That is why, without JSX, the value is given with a getter: \u003Ccode\u003Eattr.add({ action: () =\u0026gt; search })\u003C/code\u003E attaches the handler, while \u003Ccode\u003Eattr.add({ action: search })\u003C/code\u003E treats \u003Ccode\u003Esearch\u003C/code\u003E as the getter and writes its result. \u003Ccode\u003Emotif-explain\u003C/code\u003E shows this attribute as \u003Ccode\u003Eattr.action\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003EOn submit, the form\u0027s own \u003Ccode\u003Eonsubmit\u003C/code\u003E handlers run first; if one of them called \u003Ccode\u003EpreventDefault()\u003C/code\u003E (\u003Ccode\u003Eonsubmit:prevent\u003C/code\u003E included), the function is not called. Otherwise the framework calls \u003Ccode\u003EpreventDefault()\u003C/code\u003E, builds \u003Ccode\u003Enew FormData(form, submitter)\u003C/code\u003E and calls the function by the rules of event handlers: one parameter \u003Ccode\u003E(data)\u003C/code\u003E, two parameters \u003Ccode\u003E(sender, data)\u003C/code\u003E; \u003Ccode\u003Esender\u003C/code\u003E is the component that carries the attribute, the form for \u003Ccode\u003Eaction\u003C/code\u003E and the button for \u003Ccode\u003Eformaction\u003C/code\u003E. The \u003Ccode\u003Ename\u003C/code\u003E/\u003Ccode\u003Evalue\u003C/code\u003E pair of the submitting button is inside \u003Ccode\u003Edata\u003C/code\u003E. If the submitter\u0027s \u003Ccode\u003Eformaction\u003C/code\u003E is a function, it takes precedence over the form\u0027s \u003Ccode\u003Eaction\u003C/code\u003E; if it is a string, the browser does the submitting. \u003Ccode\u003Eform.requestSubmit()\u003C/code\u003E runs the function; \u003Ccode\u003Eform.submit()\u003C/code\u003E produces no event, so it does not. If the function throws, or the promise it returns is rejected, the error is reported with \u003Ccode\u003EMJX123\u003C/code\u003E (see \u003Ca href=\u0022/docs/error-handling\u0022\u003EError Handling\u003C/a\u003E). The form is not reset after submission; the function empties any field that needs emptying itself.\u003C/p\u003E\n\u003Cp\u003EThe function can be async. The waiting state is kept in the operation itself: \u003Ccode\u003Erefresh\u003C/code\u003E pulls the notes from \u003Ccode\u003ESyncService\u003C/code\u003E (\u003Ccode\u003Esrc/services/sync.ts\u003C/code\u003E on the \u003Ca href=\u0022/docs/lifecycle\u0022\u003ELifecycle\u003C/a\u003E page), raises a flag at the start and lowers it at the end, and the button is bound to that flag:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/SyncForm.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/SyncForm.ts\u0022\u003E\u003Ccode\u003Easync refresh() {\n  this.state.syncing = true;\n  try {\n    this.notes.state.items = await this.sync.pull();\n  } finally {\n    this.state.syncing = false;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/SyncForm.ts\u0022\u003E\u003Ccode\u003Econst refresh = async () =\u0026gt; {\n  state.syncing = true;\n  try {\n    notes.state.items = await sync.pull();\n  } finally {\n    state.syncing = false;\n  }\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/SyncForm.js\u0022\u003E\u003Ccode\u003Easync refresh() {\n  this.state.syncing = true;\n  try {\n    this.notes.state.items = await this.sync.pull();\n  } finally {\n    this.state.syncing = false;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/SyncForm.js\u0022\u003E\u003Ccode\u003Econst refresh = async () =\u0026gt; {\n  state.syncing = true;\n  try {\n    notes.state.items = await sync.pull();\n  } finally {\n    state.syncing = false;\n  }\n};\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the function component, \u003Ccode\u003Estate\u003C/code\u003E is the local state the component sets up with \u003Ccode\u003Ereactive\u003C/code\u003E, and \u003Ccode\u003Enotes\u003C/code\u003E and \u003Ccode\u003Esync\u003C/code\u003E are the services obtained with \u003Ccode\u003EFromService\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/SyncForm.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/parts/SyncForm.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;form action={() =\u0026gt; this.refresh()}\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; this.state.syncing}\u0026gt;Refresh from server\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/SyncForm.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;form action={() =\u0026gt; refresh()}\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; state.syncing}\u0026gt;Refresh from server\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/parts/SyncForm.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.attr.add({ action: () =\u0026gt; () =\u0026gt; this.refresh() });\n  form.controls.add(motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; this.state.syncing });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Refresh from server\u0026quot;)));\n  }));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/SyncForm.ts\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form: ComponentBase) =\u0026gt; {\n  form.attr.add({ action: () =\u0026gt; () =\u0026gt; refresh() });\n  form.controls.add(motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; state.syncing });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Refresh from server\u0026quot;)));\n  }));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/parts/SyncForm.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;form action={() =\u0026gt; this.refresh()}\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; this.state.syncing}\u0026gt;Refresh from server\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/SyncForm.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;form action={() =\u0026gt; refresh()}\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; state.syncing}\u0026gt;Refresh from server\u0026lt;/button\u0026gt;\n\u0026lt;/form\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/parts/SyncForm.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.attr.add({ action: () =\u0026gt; () =\u0026gt; this.refresh() });\n  form.controls.add(motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; this.state.syncing });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Refresh from server\u0026quot;)));\n  }));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/SyncForm.js\u0022\u003E\u003Ccode\u003EmotifComponent(\u0026quot;form\u0026quot;, (form) =\u0026gt; {\n  form.attr.add({ action: () =\u0026gt; () =\u0026gt; refresh() });\n  form.controls.add(motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n    button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; state.syncing });\n    button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Refresh from server\u0026quot;)));\n  }));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022validation\u0022\u003EA validation pattern\u003C/h2\u003E\n\u003Cp\u003EMotifJS does not impose a special validation API; you build it with reactive fields. A derived \u003Ccode\u003Eget\u003C/code\u003E field holds the rule, and \u003Ccode\u003Ex-wait\u003C/code\u003E holds the error text back until the rule is satisfied:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteForm.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/parts/NoteForm.ts\u0022\u003E\u003Ccode\u003Econst draft = reactive({\n  title: \u0026quot;\u0026quot;,\n  get valid() { return draft.title.trim().length \u0026gt;= 3; },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/parts/NoteForm.js\u0022\u003E\u003Ccode\u003Econst draft = reactive({\n  title: \u0026quot;\u0026quot;,\n  get valid() { return draft.title.trim().length \u0026gt;= 3; },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteForm.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; value={() =\u0026gt; draft.title} oninput={(e) =\u0026gt; (draft.title = (e.target as HTMLInputElement).value)} /\u0026gt;\n  \u0026lt;small class=\u0026quot;error\u0026quot; x-wait={() =\u0026gt; draft.valid}\u0026gt;Title must be at least 3 characters\u0026lt;/small\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !draft.valid}\u0026gt;Save\u0026lt;/button\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteForm.ts\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (field: ComponentBase) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;text\u0026quot; });\n  field.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; draft.title);\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender: ComponentBase, e: Event) =\u0026gt; (draft.title = (e.target as HTMLInputElement).value));\n});\nconst error = motifComponent(\u0026quot;small\u0026quot;, {\n  preconfig: (error: ComponentBase) =\u0026gt; error.bindings.wait(() =\u0026gt; draft.valid),\n  initializeComponent: (error: ComponentBase) =\u0026gt; {\n    error.class.add(\u0026quot;error\u0026quot;);\n    error.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Title must be at least 3 characters\u0026quot;)));\n  },\n});\nconst save = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !draft.valid });\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteForm.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;\u0026gt;\n  \u0026lt;input type=\u0026quot;text\u0026quot; value={() =\u0026gt; draft.title} oninput={(e) =\u0026gt; (draft.title = e.target.value)} /\u0026gt;\n  \u0026lt;small class=\u0026quot;error\u0026quot; x-wait={() =\u0026gt; draft.valid}\u0026gt;Title must be at least 3 characters\u0026lt;/small\u0026gt;\n  \u0026lt;button type=\u0026quot;submit\u0026quot; disabled={() =\u0026gt; !draft.valid}\u0026gt;Save\u0026lt;/button\u0026gt;\n\u0026lt;/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteForm.js\u0022\u003E\u003Ccode\u003Econst title = motifComponent(\u0026quot;input\u0026quot;, (field) =\u0026gt; {\n  field.attr.add({ type: \u0026quot;text\u0026quot; });\n  field.bindings.add(\u0026quot;value\u0026quot;, () =\u0026gt; draft.title);\n  field.motif.on(\u0026quot;input\u0026quot;, (_sender, e) =\u0026gt; (draft.title = e.target.value));\n});\nconst error = motifComponent(\u0026quot;small\u0026quot;, {\n  preconfig: (error) =\u0026gt; error.bindings.wait(() =\u0026gt; draft.valid),\n  initializeComponent: (error) =\u0026gt; {\n    error.class.add(\u0026quot;error\u0026quot;);\n    error.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Title must be at least 3 characters\u0026quot;)));\n  },\n});\nconst save = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n  button.attr.add({ type: \u0026quot;submit\u0026quot;, disabled: () =\u0026gt; !draft.valid });\n  button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Save\u0026quot;)));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022comparison\u0022\u003EComparing the methods\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMethod\u003C/th\u003E\n\u003Cth\u003EWhen\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EOne-way (\u003Ccode\u003Evalue\u003C/code\u003E \u002B \u003Ccode\u003Eoninput\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003EWhen you will run extra logic on change (conversion, validation, a side effect).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.model\u003C/code\u003E / \u003Ccode\u003Ex-model\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhen two-way sync is enough; the least code.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ebindings.add(\u0026quot;checked\u0026quot;/\u0026quot;value\u0026quot;, ...)\u003C/code\u003E \u002B an event\u003C/td\u003E\n\u003Ctd\u003EWhen you want to pick the bound property by hand (one-way; writing back through an event).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eonsubmit:prevent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhen the fields are bound to the model; the submission only triggers the operation.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eaction={fn}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhen the fields are not bound and you want their values in one go as \u003Ccode\u003EFormData\u003C/code\u003E; different operations per button with \u003Ccode\u003Eformaction\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn about the lifecycle of components in detail, go on to \u003Ca href=\u0022/docs/lifecycle\u0022\u003ELifecycle\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"one-way","text":"The one-way (explicit) approach","level":2},{"id":"model","text":"Two-way binding — bindings.model","level":2},{"id":"x-model","text":"The x-model shorthand","level":3},{"id":"component-model","text":"x-model on your own component","level":3},{"id":"bindings-add","text":"Binding a specific property with bindings.add","level":2},{"id":"text-value","text":"Text input and value","level":2},{"id":"select","text":"A \u003Cselect\u003E example","level":2},{"id":"submit","text":"Form submission","level":2},{"id":"action","text":"Submitting with a function action","level":3},{"id":"validation","text":"A validation pattern","level":2},{"id":"comparison","text":"Comparing the methods","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"events","title":"Events"},"next":{"slug":"lifecycle","title":"Lifecycle"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Core concepts</p>
+        <h1>Forms and Two-Way Binding</h1>
+        <p>One-way value&#x2B;oninput, two-way binding with bindings.model and x-model, select, form submission with onsubmit and a function action, a validation pattern; with and without JSX.</p>
+<p>MotifJS handles form input in two ways:</p>
+<ol>
+<li>Reactive read + event write (one-way, explicit): <code>value={() =&gt; note.title}</code> + <code>oninput</code>.</li>
+<li>A two-way binding (<code>bindings.model</code>, <code>x-model</code> in JSX): the input and the model stay in sync automatically. For a one-way binding to a specific DOM property, use <code>bindings.add</code>.</li>
+</ol>
+<p>The examples are slices of the notes application. <code>Note</code> and <code>NotesService</code> are the ones in the <code>src/services/notes.ts</code> file on the <a href="/docs/components">Components</a> page, and <code>SettingsService</code> and <code>THEMES</code> come from the <code>src/services/settings.ts</code> file on the <a href="/docs/getting-started">Getting Started</a> page; <code>note</code> is the note being edited.</p>
+<h2 id="one-way">The one-way (explicit) approach</h2>
+<p>You read the value reactively and write the change to the model with an event. This is the route to take when a change involves extra work (conversion, validation, a side effect):</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteFields.tsx"><code>&lt;form&gt;
+  &lt;input type=&quot;text&quot; value={() =&gt; note.title} oninput={(e) =&gt; (note.title = (e.target as HTMLInputElement).value)} /&gt;
+  &lt;input type=&quot;checkbox&quot; checked={() =&gt; note.pinned} onchange={(e) =&gt; (note.pinned = (e.target as HTMLInputElement).checked)} /&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteFields.ts"><code>motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  const title = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+    input.attr.add({ type: &quot;text&quot; });
+    input.bindings.add(&quot;value&quot;, () =&gt; note.title);
+    input.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (note.title = (e.target as HTMLInputElement).value));
+  });
+  const pinned = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+    input.attr.add({ type: &quot;checkbox&quot; });
+    input.bindings.add(&quot;checked&quot;, () =&gt; note.pinned);
+    input.motif.on(&quot;change&quot;, (_sender: ComponentBase, e: Event) =&gt; (note.pinned = (e.target as HTMLInputElement).checked));
+  });
+  form.controls.add(title, pinned);
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteFields.jsx"><code>&lt;form&gt;
+  &lt;input type=&quot;text&quot; value={() =&gt; note.title} oninput={(e) =&gt; (note.title = e.target.value)} /&gt;
+  &lt;input type=&quot;checkbox&quot; checked={() =&gt; note.pinned} onchange={(e) =&gt; (note.pinned = e.target.checked)} /&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteFields.js"><code>motifComponent(&quot;form&quot;, (form) =&gt; {
+  const title = motifComponent(&quot;input&quot;, (input) =&gt; {
+    input.attr.add({ type: &quot;text&quot; });
+    input.bindings.add(&quot;value&quot;, () =&gt; note.title);
+    input.motif.on(&quot;input&quot;, (_sender, e) =&gt; (note.title = e.target.value));
+  });
+  const pinned = motifComponent(&quot;input&quot;, (input) =&gt; {
+    input.attr.add({ type: &quot;checkbox&quot; });
+    input.bindings.add(&quot;checked&quot;, () =&gt; note.pinned);
+    input.motif.on(&quot;change&quot;, (_sender, e) =&gt; (note.pinned = e.target.checked));
+  });
+  form.controls.add(title, pinned);
+});</code></pre>
+</div>
+<p><code>value</code> and <code>checked</code> are property bindings: a <code>value={() =&gt; …}</code> written on a tag in JSX compiles to a <code>bindings.add(&quot;value&quot;, getter)</code> call, and no attribute is written.</p>
+<h2 id="model">Two-way binding — <code>bindings.model</code></h2>
+<p><code>bindings.model</code> picks the right DOM property automatically based on the type of the element and binds it to the model in both directions:</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Bound property</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;input type=&quot;checkbox&quot;&gt;</code>, <code>&lt;input type=&quot;radio&quot;&gt;</code></td>
+<td><code>checked</code> (boolean)</td>
+</tr>
+<tr>
+<td><code>&lt;input&gt;</code> (others)</td>
+<td><code>value</code></td>
+</tr>
+<tr>
+<td><code>&lt;select&gt;</code></td>
+<td><code>value</code></td>
+</tr>
+<tr>
+<td><code>&lt;textarea&gt;</code></td>
+<td><code>value</code></td>
+</tr>
+<tr>
+<td><code>&lt;img&gt;</code>, <code>&lt;audio&gt;</code>, <code>&lt;video&gt;</code></td>
+<td><code>src</code> (one-way: model → element only)</td>
+</tr>
+</tbody>
+</table>
+<p>On inputs, the choice between <code>checked</code> and <code>value</code> is made not when the binding is set up but on every read and write, based on the element's current <code>type</code>: when <code>onConfig</code> sets up the binding, the <code>type</code> attribute may not have been applied yet.</p>
+<p>The type of the value written to the model is also decided by the element:</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Written to the model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>checkbox</code>, <code>radio</code></td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td><code>number</code>, <code>range</code></td>
+<td><code>number</code> (<code>null</code> if the input is emptied)</td>
+</tr>
+<tr>
+<td>everything else (<code>text</code>, <code>date</code>, <code>select</code>, <code>textarea</code>…)</td>
+<td><code>string</code></td>
+</tr>
+</tbody>
+</table>
+<p>Date types stay strings on purpose: their natural model is the <code>'2026-10-16'</code> form.</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteFields.tsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; onConfig={(field) =&gt; field.bindings.model(note, &quot;title&quot;)} /&gt;
+  &lt;input type=&quot;checkbox&quot; onConfig={(box) =&gt; box.bindings.model(note, &quot;pinned&quot;)} /&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteFields.ts"><code>const title = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+  field.attr.add({ type: &quot;text&quot; });
+  field.bindings.model(note, &quot;title&quot;);
+});
+const pinned = motifComponent(&quot;input&quot;, (box: ComponentBase) =&gt; {
+  box.attr.add({ type: &quot;checkbox&quot; });
+  box.bindings.model(note, &quot;pinned&quot;);
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteFields.jsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; onConfig={(field) =&gt; field.bindings.model(note, &quot;title&quot;)} /&gt;
+  &lt;input type=&quot;checkbox&quot; onConfig={(box) =&gt; box.bindings.model(note, &quot;pinned&quot;)} /&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteFields.js"><code>const title = motifComponent(&quot;input&quot;, (field) =&gt; {
+  field.attr.add({ type: &quot;text&quot; });
+  field.bindings.model(note, &quot;title&quot;);
+});
+const pinned = motifComponent(&quot;input&quot;, (box) =&gt; {
+  box.attr.add({ type: &quot;checkbox&quot; });
+  box.bindings.model(note, &quot;pinned&quot;);
+});</code></pre>
+</div>
+<p>In JSX the binding is set up in <code>onConfig</code>: it is added while the component is being configured. Without JSX, the setup function itself is that place.</p>
+<p>Signatures:</p>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th>Bound value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model(dataSource, dataMember)</code></td>
+<td>The <code>dataMember</code> field on <code>dataSource</code></td>
+</tr>
+<tr>
+<td><code>model(dataSource, dataMember, formatString)</code></td>
+<td>The same field, formatted with <code>formatString</code></td>
+</tr>
+<tr>
+<td><code>model(dataSource, dataMember, formatString, formatInfo)</code></td>
+<td>The same field; locale and currency come from <code>formatInfo</code> (<code>{ locale, currency }</code>)</td>
+</tr>
+<tr>
+<td><code>model(getter, setter)</code></td>
+<td>Reads with <code>getter()</code>, writes with <code>setter(value)</code></td>
+</tr>
+<tr>
+<td><code>model(binding)</code></td>
+<td>A ready binding object</td>
+</tr>
+</tbody>
+</table>
+<p>Every form returns the added binding (<code>IBaseBinding</code>).</p>
+<p><code>dataMember</code> can also be a dotted path (<code>&quot;meta.category&quot;</code>). In a call with one argument, an object is interpreted as an <code>IBaseBinding</code>, while a function given as the single argument only reads, binding one-way. <code>model(dataSource, dataMember)</code> keeps the <code>dataSource</code> object as it was at the time of the call; if that object can be replaced as a whole, use <code>x-model</code> or the getter/setter form.</p>
+<h3 id="x-model">The <code>x-model</code> shorthand</h3>
+<p><code>x-model</code> compiles to a <code>bindings.model(getter, setter)</code> call and is two-way; without JSX you write the getter and the setter yourself:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteFields.tsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; x-model={() =&gt; note.title} /&gt;
+  &lt;input type=&quot;checkbox&quot; x-model={() =&gt; note.pinned} /&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteFields.ts"><code>const title = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+});
+const pinned = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+  input.attr.add({ type: &quot;checkbox&quot; });
+  input.bindings.model(() =&gt; note.pinned, (value: boolean) =&gt; (note.pinned = value));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteFields.jsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; x-model={() =&gt; note.title} /&gt;
+  &lt;input type=&quot;checkbox&quot; x-model={() =&gt; note.pinned} /&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteFields.js"><code>const title = motifComponent(&quot;input&quot;, (input) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+});
+const pinned = motifComponent(&quot;input&quot;, (input) =&gt; {
+  input.attr.add({ type: &quot;checkbox&quot; });
+  input.bindings.model(() =&gt; note.pinned, (value) =&gt; (note.pinned = value));
+});</code></pre>
+</div>
+<p>The setter the compiler produces reads the object that owns the member again on every write (<code>note</code> for <code>note.title</code>, <code>row.note</code> for <code>row.note.title</code>, <code>state.selected</code> for <code>state.selected.title</code>). That way the binding does not break when the object is replaced as a whole (<code>state.selected = otherNote</code>) or when list rows change places:</p>
+<div class="doc-code" data-file="src/parts/TitleList.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/TitleList.tsx"><code>{notes.list(&quot;notes&quot;).map((note) =&gt; &lt;input key={note.id} type=&quot;text&quot; x-model={() =&gt; note.title} /&gt;)}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/TitleList.ts"><code>motifComponent({
+  initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; notes.list(&quot;notes&quot;), (note: Note) =&gt; motifComponent(&quot;input&quot;, {
+    indexkey: () =&gt; note.id,
+    initializeComponent: (field: ComponentBase) =&gt; {
+      field.attr.add({ type: &quot;text&quot; });
+      field.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+    },
+  })),
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/TitleList.jsx"><code>{notes.list(&quot;notes&quot;).map((note) =&gt; &lt;input key={note.id} type=&quot;text&quot; x-model={() =&gt; note.title} /&gt;)}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/TitleList.js"><code>motifComponent({
+  initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; notes.list(&quot;notes&quot;), (note) =&gt; motifComponent(&quot;input&quot;, {
+    indexkey: () =&gt; note.id,
+    initializeComponent: (field) =&gt; {
+      field.attr.add({ type: &quot;text&quot; });
+      field.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+    },
+  })),
+});</code></pre>
+</div>
+<p>The write is skipped while the owner is <code>null</code>/<code>undefined</code> (<code>x-model={() =&gt; state.selected?.title}</code>) and while the member holds a function (a getter prop). An expression without member access (<code>() =&gt; a + b</code>, <code>() =&gt; fn(x)</code>) is only read and stays one-way; <code>motif-explain</code> shows which case applies.</p>
+<h3 id="component-model"><code>x-model</code> on your own component</h3>
+<p>A component whose element is not a form element can also be used with <code>x-model</code>. The bound value is written to the component's <code>value</code> property; if the component defines its own <code>value</code> property, the value goes to the component even when its element is something with a <code>value</code> field of its own, such as a <code>&lt;button&gt;</code>. The component writes the new value back to the model with <code>bindings.writeModel(value)</code> (<code>this.bindings</code> in a class and in Options, the <code>bindings</code> of the <a href="/docs/components#function-root">root component</a> in a function component). <code>PinSwitch</code> is a button that turns pinning a note on and off: in the class and in Options, <code>value</code> is an accessor (<code>get</code>/<code>set</code>), and in the function the accessor is set up with <code>Object.defineProperty</code> in the root's <code>initializeComponent</code> hook:</p>
+<div class="doc-code" data-file="src/parts/PinSwitch.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/PinSwitch.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+
+export class PinSwitch extends Component&lt;HTMLButtonElement&gt; {
+  state = reactive({ on: false });
+
+  set value(v: boolean) { this.state.on = !!v; }
+  get value() { return this.state.on; }
+
+  override onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.state.on));
+  }
+
+  override view() {
+    return &lt;&gt;{() =&gt; (this.state.on ? &quot;Fixed&quot; : &quot;Free&quot;)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/PinSwitch.ts"><code>import { Component, ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export class PinSwitch extends Component&lt;HTMLButtonElement&gt; {
+  static override elementTag = &quot;button&quot;;
+  state = reactive({ on: false });
+
+  set value(v: boolean) { this.state.on = !!v; }
+  get value() { return this.state.on; }
+
+  override onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.state.on));
+  }
+
+  override view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; (this.state.on ? &quot;Fixed&quot; : &quot;Free&quot;)));
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/PinSwitch.tsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export function PinSwitch() {
+  const state = reactive({ on: false });
+  return (
+    &lt;button
+      type=&quot;button&quot;
+      class=&quot;switch&quot;
+      initializeComponent={(root) =&gt; Object.defineProperty(root, &quot;value&quot;, { get: () =&gt; state.on, set: (v: boolean) =&gt; (state.on = !!v), configurable: true })}
+      onclick={(root, _e) =&gt; root.bindings.writeModel(!state.on)}
+    &gt;
+      {() =&gt; (state.on ? &quot;Fixed&quot; : &quot;Free&quot;)}
+    &lt;/button&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/PinSwitch.ts"><code>import { ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export function PinSwitch() {
+  const state = reactive({ on: false });
+  return motifComponent(&quot;button&quot;, (root: ComponentBase) =&gt; {
+    Object.defineProperty(root, &quot;value&quot;, { get: () =&gt; state.on, set: (v: boolean) =&gt; (state.on = !!v), configurable: true });
+    root.attr.add({ type: &quot;button&quot; });
+    root.class.add(&quot;switch&quot;);
+    root.motif.on(&quot;click&quot;, () =&gt; root.bindings.writeModel(!state.on));
+    root.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; (state.on ? &quot;Fixed&quot; : &quot;Free&quot;))));
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/PinSwitch.tsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const PinSwitch = () =&gt; motifOptions({
+  el: &quot;button&quot;,
+  data: reactive({ on: false }),
+
+  set value(v: boolean) { this.data.on = !!v; },
+  get value() { return this.data.on; },
+
+  onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.data.on));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; (this.data.on ? &quot;Fixed&quot; : &quot;Free&quot;)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/PinSwitch.ts"><code>import { ComponentBase, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const PinSwitch = () =&gt; motifOptions({
+  el: &quot;button&quot;,
+  data: reactive({ on: false }),
+
+  set value(v: boolean) { this.data.on = !!v; },
+  get value() { return this.data.on; },
+
+  onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.data.on));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; (this.data.on ? &quot;Fixed&quot; : &quot;Free&quot;)));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/PinSwitch.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+
+export class PinSwitch extends Component {
+  static elementTag = &quot;button&quot;;
+  state = reactive({ on: false });
+
+  set value(v) { this.state.on = !!v; }
+  get value() { return this.state.on; }
+
+  onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.state.on));
+  }
+
+  view() {
+    return &lt;&gt;{() =&gt; (this.state.on ? &quot;Fixed&quot; : &quot;Free&quot;)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/PinSwitch.js"><code>import { Component, motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export class PinSwitch extends Component {
+  static elementTag = &quot;button&quot;;
+  state = reactive({ on: false });
+
+  set value(v) { this.state.on = !!v; }
+  get value() { return this.state.on; }
+
+  onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.state.on));
+  }
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; (this.state.on ? &quot;Fixed&quot; : &quot;Free&quot;)));
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/PinSwitch.jsx"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export function PinSwitch() {
+  const state = reactive({ on: false });
+  return (
+    &lt;button
+      type=&quot;button&quot;
+      class=&quot;switch&quot;
+      initializeComponent={(root) =&gt; Object.defineProperty(root, &quot;value&quot;, { get: () =&gt; state.on, set: (v) =&gt; (state.on = !!v), configurable: true })}
+      onclick={(root, _e) =&gt; root.bindings.writeModel(!state.on)}
+    &gt;
+      {() =&gt; (state.on ? &quot;Fixed&quot; : &quot;Free&quot;)}
+    &lt;/button&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/PinSwitch.js"><code>import { motifComponent, reactive } from &quot;@motifx/core&quot;;
+
+export function PinSwitch() {
+  const state = reactive({ on: false });
+  return motifComponent(&quot;button&quot;, (root) =&gt; {
+    Object.defineProperty(root, &quot;value&quot;, { get: () =&gt; state.on, set: (v) =&gt; (state.on = !!v), configurable: true });
+    root.attr.add({ type: &quot;button&quot; });
+    root.class.add(&quot;switch&quot;);
+    root.motif.on(&quot;click&quot;, () =&gt; root.bindings.writeModel(!state.on));
+    root.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; (state.on ? &quot;Fixed&quot; : &quot;Free&quot;))));
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/PinSwitch.jsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const PinSwitch = () =&gt; motifOptions({
+  el: &quot;button&quot;,
+  data: reactive({ on: false }),
+
+  set value(v) { this.data.on = !!v; },
+  get value() { return this.data.on; },
+
+  onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.data.on));
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; (this.data.on ? &quot;Fixed&quot; : &quot;Free&quot;)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/PinSwitch.js"><code>import { motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+
+export const PinSwitch = () =&gt; motifOptions({
+  el: &quot;button&quot;,
+  data: reactive({ on: false }),
+
+  set value(v) { this.data.on = !!v; },
+  get value() { return this.data.on; },
+
+  onConfigured() {
+    this.attr.add({ type: &quot;button&quot; });
+    this.class.add(&quot;switch&quot;);
+    this.motif.on(&quot;click&quot;, () =&gt; this.bindings.writeModel(!this.data.on));
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; (this.data.on ? &quot;Fixed&quot; : &quot;Free&quot;)));
+  },
+});</code></pre>
+</div>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteFields.tsx"><code>&lt;PinSwitch x-model={() =&gt; note.pinned} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteFields.ts"><code>const pin = motifComponent(PinSwitch);
+pin.bindings.model(() =&gt; note.pinned, (value: boolean) =&gt; (note.pinned = value));</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteFields.jsx"><code>&lt;PinSwitch x-model={() =&gt; note.pinned} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteFields.js"><code>const pin = motifComponent(PinSwitch);
+pin.bindings.model(() =&gt; note.pinned, (value) =&gt; (note.pinned = value));</code></pre>
+</div>
+<p><code>writeModel</code> writes to every binding set up on the component with <code>bindings.model</code> or <code>x-model</code>; <code>converterBack</code> is applied if there is one, and the write path is the same as on form elements. If there is no binding, it writes nothing and returns <code>false</code>, so the component can be used without <code>x-model</code> too. It does not touch bindings set up with <code>bindings.add</code>.</p>
+<h2 id="bindings-add">Binding a specific property with <code>bindings.add</code></h2>
+<p>If you want to specify which DOM property to bind yourself, use <code>bindings.add</code>. This binding is one-way (model → DOM); to write the user's change to the model, add an event handler:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteFields.tsx"><code>&lt;input type=&quot;checkbox&quot; onConfig={(box) =&gt; box.bindings.add(&quot;checked&quot;, note, &quot;pinned&quot;)} onchange={(e) =&gt; (note.pinned = (e.target as HTMLInputElement).checked)} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteFields.ts"><code>motifComponent(&quot;input&quot;, (box: ComponentBase) =&gt; {
+  box.attr.add({ type: &quot;checkbox&quot; });
+  box.bindings.add(&quot;checked&quot;, note, &quot;pinned&quot;);
+  box.motif.on(&quot;change&quot;, (_sender: ComponentBase, e: Event) =&gt; (note.pinned = (e.target as HTMLInputElement).checked));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteFields.jsx"><code>&lt;input type=&quot;checkbox&quot; onConfig={(box) =&gt; box.bindings.add(&quot;checked&quot;, note, &quot;pinned&quot;)} onchange={(e) =&gt; (note.pinned = e.target.checked)} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteFields.js"><code>motifComponent(&quot;input&quot;, (box) =&gt; {
+  box.attr.add({ type: &quot;checkbox&quot; });
+  box.bindings.add(&quot;checked&quot;, note, &quot;pinned&quot;);
+  box.motif.on(&quot;change&quot;, (_sender, e) =&gt; (note.pinned = e.target.checked));
+});</code></pre>
+</div>
+<p>When <code>checked</code>, <code>selected</code>, <code>muted</code>, <code>indeterminate</code> and <code>srcObject</code> are written as attributes, they are assigned as element properties (<code>!!value</code>), not as HTML attributes: <code>&lt;input type=&quot;checkbox&quot; indeterminate={() =&gt; selection.partial} /&gt;</code>.</p>
+<h2 id="text-value">Text input and <code>value</code></h2>
+<p>For <code>&lt;input&gt;</code> and <code>&lt;textarea&gt;</code> the <code>value</code> prop is recognized specially; it takes a reactive value or a getter:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteFields.tsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; value={() =&gt; note.title} oninput={(e) =&gt; (note.title = (e.target as HTMLInputElement).value)} /&gt;
+  &lt;textarea value={() =&gt; note.body} oninput={(e) =&gt; (note.body = (e.target as HTMLTextAreaElement).value)} /&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteFields.ts"><code>const title = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.bindings.add(&quot;value&quot;, () =&gt; note.title);
+  input.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (note.title = (e.target as HTMLInputElement).value));
+});
+const body = motifComponent(&quot;textarea&quot;, (area: ComponentBase) =&gt; {
+  area.bindings.add(&quot;value&quot;, () =&gt; note.body);
+  area.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (note.body = (e.target as HTMLTextAreaElement).value));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteFields.jsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; value={() =&gt; note.title} oninput={(e) =&gt; (note.title = e.target.value)} /&gt;
+  &lt;textarea value={() =&gt; note.body} oninput={(e) =&gt; (note.body = e.target.value)} /&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteFields.js"><code>const title = motifComponent(&quot;input&quot;, (input) =&gt; {
+  input.attr.add({ type: &quot;text&quot; });
+  input.bindings.add(&quot;value&quot;, () =&gt; note.title);
+  input.motif.on(&quot;input&quot;, (_sender, e) =&gt; (note.title = e.target.value));
+});
+const body = motifComponent(&quot;textarea&quot;, (area) =&gt; {
+  area.bindings.add(&quot;value&quot;, () =&gt; note.body);
+  area.motif.on(&quot;input&quot;, (_sender, e) =&gt; (note.body = e.target.value));
+});</code></pre>
+</div>
+<h2 id="select">A <code>&lt;select&gt;</code> example</h2>
+<p>The theme choice is written to the settings service. The change goes through <code>setTheme</code>, because the service applies the theme to <code>&lt;html&gt;</code> and saves it:</p>
+<div class="doc-code" data-file="src/parts/ThemeSelect.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/ThemeSelect.tsx"><code>&lt;select value={() =&gt; settings.state.theme} onchange={(e) =&gt; settings.setTheme((e.target as HTMLSelectElement).value as Theme)}&gt;
+  &lt;option value=&quot;system&quot;&gt;System&lt;/option&gt;
+  &lt;option value=&quot;light&quot;&gt;Light&lt;/option&gt;
+  &lt;option value=&quot;dark&quot;&gt;Dark&lt;/option&gt;
+&lt;/select&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/ThemeSelect.ts"><code>motifComponent(&quot;select&quot;, (select: ComponentBase) =&gt; {
+  select.bindings.add(&quot;value&quot;, () =&gt; settings.state.theme);
+  select.motif.on(&quot;change&quot;, (_sender: ComponentBase, e: Event) =&gt; settings.setTheme((e.target as HTMLSelectElement).value as Theme));
+  for (const [value, label] of [[&quot;system&quot;, &quot;System&quot;], [&quot;light&quot;, &quot;Light&quot;], [&quot;dark&quot;, &quot;Dark&quot;]]) {
+    select.controls.add(motifComponent(&quot;option&quot;, (option: ComponentBase) =&gt; {
+      option.attr.add({ value });
+      option.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(label)));
+    }));
+  }
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/ThemeSelect.jsx"><code>&lt;select value={() =&gt; settings.state.theme} onchange={(e) =&gt; settings.setTheme(e.target.value)}&gt;
+  &lt;option value=&quot;system&quot;&gt;System&lt;/option&gt;
+  &lt;option value=&quot;light&quot;&gt;Light&lt;/option&gt;
+  &lt;option value=&quot;dark&quot;&gt;Dark&lt;/option&gt;
+&lt;/select&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/ThemeSelect.js"><code>motifComponent(&quot;select&quot;, (select) =&gt; {
+  select.bindings.add(&quot;value&quot;, () =&gt; settings.state.theme);
+  select.motif.on(&quot;change&quot;, (_sender, e) =&gt; settings.setTheme(e.target.value));
+  for (const [value, label] of [[&quot;system&quot;, &quot;System&quot;], [&quot;light&quot;, &quot;Light&quot;], [&quot;dark&quot;, &quot;Dark&quot;]]) {
+    select.controls.add(motifComponent(&quot;option&quot;, (option) =&gt; {
+      option.attr.add({ value });
+      option.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(label)));
+    }));
+  }
+});</code></pre>
+</div>
+<p><code>&lt;select x-model={() =&gt; settings.state.theme}&gt;</code> binds both ways too, but it writes to the field directly and skips the applying and saving that <code>setTheme</code> does.</p>
+<h2 id="submit">Form submission</h2>
+<p><code>NoteForm</code> binds the fields of a new note to a draft with <code>x-model</code> and writes it to the service on submit. <code>onsubmit:prevent</code> keeps the page from reloading; without JSX the same modifier is given with <code>motif.on(&quot;submit:prevent&quot;, …)</code>:</p>
+<div class="doc-code" data-file="src/parts/NoteForm.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteForm.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class NoteForm extends Component {
+  notes = this.getService(NotesService)!;
+  draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.draft.title;
+    note.body = this.draft.body;
+    note.pinned = this.draft.pinned;
+    this.draft.title = &quot;&quot;;
+    this.draft.body = &quot;&quot;;
+    this.draft.due = &quot;&quot;;
+  }
+
+  override view() {
+    return (
+      &lt;form class=&quot;note-form&quot; onsubmit:prevent={() =&gt; this.save()}&gt;
+        &lt;input type=&quot;text&quot; placeholder=&quot;Title&quot; x-model={() =&gt; this.draft.title} /&gt;
+        &lt;textarea placeholder=&quot;Body&quot; x-model={() =&gt; this.draft.body} /&gt;
+        &lt;label&gt;&lt;input type=&quot;checkbox&quot; x-model={() =&gt; this.draft.pinned} /&gt; Pin&lt;/label&gt;
+        &lt;input type=&quot;date&quot; x-model={() =&gt; this.draft.due} /&gt;
+        &lt;button type=&quot;submit&quot; disabled={() =&gt; !this.draft.title.trim()}&gt;Save&lt;/button&gt;
+      &lt;/form&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteForm.ts"><code>import { Component, ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class NoteForm extends Component {
+  notes = this.getService(NotesService)!;
+  draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.draft.title;
+    note.body = this.draft.body;
+    note.pinned = this.draft.pinned;
+    this.draft.title = &quot;&quot;;
+    this.draft.body = &quot;&quot;;
+    this.draft.due = &quot;&quot;;
+  }
+
+  override view() {
+    return motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+      form.class.add(&quot;note-form&quot;);
+      form.motif.on(&quot;submit:prevent&quot;, () =&gt; this.save());
+      const title = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+        input.attr.add({ type: &quot;text&quot;, placeholder: &quot;Title&quot; });
+        input.bindings.model(() =&gt; this.draft.title, (value: string) =&gt; (this.draft.title = value));
+      });
+      const body = motifComponent(&quot;textarea&quot;, (area: ComponentBase) =&gt; {
+        area.attr.add({ placeholder: &quot;Body&quot; });
+        area.bindings.model(() =&gt; this.draft.body, (value: string) =&gt; (this.draft.body = value));
+      });
+      const pinned = motifComponent(&quot;label&quot;, (label: ComponentBase) =&gt; {
+        label.controls.add(
+          motifComponent(&quot;input&quot;, (box: ComponentBase) =&gt; {
+            box.attr.add({ type: &quot;checkbox&quot; });
+            box.bindings.model(() =&gt; this.draft.pinned, (value: boolean) =&gt; (this.draft.pinned = value));
+          }),
+          motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot; Pin&quot;)),
+        );
+      });
+      const due = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+        input.attr.add({ type: &quot;date&quot; });
+        input.bindings.model(() =&gt; this.draft.due, (value: string) =&gt; (this.draft.due = value));
+      });
+      const submit = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+        button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !this.draft.title.trim() });
+        button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Save&quot;)));
+      });
+      form.controls.add(title, body, pinned, due, submit);
+    });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteForm.tsx"><code>import { FromService, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function NoteForm() {
+  const notes = FromService(NotesService)!;
+  const draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  const save = () =&gt; {
+    const note = notes.create();
+    note.title = draft.title;
+    note.body = draft.body;
+    note.pinned = draft.pinned;
+    draft.title = &quot;&quot;;
+    draft.body = &quot;&quot;;
+    draft.due = &quot;&quot;;
+  };
+
+  return (
+    &lt;form class=&quot;note-form&quot; onsubmit:prevent={save}&gt;
+      &lt;input type=&quot;text&quot; placeholder=&quot;Title&quot; x-model={() =&gt; draft.title} /&gt;
+      &lt;textarea placeholder=&quot;Body&quot; x-model={() =&gt; draft.body} /&gt;
+      &lt;label&gt;&lt;input type=&quot;checkbox&quot; x-model={() =&gt; draft.pinned} /&gt; Pin&lt;/label&gt;
+      &lt;input type=&quot;date&quot; x-model={() =&gt; draft.due} /&gt;
+      &lt;button type=&quot;submit&quot; disabled={() =&gt; !draft.title.trim()}&gt;Save&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteForm.ts"><code>import { ComponentBase, FromService, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function NoteForm() {
+  const notes = FromService(NotesService)!;
+  const draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  const save = () =&gt; {
+    const note = notes.create();
+    note.title = draft.title;
+    note.body = draft.body;
+    note.pinned = draft.pinned;
+    draft.title = &quot;&quot;;
+    draft.body = &quot;&quot;;
+    draft.due = &quot;&quot;;
+  };
+
+  return motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+    form.class.add(&quot;note-form&quot;);
+    form.motif.on(&quot;submit:prevent&quot;, save);
+    const title = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+      input.attr.add({ type: &quot;text&quot;, placeholder: &quot;Title&quot; });
+      input.bindings.model(() =&gt; draft.title, (value: string) =&gt; (draft.title = value));
+    });
+    const body = motifComponent(&quot;textarea&quot;, (area: ComponentBase) =&gt; {
+      area.attr.add({ placeholder: &quot;Body&quot; });
+      area.bindings.model(() =&gt; draft.body, (value: string) =&gt; (draft.body = value));
+    });
+    const pinned = motifComponent(&quot;label&quot;, (label: ComponentBase) =&gt; {
+      label.controls.add(
+        motifComponent(&quot;input&quot;, (box: ComponentBase) =&gt; {
+          box.attr.add({ type: &quot;checkbox&quot; });
+          box.bindings.model(() =&gt; draft.pinned, (value: boolean) =&gt; (draft.pinned = value));
+        }),
+        motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot; Pin&quot;)),
+      );
+    });
+    const due = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+      input.attr.add({ type: &quot;date&quot; });
+      input.bindings.model(() =&gt; draft.due, (value: string) =&gt; (draft.due = value));
+    });
+    const submit = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !draft.title.trim() });
+      button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Save&quot;)));
+    });
+    form.controls.add(title, body, pinned, due, submit);
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteForm.tsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const NoteForm = () =&gt; motifOptions({
+  el: &quot;form&quot;,
+  data: reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; }),
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.data.title;
+    note.body = this.data.body;
+    note.pinned = this.data.pinned;
+    this.data.title = &quot;&quot;;
+    this.data.body = &quot;&quot;;
+    this.data.due = &quot;&quot;;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;note-form&quot;);
+    this.motif.on(&quot;submit:prevent&quot;, () =&gt; this.save());
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;input type=&quot;text&quot; placeholder=&quot;Title&quot; x-model={() =&gt; this.data.title} /&gt;
+        &lt;textarea placeholder=&quot;Body&quot; x-model={() =&gt; this.data.body} /&gt;
+        &lt;label&gt;&lt;input type=&quot;checkbox&quot; x-model={() =&gt; this.data.pinned} /&gt; Pin&lt;/label&gt;
+        &lt;input type=&quot;date&quot; x-model={() =&gt; this.data.due} /&gt;
+        &lt;button type=&quot;submit&quot; disabled={() =&gt; !this.data.title.trim()}&gt;Save&lt;/button&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteForm.ts"><code>import { ComponentBase, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const NoteForm = () =&gt; motifOptions({
+  el: &quot;form&quot;,
+  data: reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; }),
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.data.title;
+    note.body = this.data.body;
+    note.pinned = this.data.pinned;
+    this.data.title = &quot;&quot;;
+    this.data.body = &quot;&quot;;
+    this.data.due = &quot;&quot;;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;note-form&quot;);
+    this.motif.on(&quot;submit:prevent&quot;, () =&gt; this.save());
+  },
+
+  view() {
+    const title = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+      input.attr.add({ type: &quot;text&quot;, placeholder: &quot;Title&quot; });
+      input.bindings.model(() =&gt; this.data.title, (value: string) =&gt; (this.data.title = value));
+    });
+    const body = motifComponent(&quot;textarea&quot;, (area: ComponentBase) =&gt; {
+      area.attr.add({ placeholder: &quot;Body&quot; });
+      area.bindings.model(() =&gt; this.data.body, (value: string) =&gt; (this.data.body = value));
+    });
+    const pinned = motifComponent(&quot;label&quot;, (label: ComponentBase) =&gt; {
+      label.controls.add(
+        motifComponent(&quot;input&quot;, (box: ComponentBase) =&gt; {
+          box.attr.add({ type: &quot;checkbox&quot; });
+          box.bindings.model(() =&gt; this.data.pinned, (value: boolean) =&gt; (this.data.pinned = value));
+        }),
+        motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot; Pin&quot;)),
+      );
+    });
+    const due = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; {
+      input.attr.add({ type: &quot;date&quot; });
+      input.bindings.model(() =&gt; this.data.due, (value: string) =&gt; (this.data.due = value));
+    });
+    const submit = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !this.data.title.trim() });
+      button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Save&quot;)));
+    });
+    return [title, body, pinned, due, submit];
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteForm.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class NoteForm extends Component {
+  notes = this.getService(NotesService);
+  draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.draft.title;
+    note.body = this.draft.body;
+    note.pinned = this.draft.pinned;
+    this.draft.title = &quot;&quot;;
+    this.draft.body = &quot;&quot;;
+    this.draft.due = &quot;&quot;;
+  }
+
+  view() {
+    return (
+      &lt;form class=&quot;note-form&quot; onsubmit:prevent={() =&gt; this.save()}&gt;
+        &lt;input type=&quot;text&quot; placeholder=&quot;Title&quot; x-model={() =&gt; this.draft.title} /&gt;
+        &lt;textarea placeholder=&quot;Body&quot; x-model={() =&gt; this.draft.body} /&gt;
+        &lt;label&gt;&lt;input type=&quot;checkbox&quot; x-model={() =&gt; this.draft.pinned} /&gt; Pin&lt;/label&gt;
+        &lt;input type=&quot;date&quot; x-model={() =&gt; this.draft.due} /&gt;
+        &lt;button type=&quot;submit&quot; disabled={() =&gt; !this.draft.title.trim()}&gt;Save&lt;/button&gt;
+      &lt;/form&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteForm.js"><code>import { Component, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class NoteForm extends Component {
+  notes = this.getService(NotesService);
+  draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.draft.title;
+    note.body = this.draft.body;
+    note.pinned = this.draft.pinned;
+    this.draft.title = &quot;&quot;;
+    this.draft.body = &quot;&quot;;
+    this.draft.due = &quot;&quot;;
+  }
+
+  view() {
+    return motifComponent(&quot;form&quot;, (form) =&gt; {
+      form.class.add(&quot;note-form&quot;);
+      form.motif.on(&quot;submit:prevent&quot;, () =&gt; this.save());
+      const title = motifComponent(&quot;input&quot;, (input) =&gt; {
+        input.attr.add({ type: &quot;text&quot;, placeholder: &quot;Title&quot; });
+        input.bindings.model(() =&gt; this.draft.title, (value) =&gt; (this.draft.title = value));
+      });
+      const body = motifComponent(&quot;textarea&quot;, (area) =&gt; {
+        area.attr.add({ placeholder: &quot;Body&quot; });
+        area.bindings.model(() =&gt; this.draft.body, (value) =&gt; (this.draft.body = value));
+      });
+      const pinned = motifComponent(&quot;label&quot;, (label) =&gt; {
+        label.controls.add(
+          motifComponent(&quot;input&quot;, (box) =&gt; {
+            box.attr.add({ type: &quot;checkbox&quot; });
+            box.bindings.model(() =&gt; this.draft.pinned, (value) =&gt; (this.draft.pinned = value));
+          }),
+          motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot; Pin&quot;)),
+        );
+      });
+      const due = motifComponent(&quot;input&quot;, (input) =&gt; {
+        input.attr.add({ type: &quot;date&quot; });
+        input.bindings.model(() =&gt; this.draft.due, (value) =&gt; (this.draft.due = value));
+      });
+      const submit = motifComponent(&quot;button&quot;, (button) =&gt; {
+        button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !this.draft.title.trim() });
+        button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Save&quot;)));
+      });
+      form.controls.add(title, body, pinned, due, submit);
+    });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteForm.jsx"><code>import { FromService, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function NoteForm() {
+  const notes = FromService(NotesService);
+  const draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  const save = () =&gt; {
+    const note = notes.create();
+    note.title = draft.title;
+    note.body = draft.body;
+    note.pinned = draft.pinned;
+    draft.title = &quot;&quot;;
+    draft.body = &quot;&quot;;
+    draft.due = &quot;&quot;;
+  };
+
+  return (
+    &lt;form class=&quot;note-form&quot; onsubmit:prevent={save}&gt;
+      &lt;input type=&quot;text&quot; placeholder=&quot;Title&quot; x-model={() =&gt; draft.title} /&gt;
+      &lt;textarea placeholder=&quot;Body&quot; x-model={() =&gt; draft.body} /&gt;
+      &lt;label&gt;&lt;input type=&quot;checkbox&quot; x-model={() =&gt; draft.pinned} /&gt; Pin&lt;/label&gt;
+      &lt;input type=&quot;date&quot; x-model={() =&gt; draft.due} /&gt;
+      &lt;button type=&quot;submit&quot; disabled={() =&gt; !draft.title.trim()}&gt;Save&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteForm.js"><code>import { FromService, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function NoteForm() {
+  const notes = FromService(NotesService);
+  const draft = reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; });
+
+  const save = () =&gt; {
+    const note = notes.create();
+    note.title = draft.title;
+    note.body = draft.body;
+    note.pinned = draft.pinned;
+    draft.title = &quot;&quot;;
+    draft.body = &quot;&quot;;
+    draft.due = &quot;&quot;;
+  };
+
+  return motifComponent(&quot;form&quot;, (form) =&gt; {
+    form.class.add(&quot;note-form&quot;);
+    form.motif.on(&quot;submit:prevent&quot;, save);
+    const title = motifComponent(&quot;input&quot;, (input) =&gt; {
+      input.attr.add({ type: &quot;text&quot;, placeholder: &quot;Title&quot; });
+      input.bindings.model(() =&gt; draft.title, (value) =&gt; (draft.title = value));
+    });
+    const body = motifComponent(&quot;textarea&quot;, (area) =&gt; {
+      area.attr.add({ placeholder: &quot;Body&quot; });
+      area.bindings.model(() =&gt; draft.body, (value) =&gt; (draft.body = value));
+    });
+    const pinned = motifComponent(&quot;label&quot;, (label) =&gt; {
+      label.controls.add(
+        motifComponent(&quot;input&quot;, (box) =&gt; {
+          box.attr.add({ type: &quot;checkbox&quot; });
+          box.bindings.model(() =&gt; draft.pinned, (value) =&gt; (draft.pinned = value));
+        }),
+        motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot; Pin&quot;)),
+      );
+    });
+    const due = motifComponent(&quot;input&quot;, (input) =&gt; {
+      input.attr.add({ type: &quot;date&quot; });
+      input.bindings.model(() =&gt; draft.due, (value) =&gt; (draft.due = value));
+    });
+    const submit = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !draft.title.trim() });
+      button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Save&quot;)));
+    });
+    form.controls.add(title, body, pinned, due, submit);
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteForm.jsx"><code>import { motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const NoteForm = () =&gt; motifOptions({
+  el: &quot;form&quot;,
+  data: reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; }),
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.data.title;
+    note.body = this.data.body;
+    note.pinned = this.data.pinned;
+    this.data.title = &quot;&quot;;
+    this.data.body = &quot;&quot;;
+    this.data.due = &quot;&quot;;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;note-form&quot;);
+    this.motif.on(&quot;submit:prevent&quot;, () =&gt; this.save());
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;input type=&quot;text&quot; placeholder=&quot;Title&quot; x-model={() =&gt; this.data.title} /&gt;
+        &lt;textarea placeholder=&quot;Body&quot; x-model={() =&gt; this.data.body} /&gt;
+        &lt;label&gt;&lt;input type=&quot;checkbox&quot; x-model={() =&gt; this.data.pinned} /&gt; Pin&lt;/label&gt;
+        &lt;input type=&quot;date&quot; x-model={() =&gt; this.data.due} /&gt;
+        &lt;button type=&quot;submit&quot; disabled={() =&gt; !this.data.title.trim()}&gt;Save&lt;/button&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteForm.js"><code>import { motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const NoteForm = () =&gt; motifOptions({
+  el: &quot;form&quot;,
+  data: reactive({ title: &quot;&quot;, body: &quot;&quot;, pinned: false, due: &quot;&quot; }),
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  save() {
+    const note = this.notes.create();
+    note.title = this.data.title;
+    note.body = this.data.body;
+    note.pinned = this.data.pinned;
+    this.data.title = &quot;&quot;;
+    this.data.body = &quot;&quot;;
+    this.data.due = &quot;&quot;;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;note-form&quot;);
+    this.motif.on(&quot;submit:prevent&quot;, () =&gt; this.save());
+  },
+
+  view() {
+    const title = motifComponent(&quot;input&quot;, (input) =&gt; {
+      input.attr.add({ type: &quot;text&quot;, placeholder: &quot;Title&quot; });
+      input.bindings.model(() =&gt; this.data.title, (value) =&gt; (this.data.title = value));
+    });
+    const body = motifComponent(&quot;textarea&quot;, (area) =&gt; {
+      area.attr.add({ placeholder: &quot;Body&quot; });
+      area.bindings.model(() =&gt; this.data.body, (value) =&gt; (this.data.body = value));
+    });
+    const pinned = motifComponent(&quot;label&quot;, (label) =&gt; {
+      label.controls.add(
+        motifComponent(&quot;input&quot;, (box) =&gt; {
+          box.attr.add({ type: &quot;checkbox&quot; });
+          box.bindings.model(() =&gt; this.data.pinned, (value) =&gt; (this.data.pinned = value));
+        }),
+        motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot; Pin&quot;)),
+      );
+    });
+    const due = motifComponent(&quot;input&quot;, (input) =&gt; {
+      input.attr.add({ type: &quot;date&quot; });
+      input.bindings.model(() =&gt; this.data.due, (value) =&gt; (this.data.due = value));
+    });
+    const submit = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !this.data.title.trim() });
+      button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Save&quot;)));
+    });
+    return [title, body, pinned, due, submit];
+  },
+});</code></pre>
+</div>
+<p><code>onsubmit={(sender, e) =&gt; { e.preventDefault(); save(); }}</code> does the same job with a block body. When element methods are written as JSX props, no attribute is written and the method is called: <code>&lt;form requestSubmit={() =&gt; draft.send}&gt;</code>, <code>&lt;input focus={() =&gt; draft.editing} /&gt;</code> (<code>false</code> → <code>blur()</code>), <code>&lt;input setSelectionRange={[0, 5]} /&gt;</code>. <code>reportValidity</code>, <code>checkValidity</code>, <code>select</code>, <code>reset</code> and <code>submit</code> are in this group as well; for the full list and the value rules, see <a href="/docs/jsx#element-methods">Element methods</a>.</p>
+<h3 id="action">Submitting with a function <code>action</code></h3>
+<p>When a function is given to the <code>action</code> attribute instead of a URL, that function is called when the form is submitted and the page does not navigate. The search box is a form: on submit, <code>search</code> receives the query, and the &quot;Clear&quot; button empties the query with its own <code>formAction</code>:</p>
+<div class="doc-code" data-file="src/parts/NoteSearch.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/parts/NoteSearch.tsx"><code>&lt;form class=&quot;search&quot; action={(data) =&gt; this.search(String(data.get(&quot;q&quot;) ?? &quot;&quot;))}&gt;
+  &lt;input type=&quot;search&quot; name=&quot;q&quot; placeholder=&quot;Search notes&quot; /&gt;
+  &lt;button type=&quot;submit&quot;&gt;Search&lt;/button&gt;
+  &lt;button type=&quot;submit&quot; formAction={() =&gt; this.search(&quot;&quot;)}&gt;Clear&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteSearch.tsx"><code>&lt;form class=&quot;search&quot; action={(data) =&gt; search(String(data.get(&quot;q&quot;) ?? &quot;&quot;))}&gt;
+  &lt;input type=&quot;search&quot; name=&quot;q&quot; placeholder=&quot;Search notes&quot; /&gt;
+  &lt;button type=&quot;submit&quot;&gt;Search&lt;/button&gt;
+  &lt;button type=&quot;submit&quot; formAction={() =&gt; search(&quot;&quot;)}&gt;Clear&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/parts/NoteSearch.ts"><code>motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.class.add(&quot;search&quot;);
+  form.attr.add({ action: () =&gt; (data: FormData) =&gt; this.search(String(data.get(&quot;q&quot;) ?? &quot;&quot;)) });
+  const field = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; input.attr.add({ type: &quot;search&quot;, name: &quot;q&quot;, placeholder: &quot;Search notes&quot; }));
+  const run = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.attr.add({ type: &quot;submit&quot; });
+    button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Search&quot;)));
+  });
+  const clear = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, formaction: () =&gt; () =&gt; this.search(&quot;&quot;) });
+    button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Clear&quot;)));
+  });
+  form.controls.add(field, run, clear);
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteSearch.ts"><code>motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.class.add(&quot;search&quot;);
+  form.attr.add({ action: () =&gt; (data: FormData) =&gt; search(String(data.get(&quot;q&quot;) ?? &quot;&quot;)) });
+  const field = motifComponent(&quot;input&quot;, (input: ComponentBase) =&gt; input.attr.add({ type: &quot;search&quot;, name: &quot;q&quot;, placeholder: &quot;Search notes&quot; }));
+  const run = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.attr.add({ type: &quot;submit&quot; });
+    button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Search&quot;)));
+  });
+  const clear = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, formaction: () =&gt; () =&gt; search(&quot;&quot;) });
+    button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Clear&quot;)));
+  });
+  form.controls.add(field, run, clear);
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/parts/NoteSearch.jsx"><code>&lt;form class=&quot;search&quot; action={(data) =&gt; this.search(String(data.get(&quot;q&quot;) ?? &quot;&quot;))}&gt;
+  &lt;input type=&quot;search&quot; name=&quot;q&quot; placeholder=&quot;Search notes&quot; /&gt;
+  &lt;button type=&quot;submit&quot;&gt;Search&lt;/button&gt;
+  &lt;button type=&quot;submit&quot; formAction={() =&gt; this.search(&quot;&quot;)}&gt;Clear&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteSearch.jsx"><code>&lt;form class=&quot;search&quot; action={(data) =&gt; search(String(data.get(&quot;q&quot;) ?? &quot;&quot;))}&gt;
+  &lt;input type=&quot;search&quot; name=&quot;q&quot; placeholder=&quot;Search notes&quot; /&gt;
+  &lt;button type=&quot;submit&quot;&gt;Search&lt;/button&gt;
+  &lt;button type=&quot;submit&quot; formAction={() =&gt; search(&quot;&quot;)}&gt;Clear&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/parts/NoteSearch.js"><code>motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.class.add(&quot;search&quot;);
+  form.attr.add({ action: () =&gt; (data) =&gt; this.search(String(data.get(&quot;q&quot;) ?? &quot;&quot;)) });
+  const field = motifComponent(&quot;input&quot;, (input) =&gt; input.attr.add({ type: &quot;search&quot;, name: &quot;q&quot;, placeholder: &quot;Search notes&quot; }));
+  const run = motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.attr.add({ type: &quot;submit&quot; });
+    button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Search&quot;)));
+  });
+  const clear = motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, formaction: () =&gt; () =&gt; this.search(&quot;&quot;) });
+    button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Clear&quot;)));
+  });
+  form.controls.add(field, run, clear);
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteSearch.js"><code>motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.class.add(&quot;search&quot;);
+  form.attr.add({ action: () =&gt; (data) =&gt; search(String(data.get(&quot;q&quot;) ?? &quot;&quot;)) });
+  const field = motifComponent(&quot;input&quot;, (input) =&gt; input.attr.add({ type: &quot;search&quot;, name: &quot;q&quot;, placeholder: &quot;Search notes&quot; }));
+  const run = motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.attr.add({ type: &quot;submit&quot; });
+    button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Search&quot;)));
+  });
+  const clear = motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, formaction: () =&gt; () =&gt; search(&quot;&quot;) });
+    button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Clear&quot;)));
+  });
+  form.controls.add(field, run, clear);
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the function component, <code>search</code> and <code>refresh</code> are local functions inside the component function, and <code>state</code> is the local state set up with <code>reactive</code>.</p>
+</div>
+<p>As with every attribute, the value is read inside a getter. If the result is a function, no attribute is written and the function becomes the submit handler; if it is a string, it is written as the URL and stays live (<code>action=&quot;/search&quot;</code>, <code>action={state.url}</code>). That is why, without JSX, the value is given with a getter: <code>attr.add({ action: () =&gt; search })</code> attaches the handler, while <code>attr.add({ action: search })</code> treats <code>search</code> as the getter and writes its result. <code>motif-explain</code> shows this attribute as <code>attr.action</code>.</p>
+<p>On submit, the form's own <code>onsubmit</code> handlers run first; if one of them called <code>preventDefault()</code> (<code>onsubmit:prevent</code> included), the function is not called. Otherwise the framework calls <code>preventDefault()</code>, builds <code>new FormData(form, submitter)</code> and calls the function by the rules of event handlers: one parameter <code>(data)</code>, two parameters <code>(sender, data)</code>; <code>sender</code> is the component that carries the attribute, the form for <code>action</code> and the button for <code>formaction</code>. The <code>name</code>/<code>value</code> pair of the submitting button is inside <code>data</code>. If the submitter's <code>formaction</code> is a function, it takes precedence over the form's <code>action</code>; if it is a string, the browser does the submitting. <code>form.requestSubmit()</code> runs the function; <code>form.submit()</code> produces no event, so it does not. If the function throws, or the promise it returns is rejected, the error is reported with <code>MJX123</code> (see <a href="/docs/error-handling">Error Handling</a>). The form is not reset after submission; the function empties any field that needs emptying itself.</p>
+<p>The function can be async. The waiting state is kept in the operation itself: <code>refresh</code> pulls the notes from <code>SyncService</code> (<code>src/services/sync.ts</code> on the <a href="/docs/lifecycle">Lifecycle</a> page), raises a flag at the start and lowers it at the end, and the button is bound to that flag:</p>
+<div class="doc-code" data-file="src/parts/SyncForm.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/SyncForm.ts"><code>async refresh() {
+  this.state.syncing = true;
+  try {
+    this.notes.state.items = await this.sync.pull();
+  } finally {
+    this.state.syncing = false;
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/SyncForm.ts"><code>const refresh = async () =&gt; {
+  state.syncing = true;
+  try {
+    notes.state.items = await sync.pull();
+  } finally {
+    state.syncing = false;
+  }
+};</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/SyncForm.js"><code>async refresh() {
+  this.state.syncing = true;
+  try {
+    this.notes.state.items = await this.sync.pull();
+  } finally {
+    this.state.syncing = false;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/SyncForm.js"><code>const refresh = async () =&gt; {
+  state.syncing = true;
+  try {
+    notes.state.items = await sync.pull();
+  } finally {
+    state.syncing = false;
+  }
+};</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the function component, <code>state</code> is the local state the component sets up with <code>reactive</code>, and <code>notes</code> and <code>sync</code> are the services obtained with <code>FromService</code>.</p>
+</div>
+<div class="doc-code" data-file="src/parts/SyncForm.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/parts/SyncForm.tsx"><code>&lt;form action={() =&gt; this.refresh()}&gt;
+  &lt;button type=&quot;submit&quot; disabled={() =&gt; this.state.syncing}&gt;Refresh from server&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/SyncForm.tsx"><code>&lt;form action={() =&gt; refresh()}&gt;
+  &lt;button type=&quot;submit&quot; disabled={() =&gt; state.syncing}&gt;Refresh from server&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/parts/SyncForm.ts"><code>motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.attr.add({ action: () =&gt; () =&gt; this.refresh() });
+  form.controls.add(motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; this.state.syncing });
+    button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Refresh from server&quot;)));
+  }));
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/SyncForm.ts"><code>motifComponent(&quot;form&quot;, (form: ComponentBase) =&gt; {
+  form.attr.add({ action: () =&gt; () =&gt; refresh() });
+  form.controls.add(motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; state.syncing });
+    button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Refresh from server&quot;)));
+  }));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/parts/SyncForm.jsx"><code>&lt;form action={() =&gt; this.refresh()}&gt;
+  &lt;button type=&quot;submit&quot; disabled={() =&gt; this.state.syncing}&gt;Refresh from server&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/SyncForm.jsx"><code>&lt;form action={() =&gt; refresh()}&gt;
+  &lt;button type=&quot;submit&quot; disabled={() =&gt; state.syncing}&gt;Refresh from server&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/parts/SyncForm.js"><code>motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.attr.add({ action: () =&gt; () =&gt; this.refresh() });
+  form.controls.add(motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; this.state.syncing });
+    button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Refresh from server&quot;)));
+  }));
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/SyncForm.js"><code>motifComponent(&quot;form&quot;, (form) =&gt; {
+  form.attr.add({ action: () =&gt; () =&gt; refresh() });
+  form.controls.add(motifComponent(&quot;button&quot;, (button) =&gt; {
+    button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; state.syncing });
+    button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Refresh from server&quot;)));
+  }));
+});</code></pre>
+</div>
+<h2 id="validation">A validation pattern</h2>
+<p>MotifJS does not impose a special validation API; you build it with reactive fields. A derived <code>get</code> field holds the rule, and <code>x-wait</code> holds the error text back until the rule is satisfied:</p>
+<div class="doc-code" data-file="src/parts/NoteForm.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/parts/NoteForm.ts"><code>const draft = reactive({
+  title: &quot;&quot;,
+  get valid() { return draft.title.trim().length &gt;= 3; },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/parts/NoteForm.js"><code>const draft = reactive({
+  title: &quot;&quot;,
+  get valid() { return draft.title.trim().length &gt;= 3; },
+});</code></pre>
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteForm.tsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; value={() =&gt; draft.title} oninput={(e) =&gt; (draft.title = (e.target as HTMLInputElement).value)} /&gt;
+  &lt;small class=&quot;error&quot; x-wait={() =&gt; draft.valid}&gt;Title must be at least 3 characters&lt;/small&gt;
+  &lt;button type=&quot;submit&quot; disabled={() =&gt; !draft.valid}&gt;Save&lt;/button&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteForm.ts"><code>const title = motifComponent(&quot;input&quot;, (field: ComponentBase) =&gt; {
+  field.attr.add({ type: &quot;text&quot; });
+  field.bindings.add(&quot;value&quot;, () =&gt; draft.title);
+  field.motif.on(&quot;input&quot;, (_sender: ComponentBase, e: Event) =&gt; (draft.title = (e.target as HTMLInputElement).value));
+});
+const error = motifComponent(&quot;small&quot;, {
+  preconfig: (error: ComponentBase) =&gt; error.bindings.wait(() =&gt; draft.valid),
+  initializeComponent: (error: ComponentBase) =&gt; {
+    error.class.add(&quot;error&quot;);
+    error.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Title must be at least 3 characters&quot;)));
+  },
+});
+const save = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+  button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !draft.valid });
+  button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Save&quot;)));
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteForm.jsx"><code>&lt;&gt;
+  &lt;input type=&quot;text&quot; value={() =&gt; draft.title} oninput={(e) =&gt; (draft.title = e.target.value)} /&gt;
+  &lt;small class=&quot;error&quot; x-wait={() =&gt; draft.valid}&gt;Title must be at least 3 characters&lt;/small&gt;
+  &lt;button type=&quot;submit&quot; disabled={() =&gt; !draft.valid}&gt;Save&lt;/button&gt;
+&lt;/&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteForm.js"><code>const title = motifComponent(&quot;input&quot;, (field) =&gt; {
+  field.attr.add({ type: &quot;text&quot; });
+  field.bindings.add(&quot;value&quot;, () =&gt; draft.title);
+  field.motif.on(&quot;input&quot;, (_sender, e) =&gt; (draft.title = e.target.value));
+});
+const error = motifComponent(&quot;small&quot;, {
+  preconfig: (error) =&gt; error.bindings.wait(() =&gt; draft.valid),
+  initializeComponent: (error) =&gt; {
+    error.class.add(&quot;error&quot;);
+    error.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Title must be at least 3 characters&quot;)));
+  },
+});
+const save = motifComponent(&quot;button&quot;, (button) =&gt; {
+  button.attr.add({ type: &quot;submit&quot;, disabled: () =&gt; !draft.valid });
+  button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Save&quot;)));
+});</code></pre>
+</div>
+<h2 id="comparison">Comparing the methods</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-way (<code>value</code> + <code>oninput</code>)</td>
+<td>When you will run extra logic on change (conversion, validation, a side effect).</td>
+</tr>
+<tr>
+<td><code>bindings.model</code> / <code>x-model</code></td>
+<td>When two-way sync is enough; the least code.</td>
+</tr>
+<tr>
+<td><code>bindings.add(&quot;checked&quot;/&quot;value&quot;, ...)</code> + an event</td>
+<td>When you want to pick the bound property by hand (one-way; writing back through an event).</td>
+</tr>
+<tr>
+<td><code>onsubmit:prevent</code></td>
+<td>When the fields are bound to the model; the submission only triggers the operation.</td>
+</tr>
+<tr>
+<td><code>action={fn}</code></td>
+<td>When the fields are not bound and you want their values in one go as <code>FormData</code>; different operations per button with <code>formaction</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Next step</h2>
+<p>To learn about the lifecycle of components in detail, go on to <a href="/docs/lifecycle">Lifecycle</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

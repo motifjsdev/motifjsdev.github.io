@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Rules for a component library that applications use; props tracked by a single binding, the developer&#x27;s data used as it is, nothing tracked inside the component, parts drawn by hand, writing only on change, lifetime traps and measuring.">
+    <title>Writing a Component Library — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/component-libraries">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-libraries">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-libraries">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-libraries">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/component-libraries">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Writing a Component Library">
+    <meta property="og:description" content="Rules for a component library that applications use; props tracked by a single binding, the developer&#x27;s data used as it is, nothing tracked inside the component, parts drawn by hand, writing only on change, lifetime traps and measuring.">
+    <script type="application/json" id="doc-data">{"slug":"component-libraries","locale":"en","title":"Writing a Component Library","description":"Rules for a component library that applications use; props tracked by a single binding, the developer\u0027s data used as it is, nothing tracked inside the component, parts drawn by hand, writing only on change, lifetime traps and measuring.","category":{"id":"6","title":"Guides"},"html":"\u003Cp\u003EA component library (controls, a data grid, a scheduler) is used in applications it does not know, and often with thousands of its parts on a single page. Application code can lean on reactivity; library code should not. The rules on this page were worked out by writing a complete kit and measuring it. Read the \u003Ca href=\u0022/docs/component-creation\u0022\u003ECreating Components\u003C/a\u003E and \u003Ca href=\u0022/docs/component-bindings\u0022\u003Ebindings\u003C/a\u003E pages first.\u003C/p\u003E\n\u003Ch2 id=\u0022three-ways-in\u0022\u003EThree ways in\u003C/h2\u003E\n\u003Cp\u003EA library component listens to only three things:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Cstrong\u003EIts props:\u003C/strong\u003E each one a value or a function (\u003Ccode\u003EBind\u0026lt;T\u0026gt;\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe developer\u0027s data:\u003C/strong\u003E used as it is. The same objects are kept and handed back; they are not wrapped with \u003Ccode\u003Ereactive()\u003C/code\u003E, copied or transformed. A change made in place is read again with \u003Ccode\u003EreState()\u003C/code\u003E or an explicit \u003Ccode\u003Erefresh()\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe developer\u0027s \u003Ccode\u003EreState()\u003C/code\u003E call.\u003C/strong\u003E\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EEverything else is the component\u0027s own state, and the component draws it by hand.\u003C/p\u003E\n\u003Ch2 id=\u0022props\u0022\u003EProps: a value or a function, tracked by a single binding\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EEvery prop and every property setter takes a value or a function. A function is tracked by \u003Cstrong\u003Ea single\u003C/strong\u003E binding of the component. This binding is registered with \u003Ccode\u003Ebindings.add(binding)\u003C/code\u003E (the \u003Ccode\u003EIBaseBinding\u003C/code\u003E shape; see \u003Ca href=\u0022/docs/component-bindings#component-property\u0022\u003EBinding a component property\u003C/a\u003E). Since it is in the component\u0027s binding registry, the developer\u0027s \u003Ccode\u003EreState()\u003C/code\u003E call reaches it; plain data works as well as reactive data.\u003C/li\u003E\n\u003Cli\u003EThe value is passed on if it differs from the last one read (\u003Ccode\u003EObject.is\u003C/code\u003E). A \u003Ccode\u003EreState()\u003C/code\u003E that finds the same value does not spoil what the user did in the meantime (the text they typed, the day they moved to).\u003C/li\u003E\n\u003Cli\u003EA property assigned from code stops tracking its function.\u003C/li\u003E\n\u003Cli\u003ETo draw a property, a list of appliers is used, not an effect: the value is applied now and on every change, without tracking. No effect is created at all for a property given as a plain value.\u003C/li\u003E\n\u003Cli\u003EData objects whose fields can be functions (menu items, toolbar items, summary items): all the fields of a source are read by \u003Cstrong\u003Ea single\u003C/strong\u003E binding, the values read are stored, and drawing is done from them. The developer\u0027s function is not called again while drawing; a function that returns a new node would produce a new node on every draw.\u003C/li\u003E\n\u003Cli\u003EA value that the user changes too (a text box, a list, a checkbox) is given to the control only when its source changes, not on every draw; otherwise what the user typed gets overwritten:\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022\u003E\u003Ccode\u003Econst handed = new WeakMap\u0026lt;object, { value: unknown }\u0026gt;();\nexport function handOver\u0026lt;V\u0026gt;(control: { value: V }, value: V) {\n  const last = handed.get(control);\n  if (last \u0026amp;\u0026amp; Object.is(last.value, value)) return;\n  handed.set(control, { value });\n  control.value = value;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022nothing-followed-inside\u0022\u003ENothing is tracked inside\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EA change is announced where it is made.\u003C/strong\u003E Every piece of the component\u0027s state calls \u003Ccode\u003Etell(name)\u003C/code\u003E. The names are collected and announced once per round; every view redraws the parts that the announced names concern. Nothing watches the state.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe component\u0027s response to a change runs before the views.\u003C/strong\u003E Reloading, re-laying out and closing an editor run first; what they announce joins the same round, and the views draw once.\n\u003Cul\u003E\n\u003Cli\u003ESuch a response runs when the values it reads differ from the ones it read last.\u003C/li\u003E\n\u003Cli\u003EStable values are compared: objects and \u003Ccode\u003EMap\u003C/code\u003Es rebuilt on every read never come out equal, so they are keyed as JSON.\u003C/li\u003E\n\u003Cli\u003ECounters, such as a \u0026quot;read again\u0026quot; counter, go into the key too.\u003C/li\u003E\n\u003C/ul\u003E\n\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EOnly a real change is announced.\u003C/strong\u003E A notification announced on every draw is a loop (draw, announce, draw) and can lock up a browser tab.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EParts drawn by hand are components built in code.\u003C/strong\u003E JSX is not used there: the compiler turns every expression that reads a variable, even an attribute, into a binding. There is no \u003Ccode\u003Ebindings.watch\u003C/code\u003E or free \u003Ccode\u003Eeffect()\u003C/code\u003E either. On a data grid page:\n\u003Cul\u003E\n\u003Cli\u003Ebindings went down from 1,306 to 87;\u003C/li\u003E\n\u003Cli\u003Eeffects running at startup went down from 2,478 to 346;\u003C/li\u003E\n\u003Cli\u003Ea sort now runs no effects at all (140 before).\u003C/li\u003E\n\u003C/ul\u003E\n\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EReactive state can stay for the application.\u003C/strong\u003E An API documented as \u0026quot;reactive\u0026quot; (a total, the number of selected rows) can keep its store for the application\u0027s own bindings; the component never reads it with tracking.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EA language or locale change is an event\u003C/strong\u003E, not a signal. Every control subscribes once and draws its texts and formats now and on every change; the subscription goes away with the control:\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022\u003E\u003Ccode\u003Eexport function onLanguage(component: ComponentBase, draw: () =\u0026gt; void) {\n  untracked(draw);\n  const changed = uiLocale.onChanged(() =\u0026gt; !component.isDisposed \u0026amp;\u0026amp; untracked(draw));\n  component.motif.setDisposable(() =\u0026gt; changed.dispose());\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EContent that does not change is built once.\u003C/strong\u003E \u003Ccode\u003E{cond \u0026amp;\u0026amp; \u0026lt;X/\u0026gt;}\u003C/code\u003E and \u003Ccode\u003E.map\u003C/code\u003E rows given a \u003Ccode\u003Ekey\u003C/code\u003E open bindings per item. Content that does not change can be built once with \u003Ccode\u003Econtrols.add\u003C/code\u003E inside \u003Ccode\u003EonConfig\u003C/code\u003E or \u003Ccode\u003EinitializeComponent\u003C/code\u003E. On a documentation page, this brought the page\u0027s effect count down from 16 thousand to 10 thousand.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022component-tree\u0022\u003EThe component\u0027s tree\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eview()\u003C/code\u003E returns a single \u003Ccode\u003EComponentBase\u003C/code\u003E. Several parts are put inside \u003Ccode\u003EmotifFragment()\u003C/code\u003E; \u003Ccode\u003E\u0026lt;\u0026gt;…\u0026lt;/\u0026gt;\u003C/code\u003E compiles to this too.\u003C/li\u003E\n\u003Cli\u003EParts that have to be direct children of the element (header cells, moved rows) are not returned from \u003Ccode\u003Eview()\u003C/code\u003E; they are added inside \u003Ccode\u003EinitializeComponent\u003C/code\u003E (an override).\u003C/li\u003E\n\u003Cli\u003EKeyed parts are matched by hand. A node that is already in place is never moved: moving the focused element takes away its focus.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Econtrols.remove(part)\u003C/code\u003E takes the part out right away. \u003Ccode\u003Epart.dispose()\u003C/code\u003E removes its element one round later; a draw made right after that still finds the element.\u003C/li\u003E\n\u003Cli\u003EA part that is shown and hidden in place, like \u003Ccode\u003Ex-display\u003C/code\u003E, swaps places with a comment placeholder and is put back there. The placeholder needs a parent, which is why the top-level parts are drawn for the first time inside \u003Ccode\u003EonBuilt\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022change-checked-writes\u0022\u003EWriting only on change\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003ERewriting an attribute, a style or a text even with the same value makes the browser recalculate styles. Hand-drawing code that rewrote unchanged attributes on every draw did five times the style calculation of the reactive code it replaced. A value is written only when it changes.\u003C/li\u003E\n\u003Cli\u003EReplacing a constructable stylesheet (\u003Ccode\u003EreplaceSync\u003C/code\u003E) with the same text invalidates the styles of the whole document. A grid that rewrote the column stylesheet on every step while a column was being widened spent 60–110 ms per step. When the sheet was written only when its text changed, the long tasks went away.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022lifetime\u0022\u003ELifetime\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EDisposing a component sets its own fields to \u003Ccode\u003Eundefined\u003C/code\u003E. Callbacks that arrive later (timers, promises, observers, a deferred draw) check \u003Ccode\u003EisDisposed\u003C/code\u003E first.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EonDisposing\u003C/code\u003E runs before the element leaves the DOM, and removing a focused element triggers \u003Ccode\u003Efocusout\u003C/code\u003E. So a \u003Ccode\u003Efocusout\u003C/code\u003E handler can run on a component that is being disposed.\u003C/li\u003E\n\u003Cli\u003EIf focus has to move away from a control that is being hidden or deactivated, the next control is focused with \u003Ccode\u003Efocus({ preventScroll: true })\u003C/code\u003E; otherwise the page scrolls to it.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref\u003C/code\u003E callbacks run inside the base constructor, before the subclass\u0027s field initializers. State a \u003Ccode\u003Eref\u003C/code\u003E may touch is kept not in class fields but in a symbol-keyed object created when needed.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022long-work\u0022\u003ELong work\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003EPromise.then\u003C/code\u003E and \u003Ccode\u003EqueueMicrotask\u003C/code\u003E do not let the browser paint; a chain of microtasks is still a single long task. Long work is split into pieces with macrotasks (\u003Ccode\u003EsetTimeout\u003C/code\u003E, \u003Ccode\u003EMessageChannel\u003C/code\u003E). Measured:\n\u003Cul\u003E\n\u003Cli\u003Ewith microtasks, a single 300 ms long task;\u003C/li\u003E\n\u003Cli\u003Ewith \u003Ccode\u003EsetTimeout\u003C/code\u003E pieces, no long task at all, and 18 painted frames.\u003C/li\u003E\n\u003C/ul\u003E\n\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022checking\u0022\u003EChecking the work\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EBindings are counted per component type by walking the component tree (\u003Ca href=\u0022/docs/devtools\u0022\u003EDevTools\u003C/a\u003E \u003Ccode\u003Einspect(path).bindings\u003C/code\u003E); counting only live effects is not enough. A binding that tracks a prop has no effect owner and does not show up in the effect count.\u003C/li\u003E\n\u003Cli\u003EWhile a view is being rewritten, the old and the new version are compared pixel by pixel on every page of that view. At every step the tests and e2e checks are kept green, and the drop in the effect count is proven.\u003C/li\u003E\n\u003Cli\u003EAn e2e check that reads the page right after \u003Ccode\u003Eload\u003C/code\u003E waits for the content first: pages draw their sections after \u003Ccode\u003Eload\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo publish the library, go on to the \u003Ca href=\u0022/docs/publishing-libraries\u0022\u003EPublishing an npm Library for MotifJS\u003C/a\u003E page.\u003C/p\u003E\n","headings":[{"id":"three-ways-in","text":"Three ways in","level":2},{"id":"props","text":"Props: a value or a function, tracked by a single binding","level":2},{"id":"nothing-followed-inside","text":"Nothing is tracked inside","level":2},{"id":"component-tree","text":"The component\u0027s tree","level":2},{"id":"change-checked-writes","text":"Writing only on change","level":2},{"id":"lifetime","text":"Lifetime","level":2},{"id":"long-work","text":"Long work","level":2},{"id":"checking","text":"Checking the work","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"devtools-packages","title":"DevTools for Packages"},"next":{"slug":"api-reference","title":"API Reference"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Guides</p>
+        <h1>Writing a Component Library</h1>
+        <p>Rules for a component library that applications use; props tracked by a single binding, the developer&#x27;s data used as it is, nothing tracked inside the component, parts drawn by hand, writing only on change, lifetime traps and measuring.</p>
+<p>A component library (controls, a data grid, a scheduler) is used in applications it does not know, and often with thousands of its parts on a single page. Application code can lean on reactivity; library code should not. The rules on this page were worked out by writing a complete kit and measuring it. Read the <a href="/docs/component-creation">Creating Components</a> and <a href="/docs/component-bindings">bindings</a> pages first.</p>
+<h2 id="three-ways-in">Three ways in</h2>
+<p>A library component listens to only three things:</p>
+<ol>
+<li><strong>Its props:</strong> each one a value or a function (<code>Bind&lt;T&gt;</code>).</li>
+<li><strong>The developer's data:</strong> used as it is. The same objects are kept and handed back; they are not wrapped with <code>reactive()</code>, copied or transformed. A change made in place is read again with <code>reState()</code> or an explicit <code>refresh()</code>.</li>
+<li><strong>The developer's <code>reState()</code> call.</strong></li>
+</ol>
+<p>Everything else is the component's own state, and the component draws it by hand.</p>
+<h2 id="props">Props: a value or a function, tracked by a single binding</h2>
+<ul>
+<li>Every prop and every property setter takes a value or a function. A function is tracked by <strong>a single</strong> binding of the component. This binding is registered with <code>bindings.add(binding)</code> (the <code>IBaseBinding</code> shape; see <a href="/docs/component-bindings#component-property">Binding a component property</a>). Since it is in the component's binding registry, the developer's <code>reState()</code> call reaches it; plain data works as well as reactive data.</li>
+<li>The value is passed on if it differs from the last one read (<code>Object.is</code>). A <code>reState()</code> that finds the same value does not spoil what the user did in the meantime (the text they typed, the day they moved to).</li>
+<li>A property assigned from code stops tracking its function.</li>
+<li>To draw a property, a list of appliers is used, not an effect: the value is applied now and on every change, without tracking. No effect is created at all for a property given as a plain value.</li>
+<li>Data objects whose fields can be functions (menu items, toolbar items, summary items): all the fields of a source are read by <strong>a single</strong> binding, the values read are stored, and drawing is done from them. The developer's function is not called again while drawing; a function that returns a new node would produce a new node on every draw.</li>
+<li>A value that the user changes too (a text box, a list, a checkbox) is given to the control only when its source changes, not on every draw; otherwise what the user typed gets overwritten:</li>
+</ul>
+<div class="doc-code">
+<pre data-lang="ts"><code>const handed = new WeakMap&lt;object, { value: unknown }&gt;();
+export function handOver&lt;V&gt;(control: { value: V }, value: V) {
+  const last = handed.get(control);
+  if (last &amp;&amp; Object.is(last.value, value)) return;
+  handed.set(control, { value });
+  control.value = value;
+}</code></pre>
+</div>
+<h2 id="nothing-followed-inside">Nothing is tracked inside</h2>
+<ul>
+<li><strong>A change is announced where it is made.</strong> Every piece of the component's state calls <code>tell(name)</code>. The names are collected and announced once per round; every view redraws the parts that the announced names concern. Nothing watches the state.</li>
+<li><strong>The component's response to a change runs before the views.</strong> Reloading, re-laying out and closing an editor run first; what they announce joins the same round, and the views draw once.
+<ul>
+<li>Such a response runs when the values it reads differ from the ones it read last.</li>
+<li>Stable values are compared: objects and <code>Map</code>s rebuilt on every read never come out equal, so they are keyed as JSON.</li>
+<li>Counters, such as a &quot;read again&quot; counter, go into the key too.</li>
+</ul>
+</li>
+<li><strong>Only a real change is announced.</strong> A notification announced on every draw is a loop (draw, announce, draw) and can lock up a browser tab.</li>
+<li><strong>Parts drawn by hand are components built in code.</strong> JSX is not used there: the compiler turns every expression that reads a variable, even an attribute, into a binding. There is no <code>bindings.watch</code> or free <code>effect()</code> either. On a data grid page:
+<ul>
+<li>bindings went down from 1,306 to 87;</li>
+<li>effects running at startup went down from 2,478 to 346;</li>
+<li>a sort now runs no effects at all (140 before).</li>
+</ul>
+</li>
+<li><strong>Reactive state can stay for the application.</strong> An API documented as &quot;reactive&quot; (a total, the number of selected rows) can keep its store for the application's own bindings; the component never reads it with tracking.</li>
+<li><strong>A language or locale change is an event</strong>, not a signal. Every control subscribes once and draws its texts and formats now and on every change; the subscription goes away with the control:</li>
+</ul>
+<div class="doc-code">
+<pre data-lang="ts"><code>export function onLanguage(component: ComponentBase, draw: () =&gt; void) {
+  untracked(draw);
+  const changed = uiLocale.onChanged(() =&gt; !component.isDisposed &amp;&amp; untracked(draw));
+  component.motif.setDisposable(() =&gt; changed.dispose());
+}</code></pre>
+</div>
+<ul>
+<li><strong>Content that does not change is built once.</strong> <code>{cond &amp;&amp; &lt;X/&gt;}</code> and <code>.map</code> rows given a <code>key</code> open bindings per item. Content that does not change can be built once with <code>controls.add</code> inside <code>onConfig</code> or <code>initializeComponent</code>. On a documentation page, this brought the page's effect count down from 16 thousand to 10 thousand.</li>
+</ul>
+<h2 id="component-tree">The component's tree</h2>
+<ul>
+<li><code>view()</code> returns a single <code>ComponentBase</code>. Several parts are put inside <code>motifFragment()</code>; <code>&lt;&gt;…&lt;/&gt;</code> compiles to this too.</li>
+<li>Parts that have to be direct children of the element (header cells, moved rows) are not returned from <code>view()</code>; they are added inside <code>initializeComponent</code> (an override).</li>
+<li>Keyed parts are matched by hand. A node that is already in place is never moved: moving the focused element takes away its focus.</li>
+<li><code>controls.remove(part)</code> takes the part out right away. <code>part.dispose()</code> removes its element one round later; a draw made right after that still finds the element.</li>
+<li>A part that is shown and hidden in place, like <code>x-display</code>, swaps places with a comment placeholder and is put back there. The placeholder needs a parent, which is why the top-level parts are drawn for the first time inside <code>onBuilt</code>.</li>
+</ul>
+<h2 id="change-checked-writes">Writing only on change</h2>
+<ul>
+<li>Rewriting an attribute, a style or a text even with the same value makes the browser recalculate styles. Hand-drawing code that rewrote unchanged attributes on every draw did five times the style calculation of the reactive code it replaced. A value is written only when it changes.</li>
+<li>Replacing a constructable stylesheet (<code>replaceSync</code>) with the same text invalidates the styles of the whole document. A grid that rewrote the column stylesheet on every step while a column was being widened spent 60–110 ms per step. When the sheet was written only when its text changed, the long tasks went away.</li>
+</ul>
+<h2 id="lifetime">Lifetime</h2>
+<ul>
+<li>Disposing a component sets its own fields to <code>undefined</code>. Callbacks that arrive later (timers, promises, observers, a deferred draw) check <code>isDisposed</code> first.</li>
+<li><code>onDisposing</code> runs before the element leaves the DOM, and removing a focused element triggers <code>focusout</code>. So a <code>focusout</code> handler can run on a component that is being disposed.</li>
+<li>If focus has to move away from a control that is being hidden or deactivated, the next control is focused with <code>focus({ preventScroll: true })</code>; otherwise the page scrolls to it.</li>
+<li><code>ref</code> callbacks run inside the base constructor, before the subclass's field initializers. State a <code>ref</code> may touch is kept not in class fields but in a symbol-keyed object created when needed.</li>
+</ul>
+<h2 id="long-work">Long work</h2>
+<ul>
+<li><code>Promise.then</code> and <code>queueMicrotask</code> do not let the browser paint; a chain of microtasks is still a single long task. Long work is split into pieces with macrotasks (<code>setTimeout</code>, <code>MessageChannel</code>). Measured:
+<ul>
+<li>with microtasks, a single 300 ms long task;</li>
+<li>with <code>setTimeout</code> pieces, no long task at all, and 18 painted frames.</li>
+</ul>
+</li>
+</ul>
+<h2 id="checking">Checking the work</h2>
+<ul>
+<li>Bindings are counted per component type by walking the component tree (<a href="/docs/devtools">DevTools</a> <code>inspect(path).bindings</code>); counting only live effects is not enough. A binding that tracks a prop has no effect owner and does not show up in the effect count.</li>
+<li>While a view is being rewritten, the old and the new version are compared pixel by pixel on every page of that view. At every step the tests and e2e checks are kept green, and the drop in the effect count is proven.</li>
+<li>An e2e check that reads the page right after <code>load</code> waits for the content first: pages draw their sections after <code>load</code>.</li>
+</ul>
+<h2 id="next">Next step</h2>
+<p>To publish the library, go on to the <a href="/docs/publishing-libraries">Publishing an npm Library for MotifJS</a> page.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

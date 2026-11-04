@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Creating a component from start to finish: definition, element, content, props and use, in the class, function and Options forms.">
+    <title>Creating Components — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/component-creation">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-creation">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-creation">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-creation">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/component-creation">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Creating Components">
+    <meta property="og:description" content="Creating a component from start to finish: definition, element, content, props and use, in the class, function and Options forms.">
+    <script type="application/json" id="doc-data">{"slug":"component-creation","locale":"en","title":"Creating Components","description":"Creating a component from start to finish: definition, element, content, props and use, in the class, function and Options forms.","category":{"id":"2","title":"Core concepts"},"html":"\u003Cp\u003EThis page builds the row of the notes list, the \u003Ccode\u003ENoteRow\u003C/code\u003E component, from start to finish. The code is shown according to the code choices on the page: the writing form, the component style and the language. \u003Ccode\u003ENote\u003C/code\u003E, \u003Ccode\u003EFolder\u003C/code\u003E and \u003Ccode\u003ENotesService\u003C/code\u003E come from the \u003Ccode\u003Esrc/services/notes.ts\u003C/code\u003E file on the \u003Ca href=\u0022/docs/components\u0022\u003EComponents\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch2 id=\u0022writing\u0022\u003EWriting the component\u003C/h2\u003E\n\u003Cp\u003EA component has four parts:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EDefinition:\u003C/strong\u003E a class that derives from \u003Ccode\u003EComponent\u003C/code\u003E, a function that returns a component, or a function that returns an object written with \u003Ccode\u003EmotifOptions\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EElement:\u003C/strong\u003E the row\u0027s element is an \u003Ccode\u003E\u0026lt;a\u0026gt;\u003C/code\u003E. In a class, the element is declared on the class: with the \u003Ccode\u003EComponent\u0026lt;HTMLAnchorElement\u0026gt;\u003C/code\u003E generic in TypeScript, and with \u003Ccode\u003Estatic elementTag = \u0026quot;a\u0026quot;\u003C/code\u003E in JavaScript. In a function the element is the returned root, and in Options it is the \u003Ccode\u003Eel\u003C/code\u003E field. If no element is declared, the component has no element (see \u003Ca href=\u0022/docs/components#root-element\u0022\u003ERoot element\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EContent:\u003C/strong\u003E in a class and in Options, \u003Ccode\u003Eview()\u003C/code\u003E returns the content that goes inside the element. The element\u0027s own class and attributes are given in \u003Ccode\u003EonConfigured\u003C/code\u003E with \u003Ccode\u003Ethis.class\u003C/code\u003E and \u003Ccode\u003Ethis.attr\u003C/code\u003E. A function builds the root together with its content itself.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EData:\u003C/strong\u003E the note and the folder arrive through props: \u003Ccode\u003Ethis.props\u003C/code\u003E in a class, the parameter in a function, and the factory\u0027s parameter in Options. A read made inside a function such as \u003Ccode\u003E() =\u0026gt; note.title …\u003C/code\u003E is live; when the note changes, only that text or class is updated.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EThe row reads the open note from the router\u0027s parameter and marks that row with the \u003Ccode\u003Eactive\u003C/code\u003E class:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteRow extends Component\u0026lt;HTMLAnchorElement, { note: Note; folder: Folder }\u0026gt; {\n  nav = useNavigation();\n\n  get open() {\n    return this.nav.params.id === String(this.props.note.id);\n  }\n\n  override onConfigured() {\n    const { note, folder } = this.props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  }\n\n  override view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;b\u0026gt;\n          \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Pinned\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n          \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n        \u0026lt;/b\u0026gt;\n        \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n        \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;}\u0026lt;/p\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteRow extends Component\u0026lt;HTMLAnchorElement, { note: Note; folder: Folder }\u0026gt; {\n  static override elementTag = \u0026quot;a\u0026quot;;\n  nav = useNavigation();\n\n  get open() {\n    return this.nav.params.id === String(this.props.note.id);\n  }\n\n  override onConfigured() {\n    const { note, folder } = this.props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  }\n\n  override view() {\n    const { note } = this.props;\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b: ComponentBase) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i: ComponentBase) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time: ComponentBase) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;));\n    return motifFragment({ childs: [title, when, preview] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteRow(props: { note: Note; folder: Folder }) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n  return (\n    \u0026lt;a\n      rel=\u0026quot;router\u0026quot;\n      href={\u0060/${folder}/${note.id}\u0060}\n      class={() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060}\n      aria-current={() =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null)}\n    \u0026gt;\n      \u0026lt;b\u0026gt;\n        \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Pinned\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n      \u0026lt;/b\u0026gt;\n      \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n      \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;}\u0026lt;/p\u0026gt;\n    \u0026lt;/a\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteRow(props: { note: Note; folder: Folder }) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n\n  return motifComponent(\u0026quot;a\u0026quot;, (row: ComponentBase) =\u0026gt; {\n    row.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null) });\n    row.class.add(() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b: ComponentBase) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i: ComponentBase) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time: ComponentBase) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;));\n\n    row.controls.add(title, when, preview);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteRow.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteRow = (props: { note: Note; folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;a\u0026quot;,\n  nav: useNavigation(),\n\n  get open() {\n    return this.nav.params.id === String(props.note.id);\n  },\n\n  onConfigured() {\n    const { note, folder } = props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  },\n\n  view() {\n    const { note } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;b\u0026gt;\n          \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Pinned\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n          \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n        \u0026lt;/b\u0026gt;\n        \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n        \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;}\u0026lt;/p\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteRow.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifFragment, motifOptions, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Folder, Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteRow = (props: { note: Note; folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;a\u0026quot;,\n  nav: useNavigation(),\n\n  get open() {\n    return this.nav.params.id === String(props.note.id);\n  },\n\n  onConfigured() {\n    const { note, folder } = props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  },\n\n  view() {\n    const { note } = props;\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b: ComponentBase) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i: ComponentBase) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i: ComponentBase) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time: ComponentBase) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;));\n    return motifFragment({ childs: [title, when, preview] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteRow.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteRow extends Component {\n  static elementTag = \u0026quot;a\u0026quot;;\n  nav = useNavigation();\n\n  get open() {\n    return this.nav.params.id === String(this.props.note.id);\n  }\n\n  onConfigured() {\n    const { note, folder } = this.props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  }\n\n  view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;b\u0026gt;\n          \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Pinned\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n          \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n        \u0026lt;/b\u0026gt;\n        \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n        \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;}\u0026lt;/p\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteRow extends Component {\n  static elementTag = \u0026quot;a\u0026quot;;\n  nav = useNavigation();\n\n  get open() {\n    return this.nav.params.id === String(this.props.note.id);\n  }\n\n  onConfigured() {\n    const { note, folder } = this.props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  }\n\n  view() {\n    const { note } = this.props;\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;));\n    return motifFragment({ childs: [title, when, preview] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteRow.jsx\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteRow(props) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n  return (\n    \u0026lt;a\n      rel=\u0026quot;router\u0026quot;\n      href={\u0060/${folder}/${note.id}\u0060}\n      class={() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060}\n      aria-current={() =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null)}\n    \u0026gt;\n      \u0026lt;b\u0026gt;\n        \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Pinned\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n        \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n      \u0026lt;/b\u0026gt;\n      \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n      \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;}\u0026lt;/p\u0026gt;\n    \u0026lt;/a\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteRow(props) {\n  const nav = useNavigation();\n  const { note, folder } = props;\n  const open = () =\u0026gt; nav.params.id === String(note.id);\n\n  return motifComponent(\u0026quot;a\u0026quot;, (row) =\u0026gt; {\n    row.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (open() ? \u0026quot;page\u0026quot; : null) });\n    row.class.add(() =\u0026gt; \u0060row${open() ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;));\n\n    row.controls.add(title, when, preview);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteRow.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteRow = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;a\u0026quot;,\n  nav: useNavigation(),\n\n  get open() {\n    return this.nav.params.id === String(props.note.id);\n  },\n\n  onConfigured() {\n    const { note, folder } = props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  },\n\n  view() {\n    const { note } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;b\u0026gt;\n          \u0026lt;i class=\u0026quot;pin\u0026quot; aria-label=\u0026quot;Pinned\u0026quot; x-display={() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived}\u0026gt;\u0026lt;/i\u0026gt;\n          \u0026lt;span\u0026gt;{() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;}\u0026lt;/span\u0026gt;\n        \u0026lt;/b\u0026gt;\n        \u0026lt;time\u0026gt;{() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)}\u0026lt;/time\u0026gt;\n        \u0026lt;p\u0026gt;{() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;}\u0026lt;/p\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteRow.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteRow = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;a\u0026quot;,\n  nav: useNavigation(),\n\n  get open() {\n    return this.nav.params.id === String(props.note.id);\n  },\n\n  onConfigured() {\n    const { note, folder } = props;\n    this.attr.add({ rel: \u0026quot;router\u0026quot;, href: \u0060/${folder}/${note.id}\u0060, \u0026quot;aria-current\u0026quot;: () =\u0026gt; (this.open ? \u0026quot;page\u0026quot; : null) });\n    this.class.add(() =\u0026gt; \u0060row${this.open ? \u0026quot; active\u0026quot; : \u0026quot;\u0026quot;}${note.title.trim() ? \u0026quot;\u0026quot; : \u0026quot; untitled\u0026quot;}\u0060);\n  },\n\n  view() {\n    const { note } = props;\n    const title = motifComponent(\u0026quot;b\u0026quot;, (b) =\u0026gt; {\n      const pin = motifComponent(\u0026quot;i\u0026quot;, {\n        preconfig: (i) =\u0026gt; i.bindings.display(() =\u0026gt; note.pinned \u0026amp;\u0026amp; !note.archived),\n        initializeComponent: (i) =\u0026gt; {\n          i.class.add(\u0026quot;pin\u0026quot;);\n          i.attr.add({ \u0026quot;aria-label\u0026quot;: \u0026quot;Pinned\u0026quot; });\n        },\n      });\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.bindings.text(() =\u0026gt; note.title.trim() || \u0026quot;Untitled\u0026quot;));\n      b.controls.add(pin, label);\n    });\n    const when = motifComponent(\u0026quot;time\u0026quot;, (time) =\u0026gt; time.bindings.text(() =\u0026gt; new Date(note.updatedAt).toLocaleDateString(\u0026quot;tr-TR\u0026quot;)));\n    const preview = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; p.bindings.text(() =\u0026gt; note.body.split(\u0026quot;\\n\u0026quot;)[0] || \u0026quot;No text\u0026quot;));\n    return motifFragment({ childs: [title, when, preview] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022using\u0022\u003EUsing the component\u003C/h2\u003E\n\u003Cp\u003EA component is created where it is used, together with its props. In JSX writing the tag is enough; the compiler turns the tag into a \u003Ccode\u003EmotifComponent(NoteRow, { note, folder })\u003C/code\u003E call. Without JSX, a class is created with \u003Ccode\u003Enew\u003C/code\u003E, and function and Options components with \u003Ccode\u003EmotifComponent\u003C/code\u003E; \u003Ccode\u003EmotifComponent\u003C/code\u003E accepts a class as well.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={this.folder} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={folder()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Enew NoteRow({ note, folder: this.folder });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: this.folder });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: folder() });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={this.folder} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;NoteRow note={note} folder={folder()} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Enew NoteRow({ note, folder: this.folder });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: this.folder });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003EmotifComponent(NoteRow, { note, folder: folder() });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the function component, \u003Ccode\u003Efolder()\u003C/code\u003E is a local function that returns the folder.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EA created component becomes visible once it is placed somewhere:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EIn JSX, where the tag is written.\u003C/li\u003E\n\u003Cli\u003EIn code, through a parent\u0027s \u003Ccode\u003Econtrols.add(...)\u003C/code\u003E call (see \u003Ca href=\u0022/docs/component-tree#controls\u0022\u003E\u003Ccode\u003Econtrols\u003C/code\u003E\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003EAs the application\u0027s root, with \u003Ccode\u003Eapp.run(\u0026quot;#app\u0026quot;, component)\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EIn a route\u0027s \u003Ccode\u003Econtrol\u003C/code\u003E field: the router creates the page component itself when the address matches (see \u003Ca href=\u0022/docs/routes#route-item-fields\u0022\u003EThe Route Table\u003C/a\u003E).\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022create-and-build\u0022\u003ECreation and building\u003C/h2\u003E\n\u003Cp\u003ECreating and building are separate steps. The component\u0027s element is prepared when it is created: in the constructor for a class, and when the function is called for function and Options components. The content arrives once, when the component is built (\u003Ccode\u003Ebuild()\u003C/code\u003E): \u003Ccode\u003Eview()\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E and the children run at that point. A component added to a parent that is already built is built right away, and a component added to a parent that is not built yet is built together with its parent.\u003C/p\u003E\n\u003Cp\u003EThat is why \u003Ccode\u003Ethis.element\u003C/code\u003E exists in a field initializer and in the constructor, but it is empty. Code that touches the content goes in \u003Ccode\u003EonBuilt\u003C/code\u003E, and code that needs the element to be attached to the document (focus, measurements) goes in \u003Ccode\u003EonMounted\u003C/code\u003E (see \u003Ca href=\u0022/docs/lifecycle#hooks\u0022\u003ELifecycle\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003EEvery argument form that \u003Ccode\u003Enew Component\u003C/code\u003E and \u003Ccode\u003EmotifComponent\u003C/code\u003E accept without JSX, components without an element, and the keys of the props object are on the \u003Ca href=\u0022/docs/imperative#new-component\u0022\u003EViews without JSX\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo give a component data and content, go on to \u003Ca href=\u0022/docs/component-props\u0022\u003EProps and Children\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"writing","text":"Writing the component","level":2},{"id":"using","text":"Using the component","level":2},{"id":"create-and-build","text":"Creation and building","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"components","title":"Components"},"next":{"slug":"component-props","title":"Props and Children"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Core concepts</p>
+        <h1>Creating Components</h1>
+        <p>Creating a component from start to finish: definition, element, content, props and use, in the class, function and Options forms.</p>
+<p>This page builds the row of the notes list, the <code>NoteRow</code> component, from start to finish. The code is shown according to the code choices on the page: the writing form, the component style and the language. <code>Note</code>, <code>Folder</code> and <code>NotesService</code> come from the <code>src/services/notes.ts</code> file on the <a href="/docs/components">Components</a> page.</p>
+<h2 id="writing">Writing the component</h2>
+<p>A component has four parts:</p>
+<ul>
+<li><strong>Definition:</strong> a class that derives from <code>Component</code>, a function that returns a component, or a function that returns an object written with <code>motifOptions</code>.</li>
+<li><strong>Element:</strong> the row's element is an <code>&lt;a&gt;</code>. In a class, the element is declared on the class: with the <code>Component&lt;HTMLAnchorElement&gt;</code> generic in TypeScript, and with <code>static elementTag = &quot;a&quot;</code> in JavaScript. In a function the element is the returned root, and in Options it is the <code>el</code> field. If no element is declared, the component has no element (see <a href="/docs/components#root-element">Root element</a>).</li>
+<li><strong>Content:</strong> in a class and in Options, <code>view()</code> returns the content that goes inside the element. The element's own class and attributes are given in <code>onConfigured</code> with <code>this.class</code> and <code>this.attr</code>. A function builds the root together with its content itself.</li>
+<li><strong>Data:</strong> the note and the folder arrive through props: <code>this.props</code> in a class, the parameter in a function, and the factory's parameter in Options. A read made inside a function such as <code>() =&gt; note.title …</code> is live; when the note changes, only that text or class is updated.</li>
+</ul>
+<p>The row reads the open note from the router's parameter and marks that row with the <code>active</code> class:</p>
+<div class="doc-code" data-file="src/parts/NoteRow.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteRow.tsx"><code>import { Component, useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export class NoteRow extends Component&lt;HTMLAnchorElement, { note: Note; folder: Folder }&gt; {
+  nav = useNavigation();
+
+  get open() {
+    return this.nav.params.id === String(this.props.note.id);
+  }
+
+  override onConfigured() {
+    const { note, folder } = this.props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  }
+
+  override view() {
+    const { note } = this.props;
+    return (
+      &lt;&gt;
+        &lt;b&gt;
+          &lt;i class=&quot;pin&quot; aria-label=&quot;Pinned&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+          &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+        &lt;/b&gt;
+        &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+        &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;}&lt;/p&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteRow.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment, useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export class NoteRow extends Component&lt;HTMLAnchorElement, { note: Note; folder: Folder }&gt; {
+  static override elementTag = &quot;a&quot;;
+  nav = useNavigation();
+
+  get open() {
+    return this.nav.params.id === String(this.props.note.id);
+  }
+
+  override onConfigured() {
+    const { note, folder } = this.props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  }
+
+  override view() {
+    const { note } = this.props;
+    const title = motifComponent(&quot;b&quot;, (b: ComponentBase) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i: ComponentBase) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time: ComponentBase) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;));
+    return motifFragment({ childs: [title, when, preview] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteRow.tsx"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export function NoteRow(props: { note: Note; folder: Folder }) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+  return (
+    &lt;a
+      rel=&quot;router&quot;
+      href={`/${folder}/${note.id}`}
+      class={() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`}
+      aria-current={() =&gt; (open() ? &quot;page&quot; : null)}
+    &gt;
+      &lt;b&gt;
+        &lt;i class=&quot;pin&quot; aria-label=&quot;Pinned&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+        &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+      &lt;/b&gt;
+      &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+      &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;}&lt;/p&gt;
+    &lt;/a&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteRow.ts"><code>import { ComponentBase, motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export function NoteRow(props: { note: Note; folder: Folder }) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+
+  return motifComponent(&quot;a&quot;, (row: ComponentBase) =&gt; {
+    row.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (open() ? &quot;page&quot; : null) });
+    row.class.add(() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+
+    const title = motifComponent(&quot;b&quot;, (b: ComponentBase) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i: ComponentBase) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time: ComponentBase) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;));
+
+    row.controls.add(title, when, preview);
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteRow.tsx"><code>import { motifOptions, useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export const NoteRow = (props: { note: Note; folder: Folder }) =&gt; motifOptions({
+  el: &quot;a&quot;,
+  nav: useNavigation(),
+
+  get open() {
+    return this.nav.params.id === String(props.note.id);
+  },
+
+  onConfigured() {
+    const { note, folder } = props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  },
+
+  view() {
+    const { note } = props;
+    return (
+      &lt;&gt;
+        &lt;b&gt;
+          &lt;i class=&quot;pin&quot; aria-label=&quot;Pinned&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+          &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+        &lt;/b&gt;
+        &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+        &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;}&lt;/p&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteRow.ts"><code>import { ComponentBase, motifComponent, motifFragment, motifOptions, useNavigation } from &quot;@motifx/core&quot;;
+import type { Folder, Note } from &quot;../services/notes&quot;;
+
+export const NoteRow = (props: { note: Note; folder: Folder }) =&gt; motifOptions({
+  el: &quot;a&quot;,
+  nav: useNavigation(),
+
+  get open() {
+    return this.nav.params.id === String(props.note.id);
+  },
+
+  onConfigured() {
+    const { note, folder } = props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  },
+
+  view() {
+    const { note } = props;
+    const title = motifComponent(&quot;b&quot;, (b: ComponentBase) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i: ComponentBase) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i: ComponentBase) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time: ComponentBase) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;));
+    return motifFragment({ childs: [title, when, preview] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteRow.jsx"><code>import { Component, useNavigation } from &quot;@motifx/core&quot;;
+
+export class NoteRow extends Component {
+  static elementTag = &quot;a&quot;;
+  nav = useNavigation();
+
+  get open() {
+    return this.nav.params.id === String(this.props.note.id);
+  }
+
+  onConfigured() {
+    const { note, folder } = this.props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  }
+
+  view() {
+    const { note } = this.props;
+    return (
+      &lt;&gt;
+        &lt;b&gt;
+          &lt;i class=&quot;pin&quot; aria-label=&quot;Pinned&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+          &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+        &lt;/b&gt;
+        &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+        &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;}&lt;/p&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteRow.js"><code>import { Component, motifComponent, motifFragment, useNavigation } from &quot;@motifx/core&quot;;
+
+export class NoteRow extends Component {
+  static elementTag = &quot;a&quot;;
+  nav = useNavigation();
+
+  get open() {
+    return this.nav.params.id === String(this.props.note.id);
+  }
+
+  onConfigured() {
+    const { note, folder } = this.props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  }
+
+  view() {
+    const { note } = this.props;
+    const title = motifComponent(&quot;b&quot;, (b) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;));
+    return motifFragment({ childs: [title, when, preview] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteRow.jsx"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+
+export function NoteRow(props) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+  return (
+    &lt;a
+      rel=&quot;router&quot;
+      href={`/${folder}/${note.id}`}
+      class={() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`}
+      aria-current={() =&gt; (open() ? &quot;page&quot; : null)}
+    &gt;
+      &lt;b&gt;
+        &lt;i class=&quot;pin&quot; aria-label=&quot;Pinned&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+        &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+      &lt;/b&gt;
+      &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+      &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;}&lt;/p&gt;
+    &lt;/a&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteRow.js"><code>import { motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+
+export function NoteRow(props) {
+  const nav = useNavigation();
+  const { note, folder } = props;
+  const open = () =&gt; nav.params.id === String(note.id);
+
+  return motifComponent(&quot;a&quot;, (row) =&gt; {
+    row.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (open() ? &quot;page&quot; : null) });
+    row.class.add(() =&gt; `row${open() ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+
+    const title = motifComponent(&quot;b&quot;, (b) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;));
+
+    row.controls.add(title, when, preview);
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteRow.jsx"><code>import { motifOptions, useNavigation } from &quot;@motifx/core&quot;;
+
+export const NoteRow = (props) =&gt; motifOptions({
+  el: &quot;a&quot;,
+  nav: useNavigation(),
+
+  get open() {
+    return this.nav.params.id === String(props.note.id);
+  },
+
+  onConfigured() {
+    const { note, folder } = props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  },
+
+  view() {
+    const { note } = props;
+    return (
+      &lt;&gt;
+        &lt;b&gt;
+          &lt;i class=&quot;pin&quot; aria-label=&quot;Pinned&quot; x-display={() =&gt; note.pinned &amp;&amp; !note.archived}&gt;&lt;/i&gt;
+          &lt;span&gt;{() =&gt; note.title.trim() || &quot;Untitled&quot;}&lt;/span&gt;
+        &lt;/b&gt;
+        &lt;time&gt;{() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)}&lt;/time&gt;
+        &lt;p&gt;{() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;}&lt;/p&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteRow.js"><code>import { motifComponent, motifFragment, motifOptions, useNavigation } from &quot;@motifx/core&quot;;
+
+export const NoteRow = (props) =&gt; motifOptions({
+  el: &quot;a&quot;,
+  nav: useNavigation(),
+
+  get open() {
+    return this.nav.params.id === String(props.note.id);
+  },
+
+  onConfigured() {
+    const { note, folder } = props;
+    this.attr.add({ rel: &quot;router&quot;, href: `/${folder}/${note.id}`, &quot;aria-current&quot;: () =&gt; (this.open ? &quot;page&quot; : null) });
+    this.class.add(() =&gt; `row${this.open ? &quot; active&quot; : &quot;&quot;}${note.title.trim() ? &quot;&quot; : &quot; untitled&quot;}`);
+  },
+
+  view() {
+    const { note } = props;
+    const title = motifComponent(&quot;b&quot;, (b) =&gt; {
+      const pin = motifComponent(&quot;i&quot;, {
+        preconfig: (i) =&gt; i.bindings.display(() =&gt; note.pinned &amp;&amp; !note.archived),
+        initializeComponent: (i) =&gt; {
+          i.class.add(&quot;pin&quot;);
+          i.attr.add({ &quot;aria-label&quot;: &quot;Pinned&quot; });
+        },
+      });
+      const label = motifComponent(&quot;span&quot;, (span) =&gt; span.bindings.text(() =&gt; note.title.trim() || &quot;Untitled&quot;));
+      b.controls.add(pin, label);
+    });
+    const when = motifComponent(&quot;time&quot;, (time) =&gt; time.bindings.text(() =&gt; new Date(note.updatedAt).toLocaleDateString(&quot;tr-TR&quot;)));
+    const preview = motifComponent(&quot;p&quot;, (p) =&gt; p.bindings.text(() =&gt; note.body.split(&quot;\n&quot;)[0] || &quot;No text&quot;));
+    return motifFragment({ childs: [title, when, preview] });
+  },
+});</code></pre>
+</div>
+<h2 id="using">Using the component</h2>
+<p>A component is created where it is used, together with its props. In JSX writing the tag is enough; the compiler turns the tag into a <code>motifComponent(NoteRow, { note, folder })</code> call. Without JSX, a class is created with <code>new</code>, and function and Options components with <code>motifComponent</code>; <code>motifComponent</code> accepts a class as well.</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;NoteRow note={note} folder={this.folder} /&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>&lt;NoteRow note={note} folder={folder()} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/NotesLayout.ts"><code>new NoteRow({ note, folder: this.folder });</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>motifComponent(NoteRow, { note, folder: this.folder });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>motifComponent(NoteRow, { note, folder: folder() });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;NoteRow note={note} folder={this.folder} /&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>&lt;NoteRow note={note} folder={folder()} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/NotesLayout.js"><code>new NoteRow({ note, folder: this.folder });</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>motifComponent(NoteRow, { note, folder: this.folder });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>motifComponent(NoteRow, { note, folder: folder() });</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the function component, <code>folder()</code> is a local function that returns the folder.</p>
+</div>
+<p>A created component becomes visible once it is placed somewhere:</p>
+<ul>
+<li>In JSX, where the tag is written.</li>
+<li>In code, through a parent's <code>controls.add(...)</code> call (see <a href="/docs/component-tree#controls"><code>controls</code></a>).</li>
+<li>As the application's root, with <code>app.run(&quot;#app&quot;, component)</code>.</li>
+<li>In a route's <code>control</code> field: the router creates the page component itself when the address matches (see <a href="/docs/routes#route-item-fields">The Route Table</a>).</li>
+</ul>
+<h2 id="create-and-build">Creation and building</h2>
+<p>Creating and building are separate steps. The component's element is prepared when it is created: in the constructor for a class, and when the function is called for function and Options components. The content arrives once, when the component is built (<code>build()</code>): <code>view()</code>, <code>initializeComponent</code> and the children run at that point. A component added to a parent that is already built is built right away, and a component added to a parent that is not built yet is built together with its parent.</p>
+<p>That is why <code>this.element</code> exists in a field initializer and in the constructor, but it is empty. Code that touches the content goes in <code>onBuilt</code>, and code that needs the element to be attached to the document (focus, measurements) goes in <code>onMounted</code> (see <a href="/docs/lifecycle#hooks">Lifecycle</a>).</p>
+<p>Every argument form that <code>new Component</code> and <code>motifComponent</code> accept without JSX, components without an element, and the keys of the props object are on the <a href="/docs/imperative#new-component">Views without JSX</a> page.</p>
+<h2 id="next">Next step</h2>
+<p>To give a component data and content, go on to <a href="/docs/component-props">Props and Children</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

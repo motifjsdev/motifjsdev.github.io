@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://motifjs.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/about" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/about" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/about" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/about" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/about" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/about" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/index</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/index" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/index" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/index" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/index</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/index" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/index" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/index" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/getting-started</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/getting-started" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/getting-started" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/getting-started" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/getting-started</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/getting-started" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/getting-started" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/getting-started" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/components</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/components" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/components" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/components" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/components</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/components" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/components" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/components" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-creation</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-creation" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-creation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-creation" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-creation</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-creation" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-creation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-creation" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-props</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-props" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-props" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-props" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-props</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-props" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-props" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-props" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-tree</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-tree" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-tree" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-tree" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-tree</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-tree" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-tree" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-tree" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-element</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-element" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-element" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-element" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-element</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-element" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-element" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-element" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-motif</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-motif" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-motif" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-motif" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-motif</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-motif" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-motif" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-motif" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-bindings</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-bindings" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-bindings" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-bindings" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-bindings</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-bindings" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-bindings" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-bindings" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-state</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-state" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-state" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-state" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-state</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-state" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-state" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-state" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/using</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/using" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/using" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/using" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/using</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/using" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/using" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/using" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/do-work</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/do-work" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/do-work" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/do-work" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/do-work</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/do-work" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/do-work" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/do-work" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/jsx</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/jsx" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/jsx" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/jsx" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/jsx</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/jsx" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/jsx" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/jsx" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/imperative</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/imperative" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/imperative" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/imperative" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/imperative</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/imperative" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/imperative" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/imperative" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/reactivity</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/reactivity" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/reactivity" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/reactivity" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/reactivity</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/reactivity" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/reactivity" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/reactivity" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/conditionals-and-lists</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/conditionals-and-lists" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/conditionals-and-lists" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/conditionals-and-lists" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/conditionals-and-lists</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/conditionals-and-lists" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/conditionals-and-lists" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/conditionals-and-lists" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/events</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/events" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/events" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/events" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/events</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/events" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/events" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/events" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/forms</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/forms" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/forms" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/forms" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/forms</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/forms" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/forms" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/forms" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/lifecycle</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/lifecycle" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/lifecycle" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/lifecycle" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/lifecycle</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/lifecycle" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/lifecycle" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/lifecycle" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/styling-and-transitions</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/styling-and-transitions" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/styling-and-transitions" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/styling-and-transitions" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/styling-and-transitions</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/styling-and-transitions" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/styling-and-transitions" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/styling-and-transitions" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/memory-and-dispose</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/memory-and-dispose" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/memory-and-dispose" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/memory-and-dispose" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/memory-and-dispose</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/memory-and-dispose" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/memory-and-dispose" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/memory-and-dispose" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/error-handling</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/error-handling" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/error-handling" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/error-handling" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/error-handling</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/error-handling" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/error-handling" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/error-handling" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/resilience</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/resilience" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/resilience" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/resilience" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/resilience</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/resilience" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/resilience" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/resilience" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/windows</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/windows" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/windows" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/windows" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/windows</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/windows" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/windows" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/windows" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/routing</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/routing" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/routing" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/routing" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/routing</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/routing" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/routing" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/routing" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/routes</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/routes" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/routes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/routes" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/routes</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/routes" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/routes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/routes" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/router-view</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/router-view" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/router-view" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/router-view" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/router-view</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/router-view" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/router-view" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/router-view" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/router-links</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/router-links" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/router-links" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/router-links" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/router-links</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/router-links" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/router-links" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/router-links" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/navigation</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/navigation" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/navigation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/navigation" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/navigation</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/navigation" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/navigation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/navigation" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/route-guards</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/route-guards" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/route-guards" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/route-guards" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/route-guards</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/route-guards" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/route-guards" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/route-guards" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/navigation-stack</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/navigation-stack" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/navigation-stack" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/navigation-stack" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/navigation-stack</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/navigation-stack" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/navigation-stack" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/navigation-stack" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/dependency-injection</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/dependency-injection" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/dependency-injection" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/dependency-injection" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/dependency-injection</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/dependency-injection" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/dependency-injection" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/dependency-injection" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/service-registration</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-registration" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-registration" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-registration" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/service-registration</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-registration" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-registration" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-registration" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/service-lifetimes</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-lifetimes" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-lifetimes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-lifetimes" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/service-lifetimes</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-lifetimes" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-lifetimes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-lifetimes" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/service-resolution</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-resolution" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-resolution" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-resolution" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/service-resolution</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-resolution" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-resolution" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-resolution" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/service-disposal</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-disposal" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-disposal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-disposal" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/service-disposal</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-disposal" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-disposal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-disposal" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/package-authoring</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/package-authoring" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/package-authoring" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/package-authoring" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/package-authoring</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/package-authoring" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/package-authoring" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/package-authoring" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/wrapping-libraries</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/wrapping-libraries" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/wrapping-libraries" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/wrapping-libraries" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/wrapping-libraries</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/wrapping-libraries" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/wrapping-libraries" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/wrapping-libraries" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/publishing-libraries</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/publishing-libraries" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/publishing-libraries" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/publishing-libraries" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/publishing-libraries</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/publishing-libraries" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/publishing-libraries" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/publishing-libraries" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/devtools</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/devtools" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/devtools" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/devtools" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/devtools</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/devtools" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/devtools" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/devtools" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/devtools-packages</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/devtools-packages" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/devtools-packages" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/devtools-packages" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/devtools-packages</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/devtools-packages" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/devtools-packages" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/devtools-packages" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/component-libraries</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-libraries" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-libraries" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-libraries" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/component-libraries</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-libraries" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-libraries" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-libraries" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/api-reference</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/api-reference" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/api-reference" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/api-reference" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/api-reference</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/api-reference" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/api-reference" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/api-reference" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/error-codes</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/error-codes" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/error-codes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/error-codes" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/error-codes</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/error-codes" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/error-codes" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/error-codes" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/query</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/query" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/query" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/query" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/query</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/query" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/query" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/query" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/collections</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/collections" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/collections" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/collections" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/collections</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/collections" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/collections" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/collections" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/frame</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/frame" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/frame" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/frame" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/frame</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/frame" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/frame" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/frame" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/lazy</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/lazy" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/lazy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/lazy" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/lazy</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/lazy" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/lazy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/lazy" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/transport</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/transport" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/transport" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/transport" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/transport</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/transport" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/transport" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/transport" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/content-body</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/content-body" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/content-body" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/content-body" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/content-body</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/content-body" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/content-body" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/content-body" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/docs/virtualization</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/virtualization" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/virtualization" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/virtualization" />
+  </url>
+  <url>
+    <loc>https://motifjs.com/tr/docs/virtualization</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://motifjs.com/docs/virtualization" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/virtualization" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/virtualization" />
+  </url>
+</urlset>

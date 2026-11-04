@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Rota bileşenlerinin yerleştiği RouterView, iç içe ve adlandırılmış çıktılar, rota bileşeninin kurulması; JSX ile ve JSX&#x27;siz.">
+    <title>RouterView — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/router-view">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/router-view">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/router-view">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/router-view">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/router-view">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RouterView">
+    <meta property="og:description" content="Rota bileşenlerinin yerleştiği RouterView, iç içe ve adlandırılmış çıktılar, rota bileşeninin kurulması; JSX ile ve JSX&#x27;siz.">
+    <script type="application/json" id="doc-data">{"slug":"router-view","locale":"tr","title":"RouterView","description":"Rota bileşenlerinin yerleştiği RouterView, iç içe ve adlandırılmış çıktılar, rota bileşeninin kurulması; JSX ile ve JSX\u0027siz.","category":{"id":"4","title":"Yönlendirme"},"html":"\u003Ch2 id=\u0022router-view\u0022\u003E\u003Ccode\u003ERouterView\u003C/code\u003E — rota çıktısı yerleştirme\u003C/h2\u003E\n\u003Cp\u003ERota bileşenlerinin ekranda gösterileceği yer \u003Ccode\u003ERouterView\u003C/code\u003E\u0027dir. Layout içine yerleştirin; JSX\u0027siz yazımda \u003Ccode\u003EmotifComponent(RouterView)\u003C/code\u003E ile kurulur. Layout rotasının bileşeni, çocuk rotaların yerleşeceği yere bir \u003Ccode\u003ERouterView\u003C/code\u003E koyar. Örnekteki layout kendi içeriğinin yanına (\u003Ccode\u003Emain.detail\u003C/code\u003E) bir \u003Ccode\u003ERouterView\u003C/code\u003E yerleştirir ve rotanın \u003Ccode\u003Emeta\u003C/code\u003E verisini \u003Ccode\u003EuseNavigation()\u003C/code\u003E ile okur:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService)!;\n  nav = useNavigation();\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  }\n\n  override view() {\n    return (\n      \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {this.notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService)!;\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder as Folder;\n\n  return (\n    \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n      \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[folder()].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n          {notes.list(folder()).map((note) =\u0026gt; (\n            \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${folder()}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n          ))}\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/section\u0026gt;\n      \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/main\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService)!;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService)!;\n  nav = useNavigation();\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      const list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n        section.class.add(\u0026quot;list\u0026quot;);\n        const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n        const rows = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n          div.class.add(\u0026quot;rows\u0026quot;);\n          div.controls.add(motifComponent({\n            initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; this.notes.list(this.folder), (note: Note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n              indexkey: () =\u0026gt; note.id,\n              initializeComponent: (a: ComponentBase) =\u0026gt; {\n                a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n                a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n              },\n            })),\n          }));\n        });\n        section.controls.add(title, rows);\n      });\n      const detail = motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n        main.class.add(\u0026quot;detail\u0026quot;);\n        main.controls.add(motifComponent(RouterView));\n      });\n      root.controls.add(list, detail);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService)!;\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder as Folder;\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n    root.class.add(\u0026quot;notes\u0026quot;);\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[folder()].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(folder()), (note: Note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a: ComponentBase) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${folder()}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    root.controls.add(list, detail);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService)!;\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(this.folder), (note: Note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a: ComponentBase) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    return [list, detail];\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService);\n  nav = useNavigation();\n\n  get folder() {\n    return this.nav.meta.folder;\n  }\n\n  view() {\n    return (\n      \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {this.notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService);\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder;\n\n  return (\n    \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n      \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[folder()].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n          {notes.list(folder()).map((note) =\u0026gt; (\n            \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${folder()}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n          ))}\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/section\u0026gt;\n      \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/main\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder() {\n    return this.nav.meta.folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService);\n  nav = useNavigation();\n\n  get folder() {\n    return this.nav.meta.folder;\n  }\n\n  view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      const list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n        section.class.add(\u0026quot;list\u0026quot;);\n        const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n        const rows = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n          div.class.add(\u0026quot;rows\u0026quot;);\n          div.controls.add(motifComponent({\n            initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; this.notes.list(this.folder), (note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n              indexkey: () =\u0026gt; note.id,\n              initializeComponent: (a) =\u0026gt; {\n                a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n                a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n              },\n            })),\n          }));\n        });\n        section.controls.add(title, rows);\n      });\n      const detail = motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n        main.class.add(\u0026quot;detail\u0026quot;);\n        main.controls.add(motifComponent(RouterView));\n      });\n      root.controls.add(list, detail);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService);\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder;\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n    root.class.add(\u0026quot;notes\u0026quot;);\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[folder()].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(folder()), (note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${folder()}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    root.controls.add(list, detail);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder() {\n    return this.nav.meta.folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService);\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(this.folder), (note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    return [list, detail];\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EGezinme aynı layout rotasında kalırsa layout yerinde kalır, yalnızca \u003Ccode\u003ERouterView\u003C/code\u003E\u0027daki bileşen değişir; başka bir rotaya geçişte layout da yeniden kurulur (bkz. \u003Ca href=\u0022/docs/routing#from-address-to-screen\u0022\u003EBir adres ekrana nasıl gelir\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003ERouterView\u003C/code\u003E\u0027ın kendi elemanı yoktur (elemansız, fragment bileşen): rota bileşeni doğrudan \u003Ccode\u003ERouterView\u003C/code\u003E\u0027ın durduğu yere, örnekte \u003Ccode\u003Emain.detail\u003C/code\u003E\u0027in içine yerleşir. Etikete yazılan \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E gibi öznitelikler yazılacak eleman olmadığı için DOM\u0027a yansımaz; çıktının çevresinde bir kap gerekiyorsa \u003Ccode\u003ERouterView\u003C/code\u003E\u0027ı bir elemanın içine koyun (bkz. \u003Ca href=\u0022/docs/components#root-element\u0022\u003EKök eleman\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022route-component\u0022\u003ERota bileşeninin kurulması\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Econtrol: () =\u0026gt; import(\u0027./pages/SettingsPage\u0027)\u003C/code\u003E ile yüklenen modülün \u003Ccode\u003Edefault\u003C/code\u003E dışa aktarımı rota bileşeni olarak kullanılır; \u003Ccode\u003Edefault\u003C/code\u003E dışa aktarımı olmayan modülde sayfa kurulamaz, \u003Ccode\u003EMJX304\u003C/code\u003E raporlanır (nedeni \u003Ccode\u003EMJX127\u003C/code\u003E) ve hata rotası gösterilir. Sınıf \u003Ccode\u003Enew Sınıf(app)\u003C/code\u003E, fonksiyon \u003Ccode\u003Efn(app)\u003C/code\u003E ile kurulur: ilk argüman çalışan \u003Ccode\u003EApplication\u003C/code\u003E\u0027dır, rota bileşeni etiketten prop almaz. \u003Ca href=\u0022/docs/components#options-components\u0022\u003EOptions API\u003C/a\u003E nesnesi döndüren fonksiyon (ya da nesnenin kendisi) da rota bileşeni olur: fonksiyon yine \u003Ccode\u003Efn(app)\u003C/code\u003E ile çağrılır, dönen nesne JSX\u0027teki gibi bileşene çevrilir ve \u003Ccode\u003Ector\u003C/code\u003E prop almaz (\u003Ccode\u003Eundefined\u003C/code\u003E). \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E ile yüklenen \u003Ccode\u003Edefault\u003C/code\u003E da bu biçimlerden biri olabilir; \u003Ccode\u003ELazy\u003C/code\u003E onu argümansız kurar.\u003C/p\u003E\n\u003Cp\u003EBileşen DI\u0027da kayıtlıysa (\u003Ccode\u003E@Injectable\u003C/code\u003E sınıf ya da \u003Ccode\u003Eservices.addTransient\u003C/code\u003E / \u003Ccode\u003EaddScoped\u003C/code\u003E / \u003Ccode\u003EaddSingleton\u003C/code\u003E kaydı) örnek sağlayıcıdan çözülür ve kaydın yaşam süresi sayfanın ömrünü belirler:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EYaşam süresi\u003C/th\u003E\n\u003Cth\u003ESayfa\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etransient\u003C/code\u003E (\u003Ccode\u003E@Injectable\u003C/code\u003E\u0027ın varsayılanı)\u003C/td\u003E\n\u003Ctd\u003EHer ziyarette yeni sayfa kurulur; ayrılınca serbest bırakılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Escoped\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHer gezinmenin kapsamında bir sayfa kurulur; ayrılınca serbest bırakılır. \u003Ccode\u003EkeepAlive: true\u003C/code\u003E ile önbellekteki sayfa kendi gezinme kapsamından uzun yaşar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Esingleton\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EUygulama boyunca tek sayfadır: hazır örnek verilmiş rota gibi ayrılınca serbest bırakılmaz, outlet\u0027ten ayrılır (\u003Ccode\u003EonDeactivated\u003C/code\u003E), dönüşte aynı örnek geri bağlanır (\u003Ccode\u003EonActivated\u003C/code\u003E). \u003Ccode\u003Eapp.dispose()\u003C/code\u003E ile serbest bırakılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022named-router-view\u0022\u003EAdlandırılmış \u003Ccode\u003ERouterView\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EBir rotanın bileşeni varsayılan olarak üst rotanın \u003Ccode\u003Edefault\u003C/code\u003E adlı \u003Ccode\u003ERouterView\u003C/code\u003E\u0027ına yerleşir; başka bir çıktıya yerleşmesi için rotada \u003Ccode\u003Eextend.targetOutlet\u003C/code\u003E verin. Bir layout birden çok \u003Ccode\u003ERouterView\u003C/code\u003E taşıyabilir; adı verilmeyen çıktı \u003Ccode\u003Edefault\u003C/code\u003E\u0027tur. Örnekte ikinci çıktının adı \u003Ccode\u003Epage\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterView /\u0026gt;\n\u0026lt;RouterView name=\u0026quot;page\u0026quot; /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Econst folders = motifComponent(RouterView);\nconst page = motifComponent(RouterView, { name: \u0026quot;page\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterView /\u0026gt;\n\u0026lt;RouterView name=\u0026quot;page\u0026quot; /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Econst folders = motifComponent(RouterView);\nconst page = motifComponent(RouterView, { name: \u0026quot;page\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Econst settings: RouteItem = { path: \u0026quot;/settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;), extend: { targetOutlet: \u0026quot;page\u0026quot; } };\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Econst settings = { path: \u0026quot;/settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;), extend: { targetOutlet: \u0026quot;page\u0026quot; } };\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EHer rota tek bir çıktıya yerleşir; aynı düzeyde bir anda tek rota gösterildiği için \u003Ccode\u003E/settings\u003C/code\u003E açıkken varsayılan çıktı boş kalır, bir klasöre dönülünce \u003Ccode\u003Epage\u003C/code\u003E çıktısı boşalır.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.run\u003C/code\u003E\u0027a kök bileşen vermezseniz, MotifJS köke otomatik olarak \u003Ccode\u003Ename: \u0027default\u0027\u003C/code\u003E bir \u003Ccode\u003ERouterView\u003C/code\u003E yerleştirir; rota tablosunun ilk halkası oraya gelir.\u003C/p\u003E\n\u003Cp\u003ELayout\u0027un \u003Ccode\u003ERouterView\u003C/code\u003E\u0027ı henüz kurulmamışsa (örneğin \u003Ccode\u003Ex-wait\u003C/code\u003E ile bekleyen bir bölümün içindeyse) çocuk rota bekler ve \u003Ccode\u003ERouterView\u003C/code\u003E kurulduğu anda yerine bağlanır. Geliştirme kipinde 3000 ms içinde kurulmazsa \u003Ccode\u003EMJX301\u003C/code\u003E uyarısı yazılır; uyarı çoğunlukla layout\u0027un \u003Ccode\u003ERouterView\u003C/code\u003E koymayı unuttuğunu gösterir.\u003C/p\u003E\n\u003Cp\u003EGezinme bittikten sonra kurulan \u003Ccode\u003ERouterView\u003C/code\u003E de aynı şekilde dolar: layout çıktısını \u003Ccode\u003EFrame\u003C/code\u003E ile değiştirdiğinde ya da \u003Ccode\u003E{koşul \u0026amp;\u0026amp; \u0026lt;RouterView /\u0026gt;}\u003C/code\u003E ile kapatıp açtığında ekrandaki rotanın bileşeni yeni \u003Ccode\u003ERouterView\u003C/code\u003E\u0027a yerleşir. Bunun için gezinme olmaz; guard\u0027lar, \u003Ccode\u003EonEntering\u003C/code\u003E ve \u003Ccode\u003EonEnter\u003C/code\u003E çalışmaz, \u003Ccode\u003EonShow\u003C/code\u003E çalışır. Eski \u003Ccode\u003ERouterView\u003C/code\u003E ile serbest bırakılan sayfa yeniden kurulur, eski çıktının çıkış geçişi varsa yeni sayfa onu beklemez. \u003Ccode\u003EkeepAlive\u003C/code\u003E, hazır örnek, \u003Ccode\u003Esingleton\u003C/code\u003E ve \u003Ccode\u003Escoped\u003C/code\u003E sayfalar serbest bırakılmaz; aynı örnek yeni \u003Ccode\u003ERouterView\u003C/code\u003E\u0027a taşınır (\u003Ccode\u003EonDeactivated\u003C/code\u003E, ardından \u003Ccode\u003EonActivated\u003C/code\u003E). \u003Ccode\u003ERouterView\u003C/code\u003E yerine yenisi konmadan kaldırılırsa bu sayfalar bekler, uyarı yazılmaz. Sayfa kurulamazsa \u003Ccode\u003EMJX304\u003C/code\u003E raporlanır ve hata rotası gösterilir.\u003C/p\u003E\n\u003Ch2 id=\u0022leaving-page\u0022\u003EAyrılan sayfa\u003C/h2\u003E\n\u003Cp\u003ERota sayfalarının giriş ve çıkış geçişleri gezinmede de oynar: ayrılan sayfa çıkış geçişini bitirir, sonra gelen sayfa yerleşip girer (bkz. \u003Ca href=\u0022/docs/styling-and-transitions#transition-visibility\u0022\u003EStil ve Animasyon\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003EYeni sayfa, ayrılan sayfanın serbest bırakılmasını beklemez. Router ayrılan sayfayı ekrandan kaldırır, yeni sayfayı yerleştirir ve ayrılan sayfayı yeni sayfa ekrana geldikten sonra serbest bırakır:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003ESayfa ayrılır ayrılmaz bağları ve bileşenlere bağlı \u003Ccode\u003Econtext.on\u003C/code\u003E / \u003Ccode\u003Econtext.onRouterChanged\u003C/code\u003E abonelikleri durur; \u003Ccode\u003ETransportTo\u003C/code\u003E ile bir yuvaya gönderdiği içerik yuvadan kalkar. Kendi çıkış geçişi olan sayfanın elemanı geçiş bitince, olmayanınki hemen kaldırılır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EonDisposing\u003C/code\u003E, \u003Ccode\u003EonDisposed\u003C/code\u003E ve \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E ile bağlanan temizlik işleri (kütüphane bileşenlerinin \u003Ccode\u003Edestroy()\u003C/code\u003E çağrısı gibi) yeni sayfa ekrana geldikten sonra çalışır ve gidilen rotayı görür. Uzun süren bir temizlik yeni sayfanın gelişini geciktirmez.\u003C/li\u003E\n\u003Cli\u003EAyrılan sayfa, kendi gezinmesinin \u003Ccode\u003Escoped\u003C/code\u003E örneklerini serbest bırakılması bitene kadar kullanır; bu örnekler sayfadan sonra serbest bırakılır (bkz. \u003Ca href=\u0022/docs/service-lifetimes#scoped\u0022\u003EYaşam Süreleri ve Kapsamlar\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EkeepAlive\u003C/code\u003E, hazır örnek ve \u003Ccode\u003Esingleton\u003C/code\u003E sayfalar ile yığında tutulan sayfalar serbest bırakılmaz, outlet\u0027ten ayrılır.\u003C/li\u003E\n\u003Cli\u003EBir gezinme bitmeden yenisi başlarsa, yarıda kalan gezinmenin kurup gösteremediği sayfa serbest bırakılır; o rotaya sonra gidildiğinde sayfa yeniden kurulur. \u003Ccode\u003EkeepAlive\u003C/code\u003E, hazır örnek ve \u003Ccode\u003Esingleton\u003C/code\u003E sayfalar korunur.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eapp.navigate\u003C/code\u003E\u0027in sonucu ve \u003Ccode\u003EonRouterChanged\u003C/code\u003E, ayrılan sayfa serbest bırakılmadan gelir. \u003Ccode\u003Eapp.dispose()\u003C/code\u003E serbest bırakılmayı bekleyen sayfaları da serbest bırakır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003ESayfalar arasında bağlantı kurmak için \u003Ca href=\u0022/docs/router-links\u0022\u003EBağlantılar\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"router-view","text":"RouterView — rota çıktısı yerleştirme","level":2},{"id":"route-component","text":"Rota bileşeninin kurulması","level":2},{"id":"named-router-view","text":"Adlandırılmış RouterView","level":2},{"id":"leaving-page","text":"Ayrılan sayfa","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"routes","title":"Rota Tablosu"},"next":{"slug":"router-links","title":"Bağlantılar"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Yönlendirme</p>
+        <h1>RouterView</h1>
+        <p>Rota bileşenlerinin yerleştiği RouterView, iç içe ve adlandırılmış çıktılar, rota bileşeninin kurulması; JSX ile ve JSX&#x27;siz.</p>
+<h2 id="router-view"><code>RouterView</code> — rota çıktısı yerleştirme</h2>
+<p>Rota bileşenlerinin ekranda gösterileceği yer <code>RouterView</code>'dir. Layout içine yerleştirin; JSX'siz yazımda <code>motifComponent(RouterView)</code> ile kurulur. Layout rotasının bileşeni, çocuk rotaların yerleşeceği yere bir <code>RouterView</code> koyar. Örnekteki layout kendi içeriğinin yanına (<code>main.detail</code>) bir <code>RouterView</code> yerleştirir ve rotanın <code>meta</code> verisini <code>useNavigation()</code> ile okur:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/layouts/NotesLayout.tsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService)!;
+  nav = useNavigation();
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  }
+
+  override view() {
+    return (
+      &lt;div class=&quot;notes&quot;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {this.notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>import { FromService, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService)!;
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder as Folder;
+
+  return (
+    &lt;div class=&quot;notes&quot;&gt;
+      &lt;section class=&quot;list&quot;&gt;
+        &lt;h2&gt;{() =&gt; FOLDERS[folder()].title}&lt;/h2&gt;
+        &lt;div class=&quot;rows&quot;&gt;
+          {notes.list(folder()).map((note) =&gt; (
+            &lt;a key={note.id} rel=&quot;router&quot; href={`/${folder()}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/section&gt;
+      &lt;main class=&quot;detail&quot;&gt;
+        &lt;RouterView /&gt;
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>import { FromService, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService)!;
+    return (
+      &lt;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/&gt;
+    );
+  },
+});
+
+export default NotesLayout;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/NotesLayout.ts"><code>import { Component, ComponentBase, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService)!;
+  nav = useNavigation();
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  }
+
+  override view() {
+    return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+        section.class.add(&quot;list&quot;);
+        const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+        const rows = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+          div.class.add(&quot;rows&quot;);
+          div.controls.add(motifComponent({
+            initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; this.notes.list(this.folder), (note: Note) =&gt; motifComponent(&quot;a&quot;, {
+              indexkey: () =&gt; note.id,
+              initializeComponent: (a: ComponentBase) =&gt; {
+                a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+                a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+              },
+            })),
+          }));
+        });
+        section.controls.add(title, rows);
+      });
+      const detail = motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+        main.class.add(&quot;detail&quot;);
+        main.controls.add(motifComponent(RouterView));
+      });
+      root.controls.add(list, detail);
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>import { ComponentBase, FromService, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService)!;
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder as Folder;
+
+  return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+    root.class.add(&quot;notes&quot;);
+    const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; FOLDERS[folder()].title))));
+      const rows = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; notes.list(folder()), (note: Note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a: ComponentBase) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${folder()}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    root.controls.add(list, detail);
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>import { ComponentBase, FromService, motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService)!;
+    const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+      const rows = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; notes.list(this.folder), (note: Note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a: ComponentBase) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    return [list, detail];
+  },
+});
+
+export default NotesLayout;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/layouts/NotesLayout.jsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService);
+  nav = useNavigation();
+
+  get folder() {
+    return this.nav.meta.folder;
+  }
+
+  view() {
+    return (
+      &lt;div class=&quot;notes&quot;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {this.notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>import { FromService, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService);
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder;
+
+  return (
+    &lt;div class=&quot;notes&quot;&gt;
+      &lt;section class=&quot;list&quot;&gt;
+        &lt;h2&gt;{() =&gt; FOLDERS[folder()].title}&lt;/h2&gt;
+        &lt;div class=&quot;rows&quot;&gt;
+          {notes.list(folder()).map((note) =&gt; (
+            &lt;a key={note.id} rel=&quot;router&quot; href={`/${folder()}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/section&gt;
+      &lt;main class=&quot;detail&quot;&gt;
+        &lt;RouterView /&gt;
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>import { FromService, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder() {
+    return this.nav.meta.folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService);
+    return (
+      &lt;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/&gt;
+    );
+  },
+});
+
+export default NotesLayout;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/NotesLayout.js"><code>import { Component, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService);
+  nav = useNavigation();
+
+  get folder() {
+    return this.nav.meta.folder;
+  }
+
+  view() {
+    return motifComponent(&quot;div&quot;, (root) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+        section.class.add(&quot;list&quot;);
+        const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+        const rows = motifComponent(&quot;div&quot;, (div) =&gt; {
+          div.class.add(&quot;rows&quot;);
+          div.controls.add(motifComponent({
+            initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; this.notes.list(this.folder), (note) =&gt; motifComponent(&quot;a&quot;, {
+              indexkey: () =&gt; note.id,
+              initializeComponent: (a) =&gt; {
+                a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+                a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+              },
+            })),
+          }));
+        });
+        section.controls.add(title, rows);
+      });
+      const detail = motifComponent(&quot;main&quot;, (main) =&gt; {
+        main.class.add(&quot;detail&quot;);
+        main.controls.add(motifComponent(RouterView));
+      });
+      root.controls.add(list, detail);
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>import { FromService, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService);
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder;
+
+  return motifComponent(&quot;div&quot;, (root) =&gt; {
+    root.class.add(&quot;notes&quot;);
+    const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; FOLDERS[folder()].title))));
+      const rows = motifComponent(&quot;div&quot;, (div) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; notes.list(folder()), (note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${folder()}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    root.controls.add(list, detail);
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>import { FromService, motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder() {
+    return this.nav.meta.folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService);
+    const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+      const rows = motifComponent(&quot;div&quot;, (div) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; notes.list(this.folder), (note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    return [list, detail];
+  },
+});
+
+export default NotesLayout;</code></pre>
+</div>
+<p>Gezinme aynı layout rotasında kalırsa layout yerinde kalır, yalnızca <code>RouterView</code>'daki bileşen değişir; başka bir rotaya geçişte layout da yeniden kurulur (bkz. <a href="/tr/docs/routing#from-address-to-screen">Bir adres ekrana nasıl gelir</a>).</p>
+<p><code>RouterView</code>'ın kendi elemanı yoktur (elemansız, fragment bileşen): rota bileşeni doğrudan <code>RouterView</code>'ın durduğu yere, örnekte <code>main.detail</code>'in içine yerleşir. Etikete yazılan <code>class</code>, <code>style</code> gibi öznitelikler yazılacak eleman olmadığı için DOM'a yansımaz; çıktının çevresinde bir kap gerekiyorsa <code>RouterView</code>'ı bir elemanın içine koyun (bkz. <a href="/tr/docs/components#root-element">Kök eleman</a>).</p>
+<h2 id="route-component">Rota bileşeninin kurulması</h2>
+<p><code>control: () =&gt; import('./pages/SettingsPage')</code> ile yüklenen modülün <code>default</code> dışa aktarımı rota bileşeni olarak kullanılır; <code>default</code> dışa aktarımı olmayan modülde sayfa kurulamaz, <code>MJX304</code> raporlanır (nedeni <code>MJX127</code>) ve hata rotası gösterilir. Sınıf <code>new Sınıf(app)</code>, fonksiyon <code>fn(app)</code> ile kurulur: ilk argüman çalışan <code>Application</code>'dır, rota bileşeni etiketten prop almaz. <a href="/tr/docs/components#options-components">Options API</a> nesnesi döndüren fonksiyon (ya da nesnenin kendisi) da rota bileşeni olur: fonksiyon yine <code>fn(app)</code> ile çağrılır, dönen nesne JSX'teki gibi bileşene çevrilir ve <code>ctor</code> prop almaz (<code>undefined</code>). <a href="/tr/docs/lazy">Lazy</a> ile yüklenen <code>default</code> da bu biçimlerden biri olabilir; <code>Lazy</code> onu argümansız kurar.</p>
+<p>Bileşen DI'da kayıtlıysa (<code>@Injectable</code> sınıf ya da <code>services.addTransient</code> / <code>addScoped</code> / <code>addSingleton</code> kaydı) örnek sağlayıcıdan çözülür ve kaydın yaşam süresi sayfanın ömrünü belirler:</p>
+<table>
+<thead>
+<tr>
+<th>Yaşam süresi</th>
+<th>Sayfa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>transient</code> (<code>@Injectable</code>'ın varsayılanı)</td>
+<td>Her ziyarette yeni sayfa kurulur; ayrılınca serbest bırakılır.</td>
+</tr>
+<tr>
+<td><code>scoped</code></td>
+<td>Her gezinmenin kapsamında bir sayfa kurulur; ayrılınca serbest bırakılır. <code>keepAlive: true</code> ile önbellekteki sayfa kendi gezinme kapsamından uzun yaşar.</td>
+</tr>
+<tr>
+<td><code>singleton</code></td>
+<td>Uygulama boyunca tek sayfadır: hazır örnek verilmiş rota gibi ayrılınca serbest bırakılmaz, outlet'ten ayrılır (<code>onDeactivated</code>), dönüşte aynı örnek geri bağlanır (<code>onActivated</code>). <code>app.dispose()</code> ile serbest bırakılır.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="named-router-view">Adlandırılmış <code>RouterView</code></h2>
+<p>Bir rotanın bileşeni varsayılan olarak üst rotanın <code>default</code> adlı <code>RouterView</code>'ına yerleşir; başka bir çıktıya yerleşmesi için rotada <code>extend.targetOutlet</code> verin. Bir layout birden çok <code>RouterView</code> taşıyabilir; adı verilmeyen çıktı <code>default</code>'tur. Örnekte ikinci çıktının adı <code>page</code>:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/MainLayout.tsx"><code>&lt;RouterView /&gt;
+&lt;RouterView name=&quot;page&quot; /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/MainLayout.ts"><code>const folders = motifComponent(RouterView);
+const page = motifComponent(RouterView, { name: &quot;page&quot; });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/MainLayout.jsx"><code>&lt;RouterView /&gt;
+&lt;RouterView name=&quot;page&quot; /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/MainLayout.js"><code>const folders = motifComponent(RouterView);
+const page = motifComponent(RouterView, { name: &quot;page&quot; });</code></pre>
+</div>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>const settings: RouteItem = { path: &quot;/settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;), extend: { targetOutlet: &quot;page&quot; } };</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>const settings = { path: &quot;/settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;), extend: { targetOutlet: &quot;page&quot; } };</code></pre>
+</div>
+<p>Her rota tek bir çıktıya yerleşir; aynı düzeyde bir anda tek rota gösterildiği için <code>/settings</code> açıkken varsayılan çıktı boş kalır, bir klasöre dönülünce <code>page</code> çıktısı boşalır.</p>
+<p><code>app.run</code>'a kök bileşen vermezseniz, MotifJS köke otomatik olarak <code>name: 'default'</code> bir <code>RouterView</code> yerleştirir; rota tablosunun ilk halkası oraya gelir.</p>
+<p>Layout'un <code>RouterView</code>'ı henüz kurulmamışsa (örneğin <code>x-wait</code> ile bekleyen bir bölümün içindeyse) çocuk rota bekler ve <code>RouterView</code> kurulduğu anda yerine bağlanır. Geliştirme kipinde 3000 ms içinde kurulmazsa <code>MJX301</code> uyarısı yazılır; uyarı çoğunlukla layout'un <code>RouterView</code> koymayı unuttuğunu gösterir.</p>
+<p>Gezinme bittikten sonra kurulan <code>RouterView</code> de aynı şekilde dolar: layout çıktısını <code>Frame</code> ile değiştirdiğinde ya da <code>{koşul &amp;&amp; &lt;RouterView /&gt;}</code> ile kapatıp açtığında ekrandaki rotanın bileşeni yeni <code>RouterView</code>'a yerleşir. Bunun için gezinme olmaz; guard'lar, <code>onEntering</code> ve <code>onEnter</code> çalışmaz, <code>onShow</code> çalışır. Eski <code>RouterView</code> ile serbest bırakılan sayfa yeniden kurulur, eski çıktının çıkış geçişi varsa yeni sayfa onu beklemez. <code>keepAlive</code>, hazır örnek, <code>singleton</code> ve <code>scoped</code> sayfalar serbest bırakılmaz; aynı örnek yeni <code>RouterView</code>'a taşınır (<code>onDeactivated</code>, ardından <code>onActivated</code>). <code>RouterView</code> yerine yenisi konmadan kaldırılırsa bu sayfalar bekler, uyarı yazılmaz. Sayfa kurulamazsa <code>MJX304</code> raporlanır ve hata rotası gösterilir.</p>
+<h2 id="leaving-page">Ayrılan sayfa</h2>
+<p>Rota sayfalarının giriş ve çıkış geçişleri gezinmede de oynar: ayrılan sayfa çıkış geçişini bitirir, sonra gelen sayfa yerleşip girer (bkz. <a href="/tr/docs/styling-and-transitions#transition-visibility">Stil ve Animasyon</a>).</p>
+<p>Yeni sayfa, ayrılan sayfanın serbest bırakılmasını beklemez. Router ayrılan sayfayı ekrandan kaldırır, yeni sayfayı yerleştirir ve ayrılan sayfayı yeni sayfa ekrana geldikten sonra serbest bırakır:</p>
+<ul>
+<li>Sayfa ayrılır ayrılmaz bağları ve bileşenlere bağlı <code>context.on</code> / <code>context.onRouterChanged</code> abonelikleri durur; <code>TransportTo</code> ile bir yuvaya gönderdiği içerik yuvadan kalkar. Kendi çıkış geçişi olan sayfanın elemanı geçiş bitince, olmayanınki hemen kaldırılır.</li>
+<li><code>onDisposing</code>, <code>onDisposed</code> ve <code>motif.setDisposable</code> ile bağlanan temizlik işleri (kütüphane bileşenlerinin <code>destroy()</code> çağrısı gibi) yeni sayfa ekrana geldikten sonra çalışır ve gidilen rotayı görür. Uzun süren bir temizlik yeni sayfanın gelişini geciktirmez.</li>
+<li>Ayrılan sayfa, kendi gezinmesinin <code>scoped</code> örneklerini serbest bırakılması bitene kadar kullanır; bu örnekler sayfadan sonra serbest bırakılır (bkz. <a href="/tr/docs/service-lifetimes#scoped">Yaşam Süreleri ve Kapsamlar</a>).</li>
+<li><code>keepAlive</code>, hazır örnek ve <code>singleton</code> sayfalar ile yığında tutulan sayfalar serbest bırakılmaz, outlet'ten ayrılır.</li>
+<li>Bir gezinme bitmeden yenisi başlarsa, yarıda kalan gezinmenin kurup gösteremediği sayfa serbest bırakılır; o rotaya sonra gidildiğinde sayfa yeniden kurulur. <code>keepAlive</code>, hazır örnek ve <code>singleton</code> sayfalar korunur.</li>
+<li><code>app.navigate</code>'in sonucu ve <code>onRouterChanged</code>, ayrılan sayfa serbest bırakılmadan gelir. <code>app.dispose()</code> serbest bırakılmayı bekleyen sayfaları da serbest bırakır.</li>
+</ul>
+<h2 id="next">Sonraki adım</h2>
+<p>Sayfalar arasında bağlantı kurmak için <a href="/tr/docs/router-links">Bağlantılar</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

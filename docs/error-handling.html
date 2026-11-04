@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="The difference between errors that are thrown, reported and written as warnings; MotifError, errorHandler, setUnexpectedErrorHandler and the safeCall helpers.">
+    <title>Error Handling — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/error-handling">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/error-handling">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/error-handling">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/error-handling">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/error-handling">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Error Handling">
+    <meta property="og:description" content="The difference between errors that are thrown, reported and written as warnings; MotifError, errorHandler, setUnexpectedErrorHandler and the safeCall helpers.">
+    <script type="application/json" id="doc-data">{"slug":"error-handling","locale":"en","title":"Error Handling","description":"The difference between errors that are thrown, reported and written as warnings; MotifError, errorHandler, setUnexpectedErrorHandler and the safeCall helpers.","category":{"id":"3","title":"Application structure"},"html":"\u003Cp\u003EMotifJS does not swallow errors coming from user code, but it does not bring the application down either. Every situation the framework throws, reports or writes as a warning has an \u003Cstrong\u003E\u003Ccode\u003EMJX\u003C/code\u003E code\u003C/strong\u003E, and these situations go down one of three paths. This section covers those paths, the places to listen for errors, and the framework\u0027s own error-safe call helpers. The full list of codes is in the \u003Ca href=\u0022/docs/error-codes\u0022\u003EError and Warning Codes\u003C/a\u003E table.\u003C/p\u003E\n\u003Ch2 id=\u0022three-paths\u0022\u003EThree paths\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EPath\u003C/th\u003E\n\u003Cth\u003EWhen\u003C/th\u003E\n\u003Cth\u003EWhere it goes\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Cstrong\u003EThrow\u003C/strong\u003E\u003C/td\u003E\n\u003Ctd\u003EMisuse the caller has to fix right away: the named route does not exist (\u003Ccode\u003EMJX302\u003C/code\u003E), the service is not registered (\u003Ccode\u003EMJX401\u003C/code\u003E), a second \u003Ccode\u003EApplicationBuilder\u003C/code\u003E (\u003Ccode\u003EMJX405\u003C/code\u003E), \u003Ccode\u003EQuery.first()\u003C/code\u003E on an empty array (\u003Ccode\u003EMJX601\u003C/code\u003E) …\u003C/td\u003E\n\u003Ctd\u003EA \u003Ccode\u003EMotifError\u003C/code\u003E is thrown; catch it with \u003Ccode\u003Etry/catch\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Cstrong\u003EReport\u003C/strong\u003E\u003C/td\u003E\n\u003Ctd\u003EA user code error that should not stop the flow: a component hook (\u003Ccode\u003EMJX122\u003C/code\u003E), an event handler (\u003Ccode\u003EMJX123\u003C/code\u003E), an effect/binding (\u003Ccode\u003EMJX208\u003C/code\u003E), a route hook and guard (\u003Ccode\u003EMJX306\u003C/code\u003E), disposal and data loading errors …\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EerrorHandler.report(MotifError)\u003C/code\u003E: to the console with \u003Ccode\u003Econsole.error\u003C/code\u003E (\u003Ccode\u003Eapp.useLogging(false)\u003C/code\u003E turns it off), to the \u003Ccode\u003EerrorHandler.addListener(fn)\u003C/code\u003E listeners, and to the devtools bus if there is one. The original error is in \u003Ccode\u003Ecause\u003C/code\u003E. Works in production too.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Cstrong\u003EWarning\u003C/strong\u003E\u003C/td\u003E\n\u003Ctd\u003EA situation that keeps running but is most likely unwanted: a duplicate \u003Ccode\u003Ekey\u003C/code\u003E (\u003Ccode\u003EMJX202\u003C/code\u003E), an effect that triggers itself (\u003Ccode\u003EMJX203\u003C/code\u003E), route definition checks (\u003Ccode\u003EMJX310\u003C/code\u003E–\u003Ccode\u003EMJX316\u003C/code\u003E) …\u003C/td\u003E\n\u003Ctd\u003EOnly in development mode (\u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E): \u003Ccode\u003Econsole.warn\u003C/code\u003E and the devtools warning list. It does not go to listeners.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022motif-error\u0022\u003E\u003Ccode\u003EMotifError\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EEvery error the framework throws or reports is a \u003Ccode\u003EMotifError\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eimport { MotifError } from \u0026quot;@motifx/core\u0026quot;;\n\ntry {\n  await app.navigateByName(\u0026quot;note\u0026quot;, { id: note.id });\n} catch (e) {\n  if (e instanceof MotifError \u0026amp;\u0026amp; e.code === \u0027MJX302\u0027) { /* named route not found */ }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eimport { MotifError } from \u0026quot;@motifx/core\u0026quot;;\n\ntry {\n  await app.navigateByName(\u0026quot;note\u0026quot;, { id: note.id });\n} catch (e) {\n  if (e instanceof MotifError \u0026amp;\u0026amp; e.code === \u0027MJX302\u0027) { /* named route not found */ }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EField\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecode\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EMotifErrorCode\u003C/code\u003E (such as \u003Ccode\u003E\u0027MJX302\u0027\u003C/code\u003E). Branch on this, not on the message text; the texts are in English and may change.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emessage\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAn English message of the form \u003Ccode\u003E[motifjs] MJX302: …\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecause\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EFor reported errors, the original error (the value the user code threw).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027MotifError\u0027\u003C/code\u003E (\u003Ccode\u003E\u0027TimeoutError\u0027\u003C/code\u003E for a \u003Ccode\u003EResilience\u003C/code\u003E timeout).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EThe \u003Ccode\u003EMotifErrorCode\u003C/code\u003E type is the union of all codes; it gives completion when you write \u003Ccode\u003Eswitch (e.code)\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022error-handler\u0022\u003EListening for reports — \u003Ccode\u003EerrorHandler\u003C/code\u003E\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eimport { errorHandler } from \u0026quot;@motifx/core\u0026quot;;\n\nconst off = errorHandler.addListener((error) =\u0026gt; {\n  navigator.sendBeacon(\u0026quot;/api/errors\u0026quot;, JSON.stringify({ code: error.code, message: error.message, cause: String(error.cause) }));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eimport { errorHandler } from \u0026quot;@motifx/core\u0026quot;;\n\nconst off = errorHandler.addListener((error) =\u0026gt; {\n  navigator.sendBeacon(\u0026quot;/api/errors\u0026quot;, JSON.stringify({ code: error.code, message: error.message, cause: String(error.cause) }));\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EA listener receives every \u003Cstrong\u003Ereported\u003C/strong\u003E \u003Ccode\u003EMotifError\u003C/code\u003E (\u003Ccode\u003EMJX122\u003C/code\u003E, \u003Ccode\u003EMJX123\u003C/code\u003E, \u003Ccode\u003EMJX208\u003C/code\u003E, \u003Ccode\u003EMJX306\u003C/code\u003E …). Errors without a code that go to \u003Ccode\u003EsetUnexpectedErrorHandler\u003C/code\u003E (below) reach the listeners as they are too.\u003C/li\u003E\n\u003Cli\u003EThrown errors do not go to the listener (they already return to the caller), and neither do warnings.\u003C/li\u003E\n\u003Cli\u003EA listener is not tied to any component; it is removed with the function returned by \u003Ccode\u003EaddListener\u003C/code\u003E (\u003Ccode\u003Eoff()\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003EListeners are called in the order they were added. An error thrown by one listener does not stop the other listeners or the flow that made the report; the error is rethrown with \u003Ccode\u003EsetTimeout(…, 0)\u003C/code\u003E and shows up in the browser at the \u003Ccode\u003Ewindow.onerror\u003C/code\u003E level. \u003Ccode\u003EsafeCall\u003C/code\u003E still returns the fallback value in that case.\u003C/li\u003E\n\u003Cli\u003EYou can put your own error on the same path with \u003Ccode\u003EerrorHandler.report(err)\u003C/code\u003E; \u003Ccode\u003Eerr\u003C/code\u003E must be an \u003Ccode\u003EError\u003C/code\u003E, it does not have to be a \u003Ccode\u003EMotifError\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EThe other members of the \u003Ccode\u003EErrorHandler\u003C/code\u003E class: \u003Ccode\u003EsetDevelopmentMode(b)\u003C/code\u003E / \u003Ccode\u003EisDevelopment()\u003C/code\u003E (\u003Ccode\u003Eapp.useDevelopment\u003C/code\u003E uses these), \u003Ccode\u003EsetConsoleLogging(b)\u003C/code\u003E (\u003Ccode\u003Eapp.useLogging\u003C/code\u003E), \u003Ccode\u003EreportSuppressed(context, err)\u003C/code\u003E (writes to the console only in development mode and does not go to listeners; the framework uses it for errors it swallows internally), \u003Ccode\u003EgetUnexpectedErrorHandler()\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022unexpected-errors\u0022\u003EUnexpected errors — \u003Ccode\u003EsetUnexpectedErrorHandler\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EErrors caught inside \u003Ccode\u003EsafeCall\u003C/code\u003E/\u003Ccode\u003EsafeCallAsync\u003C/code\u003E and errors thrown by \u003Ccode\u003EEmitter\u003C/code\u003E listeners have \u003Cstrong\u003Eno code\u003C/strong\u003E; they go down the \u003Ccode\u003EerrorHandler.onUnexpectedError(err)\u003C/code\u003E path:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003EThe handler given with \u003Ccode\u003EsetUnexpectedErrorHandler(fn)\u003C/code\u003E is called. The default handler \u003Cstrong\u003Erethrows\u003C/strong\u003E the error with \u003Ccode\u003EsetTimeout(…, 0)\u003C/code\u003E: it shows up in the browser at the \u003Ccode\u003Ewindow.onerror\u003C/code\u003E/\u003Ccode\u003Eunhandledrejection\u003C/code\u003E level, and the calling flow is not interrupted.\u003C/li\u003E\n\u003Cli\u003EThen the \u003Ccode\u003EaddListener\u003C/code\u003E listeners receive the error as it is.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eimport { setUnexpectedErrorHandler } from \u0026quot;@motifx/core\u0026quot;;\n\nsetUnexpectedErrorHandler((error) =\u0026gt; navigator.sendBeacon(\u0026quot;/api/errors\u0026quot;, String(error)));   // send it to the server instead of rethrowing\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eimport { setUnexpectedErrorHandler } from \u0026quot;@motifx/core\u0026quot;;\n\nsetUnexpectedErrorHandler((error) =\u0026gt; navigator.sendBeacon(\u0026quot;/api/errors\u0026quot;, String(error)));   // send it to the server instead of rethrowing\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EReports with a code (\u003Ccode\u003EMJX122\u003C/code\u003E …) do \u003Cstrong\u003Enot\u003C/strong\u003E go to this handler; use \u003Ccode\u003EaddListener\u003C/code\u003E for them.\u003C/p\u003E\n\u003Ch2 id=\u0022safe-call\u0022\u003EError-safe call helpers\u003C/h2\u003E\n\u003Cp\u003EThe helpers the framework uses to wrap its own code are public:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EFunction\u003C/th\u003E\n\u003Cth\u003EBehaviour\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsafeCall(fn, context, fallback?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECalls \u003Ccode\u003Efn()\u003C/code\u003E; if it throws, writes \u003Ccode\u003E[motifjs Error - context]\u003C/code\u003E in development mode, passes the error to \u003Ccode\u003EonUnexpectedError\u003C/code\u003E and returns \u003Ccode\u003Efallback\u003C/code\u003E (or \u003Ccode\u003Eundefined\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsafeCallAsync(fn, context, fallback?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe same; \u003Ccode\u003Efn\u003C/code\u003E returns a \u003Ccode\u003EPromise\u003C/code\u003E, and the rejection is caught.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsafeCallSilent(fn, context)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EIf it throws, writes to the console only in development mode; it does \u003Cstrong\u003Enot\u003C/strong\u003E go to \u003Ccode\u003EonUnexpectedError\u003C/code\u003E or the listeners.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EerrorHandler.safeCallSilentAsync\u003C/code\u003E, \u003Ccode\u003EerrorHandler.wrapSafe(fn, context)\u003C/code\u003E, \u003Ccode\u003EerrorHandler.wrapSafeAsync(fn, context)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAn async silent call; return a new function that wraps \u003Ccode\u003Efn\u003C/code\u003E with the same behaviour (reports like \u003Ccode\u003EsafeCall\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Econtext\u003C/code\u003E is a free label that only appears in the log.\u003C/p\u003E\n\u003Ch2 id=\u0022where-errors-land\u0022\u003EWhere is an error in user code caught?\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EPlace\u003C/th\u003E\n\u003Cth\u003EResult\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA lifecycle hook (\u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonBuilt\u003C/code\u003E, \u003Ccode\u003EonMounted\u003C/code\u003E …), \u003Ccode\u003EinitializeComponent\u003C/code\u003E, a \u003Ccode\u003Eref\u003C/code\u003E callback, an Options API \u003Ccode\u003Ector\u003C/code\u003E, a \u003Ccode\u003Emotif.on(\u0027x:…\u0027)\u003C/code\u003E listener\u003C/td\u003E\n\u003Ctd\u003EAn \u003Ccode\u003EMJX122\u003C/code\u003E report; the component keeps being built. The rejected promise of an \u003Ccode\u003Easync\u003C/code\u003E hook is the same.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA DOM/component event handler (\u003Ccode\u003Eonclick\u003C/code\u003E, \u003Ccode\u003Emotif.on\u003C/code\u003E, \u003Ccode\u003Eon:name\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003EAn \u003Ccode\u003EMJX123\u003C/code\u003E report; the other handlers of the same event run.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAn application event listener (\u003Ccode\u003Eapp.on\u003C/code\u003E, \u003Ccode\u003EonRouterChanged\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003EAn \u003Ccode\u003EMJX123\u003C/code\u003E report; the other listeners run and the navigation completes.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eeffect\u003C/code\u003E, \u003Ccode\u003Ebindings.watch\u003C/code\u003E, a binding getter, a \u003Ccode\u003EcreateComputed\u003C/code\u003E getter\u003C/td\u003E\n\u003Ctd\u003EAn \u003Ccode\u003EMJX208\u003C/code\u003E report; the other effects in the same flush run, and the effect that failed keeps tracking. That run has no value: \u003Ccode\u003EonValue\u003C/code\u003E in \u003Ccode\u003Eeffect(getter, onValue)\u003C/code\u003E is not called, and bindings (\u003Ccode\u003Etext\u003C/code\u003E/\u003Ccode\u003Eattr\u003C/code\u003E/\u003Ccode\u003Eclass\u003C/code\u003E, a \u003Ccode\u003Ewhen\u003C/code\u003E/\u003Ccode\u003Eternary\u003C/code\u003E/\u003Ccode\u003EswitchCase\u003C/code\u003E branch) keep their last healthy state.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA route hook (\u003Ccode\u003EonEntering\u003C/code\u003E, \u003Ccode\u003EonEnter\u003C/code\u003E, \u003Ccode\u003EonLeave\u003C/code\u003E, \u003Ccode\u003EonUpdate\u003C/code\u003E, \u003Ccode\u003EonShow\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003EAn \u003Ccode\u003EMJX306\u003C/code\u003E report; the navigation continues.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA \u003Ccode\u003EuseGuard\u003C/code\u003E guard\u003C/td\u003E\n\u003Ctd\u003EAn \u003Ccode\u003EMJX306\u003C/code\u003E report, and the navigation is \u003Cstrong\u003Ecancelled\u003C/strong\u003E (\u003Ccode\u003E{ ok: false, cancelled: true, reason: \u0027guard\u0027 }\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EA route component\u0027s constructor / an \u003Ccode\u003Eimport()\u003C/code\u003E failure\u003C/td\u003E\n\u003Ctd\u003EAn \u003Ccode\u003EMJX304\u003C/code\u003E report and the \u003Ccode\u003Efallbacks.error\u003C/code\u003E page (\u003Ccode\u003Eparams.error\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EVirtualization dataRequest\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EFirst load/refresh: \u003Ccode\u003EerrorTemplate\u003C/code\u003E or \u003Ccode\u003EMJX207\u003C/code\u003E; a later page: \u003Ccode\u003EMJX207\u003C/code\u003E \u002B \u003Ccode\u003EgetState().error\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ELazy caller\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonError\u003C/code\u003E, then \u003Ccode\u003EFallbackview\u003C/code\u003E; if there is no \u003Ccode\u003EFallbackview\u003C/code\u003E, \u003Ccode\u003EMJX126\u003C/code\u003E is reported (\u003Ccode\u003Ecause\u003C/code\u003E = the original error). Cancellation (\u003Ccode\u003Esignal\u003C/code\u003E) is not reported.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ESeveral errors inside \u003Ccode\u003EDisposableStore.clear/dispose\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX503\u003C/code\u003E is thrown; the \u003Ccode\u003Ecause.errors\u003C/code\u003E array.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAn \u003Ca href=\u0022/docs/events#emitter\u0022\u003E\u003Ccode\u003EEmitter\u003C/code\u003E\u003C/a\u003E listener\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonUnexpectedError\u003C/code\u003E (default: rethrow) \u002B the listeners.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022dev-vs-prod\u0022\u003EDevelopment and production\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003E\u003C/th\u003E\n\u003Cth\u003EDevelopment (\u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E)\u003C/th\u003E\n\u003Cth\u003EProduction\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EReports (\u003Ccode\u003EMJX122\u003C/code\u003E …)\u003C/td\u003E\n\u003Ctd\u003Econsole \u002B listeners\u003C/td\u003E\n\u003Ctd\u003Econsole \u002B listeners\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EWarnings (\u003Ccode\u003EMJX2xx\u003C/code\u003E, the \u003Ccode\u003EMJX3xx\u003C/code\u003E checks …)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Econsole.warn\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Enone\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsafeCallSilent\u003C/code\u003E / \u003Ccode\u003EreportSuppressed\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Econsole\u003C/td\u003E\n\u003Ctd\u003Enone\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ECompiler contract mismatch (\u003Ccode\u003EMJX121\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Econsole.warn\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Enone\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.useLogging(false)\u003C/code\u003E turns off only the console output; the listeners keep working.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo wrap network and external resource calls with retries, timeouts and a circuit breaker, see \u003Ca href=\u0022/docs/resilience\u0022\u003EResilience\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"three-paths","text":"Three paths","level":2},{"id":"motif-error","text":"MotifError","level":2},{"id":"error-handler","text":"Listening for reports — errorHandler","level":2},{"id":"unexpected-errors","text":"Unexpected errors — setUnexpectedErrorHandler","level":2},{"id":"safe-call","text":"Error-safe call helpers","level":2},{"id":"where-errors-land","text":"Where is an error in user code caught?","level":2},{"id":"dev-vs-prod","text":"Development and production","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"memory-and-dispose","title":"Memory Management and Disposal"},"next":{"slug":"resilience","title":"Resilience"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Application structure</p>
+        <h1>Error Handling</h1>
+        <p>The difference between errors that are thrown, reported and written as warnings; MotifError, errorHandler, setUnexpectedErrorHandler and the safeCall helpers.</p>
+<p>MotifJS does not swallow errors coming from user code, but it does not bring the application down either. Every situation the framework throws, reports or writes as a warning has an <strong><code>MJX</code> code</strong>, and these situations go down one of three paths. This section covers those paths, the places to listen for errors, and the framework's own error-safe call helpers. The full list of codes is in the <a href="/docs/error-codes">Error and Warning Codes</a> table.</p>
+<h2 id="three-paths">Three paths</h2>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>When</th>
+<th>Where it goes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Throw</strong></td>
+<td>Misuse the caller has to fix right away: the named route does not exist (<code>MJX302</code>), the service is not registered (<code>MJX401</code>), a second <code>ApplicationBuilder</code> (<code>MJX405</code>), <code>Query.first()</code> on an empty array (<code>MJX601</code>) …</td>
+<td>A <code>MotifError</code> is thrown; catch it with <code>try/catch</code>.</td>
+</tr>
+<tr>
+<td><strong>Report</strong></td>
+<td>A user code error that should not stop the flow: a component hook (<code>MJX122</code>), an event handler (<code>MJX123</code>), an effect/binding (<code>MJX208</code>), a route hook and guard (<code>MJX306</code>), disposal and data loading errors …</td>
+<td><code>errorHandler.report(MotifError)</code>: to the console with <code>console.error</code> (<code>app.useLogging(false)</code> turns it off), to the <code>errorHandler.addListener(fn)</code> listeners, and to the devtools bus if there is one. The original error is in <code>cause</code>. Works in production too.</td>
+</tr>
+<tr>
+<td><strong>Warning</strong></td>
+<td>A situation that keeps running but is most likely unwanted: a duplicate <code>key</code> (<code>MJX202</code>), an effect that triggers itself (<code>MJX203</code>), route definition checks (<code>MJX310</code>–<code>MJX316</code>) …</td>
+<td>Only in development mode (<code>app.useDevelopment(true)</code>): <code>console.warn</code> and the devtools warning list. It does not go to listeners.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="motif-error"><code>MotifError</code></h2>
+<p>Every error the framework throws or reports is a <code>MotifError</code>:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>import { MotifError } from &quot;@motifx/core&quot;;
+
+try {
+  await app.navigateByName(&quot;note&quot;, { id: note.id });
+} catch (e) {
+  if (e instanceof MotifError &amp;&amp; e.code === 'MJX302') { /* named route not found */ }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>import { MotifError } from &quot;@motifx/core&quot;;
+
+try {
+  await app.navigateByName(&quot;note&quot;, { id: note.id });
+} catch (e) {
+  if (e instanceof MotifError &amp;&amp; e.code === 'MJX302') { /* named route not found */ }
+}</code></pre>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td><code>MotifErrorCode</code> (such as <code>'MJX302'</code>). Branch on this, not on the message text; the texts are in English and may change.</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td>An English message of the form <code>[motifjs] MJX302: …</code>.</td>
+</tr>
+<tr>
+<td><code>cause</code></td>
+<td>For reported errors, the original error (the value the user code threw).</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td><code>'MotifError'</code> (<code>'TimeoutError'</code> for a <code>Resilience</code> timeout).</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>MotifErrorCode</code> type is the union of all codes; it gives completion when you write <code>switch (e.code)</code>.</p>
+<h2 id="error-handler">Listening for reports — <code>errorHandler</code></h2>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>import { errorHandler } from &quot;@motifx/core&quot;;
+
+const off = errorHandler.addListener((error) =&gt; {
+  navigator.sendBeacon(&quot;/api/errors&quot;, JSON.stringify({ code: error.code, message: error.message, cause: String(error.cause) }));
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>import { errorHandler } from &quot;@motifx/core&quot;;
+
+const off = errorHandler.addListener((error) =&gt; {
+  navigator.sendBeacon(&quot;/api/errors&quot;, JSON.stringify({ code: error.code, message: error.message, cause: String(error.cause) }));
+});</code></pre>
+</div>
+<ul>
+<li>A listener receives every <strong>reported</strong> <code>MotifError</code> (<code>MJX122</code>, <code>MJX123</code>, <code>MJX208</code>, <code>MJX306</code> …). Errors without a code that go to <code>setUnexpectedErrorHandler</code> (below) reach the listeners as they are too.</li>
+<li>Thrown errors do not go to the listener (they already return to the caller), and neither do warnings.</li>
+<li>A listener is not tied to any component; it is removed with the function returned by <code>addListener</code> (<code>off()</code>).</li>
+<li>Listeners are called in the order they were added. An error thrown by one listener does not stop the other listeners or the flow that made the report; the error is rethrown with <code>setTimeout(…, 0)</code> and shows up in the browser at the <code>window.onerror</code> level. <code>safeCall</code> still returns the fallback value in that case.</li>
+<li>You can put your own error on the same path with <code>errorHandler.report(err)</code>; <code>err</code> must be an <code>Error</code>, it does not have to be a <code>MotifError</code>.</li>
+</ul>
+<p>The other members of the <code>ErrorHandler</code> class: <code>setDevelopmentMode(b)</code> / <code>isDevelopment()</code> (<code>app.useDevelopment</code> uses these), <code>setConsoleLogging(b)</code> (<code>app.useLogging</code>), <code>reportSuppressed(context, err)</code> (writes to the console only in development mode and does not go to listeners; the framework uses it for errors it swallows internally), <code>getUnexpectedErrorHandler()</code>.</p>
+<h2 id="unexpected-errors">Unexpected errors — <code>setUnexpectedErrorHandler</code></h2>
+<p>Errors caught inside <code>safeCall</code>/<code>safeCallAsync</code> and errors thrown by <code>Emitter</code> listeners have <strong>no code</strong>; they go down the <code>errorHandler.onUnexpectedError(err)</code> path:</p>
+<ol>
+<li>The handler given with <code>setUnexpectedErrorHandler(fn)</code> is called. The default handler <strong>rethrows</strong> the error with <code>setTimeout(…, 0)</code>: it shows up in the browser at the <code>window.onerror</code>/<code>unhandledrejection</code> level, and the calling flow is not interrupted.</li>
+<li>Then the <code>addListener</code> listeners receive the error as it is.</li>
+</ol>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>import { setUnexpectedErrorHandler } from &quot;@motifx/core&quot;;
+
+setUnexpectedErrorHandler((error) =&gt; navigator.sendBeacon(&quot;/api/errors&quot;, String(error)));   // send it to the server instead of rethrowing</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>import { setUnexpectedErrorHandler } from &quot;@motifx/core&quot;;
+
+setUnexpectedErrorHandler((error) =&gt; navigator.sendBeacon(&quot;/api/errors&quot;, String(error)));   // send it to the server instead of rethrowing</code></pre>
+</div>
+<p>Reports with a code (<code>MJX122</code> …) do <strong>not</strong> go to this handler; use <code>addListener</code> for them.</p>
+<h2 id="safe-call">Error-safe call helpers</h2>
+<p>The helpers the framework uses to wrap its own code are public:</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>safeCall(fn, context, fallback?)</code></td>
+<td>Calls <code>fn()</code>; if it throws, writes <code>[motifjs Error - context]</code> in development mode, passes the error to <code>onUnexpectedError</code> and returns <code>fallback</code> (or <code>undefined</code>).</td>
+</tr>
+<tr>
+<td><code>safeCallAsync(fn, context, fallback?)</code></td>
+<td>The same; <code>fn</code> returns a <code>Promise</code>, and the rejection is caught.</td>
+</tr>
+<tr>
+<td><code>safeCallSilent(fn, context)</code></td>
+<td>If it throws, writes to the console only in development mode; it does <strong>not</strong> go to <code>onUnexpectedError</code> or the listeners.</td>
+</tr>
+<tr>
+<td><code>errorHandler.safeCallSilentAsync</code>, <code>errorHandler.wrapSafe(fn, context)</code>, <code>errorHandler.wrapSafeAsync(fn, context)</code></td>
+<td>An async silent call; return a new function that wraps <code>fn</code> with the same behaviour (reports like <code>safeCall</code>).</td>
+</tr>
+</tbody>
+</table>
+<p><code>context</code> is a free label that only appears in the log.</p>
+<h2 id="where-errors-land">Where is an error in user code caught?</h2>
+<table>
+<thead>
+<tr>
+<th>Place</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A lifecycle hook (<code>onConfig</code>, <code>onBuilt</code>, <code>onMounted</code> …), <code>initializeComponent</code>, a <code>ref</code> callback, an Options API <code>ctor</code>, a <code>motif.on('x:…')</code> listener</td>
+<td>An <code>MJX122</code> report; the component keeps being built. The rejected promise of an <code>async</code> hook is the same.</td>
+</tr>
+<tr>
+<td>A DOM/component event handler (<code>onclick</code>, <code>motif.on</code>, <code>on:name</code>)</td>
+<td>An <code>MJX123</code> report; the other handlers of the same event run.</td>
+</tr>
+<tr>
+<td>An application event listener (<code>app.on</code>, <code>onRouterChanged</code>)</td>
+<td>An <code>MJX123</code> report; the other listeners run and the navigation completes.</td>
+</tr>
+<tr>
+<td><code>effect</code>, <code>bindings.watch</code>, a binding getter, a <code>createComputed</code> getter</td>
+<td>An <code>MJX208</code> report; the other effects in the same flush run, and the effect that failed keeps tracking. That run has no value: <code>onValue</code> in <code>effect(getter, onValue)</code> is not called, and bindings (<code>text</code>/<code>attr</code>/<code>class</code>, a <code>when</code>/<code>ternary</code>/<code>switchCase</code> branch) keep their last healthy state.</td>
+</tr>
+<tr>
+<td>A route hook (<code>onEntering</code>, <code>onEnter</code>, <code>onLeave</code>, <code>onUpdate</code>, <code>onShow</code>)</td>
+<td>An <code>MJX306</code> report; the navigation continues.</td>
+</tr>
+<tr>
+<td>A <code>useGuard</code> guard</td>
+<td>An <code>MJX306</code> report, and the navigation is <strong>cancelled</strong> (<code>{ ok: false, cancelled: true, reason: 'guard' }</code>).</td>
+</tr>
+<tr>
+<td>A route component's constructor / an <code>import()</code> failure</td>
+<td>An <code>MJX304</code> report and the <code>fallbacks.error</code> page (<code>params.error</code>).</td>
+</tr>
+<tr>
+<td><code>Virtualization dataRequest</code></td>
+<td>First load/refresh: <code>errorTemplate</code> or <code>MJX207</code>; a later page: <code>MJX207</code> + <code>getState().error</code>.</td>
+</tr>
+<tr>
+<td><code>Lazy caller</code></td>
+<td><code>onError</code>, then <code>Fallbackview</code>; if there is no <code>Fallbackview</code>, <code>MJX126</code> is reported (<code>cause</code> = the original error). Cancellation (<code>signal</code>) is not reported.</td>
+</tr>
+<tr>
+<td>Several errors inside <code>DisposableStore.clear/dispose</code></td>
+<td><code>MJX503</code> is thrown; the <code>cause.errors</code> array.</td>
+</tr>
+<tr>
+<td>An <a href="/docs/events#emitter"><code>Emitter</code></a> listener</td>
+<td><code>onUnexpectedError</code> (default: rethrow) + the listeners.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dev-vs-prod">Development and production</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Development (<code>app.useDevelopment(true)</code>)</th>
+<th>Production</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reports (<code>MJX122</code> …)</td>
+<td>console + listeners</td>
+<td>console + listeners</td>
+</tr>
+<tr>
+<td>Warnings (<code>MJX2xx</code>, the <code>MJX3xx</code> checks …)</td>
+<td><code>console.warn</code></td>
+<td>none</td>
+</tr>
+<tr>
+<td><code>safeCallSilent</code> / <code>reportSuppressed</code></td>
+<td>console</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Compiler contract mismatch (<code>MJX121</code>)</td>
+<td><code>console.warn</code></td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p><code>app.useLogging(false)</code> turns off only the console output; the listeners keep working.</p>
+<h2 id="next">Next step</h2>
+<p>To wrap network and external resource calls with retries, timeouts and a circuit breaker, see <a href="/docs/resilience">Resilience</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

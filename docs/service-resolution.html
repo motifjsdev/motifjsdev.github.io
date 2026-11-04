@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="ServiceProvider.get and getAsync, getService in a component, FromService, inject, deps and useApplication.">
+    <title>Resolving Services — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/service-resolution">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/service-resolution">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/service-resolution">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/service-resolution">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/service-resolution">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Resolving Services">
+    <meta property="og:description" content="ServiceProvider.get and getAsync, getService in a component, FromService, inject, deps and useApplication.">
+    <script type="application/json" id="doc-data">{"slug":"service-resolution","locale":"en","title":"Resolving Services","description":"ServiceProvider.get and getAsync, getService in a component, FromService, inject, deps and useApplication.","category":{"id":"5","title":"Dependency Injection"},"html":"\u003Ch2 id=\u0022resolution\u0022\u003EResolving a service\u003C/h2\u003E\n\u003Cp\u003EA registered service is asked for from the provider. In a component you use \u003Ccode\u003EgetService\u003C/code\u003E or \u003Ccode\u003EFromService\u003C/code\u003E, while a service is being built \u003Ccode\u003Einject\u003C/code\u003E or \u003Ccode\u003Edeps\u003C/code\u003E, and anywhere else the provider itself (\u003Ccode\u003Eapp.provider\u003C/code\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022service-provider-get\u0022\u003E\u003Ccode\u003EServiceProvider.get\u003C/code\u003E\u003C/h3\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Econst provider = app.provider;\nconst notes = provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Econst provider = app.provider;\nconst notes = provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe router resolves a route component from the provider if it is registered there (\u003Ccode\u003Eadd*\u003C/code\u003E or \u003Ccode\u003E@Injectable\u003C/code\u003E), and builds it directly if it is not. If a registered component cannot be resolved (a missing dependency, a cycle, a constructor error), the navigation fails with \u003Ccode\u003EMJX304\u003C/code\u003E, the original error is carried in \u003Ccode\u003Ecause\u003C/code\u003E, and \u003Ccode\u003Efallbacks.error\u003C/code\u003E is shown.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Eget\u003C/code\u003E is synchronous and throws an error (\u003Ccode\u003EMJX402\u003C/code\u003E) for a service registered with an async factory or a Promise; resolve those with \u003Ccode\u003Eawait provider.getAsync(token)\u003C/code\u003E. \u003Ccode\u003Eprovider.createScope(name?)\u003C/code\u003E produces a new child scope; \u003Ccode\u003Escoped\u003C/code\u003E services have a single instance per scope.\u003C/p\u003E\n\u003Cp\u003EFrom a place that has no access to the application instance (a helper module, a route hook), the running application\u0027s provider is reached through \u003Ccode\u003EApplication.main.provider\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Econst notes = Application.main.provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Econst notes = Application.main.provider.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022get-service\u0022\u003E\u003Ccode\u003EgetService\u003C/code\u003E from a component\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EgetService\u003C/code\u003E finds the nearest provider and resolves the token; if none is found or the resolution fails, it returns \u003Ccode\u003Enull\u003C/code\u003E (in development mode an \u003Ccode\u003EMJX407\u003C/code\u003E/\u003Ccode\u003EMJX408\u003C/code\u003E warning is written). In the example, the header of the notes list writes the total number of notes to its \u003Ccode\u003Etitle\u003C/code\u003E attribute while it is being built:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\u003Ccode\u003Econst notes = this.getService(NotesService);\nif (notes) this.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} notes\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\u003Ccode\u003Econst notes = head.getService(NotesService);\nif (notes) head.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} notes\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/parts/NotesHead.js\u0022\u003E\u003Ccode\u003Econst notes = this.getService(NotesService);\nif (notes) this.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} notes\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/parts/NotesHead.js\u0022\u003E\u003Ccode\u003Econst notes = head.getService(NotesService);\nif (notes) head.attr.add({ title: \u0060${notes.count(\u0026quot;notes\u0026quot;)} notes\u0060 });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003EIn class and Options components \u003Ccode\u003EgetService\u003C/code\u003E is on the component itself; these lines are written with \u003Ccode\u003Ethis\u003C/code\u003E in a hook (\u003Ccode\u003EonConfig\u003C/code\u003E, \u003Ccode\u003EonConfigured\u003C/code\u003E) or in a field initializer.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn a function component \u003Ccode\u003EgetService\u003C/code\u003E is on the component itself (\u003Ccode\u003Ehead\u003C/code\u003E in the example): in JSX, the component that reaches the root\u0027s \u003Ccode\u003EonConfig\u003C/code\u003E hook or \u003Ccode\u003Eref\u003C/code\u003E, and without JSX, the component received by the function of the \u003Ccode\u003EmotifComponent\u003C/code\u003E call that builds the root. When the component is not at hand, \u003Ca href=\u0022#from-service\u0022\u003E\u003Ccode\u003EFromService\u003C/code\u003E\u003C/a\u003E does the same job.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EIf the service is not registered, \u003Ccode\u003EgetService\u003C/code\u003E and \u003Ccode\u003EFromService\u003C/code\u003E return \u003Ccode\u003Enull\u003C/code\u003E; \u003Ccode\u003Einject\u003C/code\u003E, \u003Ccode\u003Eprovider.get\u003C/code\u003E and \u003Ccode\u003Eprovider.getAsync\u003C/code\u003E throw when they cannot find it.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022typescript\u0022\u003E\n\u003Cp\u003EWhen a class token is given, the return type is that class; this includes classes whose constructor takes parameters, abstract classes and classes with a \u003Ccode\u003Eprotected\u003C/code\u003E constructor. \u003Ccode\u003EgetService\u003C/code\u003E and \u003Ccode\u003EFromService\u003C/code\u003E give a nullable type (\u003Ccode\u003ET | null\u003C/code\u003E), while \u003Ccode\u003Einject\u003C/code\u003E, \u003Ccode\u003Eprovider.get\u003C/code\u003E and \u003Ccode\u003Eprovider.getAsync\u003C/code\u003E give a non-null type. Writing the generic explicitly (\u003Ccode\u003EgetService\u0026lt;NotesService\u0026gt;(NotesService)\u003C/code\u003E) gives the same type; it can be used to type the class through an interface: \u003Ccode\u003EFromService\u0026lt;NoteStore\u0026gt;(NotesService)\u003C/code\u003E. For a string or symbol token, the type is given with the generic: \u003Ccode\u003EgetService\u0026lt;{ apiUrl: string }\u0026gt;(\u0026quot;config\u0026quot;)\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022from-service\u0022\u003EThe \u003Ccode\u003EFromService\u003C/code\u003E helper\u003C/h3\u003E\n\u003Cp\u003EFor quick resolution anywhere (outside components as well):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nconst notes = FromService(NotesService);   // null if it cannot be resolved\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nconst notes = FromService(NotesService);   // null if it cannot be resolved\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EIf the service is not registered, there is a circular dependency, or the constructor throws, it returns \u003Ccode\u003Enull\u003C/code\u003E; in development mode an \u003Ccode\u003EMJX414\u003C/code\u003E warning is written together with the original error. For a \u003Ccode\u003Escoped\u003C/code\u003E service it gives the handle that leads to the current navigation\u0027s instance.\u003C/p\u003E\n\u003Ch3 id=\u0022inject\u0022\u003E\u003Ccode\u003Einject(token)\u003C/code\u003E — taking a dependency\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Einject\u003C/code\u003E is called in a class\u0027s field initializers and constructor while the provider is building that class, or inside a \u003Ccode\u003EuseFactory\u003C/code\u003E factory while the provider is calling it. It resolves the dependency from the provider that builds the class: a \u003Ccode\u003Escoped\u003C/code\u003E service is the instance of the route scope that asks for it. The return type comes from the token.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\u003Ccode\u003E@Injectable()\nexport class SearchIndex {\n  private notes = inject(NotesService);\n  private config = inject\u0026lt;{ apiUrl: string }\u0026gt;(\u0026quot;config\u0026quot;);\n  private readonly size: number;\n\n  constructor() {\n    this.size = this.notes.count(\u0026quot;notes\u0026quot;);   // can be used in the constructor too\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/search.js\u0022\u003E\u003Ccode\u003E@Injectable()\nexport class SearchIndex {\n  notes = inject(NotesService);\n  config = inject(\u0026quot;config\u0026quot;);\n  size;\n\n  constructor() {\n    this.size = this.notes.count(\u0026quot;notes\u0026quot;);   // can be used in the constructor too\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Einject\u003C/code\u003E works only at setup time. Inside a method, in a \u003Ccode\u003EsetTimeout\u003C/code\u003E callback, or when the class is built by hand with \u003Ccode\u003Enew SearchIndex()\u003C/code\u003E, it throws an \u003Ccode\u003EMJX409\u003C/code\u003E error. A token that is not registered gives \u003Ccode\u003EMJX401\u003C/code\u003E, and a circular dependency \u003Ccode\u003EMJX404\u003C/code\u003E. \u003Ccode\u003Einject\u003C/code\u003E is synchronous; take async registrations that need \u003Ccode\u003EgetAsync\u003C/code\u003E with \u003Ccode\u003Edeps\u003C/code\u003E or \u003Ccode\u003EgetAsync\u003C/code\u003E.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003EIn class and Options components, use \u003Ccode\u003Ethis.getService(token)\u003C/code\u003E for a dependency.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn a function component, use \u003Ccode\u003EFromService(token)\u003C/code\u003E for a dependency.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022deps\u0022\u003E\u003Ccode\u003Edeps\u003C/code\u003E — constructor parameters\u003C/h3\u003E\n\u003Cp\u003EDependencies can also be given to the constructor as parameters. The tokens in the \u003Ccode\u003Edeps\u003C/code\u003E array are resolved in order and passed to the constructor in the same order:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/search.ts\u0022\u003E\u003Ccode\u003E@Injectable({ deps: [NotesService, \u0026quot;config\u0026quot;] })\nexport class SearchIndex {\n  constructor(private notes: NotesService, private config: { apiUrl: string }) {}\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/search.js\u0022\u003E\u003Ccode\u003E@Injectable({ deps: [NotesService, \u0026quot;config\u0026quot;] })\nexport class SearchIndex {\n  constructor(notes, config) {\n    this.notes = notes;\n    this.config = config;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ETypeScript does not check the order; \u003Ccode\u003Edeps\u003C/code\u003E and the constructor parameters have to be written in the same order. In this form the class can be built by hand in a test with fake dependencies: \u003Ccode\u003Enew SearchIndex(fakeNotes, { apiUrl: \u0026quot;/test\u0026quot; })\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022use-application\u0022\u003EThe \u003Ccode\u003EuseApplication\u003C/code\u003E hook\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EuseApplication()\u003C/code\u003E gives the running application, its provider and the router in a single object; \u003Ccode\u003Eattach(...components)\u003C/code\u003E adds components to the application shell:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\n\nconst { application, services, router, attach } = useApplication();\nconst notes = services.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\n\nconst { application, services, router, attach } = useApplication();\nconst notes = services.get(NotesService);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn when and how services are disposed, go on to \u003Ca href=\u0022/docs/service-disposal\u0022\u003EDisposing Services\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"resolution","text":"Resolving a service","level":2},{"id":"service-provider-get","text":"ServiceProvider.get","level":3},{"id":"get-service","text":"getService from a component","level":3},{"id":"from-service","text":"The FromService helper","level":3},{"id":"inject","text":"inject(token) — taking a dependency","level":3},{"id":"deps","text":"deps — constructor parameters","level":3},{"id":"use-application","text":"The useApplication hook","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"service-lifetimes","title":"Lifetimes and Scopes"},"next":{"slug":"service-disposal","title":"Disposing Services"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Dependency Injection</p>
+        <h1>Resolving Services</h1>
+        <p>ServiceProvider.get and getAsync, getService in a component, FromService, inject, deps and useApplication.</p>
+<h2 id="resolution">Resolving a service</h2>
+<p>A registered service is asked for from the provider. In a component you use <code>getService</code> or <code>FromService</code>, while a service is being built <code>inject</code> or <code>deps</code>, and anywhere else the provider itself (<code>app.provider</code>).</p>
+<h3 id="service-provider-get"><code>ServiceProvider.get</code></h3>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>const provider = app.provider;
+const notes = provider.get(NotesService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>const provider = app.provider;
+const notes = provider.get(NotesService);</code></pre>
+</div>
+<p>The router resolves a route component from the provider if it is registered there (<code>add*</code> or <code>@Injectable</code>), and builds it directly if it is not. If a registered component cannot be resolved (a missing dependency, a cycle, a constructor error), the navigation fails with <code>MJX304</code>, the original error is carried in <code>cause</code>, and <code>fallbacks.error</code> is shown.</p>
+<p><code>get</code> is synchronous and throws an error (<code>MJX402</code>) for a service registered with an async factory or a Promise; resolve those with <code>await provider.getAsync(token)</code>. <code>provider.createScope(name?)</code> produces a new child scope; <code>scoped</code> services have a single instance per scope.</p>
+<p>From a place that has no access to the application instance (a helper module, a route hook), the running application's provider is reached through <code>Application.main.provider</code>:</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>const notes = Application.main.provider.get(NotesService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>const notes = Application.main.provider.get(NotesService);</code></pre>
+</div>
+<h3 id="get-service"><code>getService</code> from a component</h3>
+<p><code>getService</code> finds the nearest provider and resolves the token; if none is found or the resolution fails, it returns <code>null</code> (in development mode an <code>MJX407</code>/<code>MJX408</code> warning is written). In the example, the header of the notes list writes the total number of notes to its <code>title</code> attribute while it is being built:</p>
+<div class="doc-code" data-file="src/parts/NotesHead.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/parts/NotesHead.ts"><code>const notes = this.getService(NotesService);
+if (notes) this.attr.add({ title: `${notes.count(&quot;notes&quot;)} notes` });</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/parts/NotesHead.ts"><code>const notes = head.getService(NotesService);
+if (notes) head.attr.add({ title: `${notes.count(&quot;notes&quot;)} notes` });</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/parts/NotesHead.js"><code>const notes = this.getService(NotesService);
+if (notes) this.attr.add({ title: `${notes.count(&quot;notes&quot;)} notes` });</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/parts/NotesHead.js"><code>const notes = head.getService(NotesService);
+if (notes) head.attr.add({ title: `${notes.count(&quot;notes&quot;)} notes` });</code></pre>
+</div>
+<div class="doc-variant" data-variant="class,options">
+<p>In class and Options components <code>getService</code> is on the component itself; these lines are written with <code>this</code> in a hook (<code>onConfig</code>, <code>onConfigured</code>) or in a field initializer.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In a function component <code>getService</code> is on the component itself (<code>head</code> in the example): in JSX, the component that reaches the root's <code>onConfig</code> hook or <code>ref</code>, and without JSX, the component received by the function of the <code>motifComponent</code> call that builds the root. When the component is not at hand, <a href="#from-service"><code>FromService</code></a> does the same job.</p>
+</div>
+<p>If the service is not registered, <code>getService</code> and <code>FromService</code> return <code>null</code>; <code>inject</code>, <code>provider.get</code> and <code>provider.getAsync</code> throw when they cannot find it.</p>
+<div class="doc-variant" data-variant="typescript">
+<p>When a class token is given, the return type is that class; this includes classes whose constructor takes parameters, abstract classes and classes with a <code>protected</code> constructor. <code>getService</code> and <code>FromService</code> give a nullable type (<code>T | null</code>), while <code>inject</code>, <code>provider.get</code> and <code>provider.getAsync</code> give a non-null type. Writing the generic explicitly (<code>getService&lt;NotesService&gt;(NotesService)</code>) gives the same type; it can be used to type the class through an interface: <code>FromService&lt;NoteStore&gt;(NotesService)</code>. For a string or symbol token, the type is given with the generic: <code>getService&lt;{ apiUrl: string }&gt;(&quot;config&quot;)</code>.</p>
+</div>
+<h3 id="from-service">The <code>FromService</code> helper</h3>
+<p>For quick resolution anywhere (outside components as well):</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>import { FromService } from &quot;@motifx/core&quot;;
+const notes = FromService(NotesService);   // null if it cannot be resolved</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>import { FromService } from &quot;@motifx/core&quot;;
+const notes = FromService(NotesService);   // null if it cannot be resolved</code></pre>
+</div>
+<p>If the service is not registered, there is a circular dependency, or the constructor throws, it returns <code>null</code>; in development mode an <code>MJX414</code> warning is written together with the original error. For a <code>scoped</code> service it gives the handle that leads to the current navigation's instance.</p>
+<h3 id="inject"><code>inject(token)</code> — taking a dependency</h3>
+<p><code>inject</code> is called in a class's field initializers and constructor while the provider is building that class, or inside a <code>useFactory</code> factory while the provider is calling it. It resolves the dependency from the provider that builds the class: a <code>scoped</code> service is the instance of the route scope that asks for it. The return type comes from the token.</p>
+<div class="doc-code" data-file="src/services/search.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/search.ts"><code>@Injectable()
+export class SearchIndex {
+  private notes = inject(NotesService);
+  private config = inject&lt;{ apiUrl: string }&gt;(&quot;config&quot;);
+  private readonly size: number;
+
+  constructor() {
+    this.size = this.notes.count(&quot;notes&quot;);   // can be used in the constructor too
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/search.js"><code>@Injectable()
+export class SearchIndex {
+  notes = inject(NotesService);
+  config = inject(&quot;config&quot;);
+  size;
+
+  constructor() {
+    this.size = this.notes.count(&quot;notes&quot;);   // can be used in the constructor too
+  }
+}</code></pre>
+</div>
+<p><code>inject</code> works only at setup time. Inside a method, in a <code>setTimeout</code> callback, or when the class is built by hand with <code>new SearchIndex()</code>, it throws an <code>MJX409</code> error. A token that is not registered gives <code>MJX401</code>, and a circular dependency <code>MJX404</code>. <code>inject</code> is synchronous; take async registrations that need <code>getAsync</code> with <code>deps</code> or <code>getAsync</code>.</p>
+<div class="doc-variant" data-variant="class,options">
+<p>In class and Options components, use <code>this.getService(token)</code> for a dependency.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In a function component, use <code>FromService(token)</code> for a dependency.</p>
+</div>
+<h3 id="deps"><code>deps</code> — constructor parameters</h3>
+<p>Dependencies can also be given to the constructor as parameters. The tokens in the <code>deps</code> array are resolved in order and passed to the constructor in the same order:</p>
+<div class="doc-code" data-file="src/services/search.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/search.ts"><code>@Injectable({ deps: [NotesService, &quot;config&quot;] })
+export class SearchIndex {
+  constructor(private notes: NotesService, private config: { apiUrl: string }) {}
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/search.js"><code>@Injectable({ deps: [NotesService, &quot;config&quot;] })
+export class SearchIndex {
+  constructor(notes, config) {
+    this.notes = notes;
+    this.config = config;
+  }
+}</code></pre>
+</div>
+<p>TypeScript does not check the order; <code>deps</code> and the constructor parameters have to be written in the same order. In this form the class can be built by hand in a test with fake dependencies: <code>new SearchIndex(fakeNotes, { apiUrl: &quot;/test&quot; })</code>.</p>
+<h2 id="use-application">The <code>useApplication</code> hook</h2>
+<p><code>useApplication()</code> gives the running application, its provider and the router in a single object; <code>attach(...components)</code> adds components to the application shell:</p>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>import { useApplication } from &quot;@motifx/core&quot;;
+
+const { application, services, router, attach } = useApplication();
+const notes = services.get(NotesService);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>import { useApplication } from &quot;@motifx/core&quot;;
+
+const { application, services, router, attach } = useApplication();
+const notes = services.get(NotesService);</code></pre>
+</div>
+<h2 id="next">Next step</h2>
+<p>To learn when and how services are disposed, go on to <a href="/docs/service-disposal">Disposing Services</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

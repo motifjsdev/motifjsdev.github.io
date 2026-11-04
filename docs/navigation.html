@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="navigate and navigateByName, live route state, navigation direction and history entry state, scroll memory.">
+    <title>Navigation and Route State — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/navigation">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/navigation">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/navigation">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/navigation">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/navigation">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Navigation and Route State">
+    <meta property="og:description" content="navigate and navigateByName, live route state, navigation direction and history entry state, scroll memory.">
+    <script type="application/json" id="doc-data">{"slug":"navigation","locale":"en","title":"Navigation and Route State","description":"navigate and navigateByName, live route state, navigation direction and history entry state, scroll memory.","category":{"id":"4","title":"Routing"},"html":"\u003Ch2 id=\u0022navigate\u0022\u003ENavigating in code\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003ETo navigate from code, use \u003Ccode\u003Ethis.context\u003C/code\u003E (the running \u003Ccode\u003EApplication\u003C/code\u003E) inside a component, and the application instance or \u003Ccode\u003EuseNavigation()\u003C/code\u003E outside one:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003ETo navigate from code, use \u003Ccode\u003EuseNavigation()\u003C/code\u003E in a function component, and the application instance outside one:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst note = this.notes.create();\nthis.context.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst nav = useNavigation();\nconst note = notes.create();\nnav.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst note = this.notes.create();\nthis.context.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst nav = useNavigation();\nconst note = notes.create();\nnav.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EFrom the application instance, with navigation options:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/5\u0026quot;);\nawait app.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 42 });\n\nconst first = app.provider.get(NotesService).list(\u0026quot;notes\u0026quot;)[0];\nawait app.navigate(\u0060/notes/${first.id}\u0060, { replace: true });\nawait app.router.navigate(\u0026quot;/archive\u0026quot;, { replace: true });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/5\u0026quot;);\nawait app.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 42 });\n\nconst first = app.provider.get(NotesService).list(\u0026quot;notes\u0026quot;)[0];\nawait app.navigate(\u0060/notes/${first.id}\u0060, { replace: true });\nawait app.router.navigate(\u0026quot;/archive\u0026quot;, { replace: true });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.navigate(uri, options?)\u003C/code\u003E and \u003Ccode\u003Eapp.router.navigate(uri, options?)\u003C/code\u003E take the same \u003Ccode\u003ENavigationOptions\u003C/code\u003E type; \u003Ccode\u003Eapp.navigate\u003C/code\u003E passes the options on to the router.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EEffect\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereplace\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EReplaces the current history entry instead of adding a new one.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA value written to the history entry (see \u003Ca href=\u0022#direction-state\u0022\u003ENavigation direction and entry state\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eforce\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ENavigation to the address on screen is normally ignored; with \u003Ccode\u003Eforce: true\u003C/code\u003E the middleware, the guards and \u003Ccode\u003EonRouterChanged\u003C/code\u003E still run. The page on screen is not recreated.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Escroll\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EScrolling at the end of the navigation: \u003Ccode\u003E\u0027top\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027smooth\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027instant\u0027\u003C/code\u003E or \u003Ccode\u003E{ top, left, behavior }\u003C/code\u003E. When given, it overrides \u003Ccode\u003EscrollMemory\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.navigate\u003C/code\u003E returns the result of the navigation: for a completed navigation, the \u003Ccode\u003EResolveResult\u003C/code\u003E of the route shown (\u003Ccode\u003Eok: false\u003C/code\u003E for an address that was not found and for the error page); for an ignored navigation, \u003Ccode\u003E{ ok: true, skipped: true, uri }\u003C/code\u003E; for a cancellation by a guard or \u003Ccode\u003EonLeave\u003C/code\u003E, \u003Ccode\u003E{ ok: false, cancelled: true, reason }\u003C/code\u003E (\u003Ccode\u003Ereason\u003C/code\u003E: \u003Ccode\u003E\u0027guard\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027onLeave\u0027\u003C/code\u003E or the text given by \u003Ccode\u003EonLeave\u003C/code\u003E); for a navigation stopped by middleware, \u003Ccode\u003E{ ok: false, uri, cancelled: true, reason: \u0027middleware\u0027 }\u003C/code\u003E; if the router was restarted with \u003Ccode\u003ErestartRouter()\u003C/code\u003E or shut down with \u003Ccode\u003Eapp.dispose()\u003C/code\u003E before the navigation finished, \u003Ccode\u003E{ ok: false, uri, cancelled: true, reason: \u0027restart\u0027 | \u0027dispose\u0027 }\u003C/code\u003E; if the navigation falls over with an unexpected error, \u003Ccode\u003EMJX317\u003C/code\u003E is reported and the result is \u003Ccode\u003E{ ok: false, uri, cancelled: true, reason: \u0027error\u0027, error }\u003C/code\u003E. \u003Ccode\u003Eapp.router.navigate\u003C/code\u003E and \u003Ccode\u003Eapp.router.navigateByName\u003C/code\u003E return the same result.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EuseNavigation()\u003C/code\u003E returns the same object as \u003Ccode\u003Eapp.router\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst nav = useNavigation();\nawait nav.navigate(\u0026quot;/archive\u0026quot;);\nawait nav.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 7 });\nnav.params;    // current path parameters: { id: \u00277\u0027 }\nnav.route;     // the current route\nnav.uri;       // the current URI\nnav.fullPath;  // the full path\nnav.meta;      // route meta data: { folder: \u0027notes\u0027 }\nnav.chain;     // each route in the chain with its own path, parameters filled in: [\u0027/\u0027, \u0027/notes\u0027, \u0027/7\u0027]\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst nav = useNavigation();\nawait nav.navigate(\u0026quot;/archive\u0026quot;);\nawait nav.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 7 });\nnav.params;    // current path parameters: { id: \u00277\u0027 }\nnav.route;     // the current route\nnav.uri;       // the current URI\nnav.fullPath;  // the full path\nnav.meta;      // route meta data: { folder: \u0027notes\u0027 }\nnav.chain;     // each route in the chain with its own path, parameters filled in: [\u0027/\u0027, \u0027/notes\u0027, \u0027/7\u0027]\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022live-route-state\u0022\u003ELive route state\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.router\u003C/code\u003E is a single object for the whole application. A router taken into a field, from \u003Ccode\u003EuseApplication().router\u003C/code\u003E or from \u003Ccode\u003EuseNavigation()\u003C/code\u003E gives the current route on every read. The route fields (\u003Ccode\u003Eparams\u003C/code\u003E, \u003Ccode\u003Eroute\u003C/code\u003E, \u003Ccode\u003Euri\u003C/code\u003E, \u003Ccode\u003Eok\u003C/code\u003E, \u003Ccode\u003Emeta\u003C/code\u003E, \u003Ccode\u003Eextend\u003C/code\u003E, \u003Ccode\u003EfullPath\u003C/code\u003E, \u003Ccode\u003EaliasOf\u003C/code\u003E, \u003Ccode\u003Echain\u003C/code\u003E, \u003Ccode\u003Edirection\u003C/code\u003E, \u003Ccode\u003Estate\u003C/code\u003E, \u003Ccode\u003Estack\u003C/code\u003E) are reactive: read inside a function, they run again on navigation. A layout that stays in place throughout navigation is updated on every navigation by reading the route fields inside a getter; it is not rebuilt. In the example, two attributes are calculated from the route\u0027s \u003Ccode\u003Emeta\u003C/code\u003E and \u003Ccode\u003Eparams\u003C/code\u003E values:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  override view() {\n    return (\n      \u0026lt;div\n        class=\u0026quot;app\u0026quot;\n        data-layout={() =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n        data-pane={() =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n      \u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return (\n    \u0026lt;div\n      class=\u0026quot;app\u0026quot;\n      data-layout={() =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n      data-pane={() =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n    \u0026gt;\n      \u0026lt;RouterView /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return \u0026lt;RouterView /\u0026gt;;\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  override view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (app: ComponentBase) =\u0026gt; {\n      app.class.add(\u0026quot;app\u0026quot;);\n      app.attr.add({\n        \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n        \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n      });\n      app.controls.add(motifComponent(RouterView));\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return motifComponent(\u0026quot;div\u0026quot;, (app: ComponentBase) =\u0026gt; {\n    app.class.add(\u0026quot;app\u0026quot;);\n    app.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n    app.controls.add(motifComponent(RouterView));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return motifComponent(RouterView);\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  view() {\n    return (\n      \u0026lt;div\n        class=\u0026quot;app\u0026quot;\n        data-layout={() =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n        data-pane={() =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n      \u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return (\n    \u0026lt;div\n      class=\u0026quot;app\u0026quot;\n      data-layout={() =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n      data-pane={() =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n    \u0026gt;\n      \u0026lt;RouterView /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return \u0026lt;RouterView /\u0026gt;;\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (app) =\u0026gt; {\n      app.class.add(\u0026quot;app\u0026quot;);\n      app.attr.add({\n        \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n        \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n      });\n      app.controls.add(motifComponent(RouterView));\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return motifComponent(\u0026quot;div\u0026quot;, (app) =\u0026gt; {\n    app.class.add(\u0026quot;app\u0026quot;);\n    app.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n    app.controls.add(motifComponent(RouterView));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return motifComponent(RouterView);\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe attributes become \u003Ccode\u003Enotes\u003C/code\u003E / \u003Ccode\u003Elist\u003C/code\u003E at \u003Ccode\u003E/notes\u003C/code\u003E, \u003Ccode\u003Enotes\u003C/code\u003E / \u003Ccode\u003Edetail\u003C/code\u003E at \u003Ccode\u003E/notes/3\u003C/code\u003E, and \u003Ccode\u003Epage\u003C/code\u003E / \u003Ccode\u003Edetail\u003C/code\u003E at \u003Ccode\u003E/settings\u003C/code\u003E; the layout is not rebuilt, only the attributes are updated.\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003ELive reading goes through the object.\u003C/strong\u003E \u003Ccode\u003Econst { params } = useNavigation()\u003C/code\u003E or \u003Ccode\u003Econst id = nav.params.id\u003C/code\u003E takes the value of that moment and does not change afterwards; for the current value, read \u003Ccode\u003Enav.params.id\u003C/code\u003E every time.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe route changes after the leaving page has been taken off the screen and before the new page is attached\u003C/strong\u003E (in stack navigation, before the transition animation); \u003Ccode\u003Escoped\u003C/code\u003E services move to the new navigation at the same moment. A page taken into the \u003Ccode\u003EkeepAlive\u003C/code\u003E cache sees its own route in \u003Ccode\u003EonDeactivated\u003C/code\u003E. The \u003Ccode\u003EonDisposing\u003C/code\u003E and \u003Ccode\u003EonDisposed\u003C/code\u003E hooks of a page being disposed run after the new page has come on screen, and see the route that was navigated to (see \u003Ca href=\u0022/docs/router-view#leaving-page\u0022\u003EThe page that leaves\u003C/a\u003E). A new page built by the router sees the route being navigated to in its constructor and in its field initial values.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EGuards and route hooks\u003C/strong\u003E (\u003Ccode\u003EuseGuard\u003C/code\u003E, \u003Ccode\u003EonEntering\u003C/code\u003E, \u003Ccode\u003EonUpdate\u003C/code\u003E) run before the route changes; the route being navigated to is in the context object (\u003Ccode\u003Eto\u003C/code\u003E, \u003Ccode\u003Eparams\u003C/code\u003E). In a cancelled navigation the route does not change.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003EkeepAlive\u003C/code\u003E pages in the cache\u003C/strong\u003E read the current route even while hidden: when another route is visited, their bindings run again with that route\u0027s values. Do route-dependent work (such as loading data) in \u003Ccode\u003EonActivated\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EBefore \u003Ccode\u003EuseRouter()\u003C/code\u003E is called, the route fields are empty (\u003Ccode\u003Eparams\u003C/code\u003E \u003Ccode\u003E{}\u003C/code\u003E, \u003Ccode\u003Euri\u003C/code\u003E \u003Ccode\u003E\u0027\u0027\u003C/code\u003E, \u003Ccode\u003Eroute\u003C/code\u003E \u003Ccode\u003Enull\u003C/code\u003E, \u003Ccode\u003Echain\u003C/code\u003E \u003Ccode\u003E[]\u003C/code\u003E) and \u003Ccode\u003Enavigate\u003C/code\u003E throws \u003Ccode\u003EMJX309\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022listen\u0022\u003EListening for route changes\u003C/h3\u003E\n\u003Cp\u003EFor values that show up on screen, reading the reactive fields inside a function is enough; \u003Ccode\u003EMainLayout\u003C/code\u003E above does that. If some side work has to be done after a navigation (the tab title, focus, a measurement), listen to \u003Ccode\u003EonRouterChanged\u003C/code\u003E. \u003Ccode\u003Eapp.onRouterChanged(fn)\u003C/code\u003E returns a function that removes the subscription. When \u003Ccode\u003Econtext.onRouterChanged(fn)\u003C/code\u003E is written inside a component (\u003Ccode\u003Ethis.context\u003C/code\u003E in a class and in Options, the \u003Ccode\u003Econtext\u003C/code\u003E of the \u003Ca href=\u0022/docs/components#function-root\u0022\u003Eroot component\u003C/a\u003E in a function component), the subscription is tied to the component\u0027s lifetime: it goes away on its own when the component is disposed, with no need to remove it separately. The payload has the form \u003Ccode\u003E{ uri, params, meta, route, ok, initial, redirectedFrom?, direction?, state? }\u003C/code\u003E; on the startup navigation \u003Ccode\u003Einitial\u003C/code\u003E is \u003Ccode\u003Etrue\u003C/code\u003E (see \u003Ca href=\u0022/docs/route-guards#guards\u0022\u003ENavigation guards\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022direction-state\u0022\u003ENavigation direction and entry state — \u003Ccode\u003Edirection\u003C/code\u003E, \u003Ccode\u003Estate\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EThe direction of every navigation arrives in the \u003Ccode\u003Edirection\u003C/code\u003E field: \u003Ccode\u003E\u0027initial\u0027\u003C/code\u003E (startup), \u003Ccode\u003E\u0027push\u0027\u003C/code\u003E (a new history entry; this includes an address typed into the address bar by hand and an entry opened by a plain anchor link), \u003Ccode\u003E\u0027replace\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027back\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027forward\u0027\u003C/code\u003E, or \u003Ccode\u003E\u0027traverse\u0027\u003C/code\u003E for a history move whose order cannot be known. The direction shows up in guards (\u003Ccode\u003Eto.direction\u003C/code\u003E), in the \u003Ccode\u003EonRouterChanged\u003C/code\u003E payload and in \u003Ccode\u003Eapp.router.direction\u003C/code\u003E. Use it to pick transitions by direction (slide left going forward, right going back).\u003C/p\u003E\n\u003Cp\u003EA value given with \u003Ccode\u003Enavigate(uri, { state })\u003C/code\u003E is written to that history entry, and it comes back \u003Cstrong\u003Ewhen returning to the entry with back/forward as well\u003C/strong\u003E; it is kept even if the page is reloaded. It suits data that has to travel without being written to the address (which filter the list was reached from, the open tab):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/7\u0026quot;, { state: { from: \u0026quot;archive\u0026quot;, query: \u0026quot;meeting\u0026quot; } });\n\napp.router.state;                // { from: \u0027archive\u0027, query: \u0027meeting\u0027 } — also when coming back with back/forward\napp.useGuard(({ to }, next) =\u0026gt; { console.log(to.direction, to.state); next(); });\napp.onRouterChanged(({ direction, state }) =\u0026gt; console.log(direction, state));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/7\u0026quot;, { state: { from: \u0026quot;archive\u0026quot;, query: \u0026quot;meeting\u0026quot; } });\n\napp.router.state;                // { from: \u0027archive\u0027, query: \u0027meeting\u0027 } — also when coming back with back/forward\napp.useGuard(({ to }, next) =\u0026gt; { console.log(to.direction, to.state); next(); });\napp.onRouterChanged(({ direction, state }) =\u0026gt; console.log(direction, state));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EPlain objects are stored as they are (the router only adds its own stamp, and \u003Ccode\u003Eapp.router.state\u003C/code\u003E removes it); values that are not plain, such as \u003Ccode\u003EDate\u003C/code\u003E and \u003Ccode\u003EMap\u003C/code\u003E, are not touched at all. For an entry without \u003Ccode\u003Estate\u003C/code\u003E, \u003Ccode\u003Eapp.router.state\u003C/code\u003E is \u003Ccode\u003Eundefined\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022scroll-memory\u0022\u003EScroll memory — \u003Ccode\u003EscrollMemory\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EIn a single-page application navigation changes the document but not the scroll position, and the browser does not manage that for an SPA on its own. When \u003Ccode\u003EscrollMemory\u003C/code\u003E is turned on, the router keeps the last scroll position of every path and puts the position back when that path is returned to (back/forward, a link, a reload):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe rules:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EA path never seen before\u003C/strong\u003E starts at the top of the page (turned off with \u003Ccode\u003Etop: false\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EIf there is an anchor in the address\u003C/strong\u003E (\u003Ccode\u003E/notes/5#history\u003C/code\u003E), the anchor overrides the memory and the page scrolls to the matching \u003Ccode\u003Eid\u003C/code\u003E. If there is a fixed top bar, give \u003Ccode\u003Escroll-margin-top\u003C/code\u003E in CSS.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EScrolling is instant\u003C/strong\u003E, even if CSS has \u003Ccode\u003Escroll-behavior: smooth\u003C/code\u003E: returning to a saved position, the top of a new page, an anchor arriving from another page, and back/forward all settle into place without waiting, as in the browser\u0027s own page transitions. An anchor link within the same page (\u003Ccode\u003E/notes/5\u003C/code\u003E → \u003Ccode\u003E/notes/5#history\u003C/code\u003E, including a plain \u003Ccode\u003E\u0026lt;a href=\u0026quot;#history\u0026quot;\u0026gt;\u003C/code\u003E in \u003Ccode\u003Ehistory\u003C/code\u003E mode) follows the \u003Ccode\u003Escroll-behavior\u003C/code\u003E rule in CSS; if \u003Ccode\u003Esmooth\u003C/code\u003E is given, it slides smoothly.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe navigation-specific \u003Ccode\u003Escroll\u003C/code\u003E option\u003C/strong\u003E overrides the memory: \u003Ccode\u003Eapp.router.navigate(\u0027/x\u0027, { scroll: \u0027top\u0027 })\u003C/code\u003E always goes to the top; it scrolls the container if \u003Ccode\u003Econtainer\u003C/code\u003E is set, and the window otherwise. When leaving the page navigated to, the position is still saved under that page\u0027s name.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EPositions are kept in memory:\u003C/strong\u003E they survive a restart with \u003Ccode\u003ErestartRouter()\u003C/code\u003E and are cleared when the page is reloaded. If they should be remembered after a reload too, you do the saving; where to write them (browser storage, a server) is up to you.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EFor saving, \u003Ccode\u003Eapp.router\u003C/code\u003E gives three methods: \u003Ccode\u003EsaveScrollPositions(fn)\u003C/code\u003E calls the callback with the current positions every time saving is needed (when leaving a page, on \u003Ccode\u003Epagehide\u003C/code\u003E, when the page is hidden, and on \u003Ccode\u003Eapp.dispose()\u003C/code\u003E) and returns a function that removes the subscription; the subscription survives a restart as well. \u003Ccode\u003ErestoreScrollPositions(positions)\u003C/code\u003E adds the given positions to the memory (\u003Ccode\u003Elimit\u003C/code\u003E applies); it can be called at startup, before \u003Ccode\u003Erun()\u003C/code\u003E too. \u003Ccode\u003EscrollPositions()\u003C/code\u003E returns the current positions, including that of the page on screen, in the form \u003Ccode\u003E{ \u0026quot;/notes\u0026quot;: 1200 }\u003C/code\u003E. While \u003Ccode\u003EscrollMemory\u003C/code\u003E is off, \u003Ccode\u003EscrollPositions()\u003C/code\u003E returns an empty object, \u003Ccode\u003ErestoreScrollPositions\u003C/code\u003E has no effect and the callback is never called.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\napp.router.restoreScrollPositions(JSON.parse(localStorage.getItem(\u0026quot;scroll\u0026quot;) ?? \u0026quot;{}\u0026quot;));\napp.router.saveScrollPositions((positions) =\u0026gt; localStorage.setItem(\u0026quot;scroll\u0026quot;, JSON.stringify(positions)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\napp.router.restoreScrollPositions(JSON.parse(localStorage.getItem(\u0026quot;scroll\u0026quot;) ?? \u0026quot;{}\u0026quot;));\napp.router.saveScrollPositions((positions) =\u0026gt; localStorage.setItem(\u0026quot;scroll\u0026quot;, JSON.stringify(positions)));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EFine-tuning with a settings object:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  scrollMemory: {\n    top: true,          // on a path not seen before, go back to the top (default)\n    anchor: true,       // the anchor overrides the saved position (default)\n    settleMs: 1200,     // upper limit for waiting until the content settles\n    limit: 60,          // how many paths to remember\n    // If one page is reached from two addresses, reduce them to a single key:\n    key: (path) =\u0026gt; path.replace(/^\\/my-notes/, \u0026quot;/notes\u0026quot;),\n    // Remember the scroll of a container instead of the window (a selector, an element or a function that returns one):\n    container: \u0026quot;main.detail\u0026quot;,\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  scrollMemory: {\n    top: true,          // on a path not seen before, go back to the top (default)\n    anchor: true,       // the anchor overrides the saved position (default)\n    settleMs: 1200,     // upper limit for waiting until the content settles\n    limit: 60,          // how many paths to remember\n    // If one page is reached from two addresses, reduce them to a single key:\n    key: (path) =\u0026gt; path.replace(/^\\/my-notes/, \u0026quot;/notes\u0026quot;),\n    // Remember the scroll of a container instead of the window (a selector, an element or a function that returns one):\n    container: \u0026quot;main.detail\u0026quot;,\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Cstrong\u003EIf scrolling happens inside a container\u003C/strong\u003E (like mobile shells with a fixed header and a tab bar), give \u003Ccode\u003Econtainer\u003C/code\u003E. The container is looked up again on every navigation, so it is fine if it is not in the DOM yet on the first load; if it is not found, window scrolling is used.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EIf content is drawn asynchronously\u003C/strong\u003E (remote data, markdown, a virtual list, rows chunked with \u003Ccode\u003Ex-chunk\u003C/code\u003E), do not worry: restoring is not a one-off, it is retried on every frame until the target is reached or \u003Ccode\u003EsettleMs\u003C/code\u003E runs out. If the user steps in meanwhile with the wheel, a touch, a key or a mouse click, the attempt is dropped.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EThe cost:\u003C/strong\u003E zero at rest. The \u003Ccode\u003Escroll\u003C/code\u003E event is not listened to; the position is read once per navigation: after the guards have passed, right before the address is applied and the content is changed. At that moment the leaving page is still on screen and its position is real; in a cancelled navigation the position is not read. While it is on, \u003Ccode\u003Ehistory.scrollRestoration\u003C/code\u003E is set to \u003Ccode\u003E\u0027manual\u0027\u003C/code\u003E; on \u003Ccode\u003Epagehide\u003C/code\u003E / when the page is hidden, the position of the page on screen is also taken into memory and the saving callback is called. While it is off (the default), no listener is attached and \u003Ccode\u003Ehistory.scrollRestoration\u003C/code\u003E is not touched.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EWhere the anchor comes from depends on the mode.\u003C/strong\u003E The \u003Ccode\u003E#…\u003C/code\u003E in the address bar is read as an anchor only in \u003Ccode\u003Ehistory\u003C/code\u003E mode. In \u003Ccode\u003Ehash\u003C/code\u003E / \u003Ccode\u003Efile\u003C/code\u003E (and \u003Ccode\u003Eshell\u003C/code\u003E) mode only the route\u0027s own anchor (\u003Ccode\u003E/page#section\u003C/code\u003E) is used; the \u003Ccode\u003E#\u003C/code\u003E part of the address is the route, so it does not count as an anchor. In these modes the memory works with the default \u003Ccode\u003Eanchor\u003C/code\u003E setting.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo control and stop navigation, go on to \u003Ca href=\u0022/docs/route-guards\u0022\u003ERoute Hooks and Guards\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"navigate","text":"Navigating in code","level":2},{"id":"live-route-state","text":"Live route state","level":3},{"id":"listen","text":"Listening for route changes","level":3},{"id":"direction-state","text":"Navigation direction and entry state — direction, state","level":3},{"id":"scroll-memory","text":"Scroll memory — scrollMemory","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"router-links","title":"Links"},"next":{"slug":"route-guards","title":"Route Hooks and Guards"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Routing</p>
+        <h1>Navigation and Route State</h1>
+        <p>navigate and navigateByName, live route state, navigation direction and history entry state, scroll memory.</p>
+<h2 id="navigate">Navigating in code</h2>
+<div class="doc-variant" data-variant="class,options">
+<p>To navigate from code, use <code>this.context</code> (the running <code>Application</code>) inside a component, and the application instance or <code>useNavigation()</code> outside one:</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>To navigate from code, use <code>useNavigation()</code> in a function component, and the application instance outside one:</p>
+</div>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const note = this.notes.create();
+this.context.navigate(`/notes/${note.id}`);</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const nav = useNavigation();
+const note = notes.create();
+nav.navigate(`/notes/${note.id}`);</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>const note = this.notes.create();
+this.context.navigate(`/notes/${note.id}`);</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>const nav = useNavigation();
+const note = notes.create();
+nav.navigate(`/notes/${note.id}`);</code></pre>
+</div>
+<p>From the application instance, with navigation options:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>await app.navigate(&quot;/notes/5&quot;);
+await app.navigateByName(&quot;notes-note&quot;, { id: 42 });
+
+const first = app.provider.get(NotesService).list(&quot;notes&quot;)[0];
+await app.navigate(`/notes/${first.id}`, { replace: true });
+await app.router.navigate(&quot;/archive&quot;, { replace: true });</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>await app.navigate(&quot;/notes/5&quot;);
+await app.navigateByName(&quot;notes-note&quot;, { id: 42 });
+
+const first = app.provider.get(NotesService).list(&quot;notes&quot;)[0];
+await app.navigate(`/notes/${first.id}`, { replace: true });
+await app.router.navigate(&quot;/archive&quot;, { replace: true });</code></pre>
+</div>
+<p><code>app.navigate(uri, options?)</code> and <code>app.router.navigate(uri, options?)</code> take the same <code>NavigationOptions</code> type; <code>app.navigate</code> passes the options on to the router.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>replace</code></td>
+<td>Replaces the current history entry instead of adding a new one.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>A value written to the history entry (see <a href="#direction-state">Navigation direction and entry state</a>).</td>
+</tr>
+<tr>
+<td><code>force</code></td>
+<td>Navigation to the address on screen is normally ignored; with <code>force: true</code> the middleware, the guards and <code>onRouterChanged</code> still run. The page on screen is not recreated.</td>
+</tr>
+<tr>
+<td><code>scroll</code></td>
+<td>Scrolling at the end of the navigation: <code>'top'</code>, <code>'smooth'</code>, <code>'instant'</code> or <code>{ top, left, behavior }</code>. When given, it overrides <code>scrollMemory</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><code>app.navigate</code> returns the result of the navigation: for a completed navigation, the <code>ResolveResult</code> of the route shown (<code>ok: false</code> for an address that was not found and for the error page); for an ignored navigation, <code>{ ok: true, skipped: true, uri }</code>; for a cancellation by a guard or <code>onLeave</code>, <code>{ ok: false, cancelled: true, reason }</code> (<code>reason</code>: <code>'guard'</code>, <code>'onLeave'</code> or the text given by <code>onLeave</code>); for a navigation stopped by middleware, <code>{ ok: false, uri, cancelled: true, reason: 'middleware' }</code>; if the router was restarted with <code>restartRouter()</code> or shut down with <code>app.dispose()</code> before the navigation finished, <code>{ ok: false, uri, cancelled: true, reason: 'restart' | 'dispose' }</code>; if the navigation falls over with an unexpected error, <code>MJX317</code> is reported and the result is <code>{ ok: false, uri, cancelled: true, reason: 'error', error }</code>. <code>app.router.navigate</code> and <code>app.router.navigateByName</code> return the same result.</p>
+<p><code>useNavigation()</code> returns the same object as <code>app.router</code>:</p>
+<div class="doc-code" data-file="src/pages/NotePage.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/pages/NotePage.ts"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+
+const nav = useNavigation();
+await nav.navigate(&quot;/archive&quot;);
+await nav.navigateByName(&quot;notes-note&quot;, { id: 7 });
+nav.params;    // current path parameters: { id: '7' }
+nav.route;     // the current route
+nav.uri;       // the current URI
+nav.fullPath;  // the full path
+nav.meta;      // route meta data: { folder: 'notes' }
+nav.chain;     // each route in the chain with its own path, parameters filled in: ['/', '/notes', '/7']</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/pages/NotePage.js"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+
+const nav = useNavigation();
+await nav.navigate(&quot;/archive&quot;);
+await nav.navigateByName(&quot;notes-note&quot;, { id: 7 });
+nav.params;    // current path parameters: { id: '7' }
+nav.route;     // the current route
+nav.uri;       // the current URI
+nav.fullPath;  // the full path
+nav.meta;      // route meta data: { folder: 'notes' }
+nav.chain;     // each route in the chain with its own path, parameters filled in: ['/', '/notes', '/7']</code></pre>
+</div>
+<h3 id="live-route-state">Live route state</h3>
+<p><code>app.router</code> is a single object for the whole application. A router taken into a field, from <code>useApplication().router</code> or from <code>useNavigation()</code> gives the current route on every read. The route fields (<code>params</code>, <code>route</code>, <code>uri</code>, <code>ok</code>, <code>meta</code>, <code>extend</code>, <code>fullPath</code>, <code>aliasOf</code>, <code>chain</code>, <code>direction</code>, <code>state</code>, <code>stack</code>) are reactive: read inside a function, they run again on navigation. A layout that stays in place throughout navigation is updated on every navigation by reading the route fields inside a getter; it is not rebuilt. In the example, two attributes are calculated from the route's <code>meta</code> and <code>params</code> values:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/layouts/MainLayout.tsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  override view() {
+    return (
+      &lt;div
+        class=&quot;app&quot;
+        data-layout={() =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+        data-pane={() =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+      &gt;
+        &lt;RouterView /&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/MainLayout.tsx"><code>import { RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return (
+    &lt;div
+      class=&quot;app&quot;
+      data-layout={() =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+      data-pane={() =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+    &gt;
+      &lt;RouterView /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/layouts/MainLayout.tsx"><code>import { motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return &lt;RouterView /&gt;;
+  },
+});
+
+export default MainLayout;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/MainLayout.ts"><code>import { Component, ComponentBase, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  override view() {
+    return motifComponent(&quot;div&quot;, (app: ComponentBase) =&gt; {
+      app.class.add(&quot;app&quot;);
+      app.attr.add({
+        &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+        &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+      });
+      app.controls.add(motifComponent(RouterView));
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/MainLayout.ts"><code>import { ComponentBase, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return motifComponent(&quot;div&quot;, (app: ComponentBase) =&gt; {
+    app.class.add(&quot;app&quot;);
+    app.attr.add({
+      &quot;data-layout&quot;: () =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+    app.controls.add(motifComponent(RouterView));
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/MainLayout.ts"><code>import { motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return motifComponent(RouterView);
+  },
+});
+
+export default MainLayout;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/layouts/MainLayout.jsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  view() {
+    return (
+      &lt;div
+        class=&quot;app&quot;
+        data-layout={() =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+        data-pane={() =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+      &gt;
+        &lt;RouterView /&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/MainLayout.jsx"><code>import { RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return (
+    &lt;div
+      class=&quot;app&quot;
+      data-layout={() =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+      data-pane={() =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+    &gt;
+      &lt;RouterView /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/layouts/MainLayout.jsx"><code>import { motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return &lt;RouterView /&gt;;
+  },
+});
+
+export default MainLayout;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/MainLayout.js"><code>import { Component, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  view() {
+    return motifComponent(&quot;div&quot;, (app) =&gt; {
+      app.class.add(&quot;app&quot;);
+      app.attr.add({
+        &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+        &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+      });
+      app.controls.add(motifComponent(RouterView));
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/MainLayout.js"><code>import { motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return motifComponent(&quot;div&quot;, (app) =&gt; {
+    app.class.add(&quot;app&quot;);
+    app.attr.add({
+      &quot;data-layout&quot;: () =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+    app.controls.add(motifComponent(RouterView));
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/MainLayout.js"><code>import { motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return motifComponent(RouterView);
+  },
+});
+
+export default MainLayout;</code></pre>
+</div>
+<p>The attributes become <code>notes</code> / <code>list</code> at <code>/notes</code>, <code>notes</code> / <code>detail</code> at <code>/notes/3</code>, and <code>page</code> / <code>detail</code> at <code>/settings</code>; the layout is not rebuilt, only the attributes are updated.</p>
+<ul>
+<li><strong>Live reading goes through the object.</strong> <code>const { params } = useNavigation()</code> or <code>const id = nav.params.id</code> takes the value of that moment and does not change afterwards; for the current value, read <code>nav.params.id</code> every time.</li>
+<li><strong>The route changes after the leaving page has been taken off the screen and before the new page is attached</strong> (in stack navigation, before the transition animation); <code>scoped</code> services move to the new navigation at the same moment. A page taken into the <code>keepAlive</code> cache sees its own route in <code>onDeactivated</code>. The <code>onDisposing</code> and <code>onDisposed</code> hooks of a page being disposed run after the new page has come on screen, and see the route that was navigated to (see <a href="/docs/router-view#leaving-page">The page that leaves</a>). A new page built by the router sees the route being navigated to in its constructor and in its field initial values.</li>
+<li><strong>Guards and route hooks</strong> (<code>useGuard</code>, <code>onEntering</code>, <code>onUpdate</code>) run before the route changes; the route being navigated to is in the context object (<code>to</code>, <code>params</code>). In a cancelled navigation the route does not change.</li>
+<li><strong><code>keepAlive</code> pages in the cache</strong> read the current route even while hidden: when another route is visited, their bindings run again with that route's values. Do route-dependent work (such as loading data) in <code>onActivated</code>.</li>
+<li>Before <code>useRouter()</code> is called, the route fields are empty (<code>params</code> <code>{}</code>, <code>uri</code> <code>''</code>, <code>route</code> <code>null</code>, <code>chain</code> <code>[]</code>) and <code>navigate</code> throws <code>MJX309</code>.</li>
+</ul>
+<h3 id="listen">Listening for route changes</h3>
+<p>For values that show up on screen, reading the reactive fields inside a function is enough; <code>MainLayout</code> above does that. If some side work has to be done after a navigation (the tab title, focus, a measurement), listen to <code>onRouterChanged</code>. <code>app.onRouterChanged(fn)</code> returns a function that removes the subscription. When <code>context.onRouterChanged(fn)</code> is written inside a component (<code>this.context</code> in a class and in Options, the <code>context</code> of the <a href="/docs/components#function-root">root component</a> in a function component), the subscription is tied to the component's lifetime: it goes away on its own when the component is disposed, with no need to remove it separately. The payload has the form <code>{ uri, params, meta, route, ok, initial, redirectedFrom?, direction?, state? }</code>; on the startup navigation <code>initial</code> is <code>true</code> (see <a href="/docs/route-guards#guards">Navigation guards</a>).</p>
+<h3 id="direction-state">Navigation direction and entry state — <code>direction</code>, <code>state</code></h3>
+<p>The direction of every navigation arrives in the <code>direction</code> field: <code>'initial'</code> (startup), <code>'push'</code> (a new history entry; this includes an address typed into the address bar by hand and an entry opened by a plain anchor link), <code>'replace'</code>, <code>'back'</code>, <code>'forward'</code>, or <code>'traverse'</code> for a history move whose order cannot be known. The direction shows up in guards (<code>to.direction</code>), in the <code>onRouterChanged</code> payload and in <code>app.router.direction</code>. Use it to pick transitions by direction (slide left going forward, right going back).</p>
+<p>A value given with <code>navigate(uri, { state })</code> is written to that history entry, and it comes back <strong>when returning to the entry with back/forward as well</strong>; it is kept even if the page is reloaded. It suits data that has to travel without being written to the address (which filter the list was reached from, the open tab):</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>await app.navigate(&quot;/notes/7&quot;, { state: { from: &quot;archive&quot;, query: &quot;meeting&quot; } });
+
+app.router.state;                // { from: 'archive', query: 'meeting' } — also when coming back with back/forward
+app.useGuard(({ to }, next) =&gt; { console.log(to.direction, to.state); next(); });
+app.onRouterChanged(({ direction, state }) =&gt; console.log(direction, state));</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>await app.navigate(&quot;/notes/7&quot;, { state: { from: &quot;archive&quot;, query: &quot;meeting&quot; } });
+
+app.router.state;                // { from: 'archive', query: 'meeting' } — also when coming back with back/forward
+app.useGuard(({ to }, next) =&gt; { console.log(to.direction, to.state); next(); });
+app.onRouterChanged(({ direction, state }) =&gt; console.log(direction, state));</code></pre>
+</div>
+<p>Plain objects are stored as they are (the router only adds its own stamp, and <code>app.router.state</code> removes it); values that are not plain, such as <code>Date</code> and <code>Map</code>, are not touched at all. For an entry without <code>state</code>, <code>app.router.state</code> is <code>undefined</code>.</p>
+<h2 id="scroll-memory">Scroll memory — <code>scrollMemory</code></h2>
+<p>In a single-page application navigation changes the document but not the scroll position, and the browser does not manage that for an SPA on its own. When <code>scrollMemory</code> is turned on, the router keeps the last scroll position of every path and puts the position back when that path is returned to (back/forward, a link, a reload):</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });</code></pre>
+</div>
+<p>The rules:</p>
+<ul>
+<li><strong>A path never seen before</strong> starts at the top of the page (turned off with <code>top: false</code>).</li>
+<li><strong>If there is an anchor in the address</strong> (<code>/notes/5#history</code>), the anchor overrides the memory and the page scrolls to the matching <code>id</code>. If there is a fixed top bar, give <code>scroll-margin-top</code> in CSS.</li>
+<li><strong>Scrolling is instant</strong>, even if CSS has <code>scroll-behavior: smooth</code>: returning to a saved position, the top of a new page, an anchor arriving from another page, and back/forward all settle into place without waiting, as in the browser's own page transitions. An anchor link within the same page (<code>/notes/5</code> → <code>/notes/5#history</code>, including a plain <code>&lt;a href=&quot;#history&quot;&gt;</code> in <code>history</code> mode) follows the <code>scroll-behavior</code> rule in CSS; if <code>smooth</code> is given, it slides smoothly.</li>
+<li><strong>The navigation-specific <code>scroll</code> option</strong> overrides the memory: <code>app.router.navigate('/x', { scroll: 'top' })</code> always goes to the top; it scrolls the container if <code>container</code> is set, and the window otherwise. When leaving the page navigated to, the position is still saved under that page's name.</li>
+<li><strong>Positions are kept in memory:</strong> they survive a restart with <code>restartRouter()</code> and are cleared when the page is reloaded. If they should be remembered after a reload too, you do the saving; where to write them (browser storage, a server) is up to you.</li>
+</ul>
+<p>For saving, <code>app.router</code> gives three methods: <code>saveScrollPositions(fn)</code> calls the callback with the current positions every time saving is needed (when leaving a page, on <code>pagehide</code>, when the page is hidden, and on <code>app.dispose()</code>) and returns a function that removes the subscription; the subscription survives a restart as well. <code>restoreScrollPositions(positions)</code> adds the given positions to the memory (<code>limit</code> applies); it can be called at startup, before <code>run()</code> too. <code>scrollPositions()</code> returns the current positions, including that of the page on screen, in the form <code>{ &quot;/notes&quot;: 1200 }</code>. While <code>scrollMemory</code> is off, <code>scrollPositions()</code> returns an empty object, <code>restoreScrollPositions</code> has no effect and the callback is never called.</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });
+app.router.restoreScrollPositions(JSON.parse(localStorage.getItem(&quot;scroll&quot;) ?? &quot;{}&quot;));
+app.router.saveScrollPositions((positions) =&gt; localStorage.setItem(&quot;scroll&quot;, JSON.stringify(positions)));</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });
+app.router.restoreScrollPositions(JSON.parse(localStorage.getItem(&quot;scroll&quot;) ?? &quot;{}&quot;));
+app.router.saveScrollPositions((positions) =&gt; localStorage.setItem(&quot;scroll&quot;, JSON.stringify(positions)));</code></pre>
+</div>
+<p>Fine-tuning with a settings object:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({
+  routes,
+  scrollMemory: {
+    top: true,          // on a path not seen before, go back to the top (default)
+    anchor: true,       // the anchor overrides the saved position (default)
+    settleMs: 1200,     // upper limit for waiting until the content settles
+    limit: 60,          // how many paths to remember
+    // If one page is reached from two addresses, reduce them to a single key:
+    key: (path) =&gt; path.replace(/^\/my-notes/, &quot;/notes&quot;),
+    // Remember the scroll of a container instead of the window (a selector, an element or a function that returns one):
+    container: &quot;main.detail&quot;,
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({
+  routes,
+  scrollMemory: {
+    top: true,          // on a path not seen before, go back to the top (default)
+    anchor: true,       // the anchor overrides the saved position (default)
+    settleMs: 1200,     // upper limit for waiting until the content settles
+    limit: 60,          // how many paths to remember
+    // If one page is reached from two addresses, reduce them to a single key:
+    key: (path) =&gt; path.replace(/^\/my-notes/, &quot;/notes&quot;),
+    // Remember the scroll of a container instead of the window (a selector, an element or a function that returns one):
+    container: &quot;main.detail&quot;,
+  },
+});</code></pre>
+</div>
+<p><strong>If scrolling happens inside a container</strong> (like mobile shells with a fixed header and a tab bar), give <code>container</code>. The container is looked up again on every navigation, so it is fine if it is not in the DOM yet on the first load; if it is not found, window scrolling is used.</p>
+<p><strong>If content is drawn asynchronously</strong> (remote data, markdown, a virtual list, rows chunked with <code>x-chunk</code>), do not worry: restoring is not a one-off, it is retried on every frame until the target is reached or <code>settleMs</code> runs out. If the user steps in meanwhile with the wheel, a touch, a key or a mouse click, the attempt is dropped.</p>
+<p><strong>The cost:</strong> zero at rest. The <code>scroll</code> event is not listened to; the position is read once per navigation: after the guards have passed, right before the address is applied and the content is changed. At that moment the leaving page is still on screen and its position is real; in a cancelled navigation the position is not read. While it is on, <code>history.scrollRestoration</code> is set to <code>'manual'</code>; on <code>pagehide</code> / when the page is hidden, the position of the page on screen is also taken into memory and the saving callback is called. While it is off (the default), no listener is attached and <code>history.scrollRestoration</code> is not touched.</p>
+<p><strong>Where the anchor comes from depends on the mode.</strong> The <code>#…</code> in the address bar is read as an anchor only in <code>history</code> mode. In <code>hash</code> / <code>file</code> (and <code>shell</code>) mode only the route's own anchor (<code>/page#section</code>) is used; the <code>#</code> part of the address is the route, so it does not count as an anchor. In these modes the memory works with the default <code>anchor</code> setting.</p>
+<h2 id="next">Next step</h2>
+<p>To control and stop navigation, go on to <a href="/docs/route-guards">Route Hooks and Guards</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

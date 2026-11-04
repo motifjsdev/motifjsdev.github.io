@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="The compiler output as the framework&#x27;s open API; which mechanism theme, layer, layout, shell and plugin, data, wrapper, settings and transition packages rely on.">
+    <title>Writing Packages on Motif — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/package-authoring">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/package-authoring">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/package-authoring">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/package-authoring">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/package-authoring">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Writing Packages on Motif">
+    <meta property="og:description" content="The compiler output as the framework&#x27;s open API; which mechanism theme, layer, layout, shell and plugin, data, wrapper, settings and transition packages rely on.">
+    <script type="application/json" id="doc-data">{"slug":"package-authoring","locale":"en","title":"Writing Packages on Motif","description":"The compiler output as the framework\u0027s open API; which mechanism theme, layer, layout, shell and plugin, data, wrapper, settings and transition packages rely on.","category":{"id":"6","title":"Guides"},"html":"\u003Cp\u003EA MotifJS package is made of the same material as application code: components, services and reactive objects. Whether the package is written with or without JSX does not concern the application that uses it, because the code the compiler produces from JSX is also the framework\u0027s public API; there is no separate template representation in between.\u003C/p\u003E\n\u003Ch2 id=\u0022compiled-output\u0022\u003ECompiler output\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe compiler turns this piece of the notes list into the calls in the table below:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003EThis piece of the notes list is the hand-written version of the calls the compiler produces from the JSX form of the same piece; the table maps the two forms line by line:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n  \u0026lt;h2\u0026gt;{folder.title}\u0026lt;/h2\u0026gt;\n  \u0026lt;p x-wait={() =\u0026gt; !state.loading}\u0026gt;Loading notes…\u0026lt;/p\u0026gt;\n  \u0026lt;ul\u0026gt;\n    {state.items.map((note) =\u0026gt; (\n      \u0026lt;li key={note.id} class={note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;}\u0026gt;{note.title}\u0026lt;/li\u0026gt;\n    ))}\n  \u0026lt;/ul\u0026gt;\n\u0026lt;/section\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Econst list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n  section.class.add(\u0026quot;list\u0026quot;);\n  const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n    h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, folder, \u0026quot;title\u0026quot;)));\n  });\n  const loading = motifComponent(\u0026quot;p\u0026quot;, {\n    preconfig: (p: ComponentBase) =\u0026gt; p.bindings.wait(() =\u0026gt; !state.loading),\n    initializeComponent: (p: ComponentBase) =\u0026gt; p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Loading notes…\u0026quot;))),\n  });\n  const items = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; {\n    ul.controls.add(motifComponent({\n      initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; state.items, (note: Note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li: ComponentBase) =\u0026gt; {\n          li.class.add([() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)]);\n          li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n        },\n      })),\n    }));\n  });\n  section.controls.add(title, loading, items);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n  \u0026lt;h2\u0026gt;{folder.title}\u0026lt;/h2\u0026gt;\n  \u0026lt;p x-wait={() =\u0026gt; !state.loading}\u0026gt;Loading notes…\u0026lt;/p\u0026gt;\n  \u0026lt;ul\u0026gt;\n    {state.items.map((note) =\u0026gt; (\n      \u0026lt;li key={note.id} class={note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;}\u0026gt;{note.title}\u0026lt;/li\u0026gt;\n    ))}\n  \u0026lt;/ul\u0026gt;\n\u0026lt;/section\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Econst list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n  section.class.add(\u0026quot;list\u0026quot;);\n  const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n    h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, folder, \u0026quot;title\u0026quot;)));\n  });\n  const loading = motifComponent(\u0026quot;p\u0026quot;, {\n    preconfig: (p) =\u0026gt; p.bindings.wait(() =\u0026gt; !state.loading),\n    initializeComponent: (p) =\u0026gt; p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Loading notes…\u0026quot;))),\n  });\n  const items = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; {\n    ul.controls.add(motifComponent({\n      initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; state.items, (note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li) =\u0026gt; {\n          li.class.add([() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)]);\n          li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n        },\n      })),\n    }));\n  });\n  section.controls.add(title, loading, items);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EJSX expression\u003C/th\u003E\n\u003Cth\u003EThe call it compiles to\u003C/th\u003E\n\u003Cth\u003ETracked\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass=\u0026quot;list\u0026quot;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Esection.class.add(\u0026quot;list\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Enothing; written once\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{folder.title}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enode.bindings.add(\u0026quot;textContent\u0026quot;, folder, \u0026quot;title\u0026quot;)\u003C/code\u003E on a text node\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Efolder.title\u003C/code\u003E only\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-wait={() =\u0026gt; !state.loading}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ep.bindings.wait(() =\u0026gt; !state.loading)\u003C/code\u003E, before the element is built (\u003Ccode\u003Epreconfig\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003Eevery field the getter reads\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{state.items.map(…)}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eholder.bindings.list(() =\u0026gt; state.items, (note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, …))\u003C/code\u003E on a holder without an element\u003C/td\u003E\n\u003Ctd\u003Ethe array\u0027s length and item identity\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey={note.id}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eindexkey: () =\u0026gt; note.id\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass={note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eli.class.add([() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)])\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eevery field the getter reads\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003Eevery element\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;h2\u0026quot;, …)\u003C/code\u003E and \u003Ccode\u003Econtrols.add(h2)\u003C/code\u003E on the parent\u003C/td\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EThe calls in the right-hand column are the form without JSX itself (see \u003Ca href=\u0022/docs/imperative\u0022\u003EViews without JSX\u003C/a\u003E). \u003Ccode\u003Emotif-explain\u003C/code\u003E, which comes with \u003Ccode\u003E@motifx/compiler\u003C/code\u003E, gives this table for a file; \u003Ccode\u003E--code\u003C/code\u003E also prints the whole generated code:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022bash\u0022\u003E\u003Ccode\u003Enpx motif-explain src/parts/NoteList.tsx\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003ESo whichever form a package writes its own components in, the application uses them the same ways: with a tag in JSX (\u003Ccode\u003E\u0026lt;NoteList /\u0026gt;\u003C/code\u003E), and without JSX with \u003Ccode\u003Enew NoteList(props)\u003C/code\u003E for a class and \u003Ccode\u003EmotifComponent(NoteList, props)\u003C/code\u003E for functions and Options.\u003C/p\u003E\n\u003Ch2 id=\u0022package-types\u0022\u003EPackage types\u003C/h2\u003E\n\u003Cp\u003EEach of the types below relies on a mechanism in the core; the details are on that mechanism\u0027s page.\u003C/p\u003E\n\u003Ch3 id=\u0022theme\u0022\u003ETheme and design system\u003C/h3\u003E\n\u003Cp\u003EA theme is a property of the document, not of components. The selected theme and density are kept as reactive state in a singleton service; the service writes them to the \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E element as an attribute (\u003Ccode\u003Edata-theme\u003C/code\u003E), and the CSS reads the attribute. If the service is registered with \u003Ccode\u003Estartup: true\u003C/code\u003E, it runs when the application opens without any component asking for it (see \u003Ca href=\u0022/docs/service-registration#startup\u0022\u003ESingletons created at startup\u003C/a\u003E). If a subtree needs to look different, the same attribute is written to that tree\u0027s root element; no separate service scope is needed.\u003C/p\u003E\n\u003Cp\u003EThe package\u0027s CSS comes inside an \u003Ccode\u003E@layer\u003C/code\u003E: an unlayered rule overrides all of the application\u0027s layered rules regardless of specificity (see \u003Ca href=\u0022/docs/publishing-libraries#css\u0022\u003EStyles and CSS\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022overlays\u0022\u003EDialogs, notifications and overlays\u003C/h3\u003E\n\u003Cp\u003EA dialog is part of the component that opens it, but it has to appear in the page\u0027s top layer. The layer is ready in the core: \u003Ccode\u003Eapp.layer\u003C/code\u003E is the layer component at the end of \u003Ccode\u003E\u0026lt;body\u0026gt;\u003C/code\u003E, and \u003Ccode\u003Eapp.layerOf(opener)\u003C/code\u003E gives that window\u0027s layer if the opening component is in a window (see \u003Ca href=\u0022/docs/component-tree#layer\u0022\u003EPage layer\u003C/a\u003E). The package can put the dialog there directly with \u003Ccode\u003Ethis.context.layerOf(this, dialog)\u003C/code\u003E; then the dialog\u0027s lifetime is the layer\u0027s, and removing it on close is the package\u0027s job (\u003Ccode\u003Eremove\u003C/code\u003E or the dialog\u0027s own \u003Ccode\u003Edispose\u003C/code\u003E). If the dialog has to go away together with the component that opened it, the package puts a \u003Ccode\u003ETransport\u003C/code\u003E slot in the layer and writes the content inside the opening component with a \u003Ccode\u003ETransportTo\u003C/code\u003E: the content appears in the slot, its bindings and event handlers work with the state of the component it was written in, and when the opening component is disposed, the content leaves the slot as well. For notifications to pile up in the same slot, the slot is set up with \u003Ccode\u003Emode: \u0026quot;merge\u0026quot;\u003C/code\u003E (see \u003Ca href=\u0022/docs/transport\u0022\u003ETransport and TransportTo\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022layout\u0022\u003ELayout and moving panels\u003C/h3\u003E\n\u003Cp\u003EIn split, tab and docking panel packages, a panel moves from one region to another but must not lose its state. When a component is given to another parent\u0027s \u003Ccode\u003Econtrols.add\u003C/code\u003E, it leaves its old parent on its own; it is not disposed, and its bindings and state stay in place. It gets \u003Ccode\u003EonDeactivated\u003C/code\u003E when removed from the DOM and \u003Ccode\u003EonActivated\u003C/code\u003E when placed again (see \u003Ca href=\u0022/docs/memory-and-dispose#detach\u0022\u003EMoving without disposing\u003C/a\u003E). \u003Ccode\u003ETransporter.transport\u003C/code\u003E does the same move (see \u003Ca href=\u0022/docs/transport#transporter\u0022\u003EMoving in code\u003C/a\u003E). For a panel that is a route page, \u003Ccode\u003EkeepAlive: true\u003C/code\u003E keeps its instance across navigations (see \u003Ca href=\u0022/docs/routes\u0022\u003ERoute Definitions\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022shell-plugins\u0022\u003EApplication shell and plugins\u003C/h3\u003E\n\u003Cp\u003EA shell package gives the application its skeleton: the sidebar, the toolbar, the status line. Plugins add pieces to this skeleton. Every region of the skeleton is a named \u003Ccode\u003ETransport\u003C/code\u003E slot; a plugin sends content to that region with a \u003Ccode\u003ETransportTo\u003C/code\u003E of the same name in its own component. Whether the slot is built before or after the sender does not change the result. A plugin\u0027s services are registered in the application\u0027s \u003Ccode\u003EServiceCollection\u003C/code\u003E, and the shell gets them from the provider (see \u003Ca href=\u0022/docs/service-registration\u0022\u003ERegistering Services\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022data\u0022\u003EData components\u003C/h3\u003E\n\u003Cp\u003EIn table, grid and long list packages, the list binding recognizes a row by the item object, not by \u003Ccode\u003Ekey\u003C/code\u003E: when the same object moves to a new position, its row is moved, not rebuilt (see \u003Ca href=\u0022/docs/conditionals-and-lists#key-and-identity\u0022\u003E\u003Ccode\u003Ekey\u003C/code\u003E and item identity\u003C/a\u003E). For thousands of rows, or data that arrives page by page from a server, \u003Ccode\u003EVirtualization\u003C/code\u003E builds only the visible rows and asks for the data with \u003Ccode\u003EdataRequest\u003C/code\u003E (see \u003Ca href=\u0022/docs/virtualization\u0022\u003EVirtual Lists\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022wrappers\u0022\u003ELibrary wrappers\u003C/h3\u003E\n\u003Cp\u003EA library that manages its own DOM (a chart, a map, an editor) is set up on the component\u0027s element. The setup is done in \u003Ccode\u003EonBuilt\u003C/code\u003E or \u003Ccode\u003EinitializeComponent\u003C/code\u003E, and the library\u0027s own cleanup is tied to the component with \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E. The full set of rules is on the \u003Ca href=\u0022/docs/wrapping-libraries\u0022\u003EWrapping Third-Party Libraries\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch3 id=\u0022settings\u0022\u003ELanguage and user settings\u003C/h3\u003E\n\u003Cp\u003ESettings such as the language, the time zone and the density sit in a single singleton service as a reactive object. Components read the value inside a binding; when a setting changes, only the bindings that read that value refresh, and components are not rebuilt (see \u003Ca href=\u0022/docs/reactivity\u0022\u003EReactivity\u003C/a\u003E, \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003ELifetimes and Scopes\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022transitions\u0022\u003ETransition packages\u003C/h3\u003E\n\u003Cp\u003EA transition package provides CSS class names and keyframe definitions. A class based transition is attached by its \u003Ccode\u003Etransition\u003C/code\u003E name (\u003Ccode\u003Efade\u003C/code\u003E → \u003Ccode\u003Efade-enter-from\u003C/code\u003E …), and an animation defined in code is given with \u003Ccode\u003Emotif.options.transition.in\u003C/code\u003E / \u003Ccode\u003Eout\u003C/code\u003E. The application decides the order of enter and leave with \u003Ccode\u003Eapp.useTransitions({ mode })\u003C/code\u003E (see \u003Ca href=\u0022/docs/styling-and-transitions\u0022\u003EStyling and Animation\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022publishing\u0022\u003EPublishing the package\u003C/h2\u003E\n\u003Cp\u003EThe package format, the build, the types, CSS, the prop contract and the pre-publish checks are on the \u003Ca href=\u0022/docs/publishing-libraries\u0022\u003EPublishing an npm Library for MotifJS\u003C/a\u003E page. A package carrying compiled JSX must be compiled with a compiler contract supported by the \u003Ccode\u003E@motifx/core\u003C/code\u003E it is used with; with an unsupported contract, development mode writes an \u003Ccode\u003EMJX121\u003C/code\u003E warning.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo turn a library that manages its own DOM into a component, go on to \u003Ca href=\u0022/docs/wrapping-libraries\u0022\u003EWrapping Third-Party Libraries\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"compiled-output","text":"Compiler output","level":2},{"id":"package-types","text":"Package types","level":2},{"id":"theme","text":"Theme and design system","level":3},{"id":"overlays","text":"Dialogs, notifications and overlays","level":3},{"id":"layout","text":"Layout and moving panels","level":3},{"id":"shell-plugins","text":"Application shell and plugins","level":3},{"id":"data","text":"Data components","level":3},{"id":"wrappers","text":"Library wrappers","level":3},{"id":"settings","text":"Language and user settings","level":3},{"id":"transitions","text":"Transition packages","level":3},{"id":"publishing","text":"Publishing the package","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"service-disposal","title":"Disposing Services"},"next":{"slug":"wrapping-libraries","title":"Wrapping Third-Party Libraries"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Guides</p>
+        <h1>Writing Packages on Motif</h1>
+        <p>The compiler output as the framework&#x27;s open API; which mechanism theme, layer, layout, shell and plugin, data, wrapper, settings and transition packages rely on.</p>
+<p>A MotifJS package is made of the same material as application code: components, services and reactive objects. Whether the package is written with or without JSX does not concern the application that uses it, because the code the compiler produces from JSX is also the framework's public API; there is no separate template representation in between.</p>
+<h2 id="compiled-output">Compiler output</h2>
+<div class="doc-variant" data-variant="declarative">
+<p>The compiler turns this piece of the notes list into the calls in the table below:</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p>This piece of the notes list is the hand-written version of the calls the compiler produces from the JSX form of the same piece; the table maps the two forms line by line:</p>
+</div>
+<div class="doc-code" data-file="src/parts/NoteList.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteList.tsx"><code>&lt;section class=&quot;list&quot;&gt;
+  &lt;h2&gt;{folder.title}&lt;/h2&gt;
+  &lt;p x-wait={() =&gt; !state.loading}&gt;Loading notes…&lt;/p&gt;
+  &lt;ul&gt;
+    {state.items.map((note) =&gt; (
+      &lt;li key={note.id} class={note.pinned ? &quot;pinned&quot; : &quot;&quot;}&gt;{note.title}&lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+&lt;/section&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteList.ts"><code>const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+  section.class.add(&quot;list&quot;);
+  const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+    h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, folder, &quot;title&quot;)));
+  });
+  const loading = motifComponent(&quot;p&quot;, {
+    preconfig: (p: ComponentBase) =&gt; p.bindings.wait(() =&gt; !state.loading),
+    initializeComponent: (p: ComponentBase) =&gt; p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Loading notes…&quot;))),
+  });
+  const items = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; {
+    ul.controls.add(motifComponent({
+      initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; state.items, (note: Note) =&gt; motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li: ComponentBase) =&gt; {
+          li.class.add([() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)]);
+          li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+        },
+      })),
+    }));
+  });
+  section.controls.add(title, loading, items);
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteList.jsx"><code>&lt;section class=&quot;list&quot;&gt;
+  &lt;h2&gt;{folder.title}&lt;/h2&gt;
+  &lt;p x-wait={() =&gt; !state.loading}&gt;Loading notes…&lt;/p&gt;
+  &lt;ul&gt;
+    {state.items.map((note) =&gt; (
+      &lt;li key={note.id} class={note.pinned ? &quot;pinned&quot; : &quot;&quot;}&gt;{note.title}&lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+&lt;/section&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteList.js"><code>const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+  section.class.add(&quot;list&quot;);
+  const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+    h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, folder, &quot;title&quot;)));
+  });
+  const loading = motifComponent(&quot;p&quot;, {
+    preconfig: (p) =&gt; p.bindings.wait(() =&gt; !state.loading),
+    initializeComponent: (p) =&gt; p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Loading notes…&quot;))),
+  });
+  const items = motifComponent(&quot;ul&quot;, (ul) =&gt; {
+    ul.controls.add(motifComponent({
+      initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; state.items, (note) =&gt; motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li) =&gt; {
+          li.class.add([() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)]);
+          li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+        },
+      })),
+    }));
+  });
+  section.controls.add(title, loading, items);
+});</code></pre>
+</div>
+<table>
+<thead>
+<tr>
+<th>JSX expression</th>
+<th>The call it compiles to</th>
+<th>Tracked</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class=&quot;list&quot;</code></td>
+<td><code>section.class.add(&quot;list&quot;)</code></td>
+<td>nothing; written once</td>
+</tr>
+<tr>
+<td><code>{folder.title}</code></td>
+<td><code>node.bindings.add(&quot;textContent&quot;, folder, &quot;title&quot;)</code> on a text node</td>
+<td><code>folder.title</code> only</td>
+</tr>
+<tr>
+<td><code>x-wait={() =&gt; !state.loading}</code></td>
+<td><code>p.bindings.wait(() =&gt; !state.loading)</code>, before the element is built (<code>preconfig</code>)</td>
+<td>every field the getter reads</td>
+</tr>
+<tr>
+<td><code>{state.items.map(…)}</code></td>
+<td><code>holder.bindings.list(() =&gt; state.items, (note) =&gt; motifComponent(&quot;li&quot;, …))</code> on a holder without an element</td>
+<td>the array's length and item identity</td>
+</tr>
+<tr>
+<td><code>key={note.id}</code></td>
+<td><code>indexkey: () =&gt; note.id</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>class={note.pinned ? &quot;pinned&quot; : &quot;&quot;}</code></td>
+<td><code>li.class.add([() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)])</code></td>
+<td>every field the getter reads</td>
+</tr>
+<tr>
+<td>every element</td>
+<td><code>motifComponent(&quot;h2&quot;, …)</code> and <code>controls.add(h2)</code> on the parent</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The calls in the right-hand column are the form without JSX itself (see <a href="/docs/imperative">Views without JSX</a>). <code>motif-explain</code>, which comes with <code>@motifx/compiler</code>, gives this table for a file; <code>--code</code> also prints the whole generated code:</p>
+<div class="doc-code">
+<pre data-lang="bash"><code>npx motif-explain src/parts/NoteList.tsx</code></pre>
+</div>
+<p>So whichever form a package writes its own components in, the application uses them the same ways: with a tag in JSX (<code>&lt;NoteList /&gt;</code>), and without JSX with <code>new NoteList(props)</code> for a class and <code>motifComponent(NoteList, props)</code> for functions and Options.</p>
+<h2 id="package-types">Package types</h2>
+<p>Each of the types below relies on a mechanism in the core; the details are on that mechanism's page.</p>
+<h3 id="theme">Theme and design system</h3>
+<p>A theme is a property of the document, not of components. The selected theme and density are kept as reactive state in a singleton service; the service writes them to the <code>&lt;html&gt;</code> element as an attribute (<code>data-theme</code>), and the CSS reads the attribute. If the service is registered with <code>startup: true</code>, it runs when the application opens without any component asking for it (see <a href="/docs/service-registration#startup">Singletons created at startup</a>). If a subtree needs to look different, the same attribute is written to that tree's root element; no separate service scope is needed.</p>
+<p>The package's CSS comes inside an <code>@layer</code>: an unlayered rule overrides all of the application's layered rules regardless of specificity (see <a href="/docs/publishing-libraries#css">Styles and CSS</a>).</p>
+<h3 id="overlays">Dialogs, notifications and overlays</h3>
+<p>A dialog is part of the component that opens it, but it has to appear in the page's top layer. The layer is ready in the core: <code>app.layer</code> is the layer component at the end of <code>&lt;body&gt;</code>, and <code>app.layerOf(opener)</code> gives that window's layer if the opening component is in a window (see <a href="/docs/component-tree#layer">Page layer</a>). The package can put the dialog there directly with <code>this.context.layerOf(this, dialog)</code>; then the dialog's lifetime is the layer's, and removing it on close is the package's job (<code>remove</code> or the dialog's own <code>dispose</code>). If the dialog has to go away together with the component that opened it, the package puts a <code>Transport</code> slot in the layer and writes the content inside the opening component with a <code>TransportTo</code>: the content appears in the slot, its bindings and event handlers work with the state of the component it was written in, and when the opening component is disposed, the content leaves the slot as well. For notifications to pile up in the same slot, the slot is set up with <code>mode: &quot;merge&quot;</code> (see <a href="/docs/transport">Transport and TransportTo</a>).</p>
+<h3 id="layout">Layout and moving panels</h3>
+<p>In split, tab and docking panel packages, a panel moves from one region to another but must not lose its state. When a component is given to another parent's <code>controls.add</code>, it leaves its old parent on its own; it is not disposed, and its bindings and state stay in place. It gets <code>onDeactivated</code> when removed from the DOM and <code>onActivated</code> when placed again (see <a href="/docs/memory-and-dispose#detach">Moving without disposing</a>). <code>Transporter.transport</code> does the same move (see <a href="/docs/transport#transporter">Moving in code</a>). For a panel that is a route page, <code>keepAlive: true</code> keeps its instance across navigations (see <a href="/docs/routes">Route Definitions</a>).</p>
+<h3 id="shell-plugins">Application shell and plugins</h3>
+<p>A shell package gives the application its skeleton: the sidebar, the toolbar, the status line. Plugins add pieces to this skeleton. Every region of the skeleton is a named <code>Transport</code> slot; a plugin sends content to that region with a <code>TransportTo</code> of the same name in its own component. Whether the slot is built before or after the sender does not change the result. A plugin's services are registered in the application's <code>ServiceCollection</code>, and the shell gets them from the provider (see <a href="/docs/service-registration">Registering Services</a>).</p>
+<h3 id="data">Data components</h3>
+<p>In table, grid and long list packages, the list binding recognizes a row by the item object, not by <code>key</code>: when the same object moves to a new position, its row is moved, not rebuilt (see <a href="/docs/conditionals-and-lists#key-and-identity"><code>key</code> and item identity</a>). For thousands of rows, or data that arrives page by page from a server, <code>Virtualization</code> builds only the visible rows and asks for the data with <code>dataRequest</code> (see <a href="/docs/virtualization">Virtual Lists</a>).</p>
+<h3 id="wrappers">Library wrappers</h3>
+<p>A library that manages its own DOM (a chart, a map, an editor) is set up on the component's element. The setup is done in <code>onBuilt</code> or <code>initializeComponent</code>, and the library's own cleanup is tied to the component with <code>motif.setDisposable</code>. The full set of rules is on the <a href="/docs/wrapping-libraries">Wrapping Third-Party Libraries</a> page.</p>
+<h3 id="settings">Language and user settings</h3>
+<p>Settings such as the language, the time zone and the density sit in a single singleton service as a reactive object. Components read the value inside a binding; when a setting changes, only the bindings that read that value refresh, and components are not rebuilt (see <a href="/docs/reactivity">Reactivity</a>, <a href="/docs/service-lifetimes">Lifetimes and Scopes</a>).</p>
+<h3 id="transitions">Transition packages</h3>
+<p>A transition package provides CSS class names and keyframe definitions. A class based transition is attached by its <code>transition</code> name (<code>fade</code> → <code>fade-enter-from</code> …), and an animation defined in code is given with <code>motif.options.transition.in</code> / <code>out</code>. The application decides the order of enter and leave with <code>app.useTransitions({ mode })</code> (see <a href="/docs/styling-and-transitions">Styling and Animation</a>).</p>
+<h2 id="publishing">Publishing the package</h2>
+<p>The package format, the build, the types, CSS, the prop contract and the pre-publish checks are on the <a href="/docs/publishing-libraries">Publishing an npm Library for MotifJS</a> page. A package carrying compiled JSX must be compiled with a compiler contract supported by the <code>@motifx/core</code> it is used with; with an unsupported contract, development mode writes an <code>MJX121</code> warning.</p>
+<h2 id="next">Next step</h2>
+<p>To turn a library that manages its own DOM into a component, go on to <a href="/docs/wrapping-libraries">Wrapping Third-Party Libraries</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Virtualization bileşeni; prop&#x27;lar, dataRequest sözleşmesi, otomatik yenileme, şablonlar, filtreleme, değişken yükseklik, çizim modeli ve yöntemler.">
+    <title>Sanal Listeler (Virtualization) — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/virtualization">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/virtualization">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/virtualization">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/virtualization">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/virtualization">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Sanal Listeler (Virtualization)">
+    <meta property="og:description" content="Virtualization bileşeni; prop&#x27;lar, dataRequest sözleşmesi, otomatik yenileme, şablonlar, filtreleme, değişken yükseklik, çizim modeli ve yöntemler.">
+    <script type="application/json" id="doc-data">{"slug":"virtualization","locale":"tr","title":"Sanal Listeler (Virtualization)","description":"Virtualization bileşeni; prop\u0027lar, dataRequest sözleşmesi, otomatik yenileme, şablonlar, filtreleme, değişken yükseklik, çizim modeli ve yöntemler.","category":{"id":"8","title":"Gelişmiş"},"html":"\u003Cp\u003EBinlerce öğelik listelerde tüm öğeleri DOM\u0027a koymak performansı düşürür. MotifJS\u0027in \u003Ccode\u003EVirtualization\u003C/code\u003E bileşeni yalnızca görünür öğeleri (ve iki yanlarında az sayıda tampon satırı) DOM\u0027da tutarak satır yüksekliği sabit ya da önceden hesaplanabilen listeleri verimli gösterir. Veriyi sayfa sayfa kendisi ister.\u003C/p\u003E\n\u003Ch2 id=\u0022basic-usage\u0022\u003ETemel kullanım\u003C/h2\u003E\n\u003Cp\u003EÖrnekte klasörün not listesi sanal listeyle çizilir. Veri servisteki notlardan sayfa sayfa dilimlenir; her satır \u003Ca href=\u0022/docs/component-creation\u0022\u003Enot satırı bileşenidir\u003C/a\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component\u0026lt;any, { folder: Folder; state: { query: string } }\u0026gt; {\n  override view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = this.props;\n    return (\n      \u0026lt;Virtualization\u0026lt;Note\u0026gt;\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component\u0026lt;any, { folder: Folder; state: { query: string } }\u0026gt; {\n  override view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = this.props;\n    return new Virtualization\u0026lt;Note\u0026gt;({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; new NoteRow({ note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props: { folder: Folder; state: { query: string } }) {\n  const notes = FromService(NotesService)!;\n  const { folder, state } = props;\n\n  return (\n    \u0026lt;Virtualization\u0026lt;Note\u0026gt;\n      itemHeight={64}\n      pageSize={50}\n      dataRequest={async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      }}\n      itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n      emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n    /\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props: { folder: Folder; state: { query: string } }) {\n  const notes = FromService(NotesService)!;\n  const { folder, state } = props;\n\n  return new Virtualization\u0026lt;Note\u0026gt;({\n    itemHeight: 64,\n    pageSize: 50,\n    dataRequest: async ({ page, pageSize }) =\u0026gt; {\n      const found = notes.list(folder, state.query);\n      const start = page * pageSize;\n      return {\n        items: found.slice(start, start \u002B pageSize),\n        totalCount: found.length,\n        hasMore: start \u002B pageSize \u0026lt; found.length,\n      };\n    },\n    itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n    emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n      p.class.add(\u0026quot;list__empty\u0026quot;);\n      p.setText(FOLDERS[folder].empty);\n    }),\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003Eimport { Virtualization, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props: { folder: Folder; state: { query: string } }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = props;\n    return (\n      \u0026lt;Virtualization\u0026lt;Note\u0026gt;\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, Virtualization, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props: { folder: Folder; state: { query: string } }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = props;\n    return new Virtualization\u0026lt;Note\u0026gt;({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component {\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = this.props;\n    return (\n      \u0026lt;Virtualization\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Eimport { Component, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component {\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = this.props;\n    return new Virtualization({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; new NoteRow({ note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props) {\n  const notes = FromService(NotesService);\n  const { folder, state } = props;\n\n  return (\n    \u0026lt;Virtualization\n      itemHeight={64}\n      pageSize={50}\n      dataRequest={async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      }}\n      itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n      emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n    /\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Eimport { FromService, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props) {\n  const notes = FromService(NotesService);\n  const { folder, state } = props;\n\n  return new Virtualization({\n    itemHeight: 64,\n    pageSize: 50,\n    dataRequest: async ({ page, pageSize }) =\u0026gt; {\n      const found = notes.list(folder, state.query);\n      const start = page * pageSize;\n      return {\n        items: found.slice(start, start \u002B pageSize),\n        totalCount: found.length,\n        hasMore: start \u002B pageSize \u0026lt; found.length,\n      };\n    },\n    itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n    emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n      p.class.add(\u0026quot;list__empty\u0026quot;);\n      p.setText(FOLDERS[folder].empty);\n    }),\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003Eimport { Virtualization, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = props;\n    return (\n      \u0026lt;Virtualization\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Eimport { Virtualization, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = props;\n    return new Virtualization({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EKlasör düzeni listeyi arama durumuyla birlikte \u003Ccode\u003E\u0026lt;NoteList folder={this.folder} state={this.state} /\u0026gt;\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003EKlasör düzeni listeyi arama durumuyla birlikte \u003Ccode\u003Enew NoteList({ folder: this.folder, state: this.state })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003EKlasör düzeni listeyi arama durumuyla birlikte \u003Ccode\u003EmotifComponent(NoteList, { folder: this.folder, state: this.state })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E verilmediğinde liste kök \u003Ccode\u003Ediv\u003C/code\u003E\u0027ini \u003Ccode\u003Eoverflow-y: auto; height: 100%; position: relative; overflow-anchor: none\u003C/code\u003E ile kurar ve kendi içinde kayar; bu yüzden onu taşıyan kabın bir yüksekliği olmalıdır ya da yükseklik \u003Ccode\u003Estyle\u003C/code\u003E ile listeye verilir. \u003Ccode\u003EdataRequest\u003C/code\u003E arama metnini ve notları okuduğu için arama kutusuna yazıldıkça liste kendiliğinden yenilenir (bkz. \u003Ca href=\u0022#auto-refresh\u0022\u003EOtomatik yenileme\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022props\u0022\u003EProp\u0027lar (\u003Ccode\u003EVirtualizationProps\u0026lt;T\u0026gt;\u003C/code\u003E)\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EProp\u003C/th\u003E\n\u003Cth\u003ETip\u003C/th\u003E\n\u003Cth\u003EAçıklama\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(req) =\u0026gt; Promise\u0026lt;VirtualizationDataResponse\u0026lt;T\u0026gt;\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003EZorunlu.\u003C/strong\u003E Sayfa verisini getiren fonksiyon; bkz. \u003Ca href=\u0022#data-request\u0022\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E sözleşmesi\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EitemTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(item: T, index: number) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003EZorunlu.\u003C/strong\u003E Her öğenin satırını kurar. Bileşen döndürmezse dönen değer bir bileşene sarılır. Öğe veride nasıl verildiyse öyle gelir (bkz. \u003Ca href=\u0022#data-as-given\u0022\u003EVeri verildiği gibi kullanılır\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EitemHeight\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber \\| (item: T, index: number) =\u0026gt; number\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003EZorunlu.\u003C/strong\u003E Her öğenin piksel yüksekliği. Sayı: tüm satırlar aynı; fonksiyon: satır başına bilinen yükseklik (bkz. \u003Ca href=\u0022#variable-height\u0022\u003EDeğişken yükseklik\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EpageSize\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHer istekte kaç öğe istenecek (varsayılan 50).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(content, state) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EListeyi saran yerleşim; bkz. \u003Ca href=\u0022#main-template\u0022\u003EÖzel kapsayıcı\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EloadingTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(state) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİlk yükleme sürerken gösterilen görünüm.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EemptyTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E() =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGösterilecek öğe kalmadığında (veri boş ya da filtre hepsini eledi) gösterilen görünüm.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EerrorTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(error) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİlk yükleme, \u003Ccode\u003Erefresh()\u003C/code\u003E ya da otomatik yenileme isteği hata verince satırların yerine gösterilen görünüm; verilmezse hata \u003Ccode\u003EMJX207\u003C/code\u003E olarak raporlanır. Sonraki sayfa isteğinin hatası her durumda \u003Ccode\u003EMJX207\u003C/code\u003E olarak raporlanır ve \u003Ccode\u003EgetState().error\u003C/code\u003E\u0027a yazılır; yüklenmiş satırlar ekranda kalır, hata görünümü gösterilmez, bir sonraki kaydırmada istek yeniden yapılır ve başarılı yüklemede \u003Ccode\u003Eerror\u003C/code\u003E temizlenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efilter\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(items: T[]) =\u0026gt; T[]\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYüklü veriye uygulanır; boşluklar ve indeksler filtrelenmiş uzunluğa göre hesaplanır (bkz. \u003Ca href=\u0022#filtering\u0022\u003EFiltreleme\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eoverscan\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGörünür alanın \u003Cstrong\u003Eüstünde ve altında\u003C/strong\u003E ek çizilen satır sayısı (varsayılan: görünür satır sayısı).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcacheSize\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÖnbellekte tutulan satır bileşeni üst sınırı, çizili satırlar dahil (varsayılan \u003Ccode\u003Emax(200, 3 × çizili satır sayısı)\u003C/code\u003E). Aşılınca ekran dışındaki satırlardan en uzun süredir görünmeyenler serbest bırakılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EautoRefresh\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E içinde okunan reaktif veri değişince yüklü aralığı tek istekte yeniden alır (varsayılan açık); bkz. \u003Ca href=\u0022#auto-refresh\u0022\u003EOtomatik yenileme\u003C/a\u003E. \u003Ccode\u003Efalse\u003C/code\u003E verilirse liste yalnız \u003Ccode\u003Erefresh()\u003C/code\u003E ile yenilenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewatch\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E() =\u0026gt; unknown\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOtomatik yenileme için ek bağımlılık: burada okunan reaktif alanlar da yeniden yüklemeyi tetikler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EautoLoad\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDibe yaklaşınca sonraki sayfayı ister (varsayılan açık). Çizilen pencere yüklü verinin sonuna \u003Ccode\u003Eoverscan\u003C/code\u003E kadar yaklaştığında da (ör. ilk sayfa görünür alanı doldurmuyorsa) sonraki sayfa istenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EautoLoadThreshold\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003EYüklü\u003C/strong\u003E verinin alt sınırına kaç piksel kala sonraki sayfa istensin (varsayılan 100). Sabit yükseklikte alt sınır \u003Ccode\u003Edata.length × itemHeight\u003C/code\u003E\u0027tır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EclassName\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Estring\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKök \u003Ccode\u003Ediv\u003C/code\u003E\u0027e eklenen sınıf.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EPartial\u0026lt;CSSStyleDeclaration\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EKök \u003Ccode\u003Ediv\u003C/code\u003E\u0027e satır içi stil. Listenin kendi \u003Ccode\u003Eoverflow-y\u003C/code\u003E, \u003Ccode\u003Eheight\u003C/code\u003E ve \u003Ccode\u003Eposition\u003C/code\u003E değerlerinden sonra uygulanır; aynı özelliği verirseniz sizinki geçerli olur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EoverscanPages\u003C/code\u003E, \u003Ccode\u003ErenderMode\u003C/code\u003E, \u003Ccode\u003EpageBuffer\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003C/td\u003E\n\u003Ctd\u003EAyrılmış; okunmazlar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022data-request\u0022\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E sözleşmesi\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E bir istek nesnesi (\u003Ccode\u003EVirtualizationDataRequest\u003C/code\u003E) alır:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EAlan\u003C/th\u003E\n\u003Cth\u003ETip\u003C/th\u003E\n\u003Cth\u003EAnlamı\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Epage\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E0 tabanlı sayfa sırası.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EpageSize\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİstenen öğe sayısı. Otomatik yenilemede yüklü aralık tek istekte istendiği için \u003Ccode\u003Epage\u003C/code\u003E 0, \u003Ccode\u003EpageSize\u003C/code\u003E ise \u003Ccode\u003EpageSize × yüklü sayfa sayısı\u003C/code\u003E olur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EscrollTop\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİstek anındaki kaydırma konumu (ilk yüklemede 0).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003Eve bir yanıt nesnesi (\u003Ccode\u003EVirtualizationDataResponse\u0026lt;T\u0026gt;\u003C/code\u003E) döndüren \u003Ccode\u003EPromise\u003C/code\u003E verir:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EAlan\u003C/th\u003E\n\u003Cth\u003ETip\u003C/th\u003E\n\u003Cth\u003EAnlamı\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eitems\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ET[]\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBu sayfadaki öğeler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtotalCount\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETüm veri setinin öğe sayısı. \u003Ccode\u003Estate.totalCount\u003C/code\u003E\u0027a yazılır (ör. başlıkta toplamı göstermek için) ve \u003Ccode\u003EhasMore\u003C/code\u003E sürdükçe kaydırma alanının boyunu belirler.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EhasMore\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESonraki sayfa var mı. \u003Ccode\u003Efalse\u003C/code\u003E döndüğünde otomatik yükleme durur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EKaydırma alanı \u003Ccode\u003EtotalCount\u003C/code\u003E\u0027un tamamını kapsar: yüklenmemiş öğeler alt boşlukta yer tutar, sabit \u003Ccode\u003EitemHeight\u003C/code\u003E\u0027ta tam yükseklikleriyle, fonksiyonla verilen yükseklikte yüklü satırların ortalamasıyla. Yüklenmemiş bölgeye kaydırılınca sayfalar oraya ulaşana kadar sırayla istenir. \u003Ccode\u003EhasMore\u003C/code\u003E \u003Ccode\u003Efalse\u003C/code\u003E olunca ya da \u003Ccode\u003EtotalCount\u003C/code\u003E yüklü öğelerden azsa alan yalnız yüklü veriden hesaplanır. \u003Ccode\u003Efilter\u003C/code\u003E yüklü öğelere uygulanır; yüklenmemiş kısım süzülmeden sayılır, süzgecin attığı öğeler yüklendikçe alan kısalır.\u003C/p\u003E\n\u003Ch3 id=\u0022auto-refresh\u0022\u003EOtomatik yenileme — \u003Ccode\u003EautoRefresh\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EautoRefresh\u003C/code\u003E (varsayılan açık) ilk yüklemede ve \u003Ccode\u003Erefresh()\u003C/code\u003E\u0027te \u003Ccode\u003EdataRequest\u003C/code\u003E\u0027i bir effect içinde çağırır. Bu çağrıda okunan reaktif alanlardan biri değişince yüklü aralık (sayfa 0\u0027dan geçerli sayfaya) tek istekte yeniden alınır; yanıtta yine bulunan öğelerin satırları korunur, bulunmayanlarınki serbest bırakılır (bkz. \u003Ca href=\u0022#rendering-and-methods\u0022\u003EÇizim modeli\u003C/a\u003E). Sonraki sayfa istekleri izlenmez; \u003Ccode\u003EsetData()\u003C/code\u003E izlemeyi durdurur. Örnekte \u003Ccode\u003Enotes.list(folder, state.query)\u003C/code\u003E not dizisini, arama metnini ve notların arşiv, sabitleme ve tarih alanlarını (arama doluyken başlık ve metni de) okur; bunlardan biri değişince liste yenilenir.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EEtikete yazılan \u003Ccode\u003Easync\u003C/code\u003E \u003Ccode\u003EdataRequest\u003C/code\u003E fonksiyonundaki \u003Ccode\u003Eawait\u003C/code\u003E\u0027leri derleyici sarar: \u003Ccode\u003Eawait\u003C/code\u003E sonrasında okunan reaktif alanlar da bağımlılık olur (başka yerlerde \u003Ccode\u003Eawait\u003C/code\u003E sonrası okumalar izlenmez; bkz. \u003Ca href=\u0022/docs/reactivity#await-reads\u0022\u003E\u003Ccode\u003Eawait\u003C/code\u003E sonrası okumalar\u003C/a\u003E). \u003Ccode\u003EdataRequest\u003C/code\u003E etiketin dışında tanımlandıysa ya da bağımlılık başka bir yerden geliyorsa \u003Ccode\u003Ewatch={() =\u0026gt; state.query}\u003C/code\u003E ile ek bağımlılık verilir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003EDerleyici \u003Ccode\u003Eawait\u003C/code\u003E sarmasını yalnız \u003Ccode\u003E\u0026lt;Virtualization\u0026gt;\u003C/code\u003E etiketine yazılan \u003Ccode\u003EdataRequest\u003C/code\u003E\u0027e uygular; JSX\u0027siz yazımda yalnız ilk \u003Ccode\u003Eawait\u003C/code\u003E\u0027ten önce okunan reaktif alanlar bağımlılık olur (bkz. \u003Ca href=\u0022/docs/reactivity#await-reads\u0022\u003E\u003Ccode\u003Eawait\u003C/code\u003E sonrası okumalar\u003C/a\u003E). \u003Ccode\u003Eawait\u003C/code\u003E sonrasında okunan ya da başka bir yerden gelen bağımlılık \u003Ccode\u003Ewatch: () =\u0026gt; state.query\u003C/code\u003E ile verilir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Ewatch\u003C/code\u003E izleme kurulurken \u003Ccode\u003EdataRequest\u003C/code\u003E ile aynı effect içinde bir kez çağrılır; okuduğu alanlar bağımlılığa eklenir, fırlattığı hata \u003Ccode\u003EMJX205\u003C/code\u003E olarak raporlanır. Yeniden yükleme değişimden sonraki mikro görevde yapılır; içerik yanıt gelene kadar yerinde kalır. Bir saniyede 30\u0027dan fazla yeniden yükleme tetiklenirse (döngü koruması) izleme durdurulur ve geliştirme modunda \u003Ccode\u003EMJX206\u003C/code\u003E uyarısı yazılır; \u003Ccode\u003Erefresh()\u003C/code\u003E izlemeyi yeniden kurar.\u003C/p\u003E\n\u003Ch2 id=\u0022templates-and-state\u0022\u003EŞablonlar ve liste durumu\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E ve \u003Ccode\u003EloadingTemplate\u003C/code\u003E listenin durumunu (\u003Ccode\u003EVirtualizationState\u0026lt;T\u0026gt;\u003C/code\u003E) alır. Durum alanları reaktiftir; şablonda getter ile okunan alan güncel kalır. \u003Ccode\u003Edata\u003C/code\u003E alanı yüklenen ya da \u003Ccode\u003EsetData\u003C/code\u003E ile verilen dizinin değiştiğini bildirir, öğeleri ise sarmaz (bkz. \u003Ca href=\u0022#data-as-given\u0022\u003EVeri verildiği gibi kullanılır\u003C/a\u003E).\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EAlan\u003C/th\u003E\n\u003Cth\u003ETip\u003C/th\u003E\n\u003Cth\u003EAnlamı\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisLoading\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİlk yükleme ya da \u003Ccode\u003Erefresh()\u003C/code\u003E isteği sürüyor.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisInitialized\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİlk yanıt geldi ya da \u003Ccode\u003EsetData()\u003C/code\u003E çağrıldı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcurrentPage\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESon yüklenen sayfa.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtotalCount\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESon yanıttaki \u003Ccode\u003EtotalCount\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EhasMore\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESon yanıttaki \u003Ccode\u003EhasMore\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eerror\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EError \\| undefined\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESon isteğin hatası; başarılı yüklemede temizlenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edata\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ET[]\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYüklü öğeler (filtre uygulanmamış), verildikleri gibi.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch3 id=\u0022data-as-given\u0022\u003EVeri verildiği gibi kullanılır\u003C/h3\u003E\n\u003Cp\u003EListe veriyi reaktif nesneye çevirmez. \u003Ccode\u003EdataRequest\u003C/code\u003E\u0027in döndürdüğü ya da \u003Ccode\u003EsetData\u003C/code\u003E\u0027ya verilen öğeler \u003Ccode\u003EitemTemplate\u003C/code\u003E, \u003Ccode\u003EitemHeight\u003C/code\u003E ve \u003Ccode\u003Efilter\u003C/code\u003E\u0027a olduğu gibi gelir; \u003Ccode\u003EsetData\u003C/code\u003E\u0027ya verilen dizinin kendisi \u003Ccode\u003Estate.data\u003C/code\u003E ve \u003Ccode\u003EgetState().data\u003C/code\u003E olarak okunur. Reaktif veri reaktif, düz veri düz kalır.\u003C/p\u003E\n\u003Cp\u003EDüz nesneyle kurulan satır, nesneye sonradan yazılan değeri kendiliğinden göstermez. Satırın değişikliği izlemesi gerekiyorsa veri \u003Ccode\u003Ereactive\u003C/code\u003E ile verilir; düz veride değişiklik, satırın bağları \u003Ccode\u003EsetState()\u003C/code\u003E ile yeniden çalıştırılarak ekrana yansıtılır (bkz. \u003Ca href=\u0022/docs/reactivity#bindings\u0022\u003EReaktivite ile DOM\u0027un buluşması\u003C/a\u003E). Yeni bir dizi gelmişse \u003Ccode\u003EsetData\u003C/code\u003E çağrılır.\u003C/p\u003E\n\u003Cp\u003ESonraki sayfalar ilk sayfanın dizisine eklenmez: liste yüklü öğeleri kendi dizisinde toplar, \u003Ccode\u003EdataRequest\u003C/code\u003E\u0027in döndürdüğü diziler değişmez.\u003C/p\u003E\n\u003Ch3 id=\u0022main-template\u0022\u003EÖzel kapsayıcı — \u003Ccode\u003EmainTemplate\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E listeyi saran yerleşimi kurar. İlk parametresi (\u003Ccode\u003Econtent\u003C/code\u003E) satırları taşıyan bileşendir; yerleşimde nereye konursa satırlar oraya çizilir. Onu saran en yakın eleman kaydırma kabı olur: liste ona \u003Ccode\u003Eoverflow-y: auto; position: relative; overflow-anchor: none\u003C/code\u003E verir ve kaydırmasını dinler, yüksekliğini ise siz verirsiniz. Kök \u003Ccode\u003Ediv\u003C/code\u003E\u0027e bu durumda stil yazılmaz. Klasör adını ve toplam not sayısını gösteren başlıklı liste:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Virtualization\u0026lt;Note\u0026gt;\n  itemHeight={64}\n  dataRequest={async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  }}\n  itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n  mainTemplate={(content, status) =\u0026gt; (\n    \u0026lt;div class=\u0026quot;list\u0026quot;\u0026gt;\n      \u0026lt;div class=\u0026quot;list__head\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{FOLDERS[folder].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; status.totalCount}\u0026lt;/span\u0026gt;\n      \u0026lt;/div\u0026gt;\n      \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n        \u0026lt;content\u0026gt;\u0026lt;/content\u0026gt;\n      \u0026lt;/div\u0026gt;\n    \u0026lt;/div\u0026gt;\n  )}\n/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Econst list = new Virtualization\u0026lt;Note\u0026gt;({\n  itemHeight: 64,\n  dataRequest: async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  },\n  itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n  mainTemplate: (content, status) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, (box: ComponentBase) =\u0026gt; {\n    box.class.add(\u0026quot;list\u0026quot;);\n    const head = motifComponent(\u0026quot;div\u0026quot;, (head: ComponentBase) =\u0026gt; {\n      head.class.add(\u0026quot;list__head\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.setText(FOLDERS[folder].title));\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; \u0060${status.totalCount}\u0060);\n      });\n      head.controls.add(title, badge);\n    });\n    const rows = motifComponent(\u0026quot;div\u0026quot;, (rows: ComponentBase) =\u0026gt; {\n      rows.class.add(\u0026quot;rows\u0026quot;);\n      rows.controls.add(content);\n    });\n    box.controls.add(head, rows);\n  }),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Virtualization\n  itemHeight={64}\n  dataRequest={async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  }}\n  itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n  mainTemplate={(content, status) =\u0026gt; (\n    \u0026lt;div class=\u0026quot;list\u0026quot;\u0026gt;\n      \u0026lt;div class=\u0026quot;list__head\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{FOLDERS[folder].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; status.totalCount}\u0026lt;/span\u0026gt;\n      \u0026lt;/div\u0026gt;\n      \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n        \u0026lt;content\u0026gt;\u0026lt;/content\u0026gt;\n      \u0026lt;/div\u0026gt;\n    \u0026lt;/div\u0026gt;\n  )}\n/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Econst list = new Virtualization({\n  itemHeight: 64,\n  dataRequest: async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  },\n  itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n  mainTemplate: (content, status) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, (box) =\u0026gt; {\n    box.class.add(\u0026quot;list\u0026quot;);\n    const head = motifComponent(\u0026quot;div\u0026quot;, (head) =\u0026gt; {\n      head.class.add(\u0026quot;list__head\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.setText(FOLDERS[folder].title));\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; \u0060${status.totalCount}\u0060);\n      });\n      head.controls.add(title, badge);\n    });\n    const rows = motifComponent(\u0026quot;div\u0026quot;, (rows) =\u0026gt; {\n      rows.class.add(\u0026quot;rows\u0026quot;);\n      rows.controls.add(content);\n    });\n    box.controls.add(head, rows);\n  }),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003E\u0026lt;content\u0026gt;\u0026lt;/content\u0026gt;\u003C/code\u003E etiketi \u003Ccode\u003Econtent\u003C/code\u003E parametresini yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Econtent\u003C/code\u003E bir bileşen olduğu için kaydırma kabının \u003Ccode\u003Econtrols\u003C/code\u003E\u0027una eklenir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E listenin yapıcısında bir kez çağrılır; ilk istek, \u003Ccode\u003Econtent\u003C/code\u003E kurulmaya başladığında yapılır.\u003C/p\u003E\n\u003Ch2 id=\u0022filtering\u0022\u003EFiltreleme\u003C/h2\u003E\n\u003Cp\u003EListe iki yerde süzülebilir:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E içinde.\u003C/strong\u003E Örnekteki arama böyle çalışır: \u003Ccode\u003Enotes.list(folder, state.query)\u003C/code\u003E yalnız eşleşen notları döndürür, \u003Ccode\u003EtotalCount\u003C/code\u003E ve \u003Ccode\u003EhasMore\u003C/code\u003E süzülmüş veriye göre hesaplanır. Süzgeç reaktif bir alanı okuyorsa otomatik yenileme listeyi kendiliğinden günceller.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003Efilter\u003C/code\u003E prop\u0027uyla.\u003C/strong\u003E Fonksiyon her yüklemede (ilk yükleme, sonraki sayfa, yenileme, \u003Ccode\u003EsetData\u003C/code\u003E) yüklü verinin tamamına uygulanır; boşluklar, indeksler ve \u003Ccode\u003EitemHeight\u003C/code\u003E toplamları süzülmüş listeye göre hesaplanır, \u003Ccode\u003Estate.data\u003C/code\u003E süzülmemiş kalır. Süzgeç yalnız yüklemede çalıştığı için okuduğu bir alan sonradan değişirse liste kendiliğinden yenilenmez; \u003Ccode\u003Erefresh()\u003C/code\u003E çağrılır ya da koşul \u003Ccode\u003EdataRequest\u003C/code\u003E\u0027e taşınır. Süzgeç yüklü öğelerin hepsini elerse \u003Ccode\u003EemptyTemplate\u003C/code\u003E gösterilir, verilmemişse liste alanı boş kalır; sunucuda başka sayfa olsa da sonraki sayfa istenmez. Sonraki sayfalarda eşleşen öğe olabiliyorsa süzme \u003Ccode\u003EdataRequest\u003C/code\u003E\u0027te yapılır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022variable-height\u0022\u003EDeğişken yükseklik ve boyut değişimi\u003C/h2\u003E\n\u003Cp\u003ESatırların yüksekliği farklıysa ama önceden hesaplanabiliyorsa \u003Ccode\u003EitemHeight\u003C/code\u003E\u0027a fonksiyon verilir; örneğin metni olan notun satırı daha uzunsa \u003Ccode\u003E(note) =\u0026gt; (note.body ? 72 : 48)\u003C/code\u003E. Yükseklikler veri her değiştiğinde (yükleme, \u003Ccode\u003EsetData\u003C/code\u003E, \u003Ccode\u003Efilter\u003C/code\u003E) bir kez toplanır; görünür aralık ikili aramayla bulunur, \u003Ccode\u003EscrollToIndex\u003C/code\u003E de bu toplamları kullanır. Geçersiz (\u003Ccode\u003ENaN\u003C/code\u003E, negatif) değerler 0 sayılır.\u003C/p\u003E\n\u003Cp\u003EListe yükseklikleri izlemez: \u003Ccode\u003EitemHeight\u003C/code\u003E\u0027ın okuduğu değer reaktif olsa da değişimi kendiliğinden görmez. Veri aynı kalıp bir ya da birkaç satırın yüksekliği değişince (satır genişledi, yoğunluk ayarı değişti, sabit \u003Ccode\u003EitemHeight\u003C/code\u003E sayısı başka bir sayıyla değiştirildi) \u003Ccode\u003EupdateHeights()\u003C/code\u003E çağrılır. Yöntem yükseklikleri baştan okur ve pencereyi yeniden çizer; satırlar olduğu gibi kalır, \u003Ccode\u003Efilter\u003C/code\u003E yeniden çalışmaz, yükleme istenmez. Ekranın üstündeki satır \u003Ca href=\u0022#rendering-and-methods\u0022\u003Everi değişiminde olduğu gibi\u003C/a\u003E ekrandaki yerini korur: üstteki bir satır uzarsa kaydırma konumu aynı farkla kayar. Yükseklik yalnızca çizimden sonra ölçülerek bilinebiliyorsa (serbest metinli akış) bu yöntem uygun değildir.\u003C/p\u003E\n\u003Cp\u003EListe kabının boyutu değişince (ekran döndürme, mobil klavyenin açılması, pencere boyutu) görünür satırlar kaydırma beklenmeden yeniden hesaplanır. Bunun için \u003Ccode\u003EResizeObserver\u003C/code\u003E kullanılır; ortamda yoksa bu adım atlanır, liste serbest bırakılınca gözlemci bırakılır.\u003C/p\u003E\n\u003Ch2 id=\u0022rendering-and-methods\u0022\u003EÇizim modeli ve yöntemler\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EDOM\u0027da yalnızca pencere kadar satır bulunur: \u003Ccode\u003E[anchor − overscan, anchor \u002B görünür \u002B overscan)\u003C/code\u003E,\n\u003Ccode\u003Eanchor = floor(scrollTop / itemHeight)\u003C/code\u003E. Satırlar iki boşluk \u003Ccode\u003Ediv\u003C/code\u003E\u0027i arasında düz kardeşlerdir;\nboşluk yükseklikleri hiç negatif olmaz ve \u003Ccode\u003Eüst \u002B satırlar \u002B alt = filtrelenmiş uzunluk × itemHeight\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EPencereden çıkan satır \u003Cstrong\u003Eserbest bırakılmaz, DOM\u0027dan sökülür\u003C/strong\u003E; geri gelince aynı bileşen (bağları,\ninput durumu, öğe nesnesi) sıralı konumuna takılır. Yer tutucu yorum birikmez.\nSökülen satır \u003Ccode\u003EonDeactivated\u003C/code\u003E, geri takılan satır \u003Ccode\u003EonActivated\u003C/code\u003E alır.\n\u003Ccode\u003EcacheSize\u003C/code\u003E aşılınca en uzun süredir görünmeyen satırlar serbest bırakılır.\u003C/li\u003E\n\u003Cli\u003ESatırlar öğe nesnesinin kimliğiyle (ilkel öğelerde sırayla) önbelleğe alınır. Aynı nesne veride\nbirden çok kez bulunabilir; her geçiş kendi satırını alır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EsetData\u003C/code\u003E, otomatik yenileme ve sonraki sayfanın gelişi satırları bu kimlikle eşler: yeni görünümde\nyine bulunan nesnenin satırı, ekranda da önbellekte de olsa korunur ve yeni sırasına taşınır; yeni\ngörünümde bulunmayan nesnenin satırı (sonraki sayfayla \u003Ccode\u003Efilter\u003C/code\u003E\u0027ın eledikleri dahil) serbest bırakılır. Bir nesne ham hâliyle de reaktif proxy\u0027siyle de verilse aynı satırı bulur. İlkel\nöğede aynı sıradaki aynı değer satırını korur. Her yüklemede yeni nesneler geliyorsa (ör. sunucudan\ntaze liste) aynı \u003Ccode\u003Eid\u003C/code\u003E\u0027yi taşısalar bile satırlar yeniden kurulur. Korunan satırın \u003Ccode\u003EitemTemplate\u003C/code\u003E\u0027ten\naldığı \u003Ccode\u003Eindex\u003C/code\u003E satırın kurulduğu andaki sıradır; sonradan güncellenmez.\u003C/li\u003E\n\u003Cli\u003EVeri değişince (\u003Ccode\u003EsetData\u003C/code\u003E, otomatik yenileme, sonraki sayfa) ekranda görünen satırlardan yeni\nveride kalan ilk satır ekrandaki yerini korur: üstüne öğe eklenir ya da üstünden öğe silinirse\n(sıralayan bir \u003Ccode\u003Efilter\u003C/code\u003E\u0027la sonraki sayfanın öğeleri üste girdiğinde de) kaydırma konumu o kadar\nkayar, sıra değişince kaydırma o satırı yeni yerine götürür. İlkel öğede aynı değer, eski sırasına\nen yakın konumunda aranır. Görünen satırların hiçbiri\nkalmamışsa önce ekranın üstünde, sonra altında çizili duran satırlardan ekrana en yakın kalan kullanılır;\nonlar da kalmamışsa kaydırma konumu olduğu gibi korunur. Ekranın üstünden taşan satır kısalırsa\nbir kısmı görünür kalır. Liste en üstteyken en üstte kalır, üste eklenen öğe görünür. Yeni\nsıralamadan sonra listenin başına dönmek için \u003Ccode\u003EscrollToIndex(0)\u003C/code\u003E çağrılır. Konum ekranda çizili\nsatırlardan okunduğu için dizi yerinde değiştirilip (\u003Ccode\u003Esplice\u003C/code\u003E, \u003Ccode\u003Esort\u003C/code\u003E) aynı dizi yeniden verilse de\ndoğru kalır. Kaydırma kabına \u003Ccode\u003Eoverflow-anchor: none\u003C/code\u003E verilir: konumu tarayıcı değil liste korur;\ntarayıcının kendi kaydırma çapası liste satırları çizerken kaydırma konumunu değiştirip görünür\nalanda boşluk bırakabilir.\u003C/li\u003E\n\u003Cli\u003EHer kaydırma olayında pencere yeniden hesaplanır (\u003Ccode\u003EhasMore\u003C/code\u003E \u003Ccode\u003Efalse\u003C/code\u003E iken de); yalnızca eski ve\nyeni pencere arasındaki fark işlenir.\u003C/li\u003E\n\u003Cli\u003Eİlk istek liste kurulurken yapılır; \u003Ccode\u003Ex-wait\u003C/code\u003E ile bekletilen liste kurulmadığı için ilk istek de\nbekleme bitene kadar ertelenir.\u003C/li\u003E\n\u003Cli\u003Eİlk çizim yerleşimi bekler: kaydırma kabı henüz \u003Ccode\u003Edocument\u003C/code\u003E\u0027ta değilse çizim \u003Ccode\u003EonMounted\u003C/code\u003E\u0027a ertelenir;\nbelgede olup yüksekliği 0 olan kapta çizim, kabın boyutu değişince yapılır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EYöntem\u003C/th\u003E\n\u003Cth\u003EEtki\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Erefresh()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EVeriyi sıfırlar, sayfa 0\u0027ı \u003Ccode\u003EdataRequest\u003C/code\u003E ile yeniden ister; önbellekteki tüm satırlar serbest bırakılır. Otomatik yenileme izlemesini yeniden kurar. \u003Ccode\u003EPromise\u003C/code\u003E döner.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsetData(items)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eİstek yapmadan veriyi değiştirir; \u003Ccode\u003EhasMore\u003C/code\u003E \u003Ccode\u003Efalse\u003C/code\u003E, sayfa 0 olur ve otomatik yenileme durur. Yeni veride yine bulunan öğelerin satırları korunur, bulunmayanlarınki serbest bırakılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EupdateHeights()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EVeri aynı kalıp yükseklikler değişince yükseklikleri yeniden okur ve pencereyi çizer; satırlar korunur, ekranın üstündeki satır yerinde kalır (bkz. \u003Ca href=\u0022#variable-height\u0022\u003EDeğişken yükseklik\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EscrollToIndex(i)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ei\u003C/code\u003E\u0027nci satırın konumuna (sabit yükseklikte \u003Ccode\u003Ei × itemHeight\u003C/code\u003E) kaydırır ve hemen çizer; aralık dışındaki indeks sınıra çekilir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EgetState()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EListe durumunun sığ kopyası.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EYöntemler liste bileşeninin kendisindedir; JSX\u0027te ona \u003Ccode\u003Eref\u003C/code\u003E ile ulaşılır (bkz. \u003Ca href=\u0022/docs/component-element#element-and-ref\u0022\u003EBileşen içinde eleman erişimi\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003EYöntemler \u003Ccode\u003Enew Virtualization(...)\u003C/code\u003E ile kurulan bileşenin üzerinden çağrılır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022when-to-use\u0022\u003ENe zaman kullanmalı?\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EDurum\u003C/th\u003E\n\u003Cth\u003EÖneri\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EAz öğe (\u0026lt; ~100), değişken yükseklik\u003C/td\u003E\n\u003Ctd\u003ENormal liste bağı (\u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EKoşullu Gösterim ve Listeler\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EÇok öğe, \u003Cstrong\u003Esabit\u003C/strong\u003E ya da \u003Cstrong\u003Eönceden hesaplanabilen\u003C/strong\u003E satır yüksekliği\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EVirtualization\u003C/code\u003E (\u003Ccode\u003EitemHeight\u003C/code\u003E sayı ya da fonksiyon).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003ESonsuz kaydırma / sayfalı API\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EVirtualization\u003C/code\u003E \u002B \u003Ccode\u003EautoLoad\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBellek yönetimini ve serbest bırakma desenini öğrenmek için \u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"basic-usage","text":"Temel kullanım","level":2},{"id":"props","text":"Prop\u0027lar (VirtualizationProps\u003CT\u003E)","level":2},{"id":"data-request","text":"dataRequest sözleşmesi","level":2},{"id":"auto-refresh","text":"Otomatik yenileme — autoRefresh","level":3},{"id":"templates-and-state","text":"Şablonlar ve liste durumu","level":2},{"id":"data-as-given","text":"Veri verildiği gibi kullanılır","level":3},{"id":"main-template","text":"Özel kapsayıcı — mainTemplate","level":3},{"id":"filtering","text":"Filtreleme","level":2},{"id":"variable-height","text":"Değişken yükseklik ve boyut değişimi","level":2},{"id":"rendering-and-methods","text":"Çizim modeli ve yöntemler","level":2},{"id":"when-to-use","text":"Ne zaman kullanmalı?","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"content-body","title":"ContentBody ve ContentBlock"},"next":null,"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Gelişmiş</p>
+        <h1>Sanal Listeler (Virtualization)</h1>
+        <p>Virtualization bileşeni; prop&#x27;lar, dataRequest sözleşmesi, otomatik yenileme, şablonlar, filtreleme, değişken yükseklik, çizim modeli ve yöntemler.</p>
+<p>Binlerce öğelik listelerde tüm öğeleri DOM'a koymak performansı düşürür. MotifJS'in <code>Virtualization</code> bileşeni yalnızca görünür öğeleri (ve iki yanlarında az sayıda tampon satırı) DOM'da tutarak satır yüksekliği sabit ya da önceden hesaplanabilen listeleri verimli gösterir. Veriyi sayfa sayfa kendisi ister.</p>
+<h2 id="basic-usage">Temel kullanım</h2>
+<p>Örnekte klasörün not listesi sanal listeyle çizilir. Veri servisteki notlardan sayfa sayfa dilimlenir; her satır <a href="/tr/docs/component-creation">not satırı bileşenidir</a>:</p>
+<div class="doc-code" data-file="src/parts/NoteList.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteList.tsx"><code>import { Component, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component&lt;any, { folder: Folder; state: { query: string } }&gt; {
+  override view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = this.props;
+    return (
+      &lt;Virtualization&lt;Note&gt;
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteList.ts"><code>import { Component, ComponentBase, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component&lt;any, { folder: Folder; state: { query: string } }&gt; {
+  override view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = this.props;
+    return new Virtualization&lt;Note&gt;({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; new NoteRow({ note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteList.tsx"><code>import { FromService, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export function NoteList(props: { folder: Folder; state: { query: string } }) {
+  const notes = FromService(NotesService)!;
+  const { folder, state } = props;
+
+  return (
+    &lt;Virtualization&lt;Note&gt;
+      itemHeight={64}
+      pageSize={50}
+      dataRequest={async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      }}
+      itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+      emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+    /&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteList.ts"><code>import { ComponentBase, FromService, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export function NoteList(props: { folder: Folder; state: { query: string } }) {
+  const notes = FromService(NotesService)!;
+  const { folder, state } = props;
+
+  return new Virtualization&lt;Note&gt;({
+    itemHeight: 64,
+    pageSize: 50,
+    dataRequest: async ({ page, pageSize }) =&gt; {
+      const found = notes.list(folder, state.query);
+      const start = page * pageSize;
+      return {
+        items: found.slice(start, start + pageSize),
+        totalCount: found.length,
+        hasMore: start + pageSize &lt; found.length,
+      };
+    },
+    itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+    emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+      p.class.add(&quot;list__empty&quot;);
+      p.setText(FOLDERS[folder].empty);
+    }),
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteList.tsx"><code>import { Virtualization, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export const NoteList = (props: { folder: Folder; state: { query: string } }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = props;
+    return (
+      &lt;Virtualization&lt;Note&gt;
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteList.ts"><code>import { ComponentBase, Virtualization, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export const NoteList = (props: { folder: Folder; state: { query: string } }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = props;
+    return new Virtualization&lt;Note&gt;({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteList.jsx"><code>import { Component, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component {
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = this.props;
+    return (
+      &lt;Virtualization
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteList.js"><code>import { Component, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component {
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = this.props;
+    return new Virtualization({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; new NoteRow({ note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteList.jsx"><code>import { FromService, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export function NoteList(props) {
+  const notes = FromService(NotesService);
+  const { folder, state } = props;
+
+  return (
+    &lt;Virtualization
+      itemHeight={64}
+      pageSize={50}
+      dataRequest={async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      }}
+      itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+      emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+    /&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteList.js"><code>import { FromService, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export function NoteList(props) {
+  const notes = FromService(NotesService);
+  const { folder, state } = props;
+
+  return new Virtualization({
+    itemHeight: 64,
+    pageSize: 50,
+    dataRequest: async ({ page, pageSize }) =&gt; {
+      const found = notes.list(folder, state.query);
+      const start = page * pageSize;
+      return {
+        items: found.slice(start, start + pageSize),
+        totalCount: found.length,
+        hasMore: start + pageSize &lt; found.length,
+      };
+    },
+    itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+    emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p) =&gt; {
+      p.class.add(&quot;list__empty&quot;);
+      p.setText(FOLDERS[folder].empty);
+    }),
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteList.jsx"><code>import { Virtualization, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export const NoteList = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = props;
+    return (
+      &lt;Virtualization
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteList.js"><code>import { Virtualization, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export const NoteList = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = props;
+    return new Virtualization({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Klasör düzeni listeyi arama durumuyla birlikte <code>&lt;NoteList folder={this.folder} state={this.state} /&gt;</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Klasör düzeni listeyi arama durumuyla birlikte <code>new NoteList({ folder: this.folder, state: this.state })</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Klasör düzeni listeyi arama durumuyla birlikte <code>motifComponent(NoteList, { folder: this.folder, state: this.state })</code> ile yerleştirir.</p>
+</div>
+<p><code>mainTemplate</code> verilmediğinde liste kök <code>div</code>'ini <code>overflow-y: auto; height: 100%; position: relative; overflow-anchor: none</code> ile kurar ve kendi içinde kayar; bu yüzden onu taşıyan kabın bir yüksekliği olmalıdır ya da yükseklik <code>style</code> ile listeye verilir. <code>dataRequest</code> arama metnini ve notları okuduğu için arama kutusuna yazıldıkça liste kendiliğinden yenilenir (bkz. <a href="#auto-refresh">Otomatik yenileme</a>).</p>
+<h2 id="props">Prop'lar (<code>VirtualizationProps&lt;T&gt;</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Prop</th>
+<th>Tip</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dataRequest</code></td>
+<td><code>(req) =&gt; Promise&lt;VirtualizationDataResponse&lt;T&gt;&gt;</code></td>
+<td><strong>Zorunlu.</strong> Sayfa verisini getiren fonksiyon; bkz. <a href="#data-request"><code>dataRequest</code> sözleşmesi</a>.</td>
+</tr>
+<tr>
+<td><code>itemTemplate</code></td>
+<td><code>(item: T, index: number) =&gt; any</code></td>
+<td><strong>Zorunlu.</strong> Her öğenin satırını kurar. Bileşen döndürmezse dönen değer bir bileşene sarılır. Öğe veride nasıl verildiyse öyle gelir (bkz. <a href="#data-as-given">Veri verildiği gibi kullanılır</a>).</td>
+</tr>
+<tr>
+<td><code>itemHeight</code></td>
+<td><code>number \| (item: T, index: number) =&gt; number</code></td>
+<td><strong>Zorunlu.</strong> Her öğenin piksel yüksekliği. Sayı: tüm satırlar aynı; fonksiyon: satır başına bilinen yükseklik (bkz. <a href="#variable-height">Değişken yükseklik</a>).</td>
+</tr>
+<tr>
+<td><code>pageSize</code></td>
+<td><code>number</code></td>
+<td>Her istekte kaç öğe istenecek (varsayılan 50).</td>
+</tr>
+<tr>
+<td><code>mainTemplate</code></td>
+<td><code>(content, state) =&gt; any</code></td>
+<td>Listeyi saran yerleşim; bkz. <a href="#main-template">Özel kapsayıcı</a>.</td>
+</tr>
+<tr>
+<td><code>loadingTemplate</code></td>
+<td><code>(state) =&gt; any</code></td>
+<td>İlk yükleme sürerken gösterilen görünüm.</td>
+</tr>
+<tr>
+<td><code>emptyTemplate</code></td>
+<td><code>() =&gt; any</code></td>
+<td>Gösterilecek öğe kalmadığında (veri boş ya da filtre hepsini eledi) gösterilen görünüm.</td>
+</tr>
+<tr>
+<td><code>errorTemplate</code></td>
+<td><code>(error) =&gt; any</code></td>
+<td>İlk yükleme, <code>refresh()</code> ya da otomatik yenileme isteği hata verince satırların yerine gösterilen görünüm; verilmezse hata <code>MJX207</code> olarak raporlanır. Sonraki sayfa isteğinin hatası her durumda <code>MJX207</code> olarak raporlanır ve <code>getState().error</code>'a yazılır; yüklenmiş satırlar ekranda kalır, hata görünümü gösterilmez, bir sonraki kaydırmada istek yeniden yapılır ve başarılı yüklemede <code>error</code> temizlenir.</td>
+</tr>
+<tr>
+<td><code>filter</code></td>
+<td><code>(items: T[]) =&gt; T[]</code></td>
+<td>Yüklü veriye uygulanır; boşluklar ve indeksler filtrelenmiş uzunluğa göre hesaplanır (bkz. <a href="#filtering">Filtreleme</a>).</td>
+</tr>
+<tr>
+<td><code>overscan</code></td>
+<td><code>number</code></td>
+<td>Görünür alanın <strong>üstünde ve altında</strong> ek çizilen satır sayısı (varsayılan: görünür satır sayısı).</td>
+</tr>
+<tr>
+<td><code>cacheSize</code></td>
+<td><code>number</code></td>
+<td>Önbellekte tutulan satır bileşeni üst sınırı, çizili satırlar dahil (varsayılan <code>max(200, 3 × çizili satır sayısı)</code>). Aşılınca ekran dışındaki satırlardan en uzun süredir görünmeyenler serbest bırakılır.</td>
+</tr>
+<tr>
+<td><code>autoRefresh</code></td>
+<td><code>boolean</code></td>
+<td><code>dataRequest</code> içinde okunan reaktif veri değişince yüklü aralığı tek istekte yeniden alır (varsayılan açık); bkz. <a href="#auto-refresh">Otomatik yenileme</a>. <code>false</code> verilirse liste yalnız <code>refresh()</code> ile yenilenir.</td>
+</tr>
+<tr>
+<td><code>watch</code></td>
+<td><code>() =&gt; unknown</code></td>
+<td>Otomatik yenileme için ek bağımlılık: burada okunan reaktif alanlar da yeniden yüklemeyi tetikler.</td>
+</tr>
+<tr>
+<td><code>autoLoad</code></td>
+<td><code>boolean</code></td>
+<td>Dibe yaklaşınca sonraki sayfayı ister (varsayılan açık). Çizilen pencere yüklü verinin sonuna <code>overscan</code> kadar yaklaştığında da (ör. ilk sayfa görünür alanı doldurmuyorsa) sonraki sayfa istenir.</td>
+</tr>
+<tr>
+<td><code>autoLoadThreshold</code></td>
+<td><code>number</code></td>
+<td><strong>Yüklü</strong> verinin alt sınırına kaç piksel kala sonraki sayfa istensin (varsayılan 100). Sabit yükseklikte alt sınır <code>data.length × itemHeight</code>'tır.</td>
+</tr>
+<tr>
+<td><code>className</code></td>
+<td><code>string</code></td>
+<td>Kök <code>div</code>'e eklenen sınıf.</td>
+</tr>
+<tr>
+<td><code>style</code></td>
+<td><code>Partial&lt;CSSStyleDeclaration&gt;</code></td>
+<td>Kök <code>div</code>'e satır içi stil. Listenin kendi <code>overflow-y</code>, <code>height</code> ve <code>position</code> değerlerinden sonra uygulanır; aynı özelliği verirseniz sizinki geçerli olur.</td>
+</tr>
+<tr>
+<td><code>overscanPages</code>, <code>renderMode</code>, <code>pageBuffer</code></td>
+<td></td>
+<td>Ayrılmış; okunmazlar.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="data-request"><code>dataRequest</code> sözleşmesi</h2>
+<p><code>dataRequest</code> bir istek nesnesi (<code>VirtualizationDataRequest</code>) alır:</p>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Tip</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>page</code></td>
+<td><code>number</code></td>
+<td>0 tabanlı sayfa sırası.</td>
+</tr>
+<tr>
+<td><code>pageSize</code></td>
+<td><code>number</code></td>
+<td>İstenen öğe sayısı. Otomatik yenilemede yüklü aralık tek istekte istendiği için <code>page</code> 0, <code>pageSize</code> ise <code>pageSize × yüklü sayfa sayısı</code> olur.</td>
+</tr>
+<tr>
+<td><code>scrollTop</code></td>
+<td><code>number</code></td>
+<td>İstek anındaki kaydırma konumu (ilk yüklemede 0).</td>
+</tr>
+</tbody>
+</table>
+<p>ve bir yanıt nesnesi (<code>VirtualizationDataResponse&lt;T&gt;</code>) döndüren <code>Promise</code> verir:</p>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Tip</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>items</code></td>
+<td><code>T[]</code></td>
+<td>Bu sayfadaki öğeler.</td>
+</tr>
+<tr>
+<td><code>totalCount</code></td>
+<td><code>number</code></td>
+<td>Tüm veri setinin öğe sayısı. <code>state.totalCount</code>'a yazılır (ör. başlıkta toplamı göstermek için) ve <code>hasMore</code> sürdükçe kaydırma alanının boyunu belirler.</td>
+</tr>
+<tr>
+<td><code>hasMore</code></td>
+<td><code>boolean</code></td>
+<td>Sonraki sayfa var mı. <code>false</code> döndüğünde otomatik yükleme durur.</td>
+</tr>
+</tbody>
+</table>
+<p>Kaydırma alanı <code>totalCount</code>'un tamamını kapsar: yüklenmemiş öğeler alt boşlukta yer tutar, sabit <code>itemHeight</code>'ta tam yükseklikleriyle, fonksiyonla verilen yükseklikte yüklü satırların ortalamasıyla. Yüklenmemiş bölgeye kaydırılınca sayfalar oraya ulaşana kadar sırayla istenir. <code>hasMore</code> <code>false</code> olunca ya da <code>totalCount</code> yüklü öğelerden azsa alan yalnız yüklü veriden hesaplanır. <code>filter</code> yüklü öğelere uygulanır; yüklenmemiş kısım süzülmeden sayılır, süzgecin attığı öğeler yüklendikçe alan kısalır.</p>
+<h3 id="auto-refresh">Otomatik yenileme — <code>autoRefresh</code></h3>
+<p><code>autoRefresh</code> (varsayılan açık) ilk yüklemede ve <code>refresh()</code>'te <code>dataRequest</code>'i bir effect içinde çağırır. Bu çağrıda okunan reaktif alanlardan biri değişince yüklü aralık (sayfa 0'dan geçerli sayfaya) tek istekte yeniden alınır; yanıtta yine bulunan öğelerin satırları korunur, bulunmayanlarınki serbest bırakılır (bkz. <a href="#rendering-and-methods">Çizim modeli</a>). Sonraki sayfa istekleri izlenmez; <code>setData()</code> izlemeyi durdurur. Örnekte <code>notes.list(folder, state.query)</code> not dizisini, arama metnini ve notların arşiv, sabitleme ve tarih alanlarını (arama doluyken başlık ve metni de) okur; bunlardan biri değişince liste yenilenir.</p>
+<div class="doc-variant" data-variant="declarative">
+<p>Etikete yazılan <code>async</code> <code>dataRequest</code> fonksiyonundaki <code>await</code>'leri derleyici sarar: <code>await</code> sonrasında okunan reaktif alanlar da bağımlılık olur (başka yerlerde <code>await</code> sonrası okumalar izlenmez; bkz. <a href="/tr/docs/reactivity#await-reads"><code>await</code> sonrası okumalar</a>). <code>dataRequest</code> etiketin dışında tanımlandıysa ya da bağımlılık başka bir yerden geliyorsa <code>watch={() =&gt; state.query}</code> ile ek bağımlılık verilir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p>Derleyici <code>await</code> sarmasını yalnız <code>&lt;Virtualization&gt;</code> etiketine yazılan <code>dataRequest</code>'e uygular; JSX'siz yazımda yalnız ilk <code>await</code>'ten önce okunan reaktif alanlar bağımlılık olur (bkz. <a href="/tr/docs/reactivity#await-reads"><code>await</code> sonrası okumalar</a>). <code>await</code> sonrasında okunan ya da başka bir yerden gelen bağımlılık <code>watch: () =&gt; state.query</code> ile verilir.</p>
+</div>
+<p><code>watch</code> izleme kurulurken <code>dataRequest</code> ile aynı effect içinde bir kez çağrılır; okuduğu alanlar bağımlılığa eklenir, fırlattığı hata <code>MJX205</code> olarak raporlanır. Yeniden yükleme değişimden sonraki mikro görevde yapılır; içerik yanıt gelene kadar yerinde kalır. Bir saniyede 30'dan fazla yeniden yükleme tetiklenirse (döngü koruması) izleme durdurulur ve geliştirme modunda <code>MJX206</code> uyarısı yazılır; <code>refresh()</code> izlemeyi yeniden kurar.</p>
+<h2 id="templates-and-state">Şablonlar ve liste durumu</h2>
+<p><code>mainTemplate</code> ve <code>loadingTemplate</code> listenin durumunu (<code>VirtualizationState&lt;T&gt;</code>) alır. Durum alanları reaktiftir; şablonda getter ile okunan alan güncel kalır. <code>data</code> alanı yüklenen ya da <code>setData</code> ile verilen dizinin değiştiğini bildirir, öğeleri ise sarmaz (bkz. <a href="#data-as-given">Veri verildiği gibi kullanılır</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Tip</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isLoading</code></td>
+<td><code>boolean</code></td>
+<td>İlk yükleme ya da <code>refresh()</code> isteği sürüyor.</td>
+</tr>
+<tr>
+<td><code>isInitialized</code></td>
+<td><code>boolean</code></td>
+<td>İlk yanıt geldi ya da <code>setData()</code> çağrıldı.</td>
+</tr>
+<tr>
+<td><code>currentPage</code></td>
+<td><code>number</code></td>
+<td>Son yüklenen sayfa.</td>
+</tr>
+<tr>
+<td><code>totalCount</code></td>
+<td><code>number</code></td>
+<td>Son yanıttaki <code>totalCount</code>.</td>
+</tr>
+<tr>
+<td><code>hasMore</code></td>
+<td><code>boolean</code></td>
+<td>Son yanıttaki <code>hasMore</code>.</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td><code>Error \| undefined</code></td>
+<td>Son isteğin hatası; başarılı yüklemede temizlenir.</td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td><code>T[]</code></td>
+<td>Yüklü öğeler (filtre uygulanmamış), verildikleri gibi.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-as-given">Veri verildiği gibi kullanılır</h3>
+<p>Liste veriyi reaktif nesneye çevirmez. <code>dataRequest</code>'in döndürdüğü ya da <code>setData</code>'ya verilen öğeler <code>itemTemplate</code>, <code>itemHeight</code> ve <code>filter</code>'a olduğu gibi gelir; <code>setData</code>'ya verilen dizinin kendisi <code>state.data</code> ve <code>getState().data</code> olarak okunur. Reaktif veri reaktif, düz veri düz kalır.</p>
+<p>Düz nesneyle kurulan satır, nesneye sonradan yazılan değeri kendiliğinden göstermez. Satırın değişikliği izlemesi gerekiyorsa veri <code>reactive</code> ile verilir; düz veride değişiklik, satırın bağları <code>setState()</code> ile yeniden çalıştırılarak ekrana yansıtılır (bkz. <a href="/tr/docs/reactivity#bindings">Reaktivite ile DOM'un buluşması</a>). Yeni bir dizi gelmişse <code>setData</code> çağrılır.</p>
+<p>Sonraki sayfalar ilk sayfanın dizisine eklenmez: liste yüklü öğeleri kendi dizisinde toplar, <code>dataRequest</code>'in döndürdüğü diziler değişmez.</p>
+<h3 id="main-template">Özel kapsayıcı — <code>mainTemplate</code></h3>
+<p><code>mainTemplate</code> listeyi saran yerleşimi kurar. İlk parametresi (<code>content</code>) satırları taşıyan bileşendir; yerleşimde nereye konursa satırlar oraya çizilir. Onu saran en yakın eleman kaydırma kabı olur: liste ona <code>overflow-y: auto; position: relative; overflow-anchor: none</code> verir ve kaydırmasını dinler, yüksekliğini ise siz verirsiniz. Kök <code>div</code>'e bu durumda stil yazılmaz. Klasör adını ve toplam not sayısını gösteren başlıklı liste:</p>
+<div class="doc-code" data-file="src/parts/NoteList.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteList.tsx"><code>&lt;Virtualization&lt;Note&gt;
+  itemHeight={64}
+  dataRequest={async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  }}
+  itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+  mainTemplate={(content, status) =&gt; (
+    &lt;div class=&quot;list&quot;&gt;
+      &lt;div class=&quot;list__head&quot;&gt;
+        &lt;h2&gt;{FOLDERS[folder].title}&lt;/h2&gt;
+        &lt;span class=&quot;badge&quot;&gt;{() =&gt; status.totalCount}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;rows&quot;&gt;
+        &lt;content&gt;&lt;/content&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )}
+/&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteList.ts"><code>const list = new Virtualization&lt;Note&gt;({
+  itemHeight: 64,
+  dataRequest: async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  },
+  itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+  mainTemplate: (content, status) =&gt; motifComponent(&quot;div&quot;, (box: ComponentBase) =&gt; {
+    box.class.add(&quot;list&quot;);
+    const head = motifComponent(&quot;div&quot;, (head: ComponentBase) =&gt; {
+      head.class.add(&quot;list__head&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.setText(FOLDERS[folder].title));
+      const badge = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; `${status.totalCount}`);
+      });
+      head.controls.add(title, badge);
+    });
+    const rows = motifComponent(&quot;div&quot;, (rows: ComponentBase) =&gt; {
+      rows.class.add(&quot;rows&quot;);
+      rows.controls.add(content);
+    });
+    box.controls.add(head, rows);
+  }),
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteList.jsx"><code>&lt;Virtualization
+  itemHeight={64}
+  dataRequest={async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  }}
+  itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+  mainTemplate={(content, status) =&gt; (
+    &lt;div class=&quot;list&quot;&gt;
+      &lt;div class=&quot;list__head&quot;&gt;
+        &lt;h2&gt;{FOLDERS[folder].title}&lt;/h2&gt;
+        &lt;span class=&quot;badge&quot;&gt;{() =&gt; status.totalCount}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;rows&quot;&gt;
+        &lt;content&gt;&lt;/content&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )}
+/&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteList.js"><code>const list = new Virtualization({
+  itemHeight: 64,
+  dataRequest: async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  },
+  itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+  mainTemplate: (content, status) =&gt; motifComponent(&quot;div&quot;, (box) =&gt; {
+    box.class.add(&quot;list&quot;);
+    const head = motifComponent(&quot;div&quot;, (head) =&gt; {
+      head.class.add(&quot;list__head&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.setText(FOLDERS[folder].title));
+      const badge = motifComponent(&quot;span&quot;, (span) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; `${status.totalCount}`);
+      });
+      head.controls.add(title, badge);
+    });
+    const rows = motifComponent(&quot;div&quot;, (rows) =&gt; {
+      rows.class.add(&quot;rows&quot;);
+      rows.controls.add(content);
+    });
+    box.controls.add(head, rows);
+  }),
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p><code>&lt;content&gt;&lt;/content&gt;</code> etiketi <code>content</code> parametresini yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p><code>content</code> bir bileşen olduğu için kaydırma kabının <code>controls</code>'una eklenir.</p>
+</div>
+<p><code>mainTemplate</code> listenin yapıcısında bir kez çağrılır; ilk istek, <code>content</code> kurulmaya başladığında yapılır.</p>
+<h2 id="filtering">Filtreleme</h2>
+<p>Liste iki yerde süzülebilir:</p>
+<ul>
+<li><strong><code>dataRequest</code> içinde.</strong> Örnekteki arama böyle çalışır: <code>notes.list(folder, state.query)</code> yalnız eşleşen notları döndürür, <code>totalCount</code> ve <code>hasMore</code> süzülmüş veriye göre hesaplanır. Süzgeç reaktif bir alanı okuyorsa otomatik yenileme listeyi kendiliğinden günceller.</li>
+<li><strong><code>filter</code> prop'uyla.</strong> Fonksiyon her yüklemede (ilk yükleme, sonraki sayfa, yenileme, <code>setData</code>) yüklü verinin tamamına uygulanır; boşluklar, indeksler ve <code>itemHeight</code> toplamları süzülmüş listeye göre hesaplanır, <code>state.data</code> süzülmemiş kalır. Süzgeç yalnız yüklemede çalıştığı için okuduğu bir alan sonradan değişirse liste kendiliğinden yenilenmez; <code>refresh()</code> çağrılır ya da koşul <code>dataRequest</code>'e taşınır. Süzgeç yüklü öğelerin hepsini elerse <code>emptyTemplate</code> gösterilir, verilmemişse liste alanı boş kalır; sunucuda başka sayfa olsa da sonraki sayfa istenmez. Sonraki sayfalarda eşleşen öğe olabiliyorsa süzme <code>dataRequest</code>'te yapılır.</li>
+</ul>
+<h2 id="variable-height">Değişken yükseklik ve boyut değişimi</h2>
+<p>Satırların yüksekliği farklıysa ama önceden hesaplanabiliyorsa <code>itemHeight</code>'a fonksiyon verilir; örneğin metni olan notun satırı daha uzunsa <code>(note) =&gt; (note.body ? 72 : 48)</code>. Yükseklikler veri her değiştiğinde (yükleme, <code>setData</code>, <code>filter</code>) bir kez toplanır; görünür aralık ikili aramayla bulunur, <code>scrollToIndex</code> de bu toplamları kullanır. Geçersiz (<code>NaN</code>, negatif) değerler 0 sayılır.</p>
+<p>Liste yükseklikleri izlemez: <code>itemHeight</code>'ın okuduğu değer reaktif olsa da değişimi kendiliğinden görmez. Veri aynı kalıp bir ya da birkaç satırın yüksekliği değişince (satır genişledi, yoğunluk ayarı değişti, sabit <code>itemHeight</code> sayısı başka bir sayıyla değiştirildi) <code>updateHeights()</code> çağrılır. Yöntem yükseklikleri baştan okur ve pencereyi yeniden çizer; satırlar olduğu gibi kalır, <code>filter</code> yeniden çalışmaz, yükleme istenmez. Ekranın üstündeki satır <a href="#rendering-and-methods">veri değişiminde olduğu gibi</a> ekrandaki yerini korur: üstteki bir satır uzarsa kaydırma konumu aynı farkla kayar. Yükseklik yalnızca çizimden sonra ölçülerek bilinebiliyorsa (serbest metinli akış) bu yöntem uygun değildir.</p>
+<p>Liste kabının boyutu değişince (ekran döndürme, mobil klavyenin açılması, pencere boyutu) görünür satırlar kaydırma beklenmeden yeniden hesaplanır. Bunun için <code>ResizeObserver</code> kullanılır; ortamda yoksa bu adım atlanır, liste serbest bırakılınca gözlemci bırakılır.</p>
+<h2 id="rendering-and-methods">Çizim modeli ve yöntemler</h2>
+<ul>
+<li>DOM'da yalnızca pencere kadar satır bulunur: <code>[anchor − overscan, anchor + görünür + overscan)</code>,
+<code>anchor = floor(scrollTop / itemHeight)</code>. Satırlar iki boşluk <code>div</code>'i arasında düz kardeşlerdir;
+boşluk yükseklikleri hiç negatif olmaz ve <code>üst + satırlar + alt = filtrelenmiş uzunluk × itemHeight</code>.</li>
+<li>Pencereden çıkan satır <strong>serbest bırakılmaz, DOM'dan sökülür</strong>; geri gelince aynı bileşen (bağları,
+input durumu, öğe nesnesi) sıralı konumuna takılır. Yer tutucu yorum birikmez.
+Sökülen satır <code>onDeactivated</code>, geri takılan satır <code>onActivated</code> alır.
+<code>cacheSize</code> aşılınca en uzun süredir görünmeyen satırlar serbest bırakılır.</li>
+<li>Satırlar öğe nesnesinin kimliğiyle (ilkel öğelerde sırayla) önbelleğe alınır. Aynı nesne veride
+birden çok kez bulunabilir; her geçiş kendi satırını alır.</li>
+<li><code>setData</code>, otomatik yenileme ve sonraki sayfanın gelişi satırları bu kimlikle eşler: yeni görünümde
+yine bulunan nesnenin satırı, ekranda da önbellekte de olsa korunur ve yeni sırasına taşınır; yeni
+görünümde bulunmayan nesnenin satırı (sonraki sayfayla <code>filter</code>'ın eledikleri dahil) serbest bırakılır. Bir nesne ham hâliyle de reaktif proxy'siyle de verilse aynı satırı bulur. İlkel
+öğede aynı sıradaki aynı değer satırını korur. Her yüklemede yeni nesneler geliyorsa (ör. sunucudan
+taze liste) aynı <code>id</code>'yi taşısalar bile satırlar yeniden kurulur. Korunan satırın <code>itemTemplate</code>'ten
+aldığı <code>index</code> satırın kurulduğu andaki sıradır; sonradan güncellenmez.</li>
+<li>Veri değişince (<code>setData</code>, otomatik yenileme, sonraki sayfa) ekranda görünen satırlardan yeni
+veride kalan ilk satır ekrandaki yerini korur: üstüne öğe eklenir ya da üstünden öğe silinirse
+(sıralayan bir <code>filter</code>'la sonraki sayfanın öğeleri üste girdiğinde de) kaydırma konumu o kadar
+kayar, sıra değişince kaydırma o satırı yeni yerine götürür. İlkel öğede aynı değer, eski sırasına
+en yakın konumunda aranır. Görünen satırların hiçbiri
+kalmamışsa önce ekranın üstünde, sonra altında çizili duran satırlardan ekrana en yakın kalan kullanılır;
+onlar da kalmamışsa kaydırma konumu olduğu gibi korunur. Ekranın üstünden taşan satır kısalırsa
+bir kısmı görünür kalır. Liste en üstteyken en üstte kalır, üste eklenen öğe görünür. Yeni
+sıralamadan sonra listenin başına dönmek için <code>scrollToIndex(0)</code> çağrılır. Konum ekranda çizili
+satırlardan okunduğu için dizi yerinde değiştirilip (<code>splice</code>, <code>sort</code>) aynı dizi yeniden verilse de
+doğru kalır. Kaydırma kabına <code>overflow-anchor: none</code> verilir: konumu tarayıcı değil liste korur;
+tarayıcının kendi kaydırma çapası liste satırları çizerken kaydırma konumunu değiştirip görünür
+alanda boşluk bırakabilir.</li>
+<li>Her kaydırma olayında pencere yeniden hesaplanır (<code>hasMore</code> <code>false</code> iken de); yalnızca eski ve
+yeni pencere arasındaki fark işlenir.</li>
+<li>İlk istek liste kurulurken yapılır; <code>x-wait</code> ile bekletilen liste kurulmadığı için ilk istek de
+bekleme bitene kadar ertelenir.</li>
+<li>İlk çizim yerleşimi bekler: kaydırma kabı henüz <code>document</code>'ta değilse çizim <code>onMounted</code>'a ertelenir;
+belgede olup yüksekliği 0 olan kapta çizim, kabın boyutu değişince yapılır.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Yöntem</th>
+<th>Etki</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>refresh()</code></td>
+<td>Veriyi sıfırlar, sayfa 0'ı <code>dataRequest</code> ile yeniden ister; önbellekteki tüm satırlar serbest bırakılır. Otomatik yenileme izlemesini yeniden kurar. <code>Promise</code> döner.</td>
+</tr>
+<tr>
+<td><code>setData(items)</code></td>
+<td>İstek yapmadan veriyi değiştirir; <code>hasMore</code> <code>false</code>, sayfa 0 olur ve otomatik yenileme durur. Yeni veride yine bulunan öğelerin satırları korunur, bulunmayanlarınki serbest bırakılır.</td>
+</tr>
+<tr>
+<td><code>updateHeights()</code></td>
+<td>Veri aynı kalıp yükseklikler değişince yükseklikleri yeniden okur ve pencereyi çizer; satırlar korunur, ekranın üstündeki satır yerinde kalır (bkz. <a href="#variable-height">Değişken yükseklik</a>).</td>
+</tr>
+<tr>
+<td><code>scrollToIndex(i)</code></td>
+<td><code>i</code>'nci satırın konumuna (sabit yükseklikte <code>i × itemHeight</code>) kaydırır ve hemen çizer; aralık dışındaki indeks sınıra çekilir.</td>
+</tr>
+<tr>
+<td><code>getState()</code></td>
+<td>Liste durumunun sığ kopyası.</td>
+</tr>
+</tbody>
+</table>
+<div class="doc-variant" data-variant="declarative">
+<p>Yöntemler liste bileşeninin kendisindedir; JSX'te ona <code>ref</code> ile ulaşılır (bkz. <a href="/tr/docs/component-element#element-and-ref">Bileşen içinde eleman erişimi</a>).</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p>Yöntemler <code>new Virtualization(...)</code> ile kurulan bileşenin üzerinden çağrılır.</p>
+</div>
+<h2 id="when-to-use">Ne zaman kullanmalı?</h2>
+<table>
+<thead>
+<tr>
+<th>Durum</th>
+<th>Öneri</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Az öğe (&lt; ~100), değişken yükseklik</td>
+<td>Normal liste bağı (<a href="/tr/docs/conditionals-and-lists">Koşullu Gösterim ve Listeler</a>).</td>
+</tr>
+<tr>
+<td>Çok öğe, <strong>sabit</strong> ya da <strong>önceden hesaplanabilen</strong> satır yüksekliği</td>
+<td><code>Virtualization</code> (<code>itemHeight</code> sayı ya da fonksiyon).</td>
+</tr>
+<tr>
+<td>Sonsuz kaydırma / sayfalı API</td>
+<td><code>Virtualization</code> + <code>autoLoad</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Sonraki adım</h2>
+<p>Bellek yönetimini ve serbest bırakma desenini öğrenmek için <a href="/tr/docs/memory-and-dispose">Bellek Yönetimi ve Serbest Bırakma</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

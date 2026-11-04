@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Kanca sırası, sınıf metodu ve JSX prop&#x27;u olarak kancalar, initializeComponent, görünürlük, bekletme, serbest bırakma ve uygulama yaşam döngüsü; JSX ile ve JSX&#x27;siz.">
+    <title>Yaşam Döngüsü — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/lifecycle">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/lifecycle">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/lifecycle">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/lifecycle">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/lifecycle">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Yaşam Döngüsü">
+    <meta property="og:description" content="Kanca sırası, sınıf metodu ve JSX prop&#x27;u olarak kancalar, initializeComponent, görünürlük, bekletme, serbest bırakma ve uygulama yaşam döngüsü; JSX ile ve JSX&#x27;siz.">
+    <script type="application/json" id="doc-data">{"slug":"lifecycle","locale":"tr","title":"Yaşam Döngüsü","description":"Kanca sırası, sınıf metodu ve JSX prop\u0027u olarak kancalar, initializeComponent, görünürlük, bekletme, serbest bırakma ve uygulama yaşam döngüsü; JSX ile ve JSX\u0027siz.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Cp\u003EHer MotifJS bileşeni, oluşturulmasından DOM\u0027a bağlanmasına ve serbest bırakılmasına kadar belirli bir yaşam döngüsünden geçer. Bu aşamalarda çalışan kancaları (hooks) \u003Cstrong\u003Esınıf metodu\u003C/strong\u003E, \u003Cstrong\u003EJSX prop\u0027u\u003C/strong\u003E ya da JSX\u0027siz yazımda \u003Ccode\u003EmotifComponent\u003C/code\u003E\u0027in nesne biçiminde \u003Cstrong\u003Eanahtar\u003C/strong\u003E olarak tanımlarsınız.\u003C/p\u003E\n\u003Cp\u003EÖrnekler bir not uygulamasının kesitleridir. \u003Ccode\u003ENote\u003C/code\u003E ve \u003Ccode\u003ENotesService\u003C/code\u003E \u003Ca href=\u0022/docs/components\u0022\u003EBileşenler\u003C/a\u003E sayfasındaki \u003Ccode\u003Esrc/services/notes.ts\u003C/code\u003E dosyasındakilerdir; notları sunucudan çeken servis şudur:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/sync.ts\u0022\u003E\u003Ccode\u003Eimport { Injectable } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;./notes\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class SyncService {\n  async pull(): Promise\u0026lt;Note[]\u0026gt; {\n    const response = await fetch(\u0026quot;/api/notes\u0026quot;);\n    return response.json();\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/sync.js\u0022\u003E\u003Ccode\u003Eimport { Injectable } from \u0026quot;@motifx/core\u0026quot;;\n\n@Injectable({ lifetime: \u0026quot;singleton\u0026quot; })\nexport class SyncService {\n  async pull() {\n    const response = await fetch(\u0026quot;/api/notes\u0026quot;);\n    return response.json();\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022hooks\u0022\u003EKancalar ve çalışma sırası\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESıra\u003C/th\u003E\n\u003Cth\u003EKanca\u003C/th\u003E\n\u003Cth\u003ENe zaman çalışır\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E1\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonInitializing\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYapıcıda, element atanıp props işlendikten sonra (\u003Ccode\u003Ethis.props\u003C/code\u003E hazır; alt sınıfın \u003Ccode\u003Estate = reactive(...)\u003C/code\u003E gibi alanları henüz ilklenmemiştir).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E2\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonInitialized\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYapıcıda, \u003Ccode\u003EonInitializing\u003C/code\u003E\u0027den hemen sonra.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E3\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonConfig\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYapılandırma aşaması; \u003Cstrong\u003Eprops hazır, DOM\u0027a henüz bağlı değil\u003C/strong\u003E. Veri çekmek için uygun yer. Alt sınıflarda \u003Ccode\u003Ebuild()\u003C/code\u003E başında (sınıf alanları ilklendikten sonra) çalışır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E4\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonConfigured\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYapılandırma tamamlandığında (build başlangıcı).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E5\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonBuilding\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDOM inşası başlarken.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E6\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EinitializeComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eview()\u003C/code\u003E çağrılmadan hemen önce; bileşenin kurulum kodu (JSX\u0027ten derleyici üretir, JSX\u0027siz yazımda siz yazarsınız).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E7\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EoninitializeComponent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBütün \u003Ccode\u003EinitializeComponent\u003C/code\u003E kodu (sınıf metodu, etiketteki değer, derleyicinin ürettiği) çalıştıktan hemen sonra, \u003Ccode\u003Eview()\u003C/code\u003E\u0027den önce.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E8\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonBuilt\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşen ve çocukları inşa edildikten sonra. Element bu anda hâlâ \u003Cstrong\u003Edetached\u003C/strong\u003E bir fragment içinde olabilir (ternary/liste dalları).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E9\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonMounted\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşen, sayfadaki bir köke bağlı ağaca yerleştikten sonraki görevde, \u003Cstrong\u003Ebir kez\u003C/strong\u003E; ekran bu sırada çizilmiş olabilir. Kök, \u003Ccode\u003Eapp.run\u003C/code\u003E\u0027ın hedefi ya da belgedeki hazır bir elemanı saran bileşendir; yol üzerindeki her bileşenin görünür olması gerekir. Yalnız elemanın gerçekten sayfada ve görünür olması gereken işler içindir: \u003Ccode\u003Efocus()\u003C/code\u003E, ölçüm, elemanı belgede isteyen kütüphaneler. Diğer kurulum işleri \u003Ccode\u003EonBuilt\u003C/code\u003E\u0027a yazılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonActivated\u003C/code\u003E / \u003Ccode\u003EonDeactivated\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşen DOM\u0027dan sökülüp (serbest bırakılmadan) yeniden yerleştiğinde: \u003Ccode\u003EkeepAlive\u003C/code\u003E rota dönüşü, \u003Ccode\u003Econtrols.detach\u003C/code\u003E/\u003Ccode\u003EsilentDetach\u003C/code\u003E sonrası \u003Ccode\u003Econtrols.add\u003C/code\u003E (taşıma dahil), \u003Ccode\u003Emotif.hide()\u003C/code\u003E/\u003Ccode\u003Emotif.show()\u003C/code\u003E (\u003Ccode\u003Ex-wait\u003C/code\u003E/\u003Ccode\u003Ex-display\u003C/code\u003E dahil), \u003Ccode\u003EVirtualization\u003C/code\u003E satırının pencereden çıkıp geri gelmesi. Ayrılırken \u003Ccode\u003EonDeactivated\u003C/code\u003E, geri gelince \u003Ccode\u003EonActivated\u003C/code\u003E. İlk gösterimde çalışmaz. Görünür alt ağaca da iletilir (önce ebeveyn); gizli bir çocuk ebeveyniyle etkinleşmez, kendi \u003Ccode\u003Emotif.show()\u003C/code\u003E\u0027unda etkinleşir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonVisibilityChanged\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Emotif.show()\u003C/code\u003E/\u003Ccode\u003Emotif.hide()\u003C/code\u003E/\u003Ccode\u003Emotif.toggle()\u003C/code\u003E (\u003Ccode\u003Ex-wait\u003C/code\u003E/\u003Ccode\u003Ex-display\u003C/code\u003E dahil) görünürlüğü değiştirirken; \u003Ccode\u003EisVisible\u003C/code\u003E güncellenmeden önce çalışır (gizlemede çıkış animasyonu bittikten sonra; \u003Ccode\u003EhideStrategy: \u0026quot;detach\u0026quot;\u003C/code\u003E ile animasyondan önce), kanca içinde \u003Ccode\u003EisVisible\u003C/code\u003E önceki değeri, \u003Ccode\u003Ee.visible\u003C/code\u003E yeni değeri gösterir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonDisposing\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESerbest bırakma başlarken.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonDisposed\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESerbest bırakma tamamlandığında.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cblockquote\u003E\n\u003Cp\u003E\u003Ccode\u003EonInitializing\u003C/code\u003E ve \u003Ccode\u003EonInitialized\u003C/code\u003E bileşen \u003Cstrong\u003Eoluşturulurken\u003C/strong\u003E (constructor akışında) çalışır. \u003Ccode\u003EonConfig\u003C/code\u003E, düz \u003Ccode\u003Enew Component(tag, { onConfig })\u003C/code\u003E örneklerinde yapıcıda; \u003Cstrong\u003Ealt sınıflarda\u003C/strong\u003E (\u003Ccode\u003Eclass X extends Component\u003C/code\u003E) ise \u003Ccode\u003Estate = reactive(...)\u003C/code\u003E gibi sınıf alanları ilklendikten sonra, \u003Ccode\u003Ebuild()\u003C/code\u003E başında \u003Ccode\u003EonConfigured\u003C/code\u003E\u0027dan hemen önce çalışır (hiç build edilmeyen bir alt sınıf örneği \u003Ccode\u003EonConfig\u003C/code\u003E almaz). \u003Ccode\u003EonConfigured\u003C/code\u003E, \u003Ccode\u003EonBuilding\u003C/code\u003E, \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003EoninitializeComponent\u003C/code\u003E ve \u003Ccode\u003EonBuilt\u003C/code\u003E \u003Ccode\u003Ebuild()\u003C/code\u003E sırasında; \u003Ccode\u003EonMounted\u003C/code\u003E ise bileşen köke bağlı ağaca yerleştikten sonraki görevde çalışır (yerleştiği anda ağaç zaten bağlıysa da sonraki görevde). \u003Ccode\u003EisInitialized\u003C/code\u003E \u003Ccode\u003EonInitializing\u003C/code\u003E sırasında \u003Ccode\u003Efalse\u003C/code\u003E, \u003Ccode\u003EonInitialized\u003C/code\u003E\u0027dan itibaren \u003Ccode\u003Etrue\u003C/code\u003E\u0027dur (yapıcıdaki ilkleme bitince atanır).\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EonMounted\u003C/code\u003E kancaları sıraya alınır ve kurulumu yapan görevden sonra, kayıt sırasıyla çalışır. Sıra 8 ms\u0027lik dilimler hâlinde işlenir: süre dolunca kalan kancalar bir sonraki göreve kalır, arada tarayıcı ekranı çizer ve kullanıcı girdisini işler. Böylece bir grafik ya da tablo kütüphanesini saran çok sayıda bileşenin kurulumu sayfayı kilitlemez. Alt bileşenin kancası üst bileşeninkinden önce çalışır; sırası gelmeden serbest bırakılan bileşenin kancası çalışmaz. Yerleşmeyi çekirdek izler: \u003Ccode\u003Econtrols.add\u003C/code\u003E, \u003Ccode\u003Ex-wait\u003C/code\u003E\u0027in bitmesi, \u003Ccode\u003Emotif.show()\u003C/code\u003E ve \u003Ccode\u003ETransporter\u003C/code\u003E kancayı sıraya sokar; bir elemanı \u003Ccode\u003EappendChild\u003C/code\u003E ile belgeye kendiniz koyarsanız kanca çalışmaz. Hazır bir elemanın içine içerik vermek için elemanı \u003Ccode\u003Enew Component(eleman)\u003C/code\u003E ile sarıp çocukları \u003Ccode\u003Econtrols.add\u003C/code\u003E ile eklersiniz; \u003Ccode\u003Ewindow.open\u003C/code\u003E ile açılan pencerenin gövdesi de böyle sarılır ve o pencereye verilen bileşenler orada bağlanır. Sıra, kökün bulunduğu pencerenin zamanlayıcısıyla işler.\u003C/p\u003E\n\u003C/blockquote\u003E\n\u003Cp\u003EDurum bayrakları: \u003Ccode\u003EisInitialized\u003C/code\u003E, \u003Ccode\u003EisConfigured\u003C/code\u003E, \u003Ccode\u003EisBuilt\u003C/code\u003E, \u003Ccode\u003EisVisible\u003C/code\u003E, \u003Ccode\u003EisWait\u003C/code\u003E, \u003Ccode\u003EisDisposed\u003C/code\u003E ilgili evre geçildiğinde güncellenir ve bileşen üzerinden okunur.\u003C/p\u003E\n\u003Cp\u003EOptions API nesnesine yazılan \u003Ccode\u003EonInitializing\u003C/code\u003E, \u003Ccode\u003EonInitialized\u003C/code\u003E ve \u003Ccode\u003EonConfig\u003C/code\u003E çalışmaz (bu evreler alanlar nesneden kopyalanmadan önce biter); kurulum için \u003Ccode\u003Ector\u003C/code\u003E ya da \u003Ccode\u003EonConfigured\u003C/code\u003E kullanın (bkz. \u003Ca href=\u0022/docs/components#options-components\u0022\u003EOptions API\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022class-hooks\u0022\u003EKancaları tanımlama\u003C/h2\u003E\n\u003Cp\u003ESınıfta kanca bir metottur; fonksiyon bileşeninde döndürülen köke yazılan bir prop, Options API\u0027de nesnenin bir üyesidir. JSX\u0027siz yazımda sınıf metodu aynı kalır, fonksiyon ve düz etiketlerde kanca \u003Ccode\u003EmotifComponent\u003C/code\u003E\u0027in nesne biçiminde bir anahtardır. \u003Ccode\u003ENoteBoard\u003C/code\u003E yapılandırılırken notları çeker (\u003Ccode\u003EonConfig\u003C/code\u003E), DOM\u0027a girince arama kutusuna odaklanır (\u003Ccode\u003EonMounted\u003C/code\u003E) ve dakikada bir yeniler; zamanlayıcı \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E ile bileşene bağlanır, serbest bırakılırken kendiliğinden durur:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport class NoteBoard extends Component {\n  notes = this.getService(NotesService)!;\n  sync = this.getService(SyncService)!;\n  state = reactive({ loading: true });\n  search!: Component\u0026lt;HTMLInputElement\u0026gt;;\n\n  override async onConfig() {\n    this.notes.state.items = await this.sync.pull();\n    this.state.loading = false;\n    const timer = setInterval(async () =\u0026gt; (this.notes.state.items = await this.sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  override onMounted() {\n    this.search.element.focus();\n  }\n\n  override view() {\n    return (\n      \u0026lt;section class=\u0026quot;board\u0026quot;\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; ref={this.search} /\u0026gt;\n        \u0026lt;p class=\u0026quot;loading\u0026quot; x-display={() =\u0026gt; this.state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\n        \u0026lt;ul\u0026gt;{this.notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;li key={note.id}\u0026gt;{note.title}\u0026lt;/li\u0026gt;)}\u0026lt;/ul\u0026gt;\n      \u0026lt;/section\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, FromService, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport function NoteBoard() {\n  const notes = FromService(NotesService)!;\n  const sync = FromService(SyncService)!;\n  const state = reactive({ loading: true });\n  let search!: Component\u0026lt;HTMLInputElement\u0026gt;;\n\n  return (\n    \u0026lt;section\n      class=\u0026quot;board\u0026quot;\n      onConfig={async (board) =\u0026gt; {\n        notes.state.items = await sync.pull();\n        state.loading = false;\n        const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n        board.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n      }}\n      onMounted={() =\u0026gt; search.element.focus()}\n    \u0026gt;\n      \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; ref={(field) =\u0026gt; (search = field)} /\u0026gt;\n      \u0026lt;p class=\u0026quot;loading\u0026quot; x-display={() =\u0026gt; state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\n      \u0026lt;ul\u0026gt;{notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;li key={note.id}\u0026gt;{note.title}\u0026lt;/li\u0026gt;)}\u0026lt;/ul\u0026gt;\n    \u0026lt;/section\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, FromService, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport const NoteBoard = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  data: reactive({ loading: true }),\n  search: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n\n  async onConfigured() {\n    const notes = FromService(NotesService)!;\n    const sync = FromService(SyncService)!;\n    this.class.add(\u0026quot;board\u0026quot;);\n    notes.state.items = await sync.pull();\n    this.data.loading = false;\n    const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  onMounted() {\n    this.search!.element.focus();\n  },\n\n  view() {\n    const notes = FromService(NotesService)!;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; ref={(field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.search = field)} /\u0026gt;\n        \u0026lt;p class=\u0026quot;loading\u0026quot; x-display={() =\u0026gt; this.data.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\n        \u0026lt;ul\u0026gt;{notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;li key={note.id}\u0026gt;{note.title}\u0026lt;/li\u0026gt;)}\u0026lt;/ul\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { Note, NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport class NoteBoard extends Component {\n  notes = this.getService(NotesService)!;\n  sync = this.getService(SyncService)!;\n  state = reactive({ loading: true });\n  search!: Component\u0026lt;HTMLInputElement\u0026gt;;\n\n  override async onConfig() {\n    this.notes.state.items = await this.sync.pull();\n    this.state.loading = false;\n    const timer = setInterval(async () =\u0026gt; (this.notes.state.items = await this.sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  override onMounted() {\n    this.search.element.focus();\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;section\u0026quot;, (board: ComponentBase) =\u0026gt; {\n      board.class.add(\u0026quot;board\u0026quot;);\n      const search = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.search = field),\n        initializeComponent: (field: ComponentBase) =\u0026gt; field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n      });\n      const loading = motifComponent(\u0026quot;p\u0026quot;, {\n        preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; this.state.loading),\n        initializeComponent: (p: ComponentBase) =\u0026gt; {\n          p.class.add(\u0026quot;loading\u0026quot;);\n          p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n        },\n      });\n      const list = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; ul.controls.add(motifComponent({\n        initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; this.notes.list(\u0026quot;notes\u0026quot;), (note: Note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n          indexkey: () =\u0026gt; note.id,\n          initializeComponent: (li: ComponentBase) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))),\n        })),\n      })));\n      board.controls.add(search, loading, list);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, FromService, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { Note, NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport function NoteBoard() {\n  const notes = FromService(NotesService)!;\n  const sync = FromService(SyncService)!;\n  const state = reactive({ loading: true });\n  let search!: Component\u0026lt;HTMLInputElement\u0026gt;;\n\n  return motifComponent(\u0026quot;section\u0026quot;, {\n    onConfig: async (board: ComponentBase) =\u0026gt; {\n      notes.state.items = await sync.pull();\n      state.loading = false;\n      const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n      board.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n    },\n    onMounted: () =\u0026gt; search.element.focus(),\n    initializeComponent: (board: ComponentBase) =\u0026gt; {\n      board.class.add(\u0026quot;board\u0026quot;);\n      const field = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (input: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (search = input),\n        initializeComponent: (input: ComponentBase) =\u0026gt; input.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n      });\n      const loading = motifComponent(\u0026quot;p\u0026quot;, {\n        preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; state.loading),\n        initializeComponent: (p: ComponentBase) =\u0026gt; {\n          p.class.add(\u0026quot;loading\u0026quot;);\n          p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n        },\n      });\n      const list = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; ul.controls.add(motifComponent({\n        initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(\u0026quot;notes\u0026quot;), (note: Note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n          indexkey: () =\u0026gt; note.id,\n          initializeComponent: (li: ComponentBase) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))),\n        })),\n      })));\n      board.controls.add(field, loading, list);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, FromService, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { Note, NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport const NoteBoard = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  data: reactive({ loading: true }),\n  search: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n\n  async onConfigured() {\n    const notes = FromService(NotesService)!;\n    const sync = FromService(SyncService)!;\n    this.class.add(\u0026quot;board\u0026quot;);\n    notes.state.items = await sync.pull();\n    this.data.loading = false;\n    const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  onMounted() {\n    this.search!.element.focus();\n  },\n\n  view() {\n    const notes = FromService(NotesService)!;\n    const search = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.search = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n    });\n    const loading = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; this.data.loading),\n      initializeComponent: (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;loading\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n      },\n    });\n    const list = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; ul.controls.add(motifComponent({\n      initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(\u0026quot;notes\u0026quot;), (note: Note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li: ComponentBase) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))),\n      })),\n    })));\n    return [search, loading, list];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport class NoteBoard extends Component {\n  notes = this.getService(NotesService);\n  sync = this.getService(SyncService);\n  state = reactive({ loading: true });\n  search;\n\n  async onConfig() {\n    this.notes.state.items = await this.sync.pull();\n    this.state.loading = false;\n    const timer = setInterval(async () =\u0026gt; (this.notes.state.items = await this.sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  onMounted() {\n    this.search.element.focus();\n  }\n\n  view() {\n    return (\n      \u0026lt;section class=\u0026quot;board\u0026quot;\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; ref={this.search} /\u0026gt;\n        \u0026lt;p class=\u0026quot;loading\u0026quot; x-display={() =\u0026gt; this.state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\n        \u0026lt;ul\u0026gt;{this.notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;li key={note.id}\u0026gt;{note.title}\u0026lt;/li\u0026gt;)}\u0026lt;/ul\u0026gt;\n      \u0026lt;/section\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport function NoteBoard() {\n  const notes = FromService(NotesService);\n  const sync = FromService(SyncService);\n  const state = reactive({ loading: true });\n  let search;\n\n  return (\n    \u0026lt;section\n      class=\u0026quot;board\u0026quot;\n      onConfig={async (board) =\u0026gt; {\n        notes.state.items = await sync.pull();\n        state.loading = false;\n        const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n        board.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n      }}\n      onMounted={() =\u0026gt; search.element.focus()}\n    \u0026gt;\n      \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; ref={(field) =\u0026gt; (search = field)} /\u0026gt;\n      \u0026lt;p class=\u0026quot;loading\u0026quot; x-display={() =\u0026gt; state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\n      \u0026lt;ul\u0026gt;{notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;li key={note.id}\u0026gt;{note.title}\u0026lt;/li\u0026gt;)}\u0026lt;/ul\u0026gt;\n    \u0026lt;/section\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport const NoteBoard = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  data: reactive({ loading: true }),\n  search: undefined,\n\n  async onConfigured() {\n    const notes = FromService(NotesService);\n    const sync = FromService(SyncService);\n    this.class.add(\u0026quot;board\u0026quot;);\n    notes.state.items = await sync.pull();\n    this.data.loading = false;\n    const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  onMounted() {\n    this.search.element.focus();\n  },\n\n  view() {\n    const notes = FromService(NotesService);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; ref={(field) =\u0026gt; (this.search = field)} /\u0026gt;\n        \u0026lt;p class=\u0026quot;loading\u0026quot; x-display={() =\u0026gt; this.data.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\n        \u0026lt;ul\u0026gt;{notes.list(\u0026quot;notes\u0026quot;).map((note) =\u0026gt; \u0026lt;li key={note.id}\u0026gt;{note.title}\u0026lt;/li\u0026gt;)}\u0026lt;/ul\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport class NoteBoard extends Component {\n  notes = this.getService(NotesService);\n  sync = this.getService(SyncService);\n  state = reactive({ loading: true });\n  search;\n\n  async onConfig() {\n    this.notes.state.items = await this.sync.pull();\n    this.state.loading = false;\n    const timer = setInterval(async () =\u0026gt; (this.notes.state.items = await this.sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  }\n\n  onMounted() {\n    this.search.element.focus();\n  }\n\n  view() {\n    return motifComponent(\u0026quot;section\u0026quot;, (board) =\u0026gt; {\n      board.class.add(\u0026quot;board\u0026quot;);\n      const search = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (field) =\u0026gt; (this.search = field),\n        initializeComponent: (field) =\u0026gt; field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n      });\n      const loading = motifComponent(\u0026quot;p\u0026quot;, {\n        preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; this.state.loading),\n        initializeComponent: (p) =\u0026gt; {\n          p.class.add(\u0026quot;loading\u0026quot;);\n          p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n        },\n      });\n      const list = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; ul.controls.add(motifComponent({\n        initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; this.notes.list(\u0026quot;notes\u0026quot;), (note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n          indexkey: () =\u0026gt; note.id,\n          initializeComponent: (li) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))),\n        })),\n      })));\n      board.controls.add(search, loading, list);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport function NoteBoard() {\n  const notes = FromService(NotesService);\n  const sync = FromService(SyncService);\n  const state = reactive({ loading: true });\n  let search;\n\n  return motifComponent(\u0026quot;section\u0026quot;, {\n    onConfig: async (board) =\u0026gt; {\n      notes.state.items = await sync.pull();\n      state.loading = false;\n      const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n      board.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n    },\n    onMounted: () =\u0026gt; search.element.focus(),\n    initializeComponent: (board) =\u0026gt; {\n      board.class.add(\u0026quot;board\u0026quot;);\n      const field = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (input) =\u0026gt; (search = input),\n        initializeComponent: (input) =\u0026gt; input.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n      });\n      const loading = motifComponent(\u0026quot;p\u0026quot;, {\n        preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; state.loading),\n        initializeComponent: (p) =\u0026gt; {\n          p.class.add(\u0026quot;loading\u0026quot;);\n          p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n        },\n      });\n      const list = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; ul.controls.add(motifComponent({\n        initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(\u0026quot;notes\u0026quot;), (note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n          indexkey: () =\u0026gt; note.id,\n          initializeComponent: (li) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))),\n        })),\n      })));\n      board.controls.add(field, loading, list);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, motifOptions, reactive } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\nimport { SyncService } from \u0026quot;../services/sync\u0026quot;;\n\nexport const NoteBoard = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  data: reactive({ loading: true }),\n  search: undefined,\n\n  async onConfigured() {\n    const notes = FromService(NotesService);\n    const sync = FromService(SyncService);\n    this.class.add(\u0026quot;board\u0026quot;);\n    notes.state.items = await sync.pull();\n    this.data.loading = false;\n    const timer = setInterval(async () =\u0026gt; (notes.state.items = await sync.pull()), 60_000);\n    this.motif.setDisposable(() =\u0026gt; clearInterval(timer));\n  },\n\n  onMounted() {\n    this.search.element.focus();\n  },\n\n  view() {\n    const notes = FromService(NotesService);\n    const search = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field) =\u0026gt; (this.search = field),\n      initializeComponent: (field) =\u0026gt; field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n    });\n    const loading = motifComponent(\u0026quot;p\u0026quot;, {\n      preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; this.data.loading),\n      initializeComponent: (p) =\u0026gt; {\n        p.class.add(\u0026quot;loading\u0026quot;);\n        p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n      },\n    });\n    const list = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; ul.controls.add(motifComponent({\n      initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(\u0026quot;notes\u0026quot;), (note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;))),\n      })),\n    })));\n    return [search, loading, list];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EHer kanca \u003Ccode\u003E(sender, e)\u003C/code\u003E imzasıyla çağrılır: \u003Ccode\u003Esender\u003C/code\u003E bileşenin kendisi, \u003Ccode\u003Ee\u003C/code\u003E \u003Ccode\u003EEventArgs\u003C/code\u003E (\u003Ccode\u003E{ cancel: boolean }\u003C/code\u003E). Fonksiyon bileşeninde \u003Ccode\u003Esender\u003C/code\u003E döndürülen köktür; fonksiyonla yazılan \u003Ccode\u003ENoteBoard\u003C/code\u003E zamanlayıcıyı bu kökün \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E\u0027ına bağlar.\u003C/p\u003E\n\u003Cp\u003EBir kancada fırlatılan hata ya da kancanın döndürdüğü Promise\u0027in reddedilmesi (\u003Ccode\u003Easync\u003C/code\u003E kancalar dahil) \u003Ccode\u003EMotifError\u003C/code\u003E \u003Ccode\u003EMJX122\u003C/code\u003E olarak raporlanır: \u003Ccode\u003Econsole.error\u003C/code\u003E\u0027a yazılır (\u003Ccode\u003Eapp.useLogging(false)\u003C/code\u003E değilse) ve \u003Ccode\u003EerrorHandler.addListener(fn)\u003C/code\u003E dinleyicilerine iletilir; geliştirme modu gerekmez, üretimde de çalışır. Bileşen kurulmaya devam eder. Bu kural \u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003EoninitializeComponent\u003C/code\u003E, Options API nesnesinin \u003Ccode\u003Ector\u003C/code\u003E\u0027u, \u003Ccode\u003Eref\u003C/code\u003E geri çağrısı (düz etikette ve sınıf bileşeni etiketinde; bileşen yine oluşturulur) ve kodla \u003Ccode\u003Emotif.on(\u0026quot;x:built\u0026quot;, fn)\u003C/code\u003E biçiminde eklenen yaşam döngüsü dinleyicileri (\u003Ccode\u003Ex:mounted\u003C/code\u003E dahil) için de geçerlidir.\u003C/p\u003E\n\u003Ch2 id=\u0022prop-hooks\u0022\u003EEtikette kanca\u003C/h2\u003E\n\u003Cp\u003EHer etikete kanca prop olarak yazılabilir; kanca o etiketin bileşenine bağlanır. JSX\u0027siz yazımda aynı adlar nesne biçiminin anahtarlarıdır. Örnekte düz bir etikete \u003Ccode\u003EonMounted\u003C/code\u003E, bir bileşen etiketine (aşağıda anlatılan \u003Ccode\u003ETitleSync\u003C/code\u003E) \u003Ccode\u003EonDisposing\u003C/code\u003E verilir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; onMounted={(field) =\u0026gt; field.element.focus()} /\u0026gt;\n\u0026lt;TitleSync onDisposing={() =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;)} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Econst search = motifComponent(\u0026quot;input\u0026quot;, {\n  onMounted: (field: ComponentBase) =\u0026gt; field.element.focus(),\n  initializeComponent: (field: ComponentBase) =\u0026gt; field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n});\nconst title = motifComponent(TitleSync, { onDisposing: () =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;) });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;input type=\u0026quot;search\u0026quot; placeholder=\u0026quot;Notlarda ara\u0026quot; onMounted={(field) =\u0026gt; field.element.focus()} /\u0026gt;\n\u0026lt;TitleSync onDisposing={() =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;)} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Econst search = motifComponent(\u0026quot;input\u0026quot;, {\n  onMounted: (field) =\u0026gt; field.element.focus(),\n  initializeComponent: (field) =\u0026gt; field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot; }),\n});\nconst title = motifComponent(TitleSync, { onDisposing: () =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;) });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Ex-\u003C/code\u003E ve \u003Ccode\u003Ex:\u003C/code\u003E biçimleri de kabul edilir: \u003Ccode\u003E\u0026lt;ul x-config={…} x:built={…}\u0026gt;\u003C/code\u003E. JSX\u0027siz nesnede \u003Ccode\u003Ex-\u003C/code\u003E biçimi anahtar olarak çalışır (\u003Ccode\u003E{ \u0026quot;x-config\u0026quot;: … }\u003C/code\u003E); \u003Ccode\u003Ex:\u003C/code\u003E biçimini yalnız JSX tanır.\u003C/p\u003E\n\u003Cblockquote\u003E\n\u003Cp\u003E\u003Cstrong\u003EÖnemli:\u003C/strong\u003E Prop olarak verdiğiniz yaşam döngüsü işleyicileri, sınıf metotlarının \u003Cstrong\u003Eyerini almaz\u003C/strong\u003E; ikisi de çalışır (prop işleyicileri toplanır ve sınıf metoduna ek olarak çağrılır).\u003C/p\u003E\n\u003C/blockquote\u003E\n\u003Cp\u003EAynı etikette bir kancanın birden çok yazımı (\u003Ccode\u003Eon\u0026lt;kanca\u0026gt;\u003C/code\u003E, \u003Ccode\u003Ex-\u0026lt;kanca\u0026gt;\u003C/code\u003E, \u003Ccode\u003Ex:\u0026lt;kanca\u0026gt;\u003C/code\u003E; büyük/küçük harf farkı dahil, örn. \u003Ccode\u003EonBuilt\u003C/code\u003E ile \u003Ccode\u003Eonbuilt\u003C/code\u003E) birleşir: hepsi kaynaktaki sırayla birer kez çalışır. JSX\u0027siz yazımda bir anahtara fonksiyon dizisi de verilebilir (\u003Ccode\u003EonBuilt: [a, b]\u003C/code\u003E); dizideki sırayla çalışırlar. Bu, düz DOM etiketinde ve bileşen etiketinde aynıdır; fonksiyon bileşeni etiketinde kancalar, tek yazımla da birleşik yazımla da, fonksiyonun döndürdüğü köke uygulanır. \u003Ccode\u003Einitializing\u003C/code\u003E/\u003Ccode\u003Einitialized\u003C/code\u003E kancaları fonksiyon bileşeni etiketinde kök kurulur kurulmaz, sınıf bileşeni etiketindeki sırayla çalışır: \u003Ccode\u003Eref\u003C/code\u003E → \u003Ccode\u003Einitializing\u003C/code\u003E → \u003Ccode\u003Einitialized\u003C/code\u003E → \u003Ccode\u003Econfig\u003C/code\u003E → … → \u003Ccode\u003Ebuilding\u003C/code\u003E → \u003Ccode\u003EinitializeComponent\u003C/code\u003E → \u003Ccode\u003Ebuilt\u003C/code\u003E. Bu kural \u003Ccode\u003Ebuilt\u003C/code\u003E, \u003Ccode\u003Ebuilding\u003C/code\u003E, \u003Ccode\u003Emounted\u003C/code\u003E, \u003Ccode\u003Econfig\u003C/code\u003E, \u003Ccode\u003Econfigured\u003C/code\u003E, \u003Ccode\u003Einitializing\u003C/code\u003E, \u003Ccode\u003Einitialized\u003C/code\u003E, \u003Ccode\u003Edisposing\u003C/code\u003E, \u003Ccode\u003Edisposed\u003C/code\u003E, \u003Ccode\u003Evisibilitychanged\u003C/code\u003E, \u003Ccode\u003Eactivated\u003C/code\u003E, \u003Ccode\u003Edeactivated\u003C/code\u003E kancalarının hepsi için geçerlidir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;ul onBuilt={() =\u0026gt; console.log(\u0026quot;önce\u0026quot;)} x-built={() =\u0026gt; console.log(\u0026quot;sonra\u0026quot;)} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Econst list = motifComponent(\u0026quot;ul\u0026quot;, { onBuilt: [() =\u0026gt; console.log(\u0026quot;önce\u0026quot;), () =\u0026gt; console.log(\u0026quot;sonra\u0026quot;)] });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;ul onBuilt={() =\u0026gt; console.log(\u0026quot;önce\u0026quot;)} x-built={() =\u0026gt; console.log(\u0026quot;sonra\u0026quot;)} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Econst list = motifComponent(\u0026quot;ul\u0026quot;, { onBuilt: [() =\u0026gt; console.log(\u0026quot;önce\u0026quot;), () =\u0026gt; console.log(\u0026quot;sonra\u0026quot;)] });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022initialize-component\u0022\u003E\u003Ccode\u003EinitializeComponent\u003C/code\u003E — bileşenin kurulum kodu\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EinitializeComponent\u003C/code\u003E, \u003Ccode\u003Eview()\u003C/code\u003E\u0027den hemen önce, bileşen başına bir kez çalışır. Derleyici JSX\u0027ten ürettiği kurulum kodunu (etikete yazılan öznitelikler, olaylar, direktifler, çocukların yerleştirilmesi) bu adla verir; JSX\u0027siz yazımda \u003Ccode\u003EmotifComponent(etiket, kurulum)\u003C/code\u003E çağrısının ikinci argümanı tam olarak budur. JSX kullanan bir bileşende bağ eklemek ya da çocukları programatik hazırlamak için de kullanılır. \u003Ccode\u003ETitleSync\u003C/code\u003E sekme başlığını not sayısıyla eşler:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/TitleSync.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/TitleSync.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class TitleSync extends Component\u0026lt;HTMLSpanElement\u0026gt; {\n  notes = this.getService(NotesService)!;\n\n  override initializeComponent(sender: ComponentBase) {\n    sender.bindings.watch(() =\u0026gt; (document.title = \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/TitleSync.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function TitleSync() {\n  const notes = FromService(NotesService)!;\n  return \u0026lt;span initializeComponent={(sender) =\u0026gt; sender.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060))} /\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/TitleSync.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const TitleSync = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  initializeComponent() {\n    const notes = FromService(NotesService)!;\n    this.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/TitleSync.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class TitleSync extends Component\u0026lt;HTMLSpanElement\u0026gt; {\n  static override elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService)!;\n\n  override initializeComponent(sender: ComponentBase) {\n    sender.bindings.watch(() =\u0026gt; (document.title = \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/TitleSync.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function TitleSync() {\n  const notes = FromService(NotesService)!;\n  return motifComponent(\u0026quot;span\u0026quot;, (sender: ComponentBase) =\u0026gt; sender.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060)));\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/TitleSync.ts\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const TitleSync = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  initializeComponent() {\n    const notes = FromService(NotesService)!;\n    this.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/TitleSync.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class TitleSync extends Component {\n  static elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService);\n\n  initializeComponent(sender) {\n    sender.bindings.watch(() =\u0026gt; (document.title = \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/TitleSync.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function TitleSync() {\n  const notes = FromService(NotesService);\n  return \u0026lt;span initializeComponent={(sender) =\u0026gt; sender.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060))} /\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/TitleSync.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const TitleSync = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  initializeComponent() {\n    const notes = FromService(NotesService);\n    this.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/TitleSync.js\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class TitleSync extends Component {\n  static elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService);\n\n  initializeComponent(sender) {\n    sender.bindings.watch(() =\u0026gt; (document.title = \u0060${this.notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/TitleSync.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function TitleSync() {\n  const notes = FromService(NotesService);\n  return motifComponent(\u0026quot;span\u0026quot;, (sender) =\u0026gt; sender.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060)));\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/TitleSync.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const TitleSync = () =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  initializeComponent() {\n    const notes = FromService(NotesService);\n    this.bindings.watch(() =\u0026gt; (document.title = \u0060${notes.count(\u0026quot;notes\u0026quot;)} not · Notlar\u0060));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EinitializeComponent\u003C/code\u003E bir etikete prop olarak da yazılabilir; etiketin bileşeni \u003Ccode\u003Esender\u003C/code\u003E olarak verilir ve kurulumda bir kez çağrılır. Düz DOM etiketinde, sınıf bileşeni etiketinde ve fonksiyon bileşeni etiketinde (fonksiyonun döndürdüğü kökte) anlamı ve zamanlaması aynıdır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;p class=\u0026quot;count\u0026quot; initializeComponent={(count) =\u0026gt; count.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060)} /\u0026gt;\n\u0026lt;TitleSync initializeComponent={(title) =\u0026gt; title.motif.setDisposable(() =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;))} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Econst count = motifComponent(\u0026quot;p\u0026quot;, (count: ComponentBase) =\u0026gt; {\n  count.class.add(\u0026quot;count\u0026quot;);\n  count.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060);\n});\nconst title = motifComponent(TitleSync, { initializeComponent: (title: ComponentBase) =\u0026gt; title.motif.setDisposable(() =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;)) });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;p class=\u0026quot;count\u0026quot; initializeComponent={(count) =\u0026gt; count.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060)} /\u0026gt;\n\u0026lt;TitleSync initializeComponent={(title) =\u0026gt; title.motif.setDisposable(() =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;))} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Econst count = motifComponent(\u0026quot;p\u0026quot;, (count) =\u0026gt; {\n  count.class.add(\u0026quot;count\u0026quot;);\n  count.bindings.text(() =\u0026gt; \u0060${notes.count(\u0026quot;notes\u0026quot;)} not\u0060);\n});\nconst title = motifComponent(TitleSync, { initializeComponent: (title) =\u0026gt; title.motif.setDisposable(() =\u0026gt; (document.title = \u0026quot;Notlar\u0026quot;)) });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EKullanıcının verdiği ve derleyicinin ürettiği ikisi de çalışır; sıra: bileşenin \u003Ccode\u003EinitializeComponent\u003C/code\u003E metodu, etikette verilen, derleyicinin ürettiği.\u003C/p\u003E\n\u003Ch3 id=\u0022on-initialize-component\u0022\u003E\u003Ccode\u003EoninitializeComponent\u003C/code\u003E — kurulum kodundan hemen sonra\u003C/h3\u003E\n\u003Cp\u003EJSX kullanan bir bileşende \u003Ccode\u003EinitializeComponent\u003C/code\u003E aşamasını derleyicinin kurulum kodu doldurur. \u003Ccode\u003EoninitializeComponent\u003C/code\u003E, aynı aşamada bu kod bittikten hemen sonra çalışan kancadır. Öznitelikler, olaylar, bağlar ve çocuklar bu anda tanımlanmış olur; \u003Ccode\u003Eview()\u003C/code\u003E henüz çağrılmamıştır. Derleyicinin ürettiği kurulumun üzerine kendi kurulumunu eklemek isteyen kod için yeri burasıdır.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Ebuild()\u003C/code\u003E içindeki sıra:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003ESınıfın \u003Ccode\u003EinitializeComponent\u003C/code\u003E metodu.\u003C/li\u003E\n\u003Cli\u003EEtiketten ya da derleyiciden gelen \u003Ccode\u003EinitializeComponent\u003C/code\u003E değerleri.\u003C/li\u003E\n\u003Cli\u003ESınıfın \u003Ccode\u003EoninitializeComponent\u003C/code\u003E metodu.\u003C/li\u003E\n\u003Cli\u003EEtiketten gelen \u003Ccode\u003EoninitializeComponent\u003C/code\u003E değerleri.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eview()\u003C/code\u003E.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003ESınıf metodu olarak (Options API nesnesinde aynı adlı üye de aynı anda çalışır):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/TagList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/TagList.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, EventArgs } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class TagList extends Component\u0026lt;HTMLUListElement\u0026gt; {\n  oninitializeComponent(sender: ComponentBase, e: EventArgs) {\n    sender.class.add(sender.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/TagList.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, EventArgs } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class TagList extends Component\u0026lt;HTMLUListElement\u0026gt; {\n  static override elementTag = \u0026quot;ul\u0026quot;;\n\n  oninitializeComponent(sender: ComponentBase, e: EventArgs) {\n    sender.class.add(sender.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/TagList.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class TagList extends Component {\n  static elementTag = \u0026quot;ul\u0026quot;;\n\n  oninitializeComponent(sender, e) {\n    sender.class.add(sender.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/TagList.js\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class TagList extends Component {\n  static elementTag = \u0026quot;ul\u0026quot;;\n\n  oninitializeComponent(sender, e) {\n    sender.class.add(sender.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EEtikette prop olarak (düz DOM etiketi, sınıf bileşeni etiketi ve fonksiyon bileşeni etiketi; fonksiyon bileşeninde fonksiyonun döndürdüğü köke uygulanır). Bu kanca çalıştığında etikete yazılan çocuklar \u003Ccode\u003Econtrols\u003C/code\u003E içine eklenmiştir; JSX\u0027siz yazımda nesne biçiminin anahtarıdır ve kurulum fonksiyonunun eklediği ya da \u003Ccode\u003Echilds\u003C/code\u003E ile verilen çocuklardan sonra çalışır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteTags.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteTags.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;ul oninitializeComponent={(list) =\u0026gt; list.class.add(list.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;)}\u0026gt;\n  \u0026lt;li\u0026gt;iş\u0026lt;/li\u0026gt;\n  \u0026lt;li\u0026gt;ev\u0026lt;/li\u0026gt;\n\u0026lt;/ul\u0026gt;\n\u0026lt;TagList oninitializeComponent={(tags) =\u0026gt; tags.attr.add({ \u0026quot;aria-label\u0026quot;: \u0060${tags.controls.items.length} etiket\u0060 })}\u0026gt;\n  \u0026lt;li\u0026gt;iş\u0026lt;/li\u0026gt;\n  \u0026lt;li\u0026gt;ev\u0026lt;/li\u0026gt;\n\u0026lt;/TagList\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteTags.ts\u0022\u003E\u003Ccode\u003Econst plain = motifComponent(\u0026quot;ul\u0026quot;, {\n  oninitializeComponent: (list: ComponentBase) =\u0026gt; list.class.add(list.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;),\n  initializeComponent: (list: ComponentBase) =\u0026gt; {\n    for (const tag of [\u0026quot;iş\u0026quot;, \u0026quot;ev\u0026quot;]) {\n      list.controls.add(motifComponent(\u0026quot;li\u0026quot;, (li: ComponentBase) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(tag)))));\n    }\n  },\n});\nconst labelled = motifComponent(TagList, {\n  oninitializeComponent: (tags: ComponentBase) =\u0026gt; tags.attr.add({ \u0026quot;aria-label\u0026quot;: \u0060${tags.controls.items.length} etiket\u0060 }),\n  childs: [\u0026quot;iş\u0026quot;, \u0026quot;ev\u0026quot;].map((tag) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, (li: ComponentBase) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(tag))))),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteTags.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;ul oninitializeComponent={(list) =\u0026gt; list.class.add(list.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;)}\u0026gt;\n  \u0026lt;li\u0026gt;iş\u0026lt;/li\u0026gt;\n  \u0026lt;li\u0026gt;ev\u0026lt;/li\u0026gt;\n\u0026lt;/ul\u0026gt;\n\u0026lt;TagList oninitializeComponent={(tags) =\u0026gt; tags.attr.add({ \u0026quot;aria-label\u0026quot;: \u0060${tags.controls.items.length} etiket\u0060 })}\u0026gt;\n  \u0026lt;li\u0026gt;iş\u0026lt;/li\u0026gt;\n  \u0026lt;li\u0026gt;ev\u0026lt;/li\u0026gt;\n\u0026lt;/TagList\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteTags.js\u0022\u003E\u003Ccode\u003Econst plain = motifComponent(\u0026quot;ul\u0026quot;, {\n  oninitializeComponent: (list) =\u0026gt; list.class.add(list.controls.items.length \u0026gt; 5 ? \u0026quot;tags tags--many\u0026quot; : \u0026quot;tags\u0026quot;),\n  initializeComponent: (list) =\u0026gt; {\n    for (const tag of [\u0026quot;iş\u0026quot;, \u0026quot;ev\u0026quot;]) {\n      list.controls.add(motifComponent(\u0026quot;li\u0026quot;, (li) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(tag)))));\n    }\n  },\n});\nconst labelled = motifComponent(TagList, {\n  oninitializeComponent: (tags) =\u0026gt; tags.attr.add({ \u0026quot;aria-label\u0026quot;: \u0060${tags.controls.items.length} etiket\u0060 }),\n  childs: [\u0026quot;iş\u0026quot;, \u0026quot;ev\u0026quot;].map((tag) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, (li) =\u0026gt; li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(tag))))),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022visibility\u0022\u003EGörünürlük — \u003Ccode\u003Emotif.show\u003C/code\u003E / \u003Ccode\u003Emotif.hide\u003C/code\u003E / \u003Ccode\u003Emotif.toggle\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EBir bileşeni serbest bırakmadan gizleyip gösterebilirsiniz:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Eawait this.motif.hide();     // gizle (varsa çıkış animasyonu oynatılır)\nawait this.motif.show();     // göster (varsa giriş animasyonu)\nthis.motif.toggle();         // tersine çevir\nthis.isVisible;              // mevcut görünürlük\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Eawait panel.motif.hide();    // gizle (varsa çıkış animasyonu oynatılır)\nawait panel.motif.show();    // göster (varsa giriş animasyonu)\npanel.motif.toggle();        // tersine çevir\npanel.isVisible;             // mevcut görünürlük\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Eawait this.motif.hide();     // gizle (varsa çıkış animasyonu oynatılır)\nawait this.motif.show();     // göster (varsa giriş animasyonu)\nthis.motif.toggle();         // tersine çevir\nthis.isVisible;              // mevcut görünürlük\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Eawait panel.motif.hide();    // gizle (varsa çıkış animasyonu oynatılır)\nawait panel.motif.show();    // göster (varsa giriş animasyonu)\npanel.motif.toggle();        // tersine çevir\npanel.isVisible;             // mevcut görünürlük\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde bu çağrılar bileşenin kendisi üzerindedir (örnekte \u003Ccode\u003Epanel\u003C/code\u003E): JSX\u0027te kökün \u003Ccode\u003EonConfig\u003C/code\u003E kancasına ya da \u003Ccode\u003Eref\u003C/code\u003E\u0027ine gelen bileşen, JSX\u0027siz yazımda kökü kuran \u003Ccode\u003EmotifComponent\u003C/code\u003E fonksiyonunun aldığı bileşen.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EGörünürlük değişince \u003Ccode\u003EonVisibilityChanged(sender, e)\u003C/code\u003E çalışır; kanca \u003Ccode\u003EisVisible\u003C/code\u003E güncellenmeden önce çağrılır. Yeni durum olay argümanındadır: \u003Ccode\u003Ee.visible\u003C/code\u003E gösterilirken \u003Ccode\u003Etrue\u003C/code\u003E, gizlenirken \u003Ccode\u003Efalse\u003C/code\u003E; \u003Ccode\u003EisVisible\u003C/code\u003E o an önceki durumu verir. Aynı argüman \u003Ccode\u003EonVisibilityChanged\u003C/code\u003E prop\u0027una ve \u003Ccode\u003Emotif.on(\u0026quot;x:visibilityChanged\u0026quot;, …)\u003C/code\u003E dinleyicisine de gelir. Gizlenen bileşen ve alt ağacı \u003Ccode\u003EonDeactivated\u003C/code\u003E, yeniden gösterilince \u003Ccode\u003EonActivated\u003C/code\u003E alır. Bağlar gizliyken de çalışmayı sürdürür; bileşen gösterildiğinde güncel değerle görünür. Elemanı olmayan (fragment) bileşende de aynı sıra geçerlidir: çocukların elemanları kendi izleriyle (\u003Ccode\u003E\u0026lt;!--h--\u0026gt;\u003C/code\u003E) yer değiştirir ve kendi çıkış/giriş geçişlerini oynatır, bildirim önce fragment\u0027a sonra görünür çocuklara gider; çocukların kendi \u003Ccode\u003EisVisible\u003C/code\u003E\u0027ı değişmez, ayrıca gizlenmiş bir çocuk fragment gösterilince gizli kalır; fragment gizliyken eklenen çocuk (yeni, önceden kurulmuş ya da başka bir ebeveynden taşınmış) da gizli kalır; yeri \u003Ccode\u003Econtrols\u003C/code\u003E içindeki sırasıyla bellidir ve fragment gösterilince o yere yerleşir.\u003C/p\u003E\n\u003Ch3 id=\u0022hide-strategy\u0022\u003EGizleme stratejisi — \u003Ccode\u003EhideStrategy\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EGizlenen bir bileşenin DOM\u0027da nasıl ele alınacağını \u003Ccode\u003EhideStrategy\u003C/code\u003E belirler:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EDeğer\u003C/th\u003E\n\u003Cth\u003EDavranış\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027placeholder\u0027\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EEleman DOM\u0027dan çıkar, yerine \u003Ccode\u003E\u0026lt;!--h--\u0026gt;\u003C/code\u003E yorum izi konur; gösterirken izle yer değiştirir. \u003Ccode\u003Econtrols.move\u003C/code\u003E ve liste sıralaması izi bileşenle birlikte taşır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027detach\u0027\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDOM\u0027dan iz bırakmadan çıkarılır; gösterilince ebeveyndeki sırasına göre yeniden eklenir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027auto\u0027\u003C/code\u003E (varsayılan)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eplaceholder\u003C/code\u003E gibi davranır; \u003Ccode\u003E.map\u003C/code\u003E satırları ve \u003Ccode\u003Ekey\u003C/code\u003E verilmiş öğeler dahil her bileşen yerinde iz bırakır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EStrateji \u003Ccode\u003Eoptions\u003C/code\u003E ile verilir; JSX\u0027te prop, JSX\u0027siz yazımda nesne biçiminin anahtarıdır. Programatik olarak \u003Ccode\u003Emotif.options.hideStrategy\u003C/code\u003E alanına yazılır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;p class=\u0026quot;loading\u0026quot; options={{ hideStrategy: \u0026quot;detach\u0026quot; }} x-display={() =\u0026gt; this.state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;p class=\u0026quot;loading\u0026quot; options={{ hideStrategy: \u0026quot;detach\u0026quot; }} x-display={() =\u0026gt; state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Econst loading = motifComponent(\u0026quot;p\u0026quot;, {\n  options: { hideStrategy: \u0026quot;detach\u0026quot; },\n  preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; this.state.loading),\n  initializeComponent: (p: ComponentBase) =\u0026gt; {\n    p.class.add(\u0026quot;loading\u0026quot;);\n    p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Econst loading = motifComponent(\u0026quot;p\u0026quot;, {\n  options: { hideStrategy: \u0026quot;detach\u0026quot; },\n  preconfig: (p: ComponentBase) =\u0026gt; p.bindings.display(() =\u0026gt; state.loading),\n  initializeComponent: (p: ComponentBase) =\u0026gt; {\n    p.class.add(\u0026quot;loading\u0026quot;);\n    p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;p class=\u0026quot;loading\u0026quot; options={{ hideStrategy: \u0026quot;detach\u0026quot; }} x-display={() =\u0026gt; this.state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;p class=\u0026quot;loading\u0026quot; options={{ hideStrategy: \u0026quot;detach\u0026quot; }} x-display={() =\u0026gt; state.loading}\u0026gt;Yükleniyor…\u0026lt;/p\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Econst loading = motifComponent(\u0026quot;p\u0026quot;, {\n  options: { hideStrategy: \u0026quot;detach\u0026quot; },\n  preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; this.state.loading),\n  initializeComponent: (p) =\u0026gt; {\n    p.class.add(\u0026quot;loading\u0026quot;);\n    p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Econst loading = motifComponent(\u0026quot;p\u0026quot;, {\n  options: { hideStrategy: \u0026quot;detach\u0026quot; },\n  preconfig: (p) =\u0026gt; p.bindings.display(() =\u0026gt; state.loading),\n  initializeComponent: (p) =\u0026gt; {\n    p.class.add(\u0026quot;loading\u0026quot;);\n    p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Yükleniyor…\u0026quot;)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class,options\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Ethis.motif.options.hideStrategy = \u0026quot;detach\u0026quot;;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Epanel.motif.options.hideStrategy = \u0026quot;detach\u0026quot;;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EFonksiyon bileşeninde \u003Ccode\u003Estate\u003C/code\u003E bileşenin \u003Ccode\u003Ereactive\u003C/code\u003E ile kurduğu yerel durumdur.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Eoptions\u003C/code\u003E bileşenin kendi ayar nesnesidir; çerçevenin tanıdığı anahtarlar okunur: \u003Ccode\u003EhideStrategy\u003C/code\u003E ve \u003Ccode\u003EdisableDisposal\u003C/code\u003E \u003Ccode\u003Emotif.options\u003C/code\u003E\u0027a kopyalanır, \u003Ccode\u003EisSvg\u003C/code\u003E elemanın ad alanını belirler (bkz. \u003Ca href=\u0022/docs/components#root-element\u0022\u003EKök eleman\u003C/a\u003E); diğer anahtarlar yok sayılır. Bu adı veri prop\u0027u olarak kullanmayın. Fonksiyon bileşeni etiketine yazılan \u003Ccode\u003Eoptions\u003C/code\u003E döndürülen köke uygulanır.\u003C/p\u003E\n\u003Ch2 id=\u0022wait\u0022\u003EBekletme — \u003Ccode\u003EisWait\u003C/code\u003E / \u003Ccode\u003Ex-wait\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Ex-wait\u003C/code\u003E direktifi bir bileşenin DOM\u0027a eklenmesini bir koşula bağlar; programatik karşılığı \u003Ccode\u003EisWait\u003C/code\u003E özelliğidir (\u003Ccode\u003EisWait\u003C/code\u003E bir JSX prop\u0027u değildir). Koşul \u003Ccode\u003Etrue\u003C/code\u003E iken bileşen bekletilir (gizli/eklenmemiş), \u003Ccode\u003Efalse\u003C/code\u003E olunca eklenir. Koşullu gösterimde birincil yöntem budur — bkz. \u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EKoşullu Gösterim ve Listeler\u003C/a\u003E. Örnekte bileşen etiketi \u003Ccode\u003Ex-wait\u003C/code\u003E koşulu \u003Ccode\u003Etrue\u003C/code\u003E olduğu sürece kurulmaz:\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Ex-chunk\u003C/code\u003E ile dilimlenen bir çocuk da sırası gelene kadar \u003Ccode\u003EisWait\u003C/code\u003E ile bekler ve izini bırakır; sırası geldiğinde çerçeve bekletmeyi kaldırır. Siz daha önce \u003Ccode\u003EisWait = false\u003C/code\u003E yazarsanız çocuk hemen kurulur ve dilim sırasından çıkar — bkz. \u003Ca href=\u0022/docs/conditionals-and-lists#large-lists\u0022\u003EBüyük listeler\u003C/a\u003E.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript,declarative/options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;TitleSync x-wait={() =\u0026gt; this.state.loading} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;TitleSync x-wait={() =\u0026gt; state.loading} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript,imperative/options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Econst title = motifComponent(TitleSync, { preconfig: (title: ComponentBase) =\u0026gt; title.bindings.wait(() =\u0026gt; this.state.loading) });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Econst title = motifComponent(TitleSync, { preconfig: (title: ComponentBase) =\u0026gt; title.bindings.wait(() =\u0026gt; state.loading) });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript,declarative/options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;TitleSync x-wait={() =\u0026gt; this.state.loading} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;TitleSync x-wait={() =\u0026gt; state.loading} /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript,imperative/options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Econst title = motifComponent(TitleSync, { preconfig: (title) =\u0026gt; title.bindings.wait(() =\u0026gt; this.state.loading) });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Econst title = motifComponent(TitleSync, { preconfig: (title) =\u0026gt; title.bindings.wait(() =\u0026gt; state.loading) });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EProgramatik:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Ethis.isWait = true;   // beklet\nthis.isWait = false;  // devam et (gerekirse DOM\u0027a eklenir)\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Epanel.isWait = true;   // beklet\npanel.isWait = false;  // devam et (gerekirse DOM\u0027a eklenir)\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Ethis.isWait = true;   // beklet\nthis.isWait = false;  // devam et (gerekirse DOM\u0027a eklenir)\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Epanel.isWait = true;   // beklet\npanel.isWait = false;  // devam et (gerekirse DOM\u0027a eklenir)\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EYaşam döngüsü açısından önemli iki nokta:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EKoşul \u003Cstrong\u003Ebaşlangıçta\u003C/strong\u003E \u003Ccode\u003Etrue\u003C/code\u003E ise \u003Ccode\u003Ebuild()\u003C/code\u003E koşul \u003Ccode\u003Efalse\u003C/code\u003E olana kadar çalışmaz. \u003Ccode\u003EonConfig\u003C/code\u003E/\u003Ccode\u003EonConfigured\u003C/code\u003E çalışır; \u003Ccode\u003EonBuilding\u003C/code\u003E/\u003Ccode\u003EonBuilt\u003C/code\u003E/\u003Ccode\u003EonMounted\u003C/code\u003E kancaları o ana kadar tetiklenmez, bileşenin alt ağacı kurulmaz ve DOM\u0027a girmez. Yerinde yalnız \u003Ccode\u003E\u0026lt;!--h--\u0026gt;\u003C/code\u003E izi durur; koşul \u003Ccode\u003Efalse\u003C/code\u003E olunca bileşen kurulur ve bu izin yerine girer.\u003C/li\u003E\n\u003Cli\u003EBekleme durumuna geri dönmek \u003Cstrong\u003Eserbest bırakmaz\u003C/strong\u003E. \u003Ccode\u003EonDisposing\u003C/code\u003E/\u003Ccode\u003EonDisposed\u003C/code\u003E çalışmaz, iç durum korunur; bileşen gizlenir ve \u003Ccode\u003EonDeactivated\u003C/code\u003E alır. Gerçekten serbest bırakma istiyorsanız \u003Ccode\u003E{koşul \u0026amp;\u0026amp; \u0026lt;X/\u0026gt;}\u003C/code\u003E (JSX\u0027siz yazımda \u003Ccode\u003Ebindings.when(koşulFn, kurFn)\u003C/code\u003E) kullanın ya da \u003Ccode\u003Edispose()\u003C/code\u003E çağırın.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022dispose\u0022\u003ESerbest bırakma (dispose)\u003C/h2\u003E\n\u003Cp\u003EGerekmeyen bir bileşen serbest bırakılır. Bu; olay dinleyicilerini kaldırır, bağları deaktive eder, çocukları özyinelemeli serbest bırakır ve DOM\u0027dan söker:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Eawait this.dispose();                               // varsayılan: { deep: true } \u002B çıkış animasyonu\nawait this.dispose({ skipLeaveTransition: true });  // animasyonsuz\nawait this.dispose({ deep: false });                // çocuklarda başvuru temizliğini atla\nawait this.disposeAsync();                          // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/pages/NoteBoard.ts\u0022\u003E\u003Ccode\u003Eawait panel.dispose();                              // varsayılan: { deep: true } \u002B çıkış animasyonu\nawait panel.dispose({ skipLeaveTransition: true }); // animasyonsuz\nawait panel.dispose({ deep: false });               // çocuklarda başvuru temizliğini atla\nawait panel.disposeAsync();                         // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Eawait this.dispose();                               // varsayılan: { deep: true } \u002B çıkış animasyonu\nawait this.dispose({ skipLeaveTransition: true });  // animasyonsuz\nawait this.dispose({ deep: false });                // çocuklarda başvuru temizliğini atla\nawait this.disposeAsync();                          // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/pages/NoteBoard.js\u0022\u003E\u003Ccode\u003Eawait panel.dispose();                              // varsayılan: { deep: true } \u002B çıkış animasyonu\nawait panel.dispose({ skipLeaveTransition: true }); // animasyonsuz\nawait panel.dispose({ deep: false });               // çocuklarda başvuru temizliğini atla\nawait panel.disposeAsync();                         // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Edeep\u003C/code\u003E (varsayılan \u003Ccode\u003Etrue\u003C/code\u003E) çocuk bileşenlerde başvuru temizliğini (\u003Ccode\u003Eelement\u003C/code\u003E, \u003Ccode\u003Eprops\u003C/code\u003E, \u003Ccode\u003Echilds\u003C/code\u003E, olay haritaları) de yapar; kök bileşen her zaman temizlenir. \u003Ccode\u003EdisposeAsync\u003C/code\u003E, çerçevenin bir ebeveyn serbest bırakılırken çocuklar için kullandığı yoldur; dışarıdan çağrılırsa bileşen çıkış geçişi beklemeden söner. Süren bir serbest bırakma varken ikinci \u003Ccode\u003Edispose\u003C/code\u003E/\u003Ccode\u003EdisposeAsync\u003C/code\u003E çağrısı yenisini başlatmaz, aynı Promise\u0027i döndürür.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Econtrols.remove(child)\u003C/code\u003E veya \u003Ccode\u003Econtrols.clear()\u003C/code\u003E da ilgili çocukları serbest bırakır. JSX ile ya da \u003Ccode\u003EmotifComponent\u003C/code\u003E ile kurduğunuz her şey (dinleyiciler, bağlar, çocuklar, \u003Ccode\u003Econtext.on\u003C/code\u003E abonelikleri) kendiliğinden temizlenir; zamanlayıcı, gözlemci, soket gibi dış kaynakları \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E ile kaydedersiniz (\u003Ccode\u003ENoteBoard\u003C/code\u003E\u0027daki \u003Ccode\u003EsetInterval\u003C/code\u003E gibi). Ayrıntı için \u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022app-lifecycle\u0022\u003EUygulama yaşam döngüsü — \u003Ccode\u003Eapp.onLifecycle\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EBileşen kancalarından ayrı olarak, uygulamanın bütünü için de bir yaşam döngüsü vardır: sekme arka plana alınır, mobil işletim sistemi sayfayı dondurur, bağlantı kopar. Yoklama, websocket ve zamanlayıcıları duraklatıp sürdürmek, dönüşte bayat veriyi yenilemek için:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Econst off = app.onLifecycle(async ({ state }) =\u0026gt; {\n  switch (state) {\n    case \u0026quot;hidden\u0026quot;:   poller.pause(); break;           // sekme/uygulama arka planda\n    case \u0026quot;visible\u0026quot;:  poller.resume(); break;\n    case \u0026quot;frozen\u0026quot;:   socket.close(); break;           // tarayıcı sayfayı dondurdu\n    case \u0026quot;resumed\u0026quot;:  socket.open(); break;\n    case \u0026quot;restored\u0026quot;: notes.state.items = await sync.pull(); break;  // geri/ileri önbelleğinden (bfcache) döndü\n    case \u0026quot;offline\u0026quot;:  offlineBanner.motif.show(); break;\n    case \u0026quot;online\u0026quot;:   offlineBanner.motif.hide(); break;\n  }\n});\noff(); // abonelikten çık\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Econst off = app.onLifecycle(async ({ state }) =\u0026gt; {\n  switch (state) {\n    case \u0026quot;hidden\u0026quot;:   poller.pause(); break;           // sekme/uygulama arka planda\n    case \u0026quot;visible\u0026quot;:  poller.resume(); break;\n    case \u0026quot;frozen\u0026quot;:   socket.close(); break;           // tarayıcı sayfayı dondurdu\n    case \u0026quot;resumed\u0026quot;:  socket.open(); break;\n    case \u0026quot;restored\u0026quot;: notes.state.items = await sync.pull(); break;  // geri/ileri önbelleğinden (bfcache) döndü\n    case \u0026quot;offline\u0026quot;:  offlineBanner.motif.show(); break;\n    case \u0026quot;online\u0026quot;:   offlineBanner.motif.hide(); break;\n  }\n});\noff(); // abonelikten çık\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.isVisible\u003C/code\u003E ve \u003Ccode\u003Eapp.isOnline\u003C/code\u003E anlık durumu verir. Tarayıcı dinleyicileri yalnızca ilk abonelikte kurulur (kullanılmıyorsa maliyeti sıfırdır) ve \u003Ccode\u003Eapp.dispose()\u003C/code\u003E ile kaldırılır. Abonelik bir bileşenin ömrüne bağlı değildir; bileşen içinden açıyorsanız \u003Ccode\u003Eoff\u003C/code\u003E\u0027u bileşenin \u003Ccode\u003Emotif.setDisposable(off)\u003C/code\u003E\u0027u ile kaydedin (sınıfta ve Options\u0027ta \u003Ccode\u003Ethis.motif\u003C/code\u003E, fonksiyon bileşeninde \u003Ca href=\u0022/docs/components#function-root\u0022\u003Ekök bileşenin\u003C/a\u003E \u003Ccode\u003Emotif\u003C/code\u003E\u0027i).\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EStil ve animasyon sistemini öğrenmek için \u003Ca href=\u0022/docs/styling-and-transitions\u0022\u003EStil ve Animasyon\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"hooks","text":"Kancalar ve çalışma sırası","level":2},{"id":"class-hooks","text":"Kancaları tanımlama","level":2},{"id":"prop-hooks","text":"Etikette kanca","level":2},{"id":"initialize-component","text":"initializeComponent — bileşenin kurulum kodu","level":2},{"id":"on-initialize-component","text":"oninitializeComponent — kurulum kodundan hemen sonra","level":3},{"id":"visibility","text":"Görünürlük — motif.show / motif.hide / motif.toggle","level":2},{"id":"hide-strategy","text":"Gizleme stratejisi — hideStrategy","level":3},{"id":"wait","text":"Bekletme — isWait / x-wait","level":2},{"id":"dispose","text":"Serbest bırakma (dispose)","level":2},{"id":"app-lifecycle","text":"Uygulama yaşam döngüsü — app.onLifecycle","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"forms","title":"Formlar ve İki Yönlü Bağlama"},"next":{"slug":"styling-and-transitions","title":"Stil ve Animasyon"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>Yaşam Döngüsü</h1>
+        <p>Kanca sırası, sınıf metodu ve JSX prop&#x27;u olarak kancalar, initializeComponent, görünürlük, bekletme, serbest bırakma ve uygulama yaşam döngüsü; JSX ile ve JSX&#x27;siz.</p>
+<p>Her MotifJS bileşeni, oluşturulmasından DOM'a bağlanmasına ve serbest bırakılmasına kadar belirli bir yaşam döngüsünden geçer. Bu aşamalarda çalışan kancaları (hooks) <strong>sınıf metodu</strong>, <strong>JSX prop'u</strong> ya da JSX'siz yazımda <code>motifComponent</code>'in nesne biçiminde <strong>anahtar</strong> olarak tanımlarsınız.</p>
+<p>Örnekler bir not uygulamasının kesitleridir. <code>Note</code> ve <code>NotesService</code> <a href="/tr/docs/components">Bileşenler</a> sayfasındaki <code>src/services/notes.ts</code> dosyasındakilerdir; notları sunucudan çeken servis şudur:</p>
+<div class="doc-code" data-file="src/services/sync.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/sync.ts"><code>import { Injectable } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;./notes&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class SyncService {
+  async pull(): Promise&lt;Note[]&gt; {
+    const response = await fetch(&quot;/api/notes&quot;);
+    return response.json();
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/sync.js"><code>import { Injectable } from &quot;@motifx/core&quot;;
+
+@Injectable({ lifetime: &quot;singleton&quot; })
+export class SyncService {
+  async pull() {
+    const response = await fetch(&quot;/api/notes&quot;);
+    return response.json();
+  }
+}</code></pre>
+</div>
+<h2 id="hooks">Kancalar ve çalışma sırası</h2>
+<table>
+<thead>
+<tr>
+<th>Sıra</th>
+<th>Kanca</th>
+<th>Ne zaman çalışır</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>onInitializing</code></td>
+<td>Yapıcıda, element atanıp props işlendikten sonra (<code>this.props</code> hazır; alt sınıfın <code>state = reactive(...)</code> gibi alanları henüz ilklenmemiştir).</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>onInitialized</code></td>
+<td>Yapıcıda, <code>onInitializing</code>'den hemen sonra.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>onConfig</code></td>
+<td>Yapılandırma aşaması; <strong>props hazır, DOM'a henüz bağlı değil</strong>. Veri çekmek için uygun yer. Alt sınıflarda <code>build()</code> başında (sınıf alanları ilklendikten sonra) çalışır.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>onConfigured</code></td>
+<td>Yapılandırma tamamlandığında (build başlangıcı).</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>onBuilding</code></td>
+<td>DOM inşası başlarken.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>initializeComponent</code></td>
+<td><code>view()</code> çağrılmadan hemen önce; bileşenin kurulum kodu (JSX'ten derleyici üretir, JSX'siz yazımda siz yazarsınız).</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>oninitializeComponent</code></td>
+<td>Bütün <code>initializeComponent</code> kodu (sınıf metodu, etiketteki değer, derleyicinin ürettiği) çalıştıktan hemen sonra, <code>view()</code>'den önce.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>onBuilt</code></td>
+<td>Bileşen ve çocukları inşa edildikten sonra. Element bu anda hâlâ <strong>detached</strong> bir fragment içinde olabilir (ternary/liste dalları).</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>onMounted</code></td>
+<td>Bileşen, sayfadaki bir köke bağlı ağaca yerleştikten sonraki görevde, <strong>bir kez</strong>; ekran bu sırada çizilmiş olabilir. Kök, <code>app.run</code>'ın hedefi ya da belgedeki hazır bir elemanı saran bileşendir; yol üzerindeki her bileşenin görünür olması gerekir. Yalnız elemanın gerçekten sayfada ve görünür olması gereken işler içindir: <code>focus()</code>, ölçüm, elemanı belgede isteyen kütüphaneler. Diğer kurulum işleri <code>onBuilt</code>'a yazılır.</td>
+</tr>
+<tr>
+<td>—</td>
+<td><code>onActivated</code> / <code>onDeactivated</code></td>
+<td>Bileşen DOM'dan sökülüp (serbest bırakılmadan) yeniden yerleştiğinde: <code>keepAlive</code> rota dönüşü, <code>controls.detach</code>/<code>silentDetach</code> sonrası <code>controls.add</code> (taşıma dahil), <code>motif.hide()</code>/<code>motif.show()</code> (<code>x-wait</code>/<code>x-display</code> dahil), <code>Virtualization</code> satırının pencereden çıkıp geri gelmesi. Ayrılırken <code>onDeactivated</code>, geri gelince <code>onActivated</code>. İlk gösterimde çalışmaz. Görünür alt ağaca da iletilir (önce ebeveyn); gizli bir çocuk ebeveyniyle etkinleşmez, kendi <code>motif.show()</code>'unda etkinleşir.</td>
+</tr>
+<tr>
+<td>—</td>
+<td><code>onVisibilityChanged</code></td>
+<td><code>motif.show()</code>/<code>motif.hide()</code>/<code>motif.toggle()</code> (<code>x-wait</code>/<code>x-display</code> dahil) görünürlüğü değiştirirken; <code>isVisible</code> güncellenmeden önce çalışır (gizlemede çıkış animasyonu bittikten sonra; <code>hideStrategy: &quot;detach&quot;</code> ile animasyondan önce), kanca içinde <code>isVisible</code> önceki değeri, <code>e.visible</code> yeni değeri gösterir.</td>
+</tr>
+<tr>
+<td>—</td>
+<td><code>onDisposing</code></td>
+<td>Serbest bırakma başlarken.</td>
+</tr>
+<tr>
+<td>—</td>
+<td><code>onDisposed</code></td>
+<td>Serbest bırakma tamamlandığında.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>onInitializing</code> ve <code>onInitialized</code> bileşen <strong>oluşturulurken</strong> (constructor akışında) çalışır. <code>onConfig</code>, düz <code>new Component(tag, { onConfig })</code> örneklerinde yapıcıda; <strong>alt sınıflarda</strong> (<code>class X extends Component</code>) ise <code>state = reactive(...)</code> gibi sınıf alanları ilklendikten sonra, <code>build()</code> başında <code>onConfigured</code>'dan hemen önce çalışır (hiç build edilmeyen bir alt sınıf örneği <code>onConfig</code> almaz). <code>onConfigured</code>, <code>onBuilding</code>, <code>initializeComponent</code>, <code>oninitializeComponent</code> ve <code>onBuilt</code> <code>build()</code> sırasında; <code>onMounted</code> ise bileşen köke bağlı ağaca yerleştikten sonraki görevde çalışır (yerleştiği anda ağaç zaten bağlıysa da sonraki görevde). <code>isInitialized</code> <code>onInitializing</code> sırasında <code>false</code>, <code>onInitialized</code>'dan itibaren <code>true</code>'dur (yapıcıdaki ilkleme bitince atanır).</p>
+<p><code>onMounted</code> kancaları sıraya alınır ve kurulumu yapan görevden sonra, kayıt sırasıyla çalışır. Sıra 8 ms'lik dilimler hâlinde işlenir: süre dolunca kalan kancalar bir sonraki göreve kalır, arada tarayıcı ekranı çizer ve kullanıcı girdisini işler. Böylece bir grafik ya da tablo kütüphanesini saran çok sayıda bileşenin kurulumu sayfayı kilitlemez. Alt bileşenin kancası üst bileşeninkinden önce çalışır; sırası gelmeden serbest bırakılan bileşenin kancası çalışmaz. Yerleşmeyi çekirdek izler: <code>controls.add</code>, <code>x-wait</code>'in bitmesi, <code>motif.show()</code> ve <code>Transporter</code> kancayı sıraya sokar; bir elemanı <code>appendChild</code> ile belgeye kendiniz koyarsanız kanca çalışmaz. Hazır bir elemanın içine içerik vermek için elemanı <code>new Component(eleman)</code> ile sarıp çocukları <code>controls.add</code> ile eklersiniz; <code>window.open</code> ile açılan pencerenin gövdesi de böyle sarılır ve o pencereye verilen bileşenler orada bağlanır. Sıra, kökün bulunduğu pencerenin zamanlayıcısıyla işler.</p>
+</blockquote>
+<p>Durum bayrakları: <code>isInitialized</code>, <code>isConfigured</code>, <code>isBuilt</code>, <code>isVisible</code>, <code>isWait</code>, <code>isDisposed</code> ilgili evre geçildiğinde güncellenir ve bileşen üzerinden okunur.</p>
+<p>Options API nesnesine yazılan <code>onInitializing</code>, <code>onInitialized</code> ve <code>onConfig</code> çalışmaz (bu evreler alanlar nesneden kopyalanmadan önce biter); kurulum için <code>ctor</code> ya da <code>onConfigured</code> kullanın (bkz. <a href="/tr/docs/components#options-components">Options API</a>).</p>
+<h2 id="class-hooks">Kancaları tanımlama</h2>
+<p>Sınıfta kanca bir metottur; fonksiyon bileşeninde döndürülen köke yazılan bir prop, Options API'de nesnenin bir üyesidir. JSX'siz yazımda sınıf metodu aynı kalır, fonksiyon ve düz etiketlerde kanca <code>motifComponent</code>'in nesne biçiminde bir anahtardır. <code>NoteBoard</code> yapılandırılırken notları çeker (<code>onConfig</code>), DOM'a girince arama kutusuna odaklanır (<code>onMounted</code>) ve dakikada bir yeniler; zamanlayıcı <code>motif.setDisposable</code> ile bileşene bağlanır, serbest bırakılırken kendiliğinden durur:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/pages/NoteBoard.tsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export class NoteBoard extends Component {
+  notes = this.getService(NotesService)!;
+  sync = this.getService(SyncService)!;
+  state = reactive({ loading: true });
+  search!: Component&lt;HTMLInputElement&gt;;
+
+  override async onConfig() {
+    this.notes.state.items = await this.sync.pull();
+    this.state.loading = false;
+    const timer = setInterval(async () =&gt; (this.notes.state.items = await this.sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  override onMounted() {
+    this.search.element.focus();
+  }
+
+  override view() {
+    return (
+      &lt;section class=&quot;board&quot;&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; ref={this.search} /&gt;
+        &lt;p class=&quot;loading&quot; x-display={() =&gt; this.state.loading}&gt;Yükleniyor…&lt;/p&gt;
+        &lt;ul&gt;{this.notes.list(&quot;notes&quot;).map((note) =&gt; &lt;li key={note.id}&gt;{note.title}&lt;/li&gt;)}&lt;/ul&gt;
+      &lt;/section&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/NoteBoard.tsx"><code>import { Component, FromService, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export function NoteBoard() {
+  const notes = FromService(NotesService)!;
+  const sync = FromService(SyncService)!;
+  const state = reactive({ loading: true });
+  let search!: Component&lt;HTMLInputElement&gt;;
+
+  return (
+    &lt;section
+      class=&quot;board&quot;
+      onConfig={async (board) =&gt; {
+        notes.state.items = await sync.pull();
+        state.loading = false;
+        const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+        board.motif.setDisposable(() =&gt; clearInterval(timer));
+      }}
+      onMounted={() =&gt; search.element.focus()}
+    &gt;
+      &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; ref={(field) =&gt; (search = field)} /&gt;
+      &lt;p class=&quot;loading&quot; x-display={() =&gt; state.loading}&gt;Yükleniyor…&lt;/p&gt;
+      &lt;ul&gt;{notes.list(&quot;notes&quot;).map((note) =&gt; &lt;li key={note.id}&gt;{note.title}&lt;/li&gt;)}&lt;/ul&gt;
+    &lt;/section&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/pages/NoteBoard.tsx"><code>import { Component, FromService, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export const NoteBoard = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  data: reactive({ loading: true }),
+  search: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+
+  async onConfigured() {
+    const notes = FromService(NotesService)!;
+    const sync = FromService(SyncService)!;
+    this.class.add(&quot;board&quot;);
+    notes.state.items = await sync.pull();
+    this.data.loading = false;
+    const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  onMounted() {
+    this.search!.element.focus();
+  },
+
+  view() {
+    const notes = FromService(NotesService)!;
+    return (
+      &lt;&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; ref={(field: Component&lt;HTMLInputElement&gt;) =&gt; (this.search = field)} /&gt;
+        &lt;p class=&quot;loading&quot; x-display={() =&gt; this.data.loading}&gt;Yükleniyor…&lt;/p&gt;
+        &lt;ul&gt;{notes.list(&quot;notes&quot;).map((note) =&gt; &lt;li key={note.id}&gt;{note.title}&lt;/li&gt;)}&lt;/ul&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/pages/NoteBoard.ts"><code>import { Component, ComponentBase, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { Note, NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export class NoteBoard extends Component {
+  notes = this.getService(NotesService)!;
+  sync = this.getService(SyncService)!;
+  state = reactive({ loading: true });
+  search!: Component&lt;HTMLInputElement&gt;;
+
+  override async onConfig() {
+    this.notes.state.items = await this.sync.pull();
+    this.state.loading = false;
+    const timer = setInterval(async () =&gt; (this.notes.state.items = await this.sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  override onMounted() {
+    this.search.element.focus();
+  }
+
+  override view() {
+    return motifComponent(&quot;section&quot;, (board: ComponentBase) =&gt; {
+      board.class.add(&quot;board&quot;);
+      const search = motifComponent(&quot;input&quot;, {
+        ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.search = field),
+        initializeComponent: (field: ComponentBase) =&gt; field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+      });
+      const loading = motifComponent(&quot;p&quot;, {
+        preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; this.state.loading),
+        initializeComponent: (p: ComponentBase) =&gt; {
+          p.class.add(&quot;loading&quot;);
+          p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+        },
+      });
+      const list = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; ul.controls.add(motifComponent({
+        initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; this.notes.list(&quot;notes&quot;), (note: Note) =&gt; motifComponent(&quot;li&quot;, {
+          indexkey: () =&gt; note.id,
+          initializeComponent: (li: ComponentBase) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))),
+        })),
+      })));
+      board.controls.add(search, loading, list);
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/NoteBoard.ts"><code>import { Component, ComponentBase, FromService, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { Note, NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export function NoteBoard() {
+  const notes = FromService(NotesService)!;
+  const sync = FromService(SyncService)!;
+  const state = reactive({ loading: true });
+  let search!: Component&lt;HTMLInputElement&gt;;
+
+  return motifComponent(&quot;section&quot;, {
+    onConfig: async (board: ComponentBase) =&gt; {
+      notes.state.items = await sync.pull();
+      state.loading = false;
+      const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+      board.motif.setDisposable(() =&gt; clearInterval(timer));
+    },
+    onMounted: () =&gt; search.element.focus(),
+    initializeComponent: (board: ComponentBase) =&gt; {
+      board.class.add(&quot;board&quot;);
+      const field = motifComponent(&quot;input&quot;, {
+        ref: (input: Component&lt;HTMLInputElement&gt;) =&gt; (search = input),
+        initializeComponent: (input: ComponentBase) =&gt; input.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+      });
+      const loading = motifComponent(&quot;p&quot;, {
+        preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; state.loading),
+        initializeComponent: (p: ComponentBase) =&gt; {
+          p.class.add(&quot;loading&quot;);
+          p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+        },
+      });
+      const list = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; ul.controls.add(motifComponent({
+        initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; notes.list(&quot;notes&quot;), (note: Note) =&gt; motifComponent(&quot;li&quot;, {
+          indexkey: () =&gt; note.id,
+          initializeComponent: (li: ComponentBase) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))),
+        })),
+      })));
+      board.controls.add(field, loading, list);
+    },
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/pages/NoteBoard.ts"><code>import { Component, ComponentBase, FromService, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { Note, NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export const NoteBoard = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  data: reactive({ loading: true }),
+  search: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+
+  async onConfigured() {
+    const notes = FromService(NotesService)!;
+    const sync = FromService(SyncService)!;
+    this.class.add(&quot;board&quot;);
+    notes.state.items = await sync.pull();
+    this.data.loading = false;
+    const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  onMounted() {
+    this.search!.element.focus();
+  },
+
+  view() {
+    const notes = FromService(NotesService)!;
+    const search = motifComponent(&quot;input&quot;, {
+      ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.search = field),
+      initializeComponent: (field: ComponentBase) =&gt; field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+    });
+    const loading = motifComponent(&quot;p&quot;, {
+      preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; this.data.loading),
+      initializeComponent: (p: ComponentBase) =&gt; {
+        p.class.add(&quot;loading&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+      },
+    });
+    const list = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; ul.controls.add(motifComponent({
+      initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; notes.list(&quot;notes&quot;), (note: Note) =&gt; motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li: ComponentBase) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))),
+      })),
+    })));
+    return [search, loading, list];
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/pages/NoteBoard.jsx"><code>import { Component, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export class NoteBoard extends Component {
+  notes = this.getService(NotesService);
+  sync = this.getService(SyncService);
+  state = reactive({ loading: true });
+  search;
+
+  async onConfig() {
+    this.notes.state.items = await this.sync.pull();
+    this.state.loading = false;
+    const timer = setInterval(async () =&gt; (this.notes.state.items = await this.sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  onMounted() {
+    this.search.element.focus();
+  }
+
+  view() {
+    return (
+      &lt;section class=&quot;board&quot;&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; ref={this.search} /&gt;
+        &lt;p class=&quot;loading&quot; x-display={() =&gt; this.state.loading}&gt;Yükleniyor…&lt;/p&gt;
+        &lt;ul&gt;{this.notes.list(&quot;notes&quot;).map((note) =&gt; &lt;li key={note.id}&gt;{note.title}&lt;/li&gt;)}&lt;/ul&gt;
+      &lt;/section&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/NoteBoard.jsx"><code>import { FromService, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export function NoteBoard() {
+  const notes = FromService(NotesService);
+  const sync = FromService(SyncService);
+  const state = reactive({ loading: true });
+  let search;
+
+  return (
+    &lt;section
+      class=&quot;board&quot;
+      onConfig={async (board) =&gt; {
+        notes.state.items = await sync.pull();
+        state.loading = false;
+        const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+        board.motif.setDisposable(() =&gt; clearInterval(timer));
+      }}
+      onMounted={() =&gt; search.element.focus()}
+    &gt;
+      &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; ref={(field) =&gt; (search = field)} /&gt;
+      &lt;p class=&quot;loading&quot; x-display={() =&gt; state.loading}&gt;Yükleniyor…&lt;/p&gt;
+      &lt;ul&gt;{notes.list(&quot;notes&quot;).map((note) =&gt; &lt;li key={note.id}&gt;{note.title}&lt;/li&gt;)}&lt;/ul&gt;
+    &lt;/section&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/pages/NoteBoard.jsx"><code>import { FromService, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export const NoteBoard = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  data: reactive({ loading: true }),
+  search: undefined,
+
+  async onConfigured() {
+    const notes = FromService(NotesService);
+    const sync = FromService(SyncService);
+    this.class.add(&quot;board&quot;);
+    notes.state.items = await sync.pull();
+    this.data.loading = false;
+    const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  onMounted() {
+    this.search.element.focus();
+  },
+
+  view() {
+    const notes = FromService(NotesService);
+    return (
+      &lt;&gt;
+        &lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; ref={(field) =&gt; (this.search = field)} /&gt;
+        &lt;p class=&quot;loading&quot; x-display={() =&gt; this.data.loading}&gt;Yükleniyor…&lt;/p&gt;
+        &lt;ul&gt;{notes.list(&quot;notes&quot;).map((note) =&gt; &lt;li key={note.id}&gt;{note.title}&lt;/li&gt;)}&lt;/ul&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/pages/NoteBoard.js"><code>import { Component, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export class NoteBoard extends Component {
+  notes = this.getService(NotesService);
+  sync = this.getService(SyncService);
+  state = reactive({ loading: true });
+  search;
+
+  async onConfig() {
+    this.notes.state.items = await this.sync.pull();
+    this.state.loading = false;
+    const timer = setInterval(async () =&gt; (this.notes.state.items = await this.sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  }
+
+  onMounted() {
+    this.search.element.focus();
+  }
+
+  view() {
+    return motifComponent(&quot;section&quot;, (board) =&gt; {
+      board.class.add(&quot;board&quot;);
+      const search = motifComponent(&quot;input&quot;, {
+        ref: (field) =&gt; (this.search = field),
+        initializeComponent: (field) =&gt; field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+      });
+      const loading = motifComponent(&quot;p&quot;, {
+        preconfig: (p) =&gt; p.bindings.display(() =&gt; this.state.loading),
+        initializeComponent: (p) =&gt; {
+          p.class.add(&quot;loading&quot;);
+          p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+        },
+      });
+      const list = motifComponent(&quot;ul&quot;, (ul) =&gt; ul.controls.add(motifComponent({
+        initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; this.notes.list(&quot;notes&quot;), (note) =&gt; motifComponent(&quot;li&quot;, {
+          indexkey: () =&gt; note.id,
+          initializeComponent: (li) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))),
+        })),
+      })));
+      board.controls.add(search, loading, list);
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/NoteBoard.js"><code>import { FromService, motifComponent, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export function NoteBoard() {
+  const notes = FromService(NotesService);
+  const sync = FromService(SyncService);
+  const state = reactive({ loading: true });
+  let search;
+
+  return motifComponent(&quot;section&quot;, {
+    onConfig: async (board) =&gt; {
+      notes.state.items = await sync.pull();
+      state.loading = false;
+      const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+      board.motif.setDisposable(() =&gt; clearInterval(timer));
+    },
+    onMounted: () =&gt; search.element.focus(),
+    initializeComponent: (board) =&gt; {
+      board.class.add(&quot;board&quot;);
+      const field = motifComponent(&quot;input&quot;, {
+        ref: (input) =&gt; (search = input),
+        initializeComponent: (input) =&gt; input.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+      });
+      const loading = motifComponent(&quot;p&quot;, {
+        preconfig: (p) =&gt; p.bindings.display(() =&gt; state.loading),
+        initializeComponent: (p) =&gt; {
+          p.class.add(&quot;loading&quot;);
+          p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+        },
+      });
+      const list = motifComponent(&quot;ul&quot;, (ul) =&gt; ul.controls.add(motifComponent({
+        initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; notes.list(&quot;notes&quot;), (note) =&gt; motifComponent(&quot;li&quot;, {
+          indexkey: () =&gt; note.id,
+          initializeComponent: (li) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))),
+        })),
+      })));
+      board.controls.add(field, loading, list);
+    },
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/pages/NoteBoard.js"><code>import { FromService, motifComponent, motifOptions, reactive } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+import { SyncService } from &quot;../services/sync&quot;;
+
+export const NoteBoard = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  data: reactive({ loading: true }),
+  search: undefined,
+
+  async onConfigured() {
+    const notes = FromService(NotesService);
+    const sync = FromService(SyncService);
+    this.class.add(&quot;board&quot;);
+    notes.state.items = await sync.pull();
+    this.data.loading = false;
+    const timer = setInterval(async () =&gt; (notes.state.items = await sync.pull()), 60_000);
+    this.motif.setDisposable(() =&gt; clearInterval(timer));
+  },
+
+  onMounted() {
+    this.search.element.focus();
+  },
+
+  view() {
+    const notes = FromService(NotesService);
+    const search = motifComponent(&quot;input&quot;, {
+      ref: (field) =&gt; (this.search = field),
+      initializeComponent: (field) =&gt; field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+    });
+    const loading = motifComponent(&quot;p&quot;, {
+      preconfig: (p) =&gt; p.bindings.display(() =&gt; this.data.loading),
+      initializeComponent: (p) =&gt; {
+        p.class.add(&quot;loading&quot;);
+        p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+      },
+    });
+    const list = motifComponent(&quot;ul&quot;, (ul) =&gt; ul.controls.add(motifComponent({
+      initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; notes.list(&quot;notes&quot;), (note) =&gt; motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;))),
+      })),
+    })));
+    return [search, loading, list];
+  },
+});</code></pre>
+</div>
+<p>Her kanca <code>(sender, e)</code> imzasıyla çağrılır: <code>sender</code> bileşenin kendisi, <code>e</code> <code>EventArgs</code> (<code>{ cancel: boolean }</code>). Fonksiyon bileşeninde <code>sender</code> döndürülen köktür; fonksiyonla yazılan <code>NoteBoard</code> zamanlayıcıyı bu kökün <code>motif.setDisposable</code>'ına bağlar.</p>
+<p>Bir kancada fırlatılan hata ya da kancanın döndürdüğü Promise'in reddedilmesi (<code>async</code> kancalar dahil) <code>MotifError</code> <code>MJX122</code> olarak raporlanır: <code>console.error</code>'a yazılır (<code>app.useLogging(false)</code> değilse) ve <code>errorHandler.addListener(fn)</code> dinleyicilerine iletilir; geliştirme modu gerekmez, üretimde de çalışır. Bileşen kurulmaya devam eder. Bu kural <code>initializeComponent</code>, <code>oninitializeComponent</code>, Options API nesnesinin <code>ctor</code>'u, <code>ref</code> geri çağrısı (düz etikette ve sınıf bileşeni etiketinde; bileşen yine oluşturulur) ve kodla <code>motif.on(&quot;x:built&quot;, fn)</code> biçiminde eklenen yaşam döngüsü dinleyicileri (<code>x:mounted</code> dahil) için de geçerlidir.</p>
+<h2 id="prop-hooks">Etikette kanca</h2>
+<p>Her etikete kanca prop olarak yazılabilir; kanca o etiketin bileşenine bağlanır. JSX'siz yazımda aynı adlar nesne biçiminin anahtarlarıdır. Örnekte düz bir etikete <code>onMounted</code>, bir bileşen etiketine (aşağıda anlatılan <code>TitleSync</code>) <code>onDisposing</code> verilir:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NoteBoard.tsx"><code>&lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; onMounted={(field) =&gt; field.element.focus()} /&gt;
+&lt;TitleSync onDisposing={() =&gt; (document.title = &quot;Notlar&quot;)} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NoteBoard.ts"><code>const search = motifComponent(&quot;input&quot;, {
+  onMounted: (field: ComponentBase) =&gt; field.element.focus(),
+  initializeComponent: (field: ComponentBase) =&gt; field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+});
+const title = motifComponent(TitleSync, { onDisposing: () =&gt; (document.title = &quot;Notlar&quot;) });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NoteBoard.jsx"><code>&lt;input type=&quot;search&quot; placeholder=&quot;Notlarda ara&quot; onMounted={(field) =&gt; field.element.focus()} /&gt;
+&lt;TitleSync onDisposing={() =&gt; (document.title = &quot;Notlar&quot;)} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NoteBoard.js"><code>const search = motifComponent(&quot;input&quot;, {
+  onMounted: (field) =&gt; field.element.focus(),
+  initializeComponent: (field) =&gt; field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot; }),
+});
+const title = motifComponent(TitleSync, { onDisposing: () =&gt; (document.title = &quot;Notlar&quot;) });</code></pre>
+</div>
+<p><code>x-</code> ve <code>x:</code> biçimleri de kabul edilir: <code>&lt;ul x-config={…} x:built={…}&gt;</code>. JSX'siz nesnede <code>x-</code> biçimi anahtar olarak çalışır (<code>{ &quot;x-config&quot;: … }</code>); <code>x:</code> biçimini yalnız JSX tanır.</p>
+<blockquote>
+<p><strong>Önemli:</strong> Prop olarak verdiğiniz yaşam döngüsü işleyicileri, sınıf metotlarının <strong>yerini almaz</strong>; ikisi de çalışır (prop işleyicileri toplanır ve sınıf metoduna ek olarak çağrılır).</p>
+</blockquote>
+<p>Aynı etikette bir kancanın birden çok yazımı (<code>on&lt;kanca&gt;</code>, <code>x-&lt;kanca&gt;</code>, <code>x:&lt;kanca&gt;</code>; büyük/küçük harf farkı dahil, örn. <code>onBuilt</code> ile <code>onbuilt</code>) birleşir: hepsi kaynaktaki sırayla birer kez çalışır. JSX'siz yazımda bir anahtara fonksiyon dizisi de verilebilir (<code>onBuilt: [a, b]</code>); dizideki sırayla çalışırlar. Bu, düz DOM etiketinde ve bileşen etiketinde aynıdır; fonksiyon bileşeni etiketinde kancalar, tek yazımla da birleşik yazımla da, fonksiyonun döndürdüğü köke uygulanır. <code>initializing</code>/<code>initialized</code> kancaları fonksiyon bileşeni etiketinde kök kurulur kurulmaz, sınıf bileşeni etiketindeki sırayla çalışır: <code>ref</code> → <code>initializing</code> → <code>initialized</code> → <code>config</code> → … → <code>building</code> → <code>initializeComponent</code> → <code>built</code>. Bu kural <code>built</code>, <code>building</code>, <code>mounted</code>, <code>config</code>, <code>configured</code>, <code>initializing</code>, <code>initialized</code>, <code>disposing</code>, <code>disposed</code>, <code>visibilitychanged</code>, <code>activated</code>, <code>deactivated</code> kancalarının hepsi için geçerlidir:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NoteBoard.tsx"><code>&lt;ul onBuilt={() =&gt; console.log(&quot;önce&quot;)} x-built={() =&gt; console.log(&quot;sonra&quot;)} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NoteBoard.ts"><code>const list = motifComponent(&quot;ul&quot;, { onBuilt: [() =&gt; console.log(&quot;önce&quot;), () =&gt; console.log(&quot;sonra&quot;)] });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NoteBoard.jsx"><code>&lt;ul onBuilt={() =&gt; console.log(&quot;önce&quot;)} x-built={() =&gt; console.log(&quot;sonra&quot;)} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NoteBoard.js"><code>const list = motifComponent(&quot;ul&quot;, { onBuilt: [() =&gt; console.log(&quot;önce&quot;), () =&gt; console.log(&quot;sonra&quot;)] });</code></pre>
+</div>
+<h2 id="initialize-component"><code>initializeComponent</code> — bileşenin kurulum kodu</h2>
+<p><code>initializeComponent</code>, <code>view()</code>'den hemen önce, bileşen başına bir kez çalışır. Derleyici JSX'ten ürettiği kurulum kodunu (etikete yazılan öznitelikler, olaylar, direktifler, çocukların yerleştirilmesi) bu adla verir; JSX'siz yazımda <code>motifComponent(etiket, kurulum)</code> çağrısının ikinci argümanı tam olarak budur. JSX kullanan bir bileşende bağ eklemek ya da çocukları programatik hazırlamak için de kullanılır. <code>TitleSync</code> sekme başlığını not sayısıyla eşler:</p>
+<div class="doc-code" data-file="src/parts/TitleSync.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/TitleSync.tsx"><code>import { Component, ComponentBase } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class TitleSync extends Component&lt;HTMLSpanElement&gt; {
+  notes = this.getService(NotesService)!;
+
+  override initializeComponent(sender: ComponentBase) {
+    sender.bindings.watch(() =&gt; (document.title = `${this.notes.count(&quot;notes&quot;)} not · Notlar`));
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/TitleSync.tsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function TitleSync() {
+  const notes = FromService(NotesService)!;
+  return &lt;span initializeComponent={(sender) =&gt; sender.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`))} /&gt;;
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/TitleSync.tsx"><code>import { FromService, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const TitleSync = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  initializeComponent() {
+    const notes = FromService(NotesService)!;
+    this.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`));
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/TitleSync.ts"><code>import { Component, ComponentBase } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class TitleSync extends Component&lt;HTMLSpanElement&gt; {
+  static override elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService)!;
+
+  override initializeComponent(sender: ComponentBase) {
+    sender.bindings.watch(() =&gt; (document.title = `${this.notes.count(&quot;notes&quot;)} not · Notlar`));
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/TitleSync.ts"><code>import { ComponentBase, FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function TitleSync() {
+  const notes = FromService(NotesService)!;
+  return motifComponent(&quot;span&quot;, (sender: ComponentBase) =&gt; sender.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`)));
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/TitleSync.ts"><code>import { FromService, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const TitleSync = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  initializeComponent() {
+    const notes = FromService(NotesService)!;
+    this.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/TitleSync.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class TitleSync extends Component {
+  static elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService);
+
+  initializeComponent(sender) {
+    sender.bindings.watch(() =&gt; (document.title = `${this.notes.count(&quot;notes&quot;)} not · Notlar`));
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/TitleSync.jsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function TitleSync() {
+  const notes = FromService(NotesService);
+  return &lt;span initializeComponent={(sender) =&gt; sender.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`))} /&gt;;
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/TitleSync.jsx"><code>import { FromService, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const TitleSync = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  initializeComponent() {
+    const notes = FromService(NotesService);
+    this.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`));
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/TitleSync.js"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class TitleSync extends Component {
+  static elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService);
+
+  initializeComponent(sender) {
+    sender.bindings.watch(() =&gt; (document.title = `${this.notes.count(&quot;notes&quot;)} not · Notlar`));
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/TitleSync.js"><code>import { FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function TitleSync() {
+  const notes = FromService(NotesService);
+  return motifComponent(&quot;span&quot;, (sender) =&gt; sender.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`)));
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/TitleSync.js"><code>import { FromService, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const TitleSync = () =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  initializeComponent() {
+    const notes = FromService(NotesService);
+    this.bindings.watch(() =&gt; (document.title = `${notes.count(&quot;notes&quot;)} not · Notlar`));
+  },
+});</code></pre>
+</div>
+<p><code>initializeComponent</code> bir etikete prop olarak da yazılabilir; etiketin bileşeni <code>sender</code> olarak verilir ve kurulumda bir kez çağrılır. Düz DOM etiketinde, sınıf bileşeni etiketinde ve fonksiyon bileşeni etiketinde (fonksiyonun döndürdüğü kökte) anlamı ve zamanlaması aynıdır:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/NoteBoard.tsx"><code>&lt;p class=&quot;count&quot; initializeComponent={(count) =&gt; count.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`)} /&gt;
+&lt;TitleSync initializeComponent={(title) =&gt; title.motif.setDisposable(() =&gt; (document.title = &quot;Notlar&quot;))} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/NoteBoard.ts"><code>const count = motifComponent(&quot;p&quot;, (count: ComponentBase) =&gt; {
+  count.class.add(&quot;count&quot;);
+  count.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`);
+});
+const title = motifComponent(TitleSync, { initializeComponent: (title: ComponentBase) =&gt; title.motif.setDisposable(() =&gt; (document.title = &quot;Notlar&quot;)) });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/NoteBoard.jsx"><code>&lt;p class=&quot;count&quot; initializeComponent={(count) =&gt; count.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`)} /&gt;
+&lt;TitleSync initializeComponent={(title) =&gt; title.motif.setDisposable(() =&gt; (document.title = &quot;Notlar&quot;))} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/NoteBoard.js"><code>const count = motifComponent(&quot;p&quot;, (count) =&gt; {
+  count.class.add(&quot;count&quot;);
+  count.bindings.text(() =&gt; `${notes.count(&quot;notes&quot;)} not`);
+});
+const title = motifComponent(TitleSync, { initializeComponent: (title) =&gt; title.motif.setDisposable(() =&gt; (document.title = &quot;Notlar&quot;)) });</code></pre>
+</div>
+<p>Kullanıcının verdiği ve derleyicinin ürettiği ikisi de çalışır; sıra: bileşenin <code>initializeComponent</code> metodu, etikette verilen, derleyicinin ürettiği.</p>
+<h3 id="on-initialize-component"><code>oninitializeComponent</code> — kurulum kodundan hemen sonra</h3>
+<p>JSX kullanan bir bileşende <code>initializeComponent</code> aşamasını derleyicinin kurulum kodu doldurur. <code>oninitializeComponent</code>, aynı aşamada bu kod bittikten hemen sonra çalışan kancadır. Öznitelikler, olaylar, bağlar ve çocuklar bu anda tanımlanmış olur; <code>view()</code> henüz çağrılmamıştır. Derleyicinin ürettiği kurulumun üzerine kendi kurulumunu eklemek isteyen kod için yeri burasıdır.</p>
+<p><code>build()</code> içindeki sıra:</p>
+<ol>
+<li>Sınıfın <code>initializeComponent</code> metodu.</li>
+<li>Etiketten ya da derleyiciden gelen <code>initializeComponent</code> değerleri.</li>
+<li>Sınıfın <code>oninitializeComponent</code> metodu.</li>
+<li>Etiketten gelen <code>oninitializeComponent</code> değerleri.</li>
+<li><code>view()</code>.</li>
+</ol>
+<p>Sınıf metodu olarak (Options API nesnesinde aynı adlı üye de aynı anda çalışır):</p>
+<div class="doc-code" data-file="src/parts/TagList.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/TagList.tsx"><code>import { Component, ComponentBase, EventArgs } from &quot;@motifx/core&quot;;
+
+export class TagList extends Component&lt;HTMLUListElement&gt; {
+  oninitializeComponent(sender: ComponentBase, e: EventArgs) {
+    sender.class.add(sender.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;);
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/TagList.ts"><code>import { Component, ComponentBase, EventArgs } from &quot;@motifx/core&quot;;
+
+export class TagList extends Component&lt;HTMLUListElement&gt; {
+  static override elementTag = &quot;ul&quot;;
+
+  oninitializeComponent(sender: ComponentBase, e: EventArgs) {
+    sender.class.add(sender.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;);
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/TagList.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class TagList extends Component {
+  static elementTag = &quot;ul&quot;;
+
+  oninitializeComponent(sender, e) {
+    sender.class.add(sender.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;);
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/TagList.js"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class TagList extends Component {
+  static elementTag = &quot;ul&quot;;
+
+  oninitializeComponent(sender, e) {
+    sender.class.add(sender.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;);
+  }
+}</code></pre>
+</div>
+<p>Etikette prop olarak (düz DOM etiketi, sınıf bileşeni etiketi ve fonksiyon bileşeni etiketi; fonksiyon bileşeninde fonksiyonun döndürdüğü köke uygulanır). Bu kanca çalıştığında etikete yazılan çocuklar <code>controls</code> içine eklenmiştir; JSX'siz yazımda nesne biçiminin anahtarıdır ve kurulum fonksiyonunun eklediği ya da <code>childs</code> ile verilen çocuklardan sonra çalışır:</p>
+<div class="doc-code" data-file="src/parts/NoteTags.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteTags.tsx"><code>&lt;ul oninitializeComponent={(list) =&gt; list.class.add(list.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;)}&gt;
+  &lt;li&gt;iş&lt;/li&gt;
+  &lt;li&gt;ev&lt;/li&gt;
+&lt;/ul&gt;
+&lt;TagList oninitializeComponent={(tags) =&gt; tags.attr.add({ &quot;aria-label&quot;: `${tags.controls.items.length} etiket` })}&gt;
+  &lt;li&gt;iş&lt;/li&gt;
+  &lt;li&gt;ev&lt;/li&gt;
+&lt;/TagList&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteTags.ts"><code>const plain = motifComponent(&quot;ul&quot;, {
+  oninitializeComponent: (list: ComponentBase) =&gt; list.class.add(list.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;),
+  initializeComponent: (list: ComponentBase) =&gt; {
+    for (const tag of [&quot;iş&quot;, &quot;ev&quot;]) {
+      list.controls.add(motifComponent(&quot;li&quot;, (li: ComponentBase) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(tag)))));
+    }
+  },
+});
+const labelled = motifComponent(TagList, {
+  oninitializeComponent: (tags: ComponentBase) =&gt; tags.attr.add({ &quot;aria-label&quot;: `${tags.controls.items.length} etiket` }),
+  childs: [&quot;iş&quot;, &quot;ev&quot;].map((tag) =&gt; motifComponent(&quot;li&quot;, (li: ComponentBase) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(tag))))),
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteTags.jsx"><code>&lt;ul oninitializeComponent={(list) =&gt; list.class.add(list.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;)}&gt;
+  &lt;li&gt;iş&lt;/li&gt;
+  &lt;li&gt;ev&lt;/li&gt;
+&lt;/ul&gt;
+&lt;TagList oninitializeComponent={(tags) =&gt; tags.attr.add({ &quot;aria-label&quot;: `${tags.controls.items.length} etiket` })}&gt;
+  &lt;li&gt;iş&lt;/li&gt;
+  &lt;li&gt;ev&lt;/li&gt;
+&lt;/TagList&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteTags.js"><code>const plain = motifComponent(&quot;ul&quot;, {
+  oninitializeComponent: (list) =&gt; list.class.add(list.controls.items.length &gt; 5 ? &quot;tags tags--many&quot; : &quot;tags&quot;),
+  initializeComponent: (list) =&gt; {
+    for (const tag of [&quot;iş&quot;, &quot;ev&quot;]) {
+      list.controls.add(motifComponent(&quot;li&quot;, (li) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(tag)))));
+    }
+  },
+});
+const labelled = motifComponent(TagList, {
+  oninitializeComponent: (tags) =&gt; tags.attr.add({ &quot;aria-label&quot;: `${tags.controls.items.length} etiket` }),
+  childs: [&quot;iş&quot;, &quot;ev&quot;].map((tag) =&gt; motifComponent(&quot;li&quot;, (li) =&gt; li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(tag))))),
+});</code></pre>
+</div>
+<h2 id="visibility">Görünürlük — <code>motif.show</code> / <code>motif.hide</code> / <code>motif.toggle</code></h2>
+<p>Bir bileşeni serbest bırakmadan gizleyip gösterebilirsiniz:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/pages/NoteBoard.ts"><code>await this.motif.hide();     // gizle (varsa çıkış animasyonu oynatılır)
+await this.motif.show();     // göster (varsa giriş animasyonu)
+this.motif.toggle();         // tersine çevir
+this.isVisible;              // mevcut görünürlük</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/pages/NoteBoard.ts"><code>await panel.motif.hide();    // gizle (varsa çıkış animasyonu oynatılır)
+await panel.motif.show();    // göster (varsa giriş animasyonu)
+panel.motif.toggle();        // tersine çevir
+panel.isVisible;             // mevcut görünürlük</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/pages/NoteBoard.js"><code>await this.motif.hide();     // gizle (varsa çıkış animasyonu oynatılır)
+await this.motif.show();     // göster (varsa giriş animasyonu)
+this.motif.toggle();         // tersine çevir
+this.isVisible;              // mevcut görünürlük</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/pages/NoteBoard.js"><code>await panel.motif.hide();    // gizle (varsa çıkış animasyonu oynatılır)
+await panel.motif.show();    // göster (varsa giriş animasyonu)
+panel.motif.toggle();        // tersine çevir
+panel.isVisible;             // mevcut görünürlük</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde bu çağrılar bileşenin kendisi üzerindedir (örnekte <code>panel</code>): JSX'te kökün <code>onConfig</code> kancasına ya da <code>ref</code>'ine gelen bileşen, JSX'siz yazımda kökü kuran <code>motifComponent</code> fonksiyonunun aldığı bileşen.</p>
+</div>
+<p>Görünürlük değişince <code>onVisibilityChanged(sender, e)</code> çalışır; kanca <code>isVisible</code> güncellenmeden önce çağrılır. Yeni durum olay argümanındadır: <code>e.visible</code> gösterilirken <code>true</code>, gizlenirken <code>false</code>; <code>isVisible</code> o an önceki durumu verir. Aynı argüman <code>onVisibilityChanged</code> prop'una ve <code>motif.on(&quot;x:visibilityChanged&quot;, …)</code> dinleyicisine de gelir. Gizlenen bileşen ve alt ağacı <code>onDeactivated</code>, yeniden gösterilince <code>onActivated</code> alır. Bağlar gizliyken de çalışmayı sürdürür; bileşen gösterildiğinde güncel değerle görünür. Elemanı olmayan (fragment) bileşende de aynı sıra geçerlidir: çocukların elemanları kendi izleriyle (<code>&lt;!--h--&gt;</code>) yer değiştirir ve kendi çıkış/giriş geçişlerini oynatır, bildirim önce fragment'a sonra görünür çocuklara gider; çocukların kendi <code>isVisible</code>'ı değişmez, ayrıca gizlenmiş bir çocuk fragment gösterilince gizli kalır; fragment gizliyken eklenen çocuk (yeni, önceden kurulmuş ya da başka bir ebeveynden taşınmış) da gizli kalır; yeri <code>controls</code> içindeki sırasıyla bellidir ve fragment gösterilince o yere yerleşir.</p>
+<h3 id="hide-strategy">Gizleme stratejisi — <code>hideStrategy</code></h3>
+<p>Gizlenen bir bileşenin DOM'da nasıl ele alınacağını <code>hideStrategy</code> belirler:</p>
+<table>
+<thead>
+<tr>
+<th>Değer</th>
+<th>Davranış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'placeholder'</code></td>
+<td>Eleman DOM'dan çıkar, yerine <code>&lt;!--h--&gt;</code> yorum izi konur; gösterirken izle yer değiştirir. <code>controls.move</code> ve liste sıralaması izi bileşenle birlikte taşır.</td>
+</tr>
+<tr>
+<td><code>'detach'</code></td>
+<td>DOM'dan iz bırakmadan çıkarılır; gösterilince ebeveyndeki sırasına göre yeniden eklenir.</td>
+</tr>
+<tr>
+<td><code>'auto'</code> (varsayılan)</td>
+<td><code>placeholder</code> gibi davranır; <code>.map</code> satırları ve <code>key</code> verilmiş öğeler dahil her bileşen yerinde iz bırakır.</td>
+</tr>
+</tbody>
+</table>
+<p>Strateji <code>options</code> ile verilir; JSX'te prop, JSX'siz yazımda nesne biçiminin anahtarıdır. Programatik olarak <code>motif.options.hideStrategy</code> alanına yazılır:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/pages/NoteBoard.tsx"><code>&lt;p class=&quot;loading&quot; options={{ hideStrategy: &quot;detach&quot; }} x-display={() =&gt; this.state.loading}&gt;Yükleniyor…&lt;/p&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/NoteBoard.tsx"><code>&lt;p class=&quot;loading&quot; options={{ hideStrategy: &quot;detach&quot; }} x-display={() =&gt; state.loading}&gt;Yükleniyor…&lt;/p&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/pages/NoteBoard.ts"><code>const loading = motifComponent(&quot;p&quot;, {
+  options: { hideStrategy: &quot;detach&quot; },
+  preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; this.state.loading),
+  initializeComponent: (p: ComponentBase) =&gt; {
+    p.class.add(&quot;loading&quot;);
+    p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/NoteBoard.ts"><code>const loading = motifComponent(&quot;p&quot;, {
+  options: { hideStrategy: &quot;detach&quot; },
+  preconfig: (p: ComponentBase) =&gt; p.bindings.display(() =&gt; state.loading),
+  initializeComponent: (p: ComponentBase) =&gt; {
+    p.class.add(&quot;loading&quot;);
+    p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/pages/NoteBoard.jsx"><code>&lt;p class=&quot;loading&quot; options={{ hideStrategy: &quot;detach&quot; }} x-display={() =&gt; this.state.loading}&gt;Yükleniyor…&lt;/p&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/NoteBoard.jsx"><code>&lt;p class=&quot;loading&quot; options={{ hideStrategy: &quot;detach&quot; }} x-display={() =&gt; state.loading}&gt;Yükleniyor…&lt;/p&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/pages/NoteBoard.js"><code>const loading = motifComponent(&quot;p&quot;, {
+  options: { hideStrategy: &quot;detach&quot; },
+  preconfig: (p) =&gt; p.bindings.display(() =&gt; this.state.loading),
+  initializeComponent: (p) =&gt; {
+    p.class.add(&quot;loading&quot;);
+    p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/NoteBoard.js"><code>const loading = motifComponent(&quot;p&quot;, {
+  options: { hideStrategy: &quot;detach&quot; },
+  preconfig: (p) =&gt; p.bindings.display(() =&gt; state.loading),
+  initializeComponent: (p) =&gt; {
+    p.class.add(&quot;loading&quot;);
+    p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Yükleniyor…&quot;)));
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="class,options" data-file="src/pages/NoteBoard.ts"><code>this.motif.options.hideStrategy = &quot;detach&quot;;</code></pre>
+<pre data-lang="ts" data-variant="function" data-file="src/pages/NoteBoard.ts"><code>panel.motif.options.hideStrategy = &quot;detach&quot;;</code></pre>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Fonksiyon bileşeninde <code>state</code> bileşenin <code>reactive</code> ile kurduğu yerel durumdur.</p>
+</div>
+<p><code>options</code> bileşenin kendi ayar nesnesidir; çerçevenin tanıdığı anahtarlar okunur: <code>hideStrategy</code> ve <code>disableDisposal</code> <code>motif.options</code>'a kopyalanır, <code>isSvg</code> elemanın ad alanını belirler (bkz. <a href="/tr/docs/components#root-element">Kök eleman</a>); diğer anahtarlar yok sayılır. Bu adı veri prop'u olarak kullanmayın. Fonksiyon bileşeni etiketine yazılan <code>options</code> döndürülen köke uygulanır.</p>
+<h2 id="wait">Bekletme — <code>isWait</code> / <code>x-wait</code></h2>
+<p><code>x-wait</code> direktifi bir bileşenin DOM'a eklenmesini bir koşula bağlar; programatik karşılığı <code>isWait</code> özelliğidir (<code>isWait</code> bir JSX prop'u değildir). Koşul <code>true</code> iken bileşen bekletilir (gizli/eklenmemiş), <code>false</code> olunca eklenir. Koşullu gösterimde birincil yöntem budur — bkz. <a href="/tr/docs/conditionals-and-lists">Koşullu Gösterim ve Listeler</a>. Örnekte bileşen etiketi <code>x-wait</code> koşulu <code>true</code> olduğu sürece kurulmaz:</p>
+<p><code>x-chunk</code> ile dilimlenen bir çocuk da sırası gelene kadar <code>isWait</code> ile bekler ve izini bırakır; sırası geldiğinde çerçeve bekletmeyi kaldırır. Siz daha önce <code>isWait = false</code> yazarsanız çocuk hemen kurulur ve dilim sırasından çıkar — bkz. <a href="/tr/docs/conditionals-and-lists#large-lists">Büyük listeler</a>.</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript,declarative/options/typescript" data-file="src/pages/NoteBoard.tsx"><code>&lt;TitleSync x-wait={() =&gt; this.state.loading} /&gt;</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/NoteBoard.tsx"><code>&lt;TitleSync x-wait={() =&gt; state.loading} /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript,imperative/options/typescript" data-file="src/pages/NoteBoard.ts"><code>const title = motifComponent(TitleSync, { preconfig: (title: ComponentBase) =&gt; title.bindings.wait(() =&gt; this.state.loading) });</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/NoteBoard.ts"><code>const title = motifComponent(TitleSync, { preconfig: (title: ComponentBase) =&gt; title.bindings.wait(() =&gt; state.loading) });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript,declarative/options/javascript" data-file="src/pages/NoteBoard.jsx"><code>&lt;TitleSync x-wait={() =&gt; this.state.loading} /&gt;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/NoteBoard.jsx"><code>&lt;TitleSync x-wait={() =&gt; state.loading} /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript,imperative/options/javascript" data-file="src/pages/NoteBoard.js"><code>const title = motifComponent(TitleSync, { preconfig: (title) =&gt; title.bindings.wait(() =&gt; this.state.loading) });</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/NoteBoard.js"><code>const title = motifComponent(TitleSync, { preconfig: (title) =&gt; title.bindings.wait(() =&gt; state.loading) });</code></pre>
+</div>
+<p>Programatik:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/pages/NoteBoard.ts"><code>this.isWait = true;   // beklet
+this.isWait = false;  // devam et (gerekirse DOM'a eklenir)</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/pages/NoteBoard.ts"><code>panel.isWait = true;   // beklet
+panel.isWait = false;  // devam et (gerekirse DOM'a eklenir)</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/pages/NoteBoard.js"><code>this.isWait = true;   // beklet
+this.isWait = false;  // devam et (gerekirse DOM'a eklenir)</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/pages/NoteBoard.js"><code>panel.isWait = true;   // beklet
+panel.isWait = false;  // devam et (gerekirse DOM'a eklenir)</code></pre>
+</div>
+<p>Yaşam döngüsü açısından önemli iki nokta:</p>
+<ul>
+<li>Koşul <strong>başlangıçta</strong> <code>true</code> ise <code>build()</code> koşul <code>false</code> olana kadar çalışmaz. <code>onConfig</code>/<code>onConfigured</code> çalışır; <code>onBuilding</code>/<code>onBuilt</code>/<code>onMounted</code> kancaları o ana kadar tetiklenmez, bileşenin alt ağacı kurulmaz ve DOM'a girmez. Yerinde yalnız <code>&lt;!--h--&gt;</code> izi durur; koşul <code>false</code> olunca bileşen kurulur ve bu izin yerine girer.</li>
+<li>Bekleme durumuna geri dönmek <strong>serbest bırakmaz</strong>. <code>onDisposing</code>/<code>onDisposed</code> çalışmaz, iç durum korunur; bileşen gizlenir ve <code>onDeactivated</code> alır. Gerçekten serbest bırakma istiyorsanız <code>{koşul &amp;&amp; &lt;X/&gt;}</code> (JSX'siz yazımda <code>bindings.when(koşulFn, kurFn)</code>) kullanın ya da <code>dispose()</code> çağırın.</li>
+</ul>
+<h2 id="dispose">Serbest bırakma (dispose)</h2>
+<p>Gerekmeyen bir bileşen serbest bırakılır. Bu; olay dinleyicilerini kaldırır, bağları deaktive eder, çocukları özyinelemeli serbest bırakır ve DOM'dan söker:</p>
+<div class="doc-code" data-file="src/pages/NoteBoard.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/pages/NoteBoard.ts"><code>await this.dispose();                               // varsayılan: { deep: true } + çıkış animasyonu
+await this.dispose({ skipLeaveTransition: true });  // animasyonsuz
+await this.dispose({ deep: false });                // çocuklarda başvuru temizliğini atla
+await this.disposeAsync();                          // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/pages/NoteBoard.ts"><code>await panel.dispose();                              // varsayılan: { deep: true } + çıkış animasyonu
+await panel.dispose({ skipLeaveTransition: true }); // animasyonsuz
+await panel.dispose({ deep: false });               // çocuklarda başvuru temizliğini atla
+await panel.disposeAsync();                         // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/pages/NoteBoard.js"><code>await this.dispose();                               // varsayılan: { deep: true } + çıkış animasyonu
+await this.dispose({ skipLeaveTransition: true });  // animasyonsuz
+await this.dispose({ deep: false });                // çocuklarda başvuru temizliğini atla
+await this.disposeAsync();                          // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/pages/NoteBoard.js"><code>await panel.dispose();                              // varsayılan: { deep: true } + çıkış animasyonu
+await panel.dispose({ skipLeaveTransition: true }); // animasyonsuz
+await panel.dispose({ deep: false });               // çocuklarda başvuru temizliğini atla
+await panel.disposeAsync();                         // çocukların serbest bırakılması: çıkış geçişi oynatılmaz, süren animasyonlar durdurulur</code></pre>
+</div>
+<p><code>deep</code> (varsayılan <code>true</code>) çocuk bileşenlerde başvuru temizliğini (<code>element</code>, <code>props</code>, <code>childs</code>, olay haritaları) de yapar; kök bileşen her zaman temizlenir. <code>disposeAsync</code>, çerçevenin bir ebeveyn serbest bırakılırken çocuklar için kullandığı yoldur; dışarıdan çağrılırsa bileşen çıkış geçişi beklemeden söner. Süren bir serbest bırakma varken ikinci <code>dispose</code>/<code>disposeAsync</code> çağrısı yenisini başlatmaz, aynı Promise'i döndürür.</p>
+<p><code>controls.remove(child)</code> veya <code>controls.clear()</code> da ilgili çocukları serbest bırakır. JSX ile ya da <code>motifComponent</code> ile kurduğunuz her şey (dinleyiciler, bağlar, çocuklar, <code>context.on</code> abonelikleri) kendiliğinden temizlenir; zamanlayıcı, gözlemci, soket gibi dış kaynakları <code>motif.setDisposable</code> ile kaydedersiniz (<code>NoteBoard</code>'daki <code>setInterval</code> gibi). Ayrıntı için <a href="/tr/docs/memory-and-dispose">Bellek Yönetimi ve Serbest Bırakma</a>.</p>
+<h2 id="app-lifecycle">Uygulama yaşam döngüsü — <code>app.onLifecycle</code></h2>
+<p>Bileşen kancalarından ayrı olarak, uygulamanın bütünü için de bir yaşam döngüsü vardır: sekme arka plana alınır, mobil işletim sistemi sayfayı dondurur, bağlantı kopar. Yoklama, websocket ve zamanlayıcıları duraklatıp sürdürmek, dönüşte bayat veriyi yenilemek için:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>const off = app.onLifecycle(async ({ state }) =&gt; {
+  switch (state) {
+    case &quot;hidden&quot;:   poller.pause(); break;           // sekme/uygulama arka planda
+    case &quot;visible&quot;:  poller.resume(); break;
+    case &quot;frozen&quot;:   socket.close(); break;           // tarayıcı sayfayı dondurdu
+    case &quot;resumed&quot;:  socket.open(); break;
+    case &quot;restored&quot;: notes.state.items = await sync.pull(); break;  // geri/ileri önbelleğinden (bfcache) döndü
+    case &quot;offline&quot;:  offlineBanner.motif.show(); break;
+    case &quot;online&quot;:   offlineBanner.motif.hide(); break;
+  }
+});
+off(); // abonelikten çık</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>const off = app.onLifecycle(async ({ state }) =&gt; {
+  switch (state) {
+    case &quot;hidden&quot;:   poller.pause(); break;           // sekme/uygulama arka planda
+    case &quot;visible&quot;:  poller.resume(); break;
+    case &quot;frozen&quot;:   socket.close(); break;           // tarayıcı sayfayı dondurdu
+    case &quot;resumed&quot;:  socket.open(); break;
+    case &quot;restored&quot;: notes.state.items = await sync.pull(); break;  // geri/ileri önbelleğinden (bfcache) döndü
+    case &quot;offline&quot;:  offlineBanner.motif.show(); break;
+    case &quot;online&quot;:   offlineBanner.motif.hide(); break;
+  }
+});
+off(); // abonelikten çık</code></pre>
+</div>
+<p><code>app.isVisible</code> ve <code>app.isOnline</code> anlık durumu verir. Tarayıcı dinleyicileri yalnızca ilk abonelikte kurulur (kullanılmıyorsa maliyeti sıfırdır) ve <code>app.dispose()</code> ile kaldırılır. Abonelik bir bileşenin ömrüne bağlı değildir; bileşen içinden açıyorsanız <code>off</code>'u bileşenin <code>motif.setDisposable(off)</code>'u ile kaydedin (sınıfta ve Options'ta <code>this.motif</code>, fonksiyon bileşeninde <a href="/tr/docs/components#function-root">kök bileşenin</a> <code>motif</code>'i).</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Stil ve animasyon sistemini öğrenmek için <a href="/tr/docs/styling-and-transitions">Stil ve Animasyon</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

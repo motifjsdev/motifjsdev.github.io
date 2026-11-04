@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="A component&#x27;s state flags, its reactive state and `setState`; reaching the application (`context`) and services; `build` and `dispose`.">
+    <title>State, Context and Services — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/component-state">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-state">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-state">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-state">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/component-state">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="State, Context and Services">
+    <meta property="og:description" content="A component&#x27;s state flags, its reactive state and `setState`; reaching the application (`context`) and services; `build` and `dispose`.">
+    <script type="application/json" id="doc-data">{"slug":"component-state","locale":"en","title":"State, Context and Services","description":"A component\u0027s state flags, its reactive state and \u0060setState\u0060; reaching the application (\u0060context\u0060) and services; \u0060build\u0060 and \u0060dispose\u0060.","category":{"id":"2","title":"Core concepts"},"html":"\u003Ch2 id=\u0022flags\u0022\u003EState flags\u003C/h2\u003E\n\u003Cp\u003EA component reports where it is in its lifecycle through flags. MotifJS manages the flags; your code reads them and does not write them.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EFlag\u003C/th\u003E\n\u003Cth\u003EWhen it is \u003Ccode\u003Etrue\u003C/code\u003E\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisInitialized\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOnce the constructor has finished.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisConfigured\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOnce the configuration phase has passed: in the constructor for a plain \u003Ccode\u003EComponent\u003C/code\u003E, at the start of the build for a class component.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisBuilt\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOnce the component is built (\u003Ccode\u003Ebuild()\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisVisible\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhile it is visible. It turns \u003Ccode\u003Efalse\u003C/code\u003E with \u003Ccode\u003Emotif.hide()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisWait\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhile the component is waiting: while an \u003Ccode\u003Ex-wait\u003C/code\u003E or \u003Ccode\u003Ebindings.wait\u003C/code\u003E condition holds, and while an \u003Ccode\u003Ex-display\u003C/code\u003E condition is \u003Ccode\u003Efalse\u003C/code\u003E. A waiting component is not built.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisDisposed\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOnce it has been disposed. From then on the component\u0027s methods do nothing.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Ex-display\u003C/code\u003E and \u003Ccode\u003Emotif.hide()\u003C/code\u003E touch different flags: a component whose \u003Ccode\u003Ex-display\u003C/code\u003E condition is \u003Ccode\u003Efalse\u003C/code\u003E is \u003Ccode\u003EisWait\u003C/code\u003E and may not be built; a component hidden with \u003Ccode\u003Emotif.hide()\u003C/code\u003E is built, only its \u003Ccode\u003EisVisible\u003C/code\u003E is \u003Ccode\u003Efalse\u003C/code\u003E (see \u003Ca href=\u0022/docs/lifecycle#visibility\u0022\u003EVisibility\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022state\u0022\u003EA component\u0027s state\u003C/h2\u003E\n\u003Cp\u003EA component\u0027s changing data is kept in a reactive object: a field in a class (\u003Ccode\u003Estate = reactive({ … })\u003C/code\u003E), a local variable in a function component, and the \u003Ccode\u003Edata\u003C/code\u003E field in Options. Bindings that read this object update on their own when the object changes (see \u003Ca href=\u0022/docs/reactivity#component-state\u0022\u003EState in a component\u003C/a\u003E). \u003Ccode\u003Ethis.useModel(model)\u003C/code\u003E is the same as \u003Ccode\u003Ereactive(model)\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003EIf data that is not reactive has changed, the bindings do not notice it on their own. In that case you make the bindings read again by hand:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003EsetState()\u003C/code\u003E runs the children\u0027s bindings first, then the component\u0027s own.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EreState()\u003C/code\u003E runs the component\u0027s own bindings first, then its children\u0027s.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003ENeither one rebuilds the component: \u003Ccode\u003Eview()\u003C/code\u003E is not called again and the \u003Ccode\u003Echilds\u003C/code\u003E slot does not change; only the bindings read their values again.\u003C/p\u003E\n\u003Ch2 id=\u0022context\u0022\u003EContext (\u003Ccode\u003Econtext\u003C/code\u003E) — reaching the application\u003C/h2\u003E\n\u003Cp\u003EEvery component reaches the application through \u003Ccode\u003Econtext\u003C/code\u003E by climbing its parent chain (\u003Ccode\u003Ethis.context\u003C/code\u003E in a class and in Options, and in a function component the \u003Ccode\u003Econtext\u003C/code\u003E of the \u003Ca href=\u0022/docs/components#function-root\u0022\u003Eroot component\u003C/a\u003E); a component that has no parent yet (in the constructor, in \u003Ccode\u003EonInitializing\u003C/code\u003E) reaches the running application as well. \u003Ccode\u003Econtext\u003C/code\u003E is a view of the running \u003Ccode\u003EApplication\u003C/code\u003E tied to the component, and its members are the application\u0027s: \u003Ccode\u003Enavigate\u003C/code\u003E, \u003Ccode\u003Eon\u003C/code\u003E, \u003Ccode\u003Efire\u003C/code\u003E, \u003Ccode\u003EonRouterChanged\u003C/code\u003E …\u003C/p\u003E\n\u003Cp\u003EThe \u003Ccode\u003Eon\u003C/code\u003E and \u003Ccode\u003EonRouterChanged\u003C/code\u003E subscriptions opened through \u003Ccode\u003Econtext\u003C/code\u003E are tied to the component\u0027s lifetime and are removed on their own when the component is disposed. That does not hold for \u003Ccode\u003EonLifecycle\u003C/code\u003E; tie the returned cancel function to the component with its \u003Ccode\u003Emotif.setDisposable(off)\u003C/code\u003E (\u003Ccode\u003Ethis.motif\u003C/code\u003E in a class and in Options, the root component\u0027s \u003Ccode\u003Emotif\u003C/code\u003E in a function component). For application events, see \u003Ca href=\u0022/docs/events#app-events\u0022\u003EEvents\u003C/a\u003E.\u003C/p\u003E\n\u003Cp\u003EA function component has no \u003Ccode\u003Ethis\u003C/code\u003E. The same work is done through the \u003Ccode\u003Econtext\u003C/code\u003E of the root, or of the component a hook receives (\u003Ccode\u003Esender.context\u003C/code\u003E), or with \u003Ccode\u003EuseNavigation()\u003C/code\u003E; \u003Ccode\u003EuseNavigation().navigate(address)\u003C/code\u003E navigates the same way as \u003Ccode\u003Econtext.navigate\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022services\u0022\u003EReaching services\u003C/h2\u003E\n\u003Cp\u003EServices registered with DI are reached in two ways. \u003Ccode\u003EgetService\u003C/code\u003E exists on every component: \u003Ccode\u003Ethis.getService(T)\u003C/code\u003E in class and Options components, and in a function component \u003Ccode\u003Esender.getService(T)\u003C/code\u003E through the \u003Ccode\u003Esender\u003C/code\u003E that a hook written on the root (for example \u003Ccode\u003EonConfig\u003C/code\u003E) receives. \u003Ccode\u003EFromService(T)\u003C/code\u003E works anywhere, the body of a function component included. For a singleton service both give the same instance; for a \u003Ccode\u003Escoped\u003C/code\u003E service \u003Ccode\u003EgetService\u003C/code\u003E is tied to the component\u0027s own provider, while \u003Ccode\u003EFromService\u003C/code\u003E resolves from the application\u0027s current provider (see \u003Ca href=\u0022/docs/dependency-injection\u0022\u003EDependency Injection\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003EThe header of the notes list shows the folder\u0027s name and the number of notes; the \u0026quot;New note\u0026quot; button creates a note through the service and takes the application to it:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NotesHead.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NotesHead.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesHead extends Component\u0026lt;HTMLDivElement, { folder: Folder }\u0026gt; {\n  notes = this.getService(NotesService)!;\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  }\n\n  override view() {\n    const { folder } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h2\u0026gt;\n          {FOLDERS[folder].title} \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; String(this.notes.count(folder))}\u0026lt;/span\u0026gt;\n        \u0026lt;/h2\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm accent\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;\n          New note\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesHead extends Component\u0026lt;HTMLDivElement, { folder: Folder }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n  notes = this.getService(NotesService)!;\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  }\n\n  override view() {\n    const { folder } = this.props;\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; String(this.notes.count(folder)));\n      });\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0060${FOLDERS[folder].title} \u0060)), badge);\n    });\n    const create = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.class.add(\u0026quot;button--sm accent\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n      button.setText(\u0026quot;New note\u0026quot;);\n    });\n    return motifFragment({ childs: [title, create] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NotesHead.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesHead(props: { folder: Folder }) {\n  const { folder } = props;\n  const notes = FromService(NotesService)!;\n  const nav = useNavigation();\n\n  const create = () =\u0026gt; {\n    const note = notes.create();\n    nav.navigate(\u0060/notes/${note.id}\u0060);\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;list__head\u0026quot;\u0026gt;\n      \u0026lt;h2\u0026gt;\n        {FOLDERS[folder].title} \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; String(notes.count(folder))}\u0026lt;/span\u0026gt;\n      \u0026lt;/h2\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm accent\u0026quot; onclick={create}\u0026gt;\n        New note\n      \u0026lt;/button\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesHead(props: { folder: Folder }) {\n  const { folder } = props;\n  const notes = FromService(NotesService)!;\n  const nav = useNavigation();\n\n  const create = () =\u0026gt; {\n    const note = notes.create();\n    nav.navigate(\u0060/notes/${note.id}\u0060);\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, (head: ComponentBase) =\u0026gt; {\n    head.class.add(\u0026quot;list__head\u0026quot;);\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; String(notes.count(folder)));\n      });\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0060${FOLDERS[folder].title} \u0060)), badge);\n    });\n    const button = motifComponent(\u0026quot;button\u0026quot;, (b: ComponentBase) =\u0026gt; {\n      b.attr.add({ type: \u0026quot;button\u0026quot; });\n      b.class.add(\u0026quot;button--sm accent\u0026quot;);\n      b.motif.on(\u0026quot;click\u0026quot;, create);\n      b.setText(\u0026quot;New note\u0026quot;);\n    });\n    head.controls.add(title, button);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NotesHead.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesHead = (props: { folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  },\n\n  view() {\n    const { folder } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h2\u0026gt;\n          {FOLDERS[folder].title} \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; String(this.notes.count(folder))}\u0026lt;/span\u0026gt;\n        \u0026lt;/h2\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm accent\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;\n          New note\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NotesHead.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesHead = (props: { folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  },\n\n  view() {\n    const { folder } = props;\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; String(this.notes.count(folder)));\n      });\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0060${FOLDERS[folder].title} \u0060)), badge);\n    });\n    const create = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.class.add(\u0026quot;button--sm accent\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n      button.setText(\u0026quot;New note\u0026quot;);\n    });\n    return motifFragment({ childs: [title, create] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NotesHead.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesHead extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  notes = this.getService(NotesService);\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  }\n\n  view() {\n    const { folder } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h2\u0026gt;\n          {FOLDERS[folder].title} \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; String(this.notes.count(folder))}\u0026lt;/span\u0026gt;\n        \u0026lt;/h2\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm accent\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;\n          New note\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NotesHead.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NotesHead extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  notes = this.getService(NotesService);\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  }\n\n  view() {\n    const { folder } = this.props;\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; String(this.notes.count(folder)));\n      });\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0060${FOLDERS[folder].title} \u0060)), badge);\n    });\n    const create = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.class.add(\u0026quot;button--sm accent\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n      button.setText(\u0026quot;New note\u0026quot;);\n    });\n    return motifFragment({ childs: [title, create] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NotesHead.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesHead(props) {\n  const { folder } = props;\n  const notes = FromService(NotesService);\n  const nav = useNavigation();\n\n  const create = () =\u0026gt; {\n    const note = notes.create();\n    nav.navigate(\u0060/notes/${note.id}\u0060);\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;list__head\u0026quot;\u0026gt;\n      \u0026lt;h2\u0026gt;\n        {FOLDERS[folder].title} \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; String(notes.count(folder))}\u0026lt;/span\u0026gt;\n      \u0026lt;/h2\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm accent\u0026quot; onclick={create}\u0026gt;\n        New note\n      \u0026lt;/button\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NotesHead.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NotesHead(props) {\n  const { folder } = props;\n  const notes = FromService(NotesService);\n  const nav = useNavigation();\n\n  const create = () =\u0026gt; {\n    const note = notes.create();\n    nav.navigate(\u0060/notes/${note.id}\u0060);\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, (head) =\u0026gt; {\n    head.class.add(\u0026quot;list__head\u0026quot;);\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; String(notes.count(folder)));\n      });\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0060${FOLDERS[folder].title} \u0060)), badge);\n    });\n    const button = motifComponent(\u0026quot;button\u0026quot;, (b) =\u0026gt; {\n      b.attr.add({ type: \u0026quot;button\u0026quot; });\n      b.class.add(\u0026quot;button--sm accent\u0026quot;);\n      b.motif.on(\u0026quot;click\u0026quot;, create);\n      b.setText(\u0026quot;New note\u0026quot;);\n    });\n    head.controls.add(title, button);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NotesHead.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesHead = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  },\n\n  view() {\n    const { folder } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;h2\u0026gt;\n          {FOLDERS[folder].title} \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; String(this.notes.count(folder))}\u0026lt;/span\u0026gt;\n        \u0026lt;/h2\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; class=\u0026quot;button--sm accent\u0026quot; onclick={() =\u0026gt; this.create()}\u0026gt;\n          New note\n        \u0026lt;/button\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NotesHead.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NotesHead = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  create() {\n    const note = this.notes.create();\n    this.context.navigate(\u0060/notes/${note.id}\u0060);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;list__head\u0026quot;);\n  },\n\n  view() {\n    const { folder } = props;\n    const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; String(this.notes.count(folder)));\n      });\n      h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0060${FOLDERS[folder].title} \u0060)), badge);\n    });\n    const create = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.class.add(\u0026quot;button--sm accent\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.create());\n      button.setText(\u0026quot;New note\u0026quot;);\n    });\n    return motifFragment({ childs: [title, create] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe notes list places the header with \u003Ccode\u003E\u0026lt;NotesHead folder={this.folder} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003EThe notes list places the header with \u003Ccode\u003Enew NotesHead({ folder: this.folder })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003EThe notes list places the header with \u003Ccode\u003EmotifComponent(NotesHead, { folder: this.folder })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022build-dispose\u0022\u003E\u003Ccode\u003Ebuild\u003C/code\u003E and \u003Ccode\u003Edispose\u003C/code\u003E\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EYou do not need to build a component by hand: it is built when it is added to a built parent, together with a parent that is not built yet, or when it is made the root with \u003Ccode\u003Eapp.run\u003C/code\u003E (see \u003Ca href=\u0022/docs/component-creation#create-and-build\u0022\u003ECreation and building\u003C/a\u003E). \u003Ccode\u003Ebuild()\u003C/code\u003E runs once; on a component that is built, waiting or disposed it does nothing.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Edispose()\u003C/code\u003E takes the component out of the tree and disposes it together with its subtree, playing the leave transition first if there is one. It returns a promise that resolves when it is finished; a second call during a disposal that is still running gives the same promise. The way to remove a parent\u0027s child is \u003Ccode\u003Econtrols.remove(child)\u003C/code\u003E, which disposes it as well.\u003C/li\u003E\n\u003Cli\u003EA disposed component\u0027s bindings, \u003Ccode\u003Emotif.on\u003C/code\u003E listeners, \u003Ccode\u003Econtext\u003C/code\u003E subscriptions and \u003Ccode\u003EsetDisposable\u003C/code\u003E registrations are released on their own. To avoid using the result of a promise that arrives after disposal, there are \u003Ca href=\u0022/docs/using\u0022\u003Eusing\u003C/a\u003E and \u003Ca href=\u0022/docs/do-work\u0022\u003EdoWork\u003C/a\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo drop an async result that arrives after disposal, go on to \u003Ca href=\u0022/docs/using\u0022\u003EAsync Results with using\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"flags","text":"State flags","level":2},{"id":"state","text":"A component\u0027s state","level":2},{"id":"context","text":"Context (context) — reaching the application","level":2},{"id":"services","text":"Reaching services","level":2},{"id":"build-dispose","text":"build and dispose","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"component-bindings","title":"bindings"},"next":{"slug":"using","title":"Async Results with using"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Core concepts</p>
+        <h1>State, Context and Services</h1>
+        <p>A component&#x27;s state flags, its reactive state and `setState`; reaching the application (`context`) and services; `build` and `dispose`.</p>
+<h2 id="flags">State flags</h2>
+<p>A component reports where it is in its lifecycle through flags. MotifJS manages the flags; your code reads them and does not write them.</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>When it is <code>true</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isInitialized</code></td>
+<td>Once the constructor has finished.</td>
+</tr>
+<tr>
+<td><code>isConfigured</code></td>
+<td>Once the configuration phase has passed: in the constructor for a plain <code>Component</code>, at the start of the build for a class component.</td>
+</tr>
+<tr>
+<td><code>isBuilt</code></td>
+<td>Once the component is built (<code>build()</code>).</td>
+</tr>
+<tr>
+<td><code>isVisible</code></td>
+<td>While it is visible. It turns <code>false</code> with <code>motif.hide()</code>.</td>
+</tr>
+<tr>
+<td><code>isWait</code></td>
+<td>While the component is waiting: while an <code>x-wait</code> or <code>bindings.wait</code> condition holds, and while an <code>x-display</code> condition is <code>false</code>. A waiting component is not built.</td>
+</tr>
+<tr>
+<td><code>isDisposed</code></td>
+<td>Once it has been disposed. From then on the component's methods do nothing.</td>
+</tr>
+</tbody>
+</table>
+<p><code>x-display</code> and <code>motif.hide()</code> touch different flags: a component whose <code>x-display</code> condition is <code>false</code> is <code>isWait</code> and may not be built; a component hidden with <code>motif.hide()</code> is built, only its <code>isVisible</code> is <code>false</code> (see <a href="/docs/lifecycle#visibility">Visibility</a>).</p>
+<h2 id="state">A component's state</h2>
+<p>A component's changing data is kept in a reactive object: a field in a class (<code>state = reactive({ … })</code>), a local variable in a function component, and the <code>data</code> field in Options. Bindings that read this object update on their own when the object changes (see <a href="/docs/reactivity#component-state">State in a component</a>). <code>this.useModel(model)</code> is the same as <code>reactive(model)</code>.</p>
+<p>If data that is not reactive has changed, the bindings do not notice it on their own. In that case you make the bindings read again by hand:</p>
+<ul>
+<li><code>setState()</code> runs the children's bindings first, then the component's own.</li>
+<li><code>reState()</code> runs the component's own bindings first, then its children's.</li>
+</ul>
+<p>Neither one rebuilds the component: <code>view()</code> is not called again and the <code>childs</code> slot does not change; only the bindings read their values again.</p>
+<h2 id="context">Context (<code>context</code>) — reaching the application</h2>
+<p>Every component reaches the application through <code>context</code> by climbing its parent chain (<code>this.context</code> in a class and in Options, and in a function component the <code>context</code> of the <a href="/docs/components#function-root">root component</a>); a component that has no parent yet (in the constructor, in <code>onInitializing</code>) reaches the running application as well. <code>context</code> is a view of the running <code>Application</code> tied to the component, and its members are the application's: <code>navigate</code>, <code>on</code>, <code>fire</code>, <code>onRouterChanged</code> …</p>
+<p>The <code>on</code> and <code>onRouterChanged</code> subscriptions opened through <code>context</code> are tied to the component's lifetime and are removed on their own when the component is disposed. That does not hold for <code>onLifecycle</code>; tie the returned cancel function to the component with its <code>motif.setDisposable(off)</code> (<code>this.motif</code> in a class and in Options, the root component's <code>motif</code> in a function component). For application events, see <a href="/docs/events#app-events">Events</a>.</p>
+<p>A function component has no <code>this</code>. The same work is done through the <code>context</code> of the root, or of the component a hook receives (<code>sender.context</code>), or with <code>useNavigation()</code>; <code>useNavigation().navigate(address)</code> navigates the same way as <code>context.navigate</code>.</p>
+<h2 id="services">Reaching services</h2>
+<p>Services registered with DI are reached in two ways. <code>getService</code> exists on every component: <code>this.getService(T)</code> in class and Options components, and in a function component <code>sender.getService(T)</code> through the <code>sender</code> that a hook written on the root (for example <code>onConfig</code>) receives. <code>FromService(T)</code> works anywhere, the body of a function component included. For a singleton service both give the same instance; for a <code>scoped</code> service <code>getService</code> is tied to the component's own provider, while <code>FromService</code> resolves from the application's current provider (see <a href="/docs/dependency-injection">Dependency Injection</a>).</p>
+<p>The header of the notes list shows the folder's name and the number of notes; the &quot;New note&quot; button creates a note through the service and takes the application to it:</p>
+<div class="doc-code" data-file="src/parts/NotesHead.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NotesHead.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export class NotesHead extends Component&lt;HTMLDivElement, { folder: Folder }&gt; {
+  notes = this.getService(NotesService)!;
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  }
+
+  override view() {
+    const { folder } = this.props;
+    return (
+      &lt;&gt;
+        &lt;h2&gt;
+          {FOLDERS[folder].title} &lt;span class=&quot;badge&quot;&gt;{() =&gt; String(this.notes.count(folder))}&lt;/span&gt;
+        &lt;/h2&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm accent&quot; onclick={() =&gt; this.create()}&gt;
+          New note
+        &lt;/button&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NotesHead.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export class NotesHead extends Component&lt;HTMLDivElement, { folder: Folder }&gt; {
+  static override elementTag = &quot;div&quot;;
+  notes = this.getService(NotesService)!;
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  }
+
+  override view() {
+    const { folder } = this.props;
+    const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+      const badge = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; String(this.notes.count(folder)));
+      });
+      h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(`${FOLDERS[folder].title} `)), badge);
+    });
+    const create = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.class.add(&quot;button--sm accent&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.create());
+      button.setText(&quot;New note&quot;);
+    });
+    return motifFragment({ childs: [title, create] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NotesHead.tsx"><code>import { FromService, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export function NotesHead(props: { folder: Folder }) {
+  const { folder } = props;
+  const notes = FromService(NotesService)!;
+  const nav = useNavigation();
+
+  const create = () =&gt; {
+    const note = notes.create();
+    nav.navigate(`/notes/${note.id}`);
+  };
+
+  return (
+    &lt;div class=&quot;list__head&quot;&gt;
+      &lt;h2&gt;
+        {FOLDERS[folder].title} &lt;span class=&quot;badge&quot;&gt;{() =&gt; String(notes.count(folder))}&lt;/span&gt;
+      &lt;/h2&gt;
+      &lt;button type=&quot;button&quot; class=&quot;button--sm accent&quot; onclick={create}&gt;
+        New note
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NotesHead.ts"><code>import { ComponentBase, FromService, motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export function NotesHead(props: { folder: Folder }) {
+  const { folder } = props;
+  const notes = FromService(NotesService)!;
+  const nav = useNavigation();
+
+  const create = () =&gt; {
+    const note = notes.create();
+    nav.navigate(`/notes/${note.id}`);
+  };
+
+  return motifComponent(&quot;div&quot;, (head: ComponentBase) =&gt; {
+    head.class.add(&quot;list__head&quot;);
+    const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+      const badge = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; String(notes.count(folder)));
+      });
+      h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(`${FOLDERS[folder].title} `)), badge);
+    });
+    const button = motifComponent(&quot;button&quot;, (b: ComponentBase) =&gt; {
+      b.attr.add({ type: &quot;button&quot; });
+      b.class.add(&quot;button--sm accent&quot;);
+      b.motif.on(&quot;click&quot;, create);
+      b.setText(&quot;New note&quot;);
+    });
+    head.controls.add(title, button);
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NotesHead.tsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export const NotesHead = (props: { folder: Folder }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  },
+
+  view() {
+    const { folder } = props;
+    return (
+      &lt;&gt;
+        &lt;h2&gt;
+          {FOLDERS[folder].title} &lt;span class=&quot;badge&quot;&gt;{() =&gt; String(this.notes.count(folder))}&lt;/span&gt;
+        &lt;/h2&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm accent&quot; onclick={() =&gt; this.create()}&gt;
+          New note
+        &lt;/button&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NotesHead.ts"><code>import { ComponentBase, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export const NotesHead = (props: { folder: Folder }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  },
+
+  view() {
+    const { folder } = props;
+    const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+      const badge = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; String(this.notes.count(folder)));
+      });
+      h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(`${FOLDERS[folder].title} `)), badge);
+    });
+    const create = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.class.add(&quot;button--sm accent&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.create());
+      button.setText(&quot;New note&quot;);
+    });
+    return motifFragment({ childs: [title, create] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NotesHead.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export class NotesHead extends Component {
+  static elementTag = &quot;div&quot;;
+  notes = this.getService(NotesService);
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  }
+
+  view() {
+    const { folder } = this.props;
+    return (
+      &lt;&gt;
+        &lt;h2&gt;
+          {FOLDERS[folder].title} &lt;span class=&quot;badge&quot;&gt;{() =&gt; String(this.notes.count(folder))}&lt;/span&gt;
+        &lt;/h2&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm accent&quot; onclick={() =&gt; this.create()}&gt;
+          New note
+        &lt;/button&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NotesHead.js"><code>import { Component, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export class NotesHead extends Component {
+  static elementTag = &quot;div&quot;;
+  notes = this.getService(NotesService);
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  }
+
+  onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  }
+
+  view() {
+    const { folder } = this.props;
+    const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+      const badge = motifComponent(&quot;span&quot;, (span) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; String(this.notes.count(folder)));
+      });
+      h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(`${FOLDERS[folder].title} `)), badge);
+    });
+    const create = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.class.add(&quot;button--sm accent&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.create());
+      button.setText(&quot;New note&quot;);
+    });
+    return motifFragment({ childs: [title, create] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NotesHead.jsx"><code>import { FromService, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export function NotesHead(props) {
+  const { folder } = props;
+  const notes = FromService(NotesService);
+  const nav = useNavigation();
+
+  const create = () =&gt; {
+    const note = notes.create();
+    nav.navigate(`/notes/${note.id}`);
+  };
+
+  return (
+    &lt;div class=&quot;list__head&quot;&gt;
+      &lt;h2&gt;
+        {FOLDERS[folder].title} &lt;span class=&quot;badge&quot;&gt;{() =&gt; String(notes.count(folder))}&lt;/span&gt;
+      &lt;/h2&gt;
+      &lt;button type=&quot;button&quot; class=&quot;button--sm accent&quot; onclick={create}&gt;
+        New note
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NotesHead.js"><code>import { FromService, motifComponent, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export function NotesHead(props) {
+  const { folder } = props;
+  const notes = FromService(NotesService);
+  const nav = useNavigation();
+
+  const create = () =&gt; {
+    const note = notes.create();
+    nav.navigate(`/notes/${note.id}`);
+  };
+
+  return motifComponent(&quot;div&quot;, (head) =&gt; {
+    head.class.add(&quot;list__head&quot;);
+    const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+      const badge = motifComponent(&quot;span&quot;, (span) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; String(notes.count(folder)));
+      });
+      h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(`${FOLDERS[folder].title} `)), badge);
+    });
+    const button = motifComponent(&quot;button&quot;, (b) =&gt; {
+      b.attr.add({ type: &quot;button&quot; });
+      b.class.add(&quot;button--sm accent&quot;);
+      b.motif.on(&quot;click&quot;, create);
+      b.setText(&quot;New note&quot;);
+    });
+    head.controls.add(title, button);
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NotesHead.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export const NotesHead = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  },
+
+  view() {
+    const { folder } = props;
+    return (
+      &lt;&gt;
+        &lt;h2&gt;
+          {FOLDERS[folder].title} &lt;span class=&quot;badge&quot;&gt;{() =&gt; String(this.notes.count(folder))}&lt;/span&gt;
+        &lt;/h2&gt;
+        &lt;button type=&quot;button&quot; class=&quot;button--sm accent&quot; onclick={() =&gt; this.create()}&gt;
+          New note
+        &lt;/button&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NotesHead.js"><code>import { motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export const NotesHead = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  create() {
+    const note = this.notes.create();
+    this.context.navigate(`/notes/${note.id}`);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;list__head&quot;);
+  },
+
+  view() {
+    const { folder } = props;
+    const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+      const badge = motifComponent(&quot;span&quot;, (span) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; String(this.notes.count(folder)));
+      });
+      h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(`${FOLDERS[folder].title} `)), badge);
+    });
+    const create = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.class.add(&quot;button--sm accent&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.create());
+      button.setText(&quot;New note&quot;);
+    });
+    return motifFragment({ childs: [title, create] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>The notes list places the header with <code>&lt;NotesHead folder={this.folder} /&gt;</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>The notes list places the header with <code>new NotesHead({ folder: this.folder })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>The notes list places the header with <code>motifComponent(NotesHead, { folder: this.folder })</code>.</p>
+</div>
+<h2 id="build-dispose"><code>build</code> and <code>dispose</code></h2>
+<ul>
+<li>You do not need to build a component by hand: it is built when it is added to a built parent, together with a parent that is not built yet, or when it is made the root with <code>app.run</code> (see <a href="/docs/component-creation#create-and-build">Creation and building</a>). <code>build()</code> runs once; on a component that is built, waiting or disposed it does nothing.</li>
+<li><code>dispose()</code> takes the component out of the tree and disposes it together with its subtree, playing the leave transition first if there is one. It returns a promise that resolves when it is finished; a second call during a disposal that is still running gives the same promise. The way to remove a parent's child is <code>controls.remove(child)</code>, which disposes it as well.</li>
+<li>A disposed component's bindings, <code>motif.on</code> listeners, <code>context</code> subscriptions and <code>setDisposable</code> registrations are released on their own. To avoid using the result of a promise that arrives after disposal, there are <a href="/docs/using">using</a> and <a href="/docs/do-work">doWork</a>.</li>
+</ul>
+<h2 id="next">Next step</h2>
+<p>To drop an async result that arrives after disposal, go on to <a href="/docs/using">Async Results with using</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

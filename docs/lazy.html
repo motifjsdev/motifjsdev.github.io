@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Content loaded through a dynamic import or any Promise; the loading flow, options, retries, cancellation and error reporting.">
+    <title>Lazy — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/lazy">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/lazy">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/lazy">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/lazy">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/lazy">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Lazy">
+    <meta property="og:description" content="Content loaded through a dynamic import or any Promise; the loading flow, options, retries, cancellation and error reporting.">
+    <script type="application/json" id="doc-data">{"slug":"lazy","locale":"en","title":"Lazy","description":"Content loaded through a dynamic import or any Promise; the loading flow, options, retries, cancellation and error reporting.","category":{"id":"8","title":"Advanced"},"html":"\u003Cp\u003E\u003Ccode\u003ELazy\u003C/code\u003E calls a function that produces a \u003Ccode\u003EPromise\u003C/code\u003E, turns the result into a component and places it in a \u003Ca href=\u0022/docs/frame\u0022\u003EFrame\u003C/a\u003E. It is designed for code splitting (\u003Ccode\u003E() =\u0026gt; import(\u0027./X\u0027)\u003C/code\u003E), but it works with any \u003Ccode\u003EPromise\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022usage\u0022\u003EUsage\u003C/h2\u003E\n\u003Cp\u003EIn the example, the \u003Ca href=\u0022/docs/wrapping-libraries#setup-on-built\u0022\u003Efolder chart\u003C/a\u003E is loaded lazily so that Chart.js is downloaded only when needed. The component is a named export, so \u003Ccode\u003EmapResult\u003C/code\u003E picks it from the module:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Lazy\n  caller={() =\u0026gt; import(\u0026quot;../parts/FolderChart\u0026quot;)}\n  options={{\n    mapResult: (m) =\u0026gt; m.FolderChart,\n    Loaderview: \u0026lt;p class=\u0026quot;loading\u0026quot;\u0026gt;Loading chart…\u0026lt;/p\u0026gt;,\n    Fallbackview: \u0026lt;p class=\u0026quot;error\u0026quot;\u0026gt;Couldn\u0027t load the chart.\u0026lt;/p\u0026gt;,\n    minDelayMs: 300,\n    timeoutMs: 10000,\n    retry: 3,\n  }}\n/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Econst chart = Lazy({\n  caller: () =\u0026gt; import(\u0026quot;../parts/FolderChart\u0026quot;),\n  options: {\n    mapResult: (m) =\u0026gt; m.FolderChart,\n    Loaderview: motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n      p.class.add(\u0026quot;loading\u0026quot;);\n      p.setText(\u0026quot;Loading chart…\u0026quot;);\n    }),\n    Fallbackview: motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n      p.class.add(\u0026quot;error\u0026quot;);\n      p.setText(\u0026quot;Couldn\u0027t load the chart.\u0026quot;);\n    }),\n    minDelayMs: 300,\n    timeoutMs: 10000,\n    retry: 3,\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Lazy\n  caller={() =\u0026gt; import(\u0026quot;../parts/FolderChart\u0026quot;)}\n  options={{\n    mapResult: (m) =\u0026gt; m.FolderChart,\n    Loaderview: \u0026lt;p class=\u0026quot;loading\u0026quot;\u0026gt;Loading chart…\u0026lt;/p\u0026gt;,\n    Fallbackview: \u0026lt;p class=\u0026quot;error\u0026quot;\u0026gt;Couldn\u0027t load the chart.\u0026lt;/p\u0026gt;,\n    minDelayMs: 300,\n    timeoutMs: 10000,\n    retry: 3,\n  }}\n/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Econst chart = Lazy({\n  caller: () =\u0026gt; import(\u0026quot;../parts/FolderChart\u0026quot;),\n  options: {\n    mapResult: (m) =\u0026gt; m.FolderChart,\n    Loaderview: motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n      p.class.add(\u0026quot;loading\u0026quot;);\n      p.setText(\u0026quot;Loading chart…\u0026quot;);\n    }),\n    Fallbackview: motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n      p.class.add(\u0026quot;error\u0026quot;);\n      p.setText(\u0026quot;Couldn\u0027t load the chart.\u0026quot;);\n    }),\n    minDelayMs: 300,\n    timeoutMs: 10000,\n    retry: 3,\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003ELazy\u003C/code\u003E is a function; a \u003Ccode\u003ELazy({ caller, options })\u003C/code\u003E call returns the same \u003Ccode\u003EFrame\u003C/code\u003E and can be placed with \u003Ccode\u003Econtrols.add\u003C/code\u003E. \u003Ccode\u003Eframe.navigateLazy(caller, options)\u003C/code\u003E and \u003Ccode\u003Eframe.navigate(promise)\u003C/code\u003E use the same path.\u003C/p\u003E\n\u003Ch2 id=\u0022flow\u0022\u003EThe loading flow\u003C/h2\u003E\n\u003Col\u003E\n\u003Cli\u003E\u003Ccode\u003EPlaceholderview\u003C/code\u003E (or \u003Ccode\u003ELoaderview\u003C/code\u003E if there is none) is shown right away.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ecaller()\u003C/code\u003E is called \u003Cstrong\u003Eright away\u003C/strong\u003E (it does not wait for the component to enter the DOM). If \u003Ccode\u003EtimeoutMs\u003C/code\u003E is given, the load counts as failed with \u003Ccode\u003EMJX110\u003C/code\u003E when the time is up; if \u003Ccode\u003Esignal\u003C/code\u003E is given, \u003Ccode\u003Eabort()\u003C/code\u003E cuts the load off with \u003Ccode\u003EMJX111\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EA successful result is turned into a component with \u003Ccode\u003EmapResult\u003C/code\u003E. The default converter takes the module\u0027s \u003Ccode\u003Edefault\u003C/code\u003E export (for the result of \u003Ccode\u003Eimport()\u003C/code\u003E); if another export is needed, write \u003Ccode\u003EmapResult: (m) =\u0026gt; m.FolderChart\u003C/code\u003E as in the example. If the returned value is a class it is built with \u003Ccode\u003Enew\u003C/code\u003E, and if it is a function it is built by calling it; a ready instance is used as it is (no props are given). An Options API object or factory is turned into a component as well. A module without a \u003Ccode\u003Edefault\u003C/code\u003E export, or some other object that is not a component, makes the load fail with \u003Ccode\u003EMJX127\u003C/code\u003E and moves on to step 5. \u003Ccode\u003Enull\u003C/code\u003E keeps the loading view, text is placed as a text node, and a promise or an array is placed as it resolves.\u003C/li\u003E\n\u003Cli\u003EIf \u003Ccode\u003EminDelayMs\u003C/code\u003E is given and the load finished sooner, the remaining time is waited out (this keeps the loading view from flashing on short loads). Then the content is placed in the \u003Ccode\u003EFrame\u003C/code\u003E; \u003Ccode\u003ELoaderview\u003C/code\u003E plays its leave transition and is disposed.\u003C/li\u003E\n\u003Cli\u003EOn failure, \u003Ccode\u003EonError(err)\u003C/code\u003E is called first. If there is a \u003Ccode\u003EFallbackview\u003C/code\u003E, it is shown and the error stays there (it is not reported). Otherwise the container is emptied and the error is reported as \u003Ccode\u003EMJX126\u003C/code\u003E with \u003Ccode\u003EerrorHandler.report\u003C/code\u003E — it is written to \u003Ccode\u003Econsole.error\u003C/code\u003E and goes to the \u003Ccode\u003EerrorHandler.addListener\u003C/code\u003E listeners, with the original error in the \u003Ccode\u003Ecause\u003C/code\u003E field (see \u003Ca href=\u0022/docs/error-handling#error-handler\u0022\u003EError handling - Listening for reports\u003C/a\u003E). Having given \u003Ccode\u003EonError\u003C/code\u003E does not remove the report.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EFor a cancelled (\u003Ccode\u003Esignal\u003C/code\u003E) load, \u003Ccode\u003EonError\u003C/code\u003E is called once with \u003Ccode\u003EMJX111\u003C/code\u003E; it makes no difference whether the cancellation arrives during an attempt or while waiting to retry. \u003Ccode\u003EFallbackview\u003C/code\u003E is not shown, the content does not change and no report is written. When the container is disposed, everything stops at the first moment of disposal: running timers and pending retries are cleared, \u003Ccode\u003EonError\u003C/code\u003E is not called, no report is written, a load that finishes later is ignored and nothing is built.\u003C/p\u003E\n\u003Ch2 id=\u0022options\u0022\u003EOptions (\u003Ccode\u003ELazyOptions\u0026lt;T\u0026gt;\u003C/code\u003E)\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EType\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003ELoaderview\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponentBase\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe content shown while loading is in progress.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EPlaceholderview\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponentBase\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETakes precedence over \u003Ccode\u003ELoaderview\u003C/code\u003E; when both are given, only this one is shown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EFallbackview\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EComponentBase\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe content shown when the last attempt also fails.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EminDelayMs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe minimum time that must pass before the content is placed.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtimeoutMs\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe upper limit of each attempt; \u003Ccode\u003EMJX110\u003C/code\u003E when exceeded.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Esignal\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EAbortSignal\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECancelling the load from outside; \u003Ccode\u003EMJX111\u003C/code\u003E. \u003Ccode\u003EFrame.navigate(promise)\u003C/code\u003E gives this itself.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EmapResult\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(result) =\u0026gt; component\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETurns the load result into a component; the \u003Ccode\u003Edefault\u003C/code\u003E export by default.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonError\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(error) =\u0026gt; void\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhen the last attempt also fails, and on cancellation (\u003Ccode\u003EMJX111\u003C/code\u003E), before \u003Ccode\u003EFallbackview\u003C/code\u003E; not called during disposal.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eretry\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber \\| LazyRetryOptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERetrying (below).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonRetry\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(attempt, error) =\u0026gt; void\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBefore every retry; \u003Ccode\u003Eattempt\u003C/code\u003E starts at 1.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022retry\u0022\u003ERetrying — \u003Ccode\u003Eretry\u003C/code\u003E\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Lazy caller={caller} options={{ retry: 3 }} /\u0026gt;                                              {/* count: 3, delayMs: 500, whenOnline: true */}\n\u0026lt;Lazy caller={caller} options={{ retry: { count: 3, delayMs: 500, whenOnline: true } }} /\u0026gt;   {/* explicit form (LazyRetryOptions) */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003ELazy({ caller, options: { retry: 3 } });                                              // count: 3, delayMs: 500, whenOnline: true\nLazy({ caller, options: { retry: { count: 3, delayMs: 500, whenOnline: true } } });   // explicit form (LazyRetryOptions)\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Lazy caller={caller} options={{ retry: 3 }} /\u0026gt;                                              {/* count: 3, delayMs: 500, whenOnline: true */}\n\u0026lt;Lazy caller={caller} options={{ retry: { count: 3, delayMs: 500, whenOnline: true } }} /\u0026gt;   {/* explicit form (LazyRetryOptions) */}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003ELazy({ caller, options: { retry: 3 } });                                              // count: 3, delayMs: 500, whenOnline: true\nLazy({ caller, options: { retry: { count: 3, delayMs: 500, whenOnline: true } } });   // explicit form (LazyRetryOptions)\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EIt is retried \u003Ccode\u003Ecount\u003C/code\u003E times; total attempts are \u003Ccode\u003Ecount \u002B 1\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EThe wait grows with each attempt: \u003Ccode\u003EdelayMs × attempt\u003C/code\u003E (500, 1000, 1500…).\u003C/li\u003E\n\u003Cli\u003EWith \u003Ccode\u003EwhenOnline: true\u003C/code\u003E, if the device is offline (\u003Ccode\u003Enavigator.onLine === false\u003C/code\u003E), the counter does not start; the wait begins when the \u003Ccode\u003Eonline\u003C/code\u003E event arrives.\u003C/li\u003E\n\u003Cli\u003EIf \u003Ccode\u003Esignal\u003C/code\u003E is cancelled during the wait, the attempt is dropped and \u003Ccode\u003EonError\u003C/code\u003E is called with \u003Ccode\u003EMJX111\u003C/code\u003E; if the container is disposed, the attempt is dropped quietly.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EtimeoutMs\u003C/code\u003E applies to each attempt separately.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022in-routes\u0022\u003EIn route pages\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Econtrol: () =\u0026gt; import(\u0027./pages/X\u0027)\u003C/code\u003E in a route definition and \u003Ccode\u003Efallbacks.notFound/error\u003C/code\u003E use their own lazy loading path; the \u003Ccode\u003ELazy\u003C/code\u003E options (loading view, retries) do not apply there. To lazily load a heavy part \u003Cstrong\u003Einside\u003C/strong\u003E a page, use \u003Ccode\u003ELazy\u003C/code\u003E (see \u003Ca href=\u0022/docs/routes#lazy\u0022\u003EThe Route Table - Lazy loading\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo show content in another slot, go on to \u003Ca href=\u0022/docs/transport\u0022\u003ETransport and TransportTo\u003C/a\u003E. For the framework\u0027s error reporting model, see \u003Ca href=\u0022/docs/error-handling\u0022\u003EError Handling\u003C/a\u003E; for the container\u0027s timing rules, \u003Ca href=\u0022/docs/frame#timing\u0022\u003EFrame\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"usage","text":"Usage","level":2},{"id":"flow","text":"The loading flow","level":2},{"id":"options","text":"Options (LazyOptions\u003CT\u003E)","level":2},{"id":"retry","text":"Retrying — retry","level":2},{"id":"in-routes","text":"In route pages","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"frame","title":"Frame"},"next":{"slug":"transport","title":"Transport and TransportTo"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Advanced</p>
+        <h1>Lazy</h1>
+        <p>Content loaded through a dynamic import or any Promise; the loading flow, options, retries, cancellation and error reporting.</p>
+<p><code>Lazy</code> calls a function that produces a <code>Promise</code>, turns the result into a component and places it in a <a href="/docs/frame">Frame</a>. It is designed for code splitting (<code>() =&gt; import('./X')</code>), but it works with any <code>Promise</code>.</p>
+<h2 id="usage">Usage</h2>
+<p>In the example, the <a href="/docs/wrapping-libraries#setup-on-built">folder chart</a> is loaded lazily so that Chart.js is downloaded only when needed. The component is a named export, so <code>mapResult</code> picks it from the module:</p>
+<div class="doc-code" data-file="src/pages/SettingsPage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/SettingsPage.tsx"><code>&lt;Lazy
+  caller={() =&gt; import(&quot;../parts/FolderChart&quot;)}
+  options={{
+    mapResult: (m) =&gt; m.FolderChart,
+    Loaderview: &lt;p class=&quot;loading&quot;&gt;Loading chart…&lt;/p&gt;,
+    Fallbackview: &lt;p class=&quot;error&quot;&gt;Couldn't load the chart.&lt;/p&gt;,
+    minDelayMs: 300,
+    timeoutMs: 10000,
+    retry: 3,
+  }}
+/&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/SettingsPage.ts"><code>const chart = Lazy({
+  caller: () =&gt; import(&quot;../parts/FolderChart&quot;),
+  options: {
+    mapResult: (m) =&gt; m.FolderChart,
+    Loaderview: motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+      p.class.add(&quot;loading&quot;);
+      p.setText(&quot;Loading chart…&quot;);
+    }),
+    Fallbackview: motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+      p.class.add(&quot;error&quot;);
+      p.setText(&quot;Couldn't load the chart.&quot;);
+    }),
+    minDelayMs: 300,
+    timeoutMs: 10000,
+    retry: 3,
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/SettingsPage.jsx"><code>&lt;Lazy
+  caller={() =&gt; import(&quot;../parts/FolderChart&quot;)}
+  options={{
+    mapResult: (m) =&gt; m.FolderChart,
+    Loaderview: &lt;p class=&quot;loading&quot;&gt;Loading chart…&lt;/p&gt;,
+    Fallbackview: &lt;p class=&quot;error&quot;&gt;Couldn't load the chart.&lt;/p&gt;,
+    minDelayMs: 300,
+    timeoutMs: 10000,
+    retry: 3,
+  }}
+/&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/SettingsPage.js"><code>const chart = Lazy({
+  caller: () =&gt; import(&quot;../parts/FolderChart&quot;),
+  options: {
+    mapResult: (m) =&gt; m.FolderChart,
+    Loaderview: motifComponent(&quot;p&quot;, (p) =&gt; {
+      p.class.add(&quot;loading&quot;);
+      p.setText(&quot;Loading chart…&quot;);
+    }),
+    Fallbackview: motifComponent(&quot;p&quot;, (p) =&gt; {
+      p.class.add(&quot;error&quot;);
+      p.setText(&quot;Couldn't load the chart.&quot;);
+    }),
+    minDelayMs: 300,
+    timeoutMs: 10000,
+    retry: 3,
+  },
+});</code></pre>
+</div>
+<p><code>Lazy</code> is a function; a <code>Lazy({ caller, options })</code> call returns the same <code>Frame</code> and can be placed with <code>controls.add</code>. <code>frame.navigateLazy(caller, options)</code> and <code>frame.navigate(promise)</code> use the same path.</p>
+<h2 id="flow">The loading flow</h2>
+<ol>
+<li><code>Placeholderview</code> (or <code>Loaderview</code> if there is none) is shown right away.</li>
+<li><code>caller()</code> is called <strong>right away</strong> (it does not wait for the component to enter the DOM). If <code>timeoutMs</code> is given, the load counts as failed with <code>MJX110</code> when the time is up; if <code>signal</code> is given, <code>abort()</code> cuts the load off with <code>MJX111</code>.</li>
+<li>A successful result is turned into a component with <code>mapResult</code>. The default converter takes the module's <code>default</code> export (for the result of <code>import()</code>); if another export is needed, write <code>mapResult: (m) =&gt; m.FolderChart</code> as in the example. If the returned value is a class it is built with <code>new</code>, and if it is a function it is built by calling it; a ready instance is used as it is (no props are given). An Options API object or factory is turned into a component as well. A module without a <code>default</code> export, or some other object that is not a component, makes the load fail with <code>MJX127</code> and moves on to step 5. <code>null</code> keeps the loading view, text is placed as a text node, and a promise or an array is placed as it resolves.</li>
+<li>If <code>minDelayMs</code> is given and the load finished sooner, the remaining time is waited out (this keeps the loading view from flashing on short loads). Then the content is placed in the <code>Frame</code>; <code>Loaderview</code> plays its leave transition and is disposed.</li>
+<li>On failure, <code>onError(err)</code> is called first. If there is a <code>Fallbackview</code>, it is shown and the error stays there (it is not reported). Otherwise the container is emptied and the error is reported as <code>MJX126</code> with <code>errorHandler.report</code> — it is written to <code>console.error</code> and goes to the <code>errorHandler.addListener</code> listeners, with the original error in the <code>cause</code> field (see <a href="/docs/error-handling#error-handler">Error handling - Listening for reports</a>). Having given <code>onError</code> does not remove the report.</li>
+</ol>
+<p>For a cancelled (<code>signal</code>) load, <code>onError</code> is called once with <code>MJX111</code>; it makes no difference whether the cancellation arrives during an attempt or while waiting to retry. <code>Fallbackview</code> is not shown, the content does not change and no report is written. When the container is disposed, everything stops at the first moment of disposal: running timers and pending retries are cleared, <code>onError</code> is not called, no report is written, a load that finishes later is ignored and nothing is built.</p>
+<h2 id="options">Options (<code>LazyOptions&lt;T&gt;</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Loaderview</code></td>
+<td><code>ComponentBase</code></td>
+<td>The content shown while loading is in progress.</td>
+</tr>
+<tr>
+<td><code>Placeholderview</code></td>
+<td><code>ComponentBase</code></td>
+<td>Takes precedence over <code>Loaderview</code>; when both are given, only this one is shown.</td>
+</tr>
+<tr>
+<td><code>Fallbackview</code></td>
+<td><code>ComponentBase</code></td>
+<td>The content shown when the last attempt also fails.</td>
+</tr>
+<tr>
+<td><code>minDelayMs</code></td>
+<td><code>number</code></td>
+<td>The minimum time that must pass before the content is placed.</td>
+</tr>
+<tr>
+<td><code>timeoutMs</code></td>
+<td><code>number</code></td>
+<td>The upper limit of each attempt; <code>MJX110</code> when exceeded.</td>
+</tr>
+<tr>
+<td><code>signal</code></td>
+<td><code>AbortSignal</code></td>
+<td>Cancelling the load from outside; <code>MJX111</code>. <code>Frame.navigate(promise)</code> gives this itself.</td>
+</tr>
+<tr>
+<td><code>mapResult</code></td>
+<td><code>(result) =&gt; component</code></td>
+<td>Turns the load result into a component; the <code>default</code> export by default.</td>
+</tr>
+<tr>
+<td><code>onError</code></td>
+<td><code>(error) =&gt; void</code></td>
+<td>When the last attempt also fails, and on cancellation (<code>MJX111</code>), before <code>Fallbackview</code>; not called during disposal.</td>
+</tr>
+<tr>
+<td><code>retry</code></td>
+<td><code>number \| LazyRetryOptions</code></td>
+<td>Retrying (below).</td>
+</tr>
+<tr>
+<td><code>onRetry</code></td>
+<td><code>(attempt, error) =&gt; void</code></td>
+<td>Before every retry; <code>attempt</code> starts at 1.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="retry">Retrying — <code>retry</code></h2>
+<div class="doc-code" data-file="src/pages/SettingsPage.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/pages/SettingsPage.tsx"><code>&lt;Lazy caller={caller} options={{ retry: 3 }} /&gt;                                              {/* count: 3, delayMs: 500, whenOnline: true */}
+&lt;Lazy caller={caller} options={{ retry: { count: 3, delayMs: 500, whenOnline: true } }} /&gt;   {/* explicit form (LazyRetryOptions) */}</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/pages/SettingsPage.ts"><code>Lazy({ caller, options: { retry: 3 } });                                              // count: 3, delayMs: 500, whenOnline: true
+Lazy({ caller, options: { retry: { count: 3, delayMs: 500, whenOnline: true } } });   // explicit form (LazyRetryOptions)</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/pages/SettingsPage.jsx"><code>&lt;Lazy caller={caller} options={{ retry: 3 }} /&gt;                                              {/* count: 3, delayMs: 500, whenOnline: true */}
+&lt;Lazy caller={caller} options={{ retry: { count: 3, delayMs: 500, whenOnline: true } }} /&gt;   {/* explicit form (LazyRetryOptions) */}</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/pages/SettingsPage.js"><code>Lazy({ caller, options: { retry: 3 } });                                              // count: 3, delayMs: 500, whenOnline: true
+Lazy({ caller, options: { retry: { count: 3, delayMs: 500, whenOnline: true } } });   // explicit form (LazyRetryOptions)</code></pre>
+</div>
+<ul>
+<li>It is retried <code>count</code> times; total attempts are <code>count + 1</code>.</li>
+<li>The wait grows with each attempt: <code>delayMs × attempt</code> (500, 1000, 1500…).</li>
+<li>With <code>whenOnline: true</code>, if the device is offline (<code>navigator.onLine === false</code>), the counter does not start; the wait begins when the <code>online</code> event arrives.</li>
+<li>If <code>signal</code> is cancelled during the wait, the attempt is dropped and <code>onError</code> is called with <code>MJX111</code>; if the container is disposed, the attempt is dropped quietly.</li>
+<li><code>timeoutMs</code> applies to each attempt separately.</li>
+</ul>
+<h2 id="in-routes">In route pages</h2>
+<p><code>control: () =&gt; import('./pages/X')</code> in a route definition and <code>fallbacks.notFound/error</code> use their own lazy loading path; the <code>Lazy</code> options (loading view, retries) do not apply there. To lazily load a heavy part <strong>inside</strong> a page, use <code>Lazy</code> (see <a href="/docs/routes#lazy">The Route Table - Lazy loading</a>).</p>
+<h2 id="next">Next step</h2>
+<p>To show content in another slot, go on to <a href="/docs/transport">Transport and TransportTo</a>. For the framework's error reporting model, see <a href="/docs/error-handling">Error Handling</a>; for the container's timing rules, <a href="/docs/frame#timing">Frame</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

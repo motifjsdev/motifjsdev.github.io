@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="A container that holds a single changing piece of content; swapping content with navigate, timing, leave transitions, and the places where the framework sets up a Frame.">
+    <title>Frame — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/frame">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/frame">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/frame">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/frame">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/frame">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Frame">
+    <meta property="og:description" content="A container that holds a single changing piece of content; swapping content with navigate, timing, leave transitions, and the places where the framework sets up a Frame.">
+    <script type="application/json" id="doc-data">{"slug":"frame","locale":"en","title":"Frame","description":"A container that holds a single changing piece of content; swapping content with navigate, timing, leave transitions, and the places where the framework sets up a Frame.","category":{"id":"8","title":"Advanced"},"html":"\u003Cp\u003EConditional branches (\u003Ccode\u003E\u0026amp;\u0026amp;\u003C/code\u003E, the ternary operator, \u003Ccode\u003Eswitch\u003C/code\u003E), getter children of the form \u003Ccode\u003E{() =\u0026gt; expression}\u003C/code\u003E and route pages all work on the same structure: \u003Cstrong\u003Ea container that holds a single piece of content and swaps it\u003C/strong\u003E. That container is \u003Ccode\u003EFrame\u003C/code\u003E. \u003Ccode\u003EFrame\u003C/code\u003E is a component whose root is a comment node (it adds no element to the DOM); at any moment it holds at most one piece of content (a component or an array of components), the content is changed with \u003Ccode\u003Enavigate\u003C/code\u003E, and the old content is disposed.\u003C/p\u003E\n\u003Ch2 id=\u0022usage\u0022\u003EUsage\u003C/h2\u003E\n\u003Cp\u003EThe summary panel in the example switches between the recent notes list (\u003Ca href=\u0022/docs/query#reactivity\u0022\u003E\u003Ccode\u003ERecentNotes\u003C/code\u003E\u003C/a\u003E) and the folder chart (\u003Ca href=\u0022/docs/wrapping-libraries#setup-on-built\u0022\u003E\u003Ccode\u003EFolderChart\u003C/code\u003E\u003C/a\u003E) with two buttons:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/SummaryPanel.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/SummaryPanel.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, Frame } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport class SummaryPanel extends Component\u0026lt;HTMLElement\u0026gt; {\n  static override elementTag = \u0026quot;section\u0026quot;;\n  frame = new Frame();\n\n  override onConfigured() {\n    this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;);\n  }\n\n  override view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;)}\u0026gt;Recent notes\u0026lt;/button\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;FolderChart /\u0026gt;)}\u0026gt;Folders\u0026lt;/button\u0026gt;\n        {this.frame}\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/SummaryPanel.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, Frame, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport class SummaryPanel extends Component\u0026lt;HTMLElement\u0026gt; {\n  static override elementTag = \u0026quot;section\u0026quot;;\n  frame = new Frame();\n\n  override onConfigured() {\n    this.frame.navigate(new RecentNotes());\n  }\n\n  override view() {\n    const recent = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(new RecentNotes()));\n      button.setText(\u0026quot;Recent notes\u0026quot;);\n    });\n    const folders = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(new FolderChart()));\n      button.setText(\u0026quot;Folders\u0026quot;);\n    });\n    return motifFragment({ childs: [recent, folders, this.frame] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/SummaryPanel.tsx\u0022\u003E\u003Ccode\u003Eimport { Frame } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport function SummaryPanel() {\n  const frame = new Frame();\n  frame.navigate(\u0026lt;RecentNotes /\u0026gt;);\n\n  return (\n    \u0026lt;section\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; frame.navigate(\u0026lt;RecentNotes /\u0026gt;)}\u0026gt;Recent notes\u0026lt;/button\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; frame.navigate(\u0026lt;FolderChart /\u0026gt;)}\u0026gt;Folders\u0026lt;/button\u0026gt;\n      {frame}\n    \u0026lt;/section\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/SummaryPanel.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, Frame, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport function SummaryPanel() {\n  const frame = new Frame();\n  frame.navigate(motifComponent(RecentNotes));\n\n  return motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n    const recent = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; frame.navigate(motifComponent(RecentNotes)));\n      button.setText(\u0026quot;Recent notes\u0026quot;);\n    });\n    const folders = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; frame.navigate(motifComponent(FolderChart)));\n      button.setText(\u0026quot;Folders\u0026quot;);\n    });\n    section.controls.add(recent, folders, frame);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/SummaryPanel.tsx\u0022\u003E\u003Ccode\u003Eimport { Frame, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport const SummaryPanel = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  frame: new Frame(),\n\n  onConfigured() {\n    this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;);\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;)}\u0026gt;Recent notes\u0026lt;/button\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;FolderChart /\u0026gt;)}\u0026gt;Folders\u0026lt;/button\u0026gt;\n        {this.frame}\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/SummaryPanel.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, Frame, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport const SummaryPanel = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  frame: new Frame(),\n\n  onConfigured() {\n    this.frame.navigate(motifComponent(RecentNotes));\n  },\n\n  view() {\n    const recent = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(motifComponent(RecentNotes)));\n      button.setText(\u0026quot;Recent notes\u0026quot;);\n    });\n    const folders = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(motifComponent(FolderChart)));\n      button.setText(\u0026quot;Folders\u0026quot;);\n    });\n    return motifFragment({ childs: [recent, folders, this.frame] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/SummaryPanel.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, Frame } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport class SummaryPanel extends Component {\n  static elementTag = \u0026quot;section\u0026quot;;\n  frame = new Frame();\n\n  onConfigured() {\n    this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;);\n  }\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;)}\u0026gt;Recent notes\u0026lt;/button\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;FolderChart /\u0026gt;)}\u0026gt;Folders\u0026lt;/button\u0026gt;\n        {this.frame}\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/SummaryPanel.js\u0022\u003E\u003Ccode\u003Eimport { Component, Frame, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport class SummaryPanel extends Component {\n  static elementTag = \u0026quot;section\u0026quot;;\n  frame = new Frame();\n\n  onConfigured() {\n    this.frame.navigate(new RecentNotes());\n  }\n\n  view() {\n    const recent = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(new RecentNotes()));\n      button.setText(\u0026quot;Recent notes\u0026quot;);\n    });\n    const folders = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(new FolderChart()));\n      button.setText(\u0026quot;Folders\u0026quot;);\n    });\n    return motifFragment({ childs: [recent, folders, this.frame] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/SummaryPanel.jsx\u0022\u003E\u003Ccode\u003Eimport { Frame } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport function SummaryPanel() {\n  const frame = new Frame();\n  frame.navigate(\u0026lt;RecentNotes /\u0026gt;);\n\n  return (\n    \u0026lt;section\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; frame.navigate(\u0026lt;RecentNotes /\u0026gt;)}\u0026gt;Recent notes\u0026lt;/button\u0026gt;\n      \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; frame.navigate(\u0026lt;FolderChart /\u0026gt;)}\u0026gt;Folders\u0026lt;/button\u0026gt;\n      {frame}\n    \u0026lt;/section\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/SummaryPanel.js\u0022\u003E\u003Ccode\u003Eimport { Frame, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport function SummaryPanel() {\n  const frame = new Frame();\n  frame.navigate(motifComponent(RecentNotes));\n\n  return motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n    const recent = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; frame.navigate(motifComponent(RecentNotes)));\n      button.setText(\u0026quot;Recent notes\u0026quot;);\n    });\n    const folders = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; frame.navigate(motifComponent(FolderChart)));\n      button.setText(\u0026quot;Folders\u0026quot;);\n    });\n    section.controls.add(recent, folders, frame);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/SummaryPanel.jsx\u0022\u003E\u003Ccode\u003Eimport { Frame, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport const SummaryPanel = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  frame: new Frame(),\n\n  onConfigured() {\n    this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;);\n  },\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;RecentNotes /\u0026gt;)}\u0026gt;Recent notes\u0026lt;/button\u0026gt;\n        \u0026lt;button type=\u0026quot;button\u0026quot; onclick={() =\u0026gt; this.frame.navigate(\u0026lt;FolderChart /\u0026gt;)}\u0026gt;Folders\u0026lt;/button\u0026gt;\n        {this.frame}\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/SummaryPanel.js\u0022\u003E\u003Ccode\u003Eimport { Frame, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { FolderChart } from \u0026quot;./FolderChart\u0026quot;;\nimport { RecentNotes } from \u0026quot;./RecentNotes\u0026quot;;\n\nexport const SummaryPanel = () =\u0026gt; motifOptions({\n  el: \u0026quot;section\u0026quot;,\n  frame: new Frame(),\n\n  onConfigured() {\n    this.frame.navigate(motifComponent(RecentNotes));\n  },\n\n  view() {\n    const recent = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(motifComponent(RecentNotes)));\n      button.setText(\u0026quot;Recent notes\u0026quot;);\n    });\n    const folders = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.attr.add({ type: \u0026quot;button\u0026quot; });\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.frame.navigate(motifComponent(FolderChart)));\n      button.setText(\u0026quot;Folders\u0026quot;);\n    });\n    return motifFragment({ childs: [recent, folders, this.frame] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EChildren written between \u003Ccode\u003E\u0026lt;Frame\u0026gt;…\u0026lt;/Frame\u0026gt;\u003C/code\u003E in JSX, and those given with \u003Ccode\u003Enew Frame({ childs: [...] })\u003C/code\u003E without JSX, become the first content. If a \u003Ccode\u003EPromise\u003C/code\u003E is given to \u003Ccode\u003Enavigate\u003C/code\u003E, the content is loaded with \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022api\u0022\u003EAPI\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMember\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Enew Frame(props?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAn empty container. If \u003Ccode\u003Eprops.childs\u003C/code\u003E is given (\u003Ccode\u003E\u0026lt;Frame\u0026gt;…\u0026lt;/Frame\u0026gt;\u003C/code\u003E in JSX), the children are added as the first content.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Enavigate(page, keepOldControl?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Epage\u003C/code\u003E can be a component, an array of components, a component class/factory or a \u003Ccode\u003EPromise\u003C/code\u003E. The old content is disposed (it stays in place if \u003Ccode\u003EkeepOldControl: true\u003C/code\u003E is given), and the new one is added. If a \u003Ccode\u003EPromise\u003C/code\u003E is given, the content is loaded with \u003Ccode\u003ELazy\u003C/code\u003E; the next \u003Ccode\u003Enavigate\u003C/code\u003E cancels the previous load. A second call with the same content does nothing. The \u003Ccode\u003EPromise\u003C/code\u003E it returns resolves once the content is in place.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EnavigateLazy(caller, options?, keepOldControl?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA shorthand for \u003Ccode\u003Enavigate(Lazy({ caller, options }))\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eflush()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDisposes the current content; the container stays empty. \u003Ccode\u003Emotif.clear()\u003C/code\u003E does the same job.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecurrent\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe content shown (\u003Ccode\u003EComponentBase\u003C/code\u003E, an array, or \u003Ccode\u003Enull\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisBusy\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Etrue\u003C/code\u003E while a \u003Ccode\u003Enavigate\u003C/code\u003E is in progress.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edispose(options?)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EDisposes the content first, then the container; \u003Ccode\u003Eoptions\u003C/code\u003E is passed on to the content too.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022timing\u0022\u003ETiming\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EThe first content is synchronous.\u003C/strong\u003E While the container is empty and \u003Ccode\u003Epage\u003C/code\u003E is not a \u003Ccode\u003EPromise\u003C/code\u003E, the content is in place by the time \u003Ccode\u003Enavigate\u003C/code\u003E returns; when \u003Ccode\u003Ebuild()\u003C/code\u003E completes, the first branch is on screen (see \u003Ca href=\u0022/docs/conditionals-and-lists#why-x-wait\u0022\u003EConditional rendering - Synchronous first render\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003ELater changes are queued.\u003C/strong\u003E Consecutive \u003Ccode\u003Enavigate\u003C/code\u003E calls are queued behind a lock, and each waits for the previous one to finish. A new call that comes in between drops the result of an older call that has not been placed yet (only the content requested last is placed).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EOld content without a leave transition\u003C/strong\u003E is disposed (\u003Ccode\u003EonDisposed\u003C/code\u003E) before the new content is added.\u003C/li\u003E\n\u003Cli\u003EIf the content cannot be placed, \u003Ccode\u003EMJX114\u003C/code\u003E is reported, and if the old content cannot be disposed, \u003Ccode\u003EMJX115\u003C/code\u003E; the container keeps working.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022transitions\u0022\u003ELeave and enter transitions\u003C/h2\u003E\n\u003Cp\u003EThe old content plays its leave transition: first its running animations are cancelled, then it is disposed with \u003Ccode\u003Edispose({ deep: true })\u003C/code\u003E; if a leave transition is defined (the \u003Ccode\u003Etransition\u003C/code\u003E prop or \u003Ccode\u003Emotif.options.transition.out(...)\u003C/code\u003E), it plays. The new content does \u003Cstrong\u003Enot wait\u003C/strong\u003E for the old one to finish: while the old content leaves, the new one is added right away, and their order is decided by the \u003Ccode\u003Emode\u003C/code\u003E of the nearest \u003Cstrong\u003Eelement\u003C/strong\u003E parent (see \u003Ca href=\u0022/docs/styling-and-transitions#transition-mode\u0022\u003EStyling and animation - Enter and leave order\u003C/a\u003E):\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003E\u003Ccode\u003Emode\u003C/code\u003E\u003C/th\u003E\n\u003Cth\u003EBehaviour\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027concurrent\u0027\u003C/code\u003E (default)\u003C/td\u003E\n\u003Ctd\u003EWhile the old content leaves, the new content enters at the same time.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027out-in\u0027\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe new content is not placed in the DOM until the old one\u0027s leave finishes.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0027in-out\u0027\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe old one\u0027s leave is postponed until the new one\u0027s enter finishes.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003EFrame\u003C/code\u003E has a comment node, so it does not carry the mode itself; it uses that of its nearest element parent. A conditional branch inside an element that carries the mode also passes through the nested \u003Ccode\u003EFrame\u003C/code\u003Es and uses the same mode.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Edispose()\u003C/code\u003E, \u003Ccode\u003Eflush()\u003C/code\u003E and \u003Ccode\u003Emotif.clear()\u003C/code\u003E also play the content\u0027s leave transition and wait for it to finish; \u003Ccode\u003Edispose({ skipLeaveTransition: true })\u003C/code\u003E is passed on to the content with the same option.\u003C/p\u003E\n\u003Ch2 id=\u0022where-used\u0022\u003EWhere the framework sets up a Frame\u003C/h2\u003E\n\u003Cp\u003EThe framework sets up a \u003Ccode\u003EFrame\u003C/code\u003E itself in these places: \u003Ccode\u003E{condition \u0026amp;\u0026amp; \u0026lt;X/\u0026gt;}\u003C/code\u003E (\u003Ccode\u003Ebindings.when\u003C/code\u003E), the ternary operator (\u003Ccode\u003Ebindings.ternary\u003C/code\u003E), \u003Ccode\u003Eswitch\u003C/code\u003E (\u003Ccode\u003Ebindings.switchCase\u003C/code\u003E), \u003Ccode\u003E{() =\u0026gt; …}\u003C/code\u003E children that return a component (\u003Ccode\u003Ebindings.method\u003C/code\u003E), and \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E. \u003Ccode\u003ERouterView\u003C/code\u003E is a separate component, but it uses the same navigation logic on a page change (the queue lock, \u003Ccode\u003ELazy\u003C/code\u003E for a \u003Ccode\u003EPromise\u003C/code\u003E); the difference is that it does not wait for the leaving page to be disposed (see \u003Ca href=\u0022/docs/router-view#leaving-page\u0022\u003EThe page that leaves\u003C/a\u003E). Apart from that, the rules above apply to all of them.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003EFor content through a dynamic \u003Ccode\u003Eimport()\u003C/code\u003E, see \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E; for the usage side of branch changes, \u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EConditional Rendering and Lists\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"usage","text":"Usage","level":2},{"id":"api","text":"API","level":2},{"id":"timing","text":"Timing","level":2},{"id":"transitions","text":"Leave and enter transitions","level":2},{"id":"where-used","text":"Where the framework sets up a Frame","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"collections","title":"Collections"},"next":{"slug":"lazy","title":"Lazy"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Advanced</p>
+        <h1>Frame</h1>
+        <p>A container that holds a single changing piece of content; swapping content with navigate, timing, leave transitions, and the places where the framework sets up a Frame.</p>
+<p>Conditional branches (<code>&amp;&amp;</code>, the ternary operator, <code>switch</code>), getter children of the form <code>{() =&gt; expression}</code> and route pages all work on the same structure: <strong>a container that holds a single piece of content and swaps it</strong>. That container is <code>Frame</code>. <code>Frame</code> is a component whose root is a comment node (it adds no element to the DOM); at any moment it holds at most one piece of content (a component or an array of components), the content is changed with <code>navigate</code>, and the old content is disposed.</p>
+<h2 id="usage">Usage</h2>
+<p>The summary panel in the example switches between the recent notes list (<a href="/docs/query#reactivity"><code>RecentNotes</code></a>) and the folder chart (<a href="/docs/wrapping-libraries#setup-on-built"><code>FolderChart</code></a>) with two buttons:</p>
+<div class="doc-code" data-file="src/parts/SummaryPanel.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/SummaryPanel.tsx"><code>import { Component, Frame } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export class SummaryPanel extends Component&lt;HTMLElement&gt; {
+  static override elementTag = &quot;section&quot;;
+  frame = new Frame();
+
+  override onConfigured() {
+    this.frame.navigate(&lt;RecentNotes /&gt;);
+  }
+
+  override view() {
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;RecentNotes /&gt;)}&gt;Recent notes&lt;/button&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;FolderChart /&gt;)}&gt;Folders&lt;/button&gt;
+        {this.frame}
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/SummaryPanel.ts"><code>import { Component, ComponentBase, Frame, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export class SummaryPanel extends Component&lt;HTMLElement&gt; {
+  static override elementTag = &quot;section&quot;;
+  frame = new Frame();
+
+  override onConfigured() {
+    this.frame.navigate(new RecentNotes());
+  }
+
+  override view() {
+    const recent = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(new RecentNotes()));
+      button.setText(&quot;Recent notes&quot;);
+    });
+    const folders = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(new FolderChart()));
+      button.setText(&quot;Folders&quot;);
+    });
+    return motifFragment({ childs: [recent, folders, this.frame] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/SummaryPanel.tsx"><code>import { Frame } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export function SummaryPanel() {
+  const frame = new Frame();
+  frame.navigate(&lt;RecentNotes /&gt;);
+
+  return (
+    &lt;section&gt;
+      &lt;button type=&quot;button&quot; onclick={() =&gt; frame.navigate(&lt;RecentNotes /&gt;)}&gt;Recent notes&lt;/button&gt;
+      &lt;button type=&quot;button&quot; onclick={() =&gt; frame.navigate(&lt;FolderChart /&gt;)}&gt;Folders&lt;/button&gt;
+      {frame}
+    &lt;/section&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/SummaryPanel.ts"><code>import { ComponentBase, Frame, motifComponent } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export function SummaryPanel() {
+  const frame = new Frame();
+  frame.navigate(motifComponent(RecentNotes));
+
+  return motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+    const recent = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; frame.navigate(motifComponent(RecentNotes)));
+      button.setText(&quot;Recent notes&quot;);
+    });
+    const folders = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; frame.navigate(motifComponent(FolderChart)));
+      button.setText(&quot;Folders&quot;);
+    });
+    section.controls.add(recent, folders, frame);
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/SummaryPanel.tsx"><code>import { Frame, motifOptions } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export const SummaryPanel = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  frame: new Frame(),
+
+  onConfigured() {
+    this.frame.navigate(&lt;RecentNotes /&gt;);
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;RecentNotes /&gt;)}&gt;Recent notes&lt;/button&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;FolderChart /&gt;)}&gt;Folders&lt;/button&gt;
+        {this.frame}
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/SummaryPanel.ts"><code>import { ComponentBase, Frame, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export const SummaryPanel = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  frame: new Frame(),
+
+  onConfigured() {
+    this.frame.navigate(motifComponent(RecentNotes));
+  },
+
+  view() {
+    const recent = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(motifComponent(RecentNotes)));
+      button.setText(&quot;Recent notes&quot;);
+    });
+    const folders = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(motifComponent(FolderChart)));
+      button.setText(&quot;Folders&quot;);
+    });
+    return motifFragment({ childs: [recent, folders, this.frame] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/SummaryPanel.jsx"><code>import { Component, Frame } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export class SummaryPanel extends Component {
+  static elementTag = &quot;section&quot;;
+  frame = new Frame();
+
+  onConfigured() {
+    this.frame.navigate(&lt;RecentNotes /&gt;);
+  }
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;RecentNotes /&gt;)}&gt;Recent notes&lt;/button&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;FolderChart /&gt;)}&gt;Folders&lt;/button&gt;
+        {this.frame}
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/SummaryPanel.js"><code>import { Component, Frame, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export class SummaryPanel extends Component {
+  static elementTag = &quot;section&quot;;
+  frame = new Frame();
+
+  onConfigured() {
+    this.frame.navigate(new RecentNotes());
+  }
+
+  view() {
+    const recent = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(new RecentNotes()));
+      button.setText(&quot;Recent notes&quot;);
+    });
+    const folders = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(new FolderChart()));
+      button.setText(&quot;Folders&quot;);
+    });
+    return motifFragment({ childs: [recent, folders, this.frame] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/SummaryPanel.jsx"><code>import { Frame } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export function SummaryPanel() {
+  const frame = new Frame();
+  frame.navigate(&lt;RecentNotes /&gt;);
+
+  return (
+    &lt;section&gt;
+      &lt;button type=&quot;button&quot; onclick={() =&gt; frame.navigate(&lt;RecentNotes /&gt;)}&gt;Recent notes&lt;/button&gt;
+      &lt;button type=&quot;button&quot; onclick={() =&gt; frame.navigate(&lt;FolderChart /&gt;)}&gt;Folders&lt;/button&gt;
+      {frame}
+    &lt;/section&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/SummaryPanel.js"><code>import { Frame, motifComponent } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export function SummaryPanel() {
+  const frame = new Frame();
+  frame.navigate(motifComponent(RecentNotes));
+
+  return motifComponent(&quot;section&quot;, (section) =&gt; {
+    const recent = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; frame.navigate(motifComponent(RecentNotes)));
+      button.setText(&quot;Recent notes&quot;);
+    });
+    const folders = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; frame.navigate(motifComponent(FolderChart)));
+      button.setText(&quot;Folders&quot;);
+    });
+    section.controls.add(recent, folders, frame);
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/SummaryPanel.jsx"><code>import { Frame, motifOptions } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export const SummaryPanel = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  frame: new Frame(),
+
+  onConfigured() {
+    this.frame.navigate(&lt;RecentNotes /&gt;);
+  },
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;RecentNotes /&gt;)}&gt;Recent notes&lt;/button&gt;
+        &lt;button type=&quot;button&quot; onclick={() =&gt; this.frame.navigate(&lt;FolderChart /&gt;)}&gt;Folders&lt;/button&gt;
+        {this.frame}
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/SummaryPanel.js"><code>import { Frame, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+import { FolderChart } from &quot;./FolderChart&quot;;
+import { RecentNotes } from &quot;./RecentNotes&quot;;
+
+export const SummaryPanel = () =&gt; motifOptions({
+  el: &quot;section&quot;,
+  frame: new Frame(),
+
+  onConfigured() {
+    this.frame.navigate(motifComponent(RecentNotes));
+  },
+
+  view() {
+    const recent = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(motifComponent(RecentNotes)));
+      button.setText(&quot;Recent notes&quot;);
+    });
+    const folders = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.attr.add({ type: &quot;button&quot; });
+      button.motif.on(&quot;click&quot;, () =&gt; this.frame.navigate(motifComponent(FolderChart)));
+      button.setText(&quot;Folders&quot;);
+    });
+    return motifFragment({ childs: [recent, folders, this.frame] });
+  },
+});</code></pre>
+</div>
+<p>Children written between <code>&lt;Frame&gt;…&lt;/Frame&gt;</code> in JSX, and those given with <code>new Frame({ childs: [...] })</code> without JSX, become the first content. If a <code>Promise</code> is given to <code>navigate</code>, the content is loaded with <a href="/docs/lazy">Lazy</a>.</p>
+<h2 id="api">API</h2>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>new Frame(props?)</code></td>
+<td>An empty container. If <code>props.childs</code> is given (<code>&lt;Frame&gt;…&lt;/Frame&gt;</code> in JSX), the children are added as the first content.</td>
+</tr>
+<tr>
+<td><code>navigate(page, keepOldControl?)</code></td>
+<td><code>page</code> can be a component, an array of components, a component class/factory or a <code>Promise</code>. The old content is disposed (it stays in place if <code>keepOldControl: true</code> is given), and the new one is added. If a <code>Promise</code> is given, the content is loaded with <code>Lazy</code>; the next <code>navigate</code> cancels the previous load. A second call with the same content does nothing. The <code>Promise</code> it returns resolves once the content is in place.</td>
+</tr>
+<tr>
+<td><code>navigateLazy(caller, options?, keepOldControl?)</code></td>
+<td>A shorthand for <code>navigate(Lazy({ caller, options }))</code>.</td>
+</tr>
+<tr>
+<td><code>flush()</code></td>
+<td>Disposes the current content; the container stays empty. <code>motif.clear()</code> does the same job.</td>
+</tr>
+<tr>
+<td><code>current</code></td>
+<td>The content shown (<code>ComponentBase</code>, an array, or <code>null</code>).</td>
+</tr>
+<tr>
+<td><code>isBusy</code></td>
+<td><code>true</code> while a <code>navigate</code> is in progress.</td>
+</tr>
+<tr>
+<td><code>dispose(options?)</code></td>
+<td>Disposes the content first, then the container; <code>options</code> is passed on to the content too.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="timing">Timing</h2>
+<ul>
+<li><strong>The first content is synchronous.</strong> While the container is empty and <code>page</code> is not a <code>Promise</code>, the content is in place by the time <code>navigate</code> returns; when <code>build()</code> completes, the first branch is on screen (see <a href="/docs/conditionals-and-lists#why-x-wait">Conditional rendering - Synchronous first render</a>).</li>
+<li><strong>Later changes are queued.</strong> Consecutive <code>navigate</code> calls are queued behind a lock, and each waits for the previous one to finish. A new call that comes in between drops the result of an older call that has not been placed yet (only the content requested last is placed).</li>
+<li><strong>Old content without a leave transition</strong> is disposed (<code>onDisposed</code>) before the new content is added.</li>
+<li>If the content cannot be placed, <code>MJX114</code> is reported, and if the old content cannot be disposed, <code>MJX115</code>; the container keeps working.</li>
+</ul>
+<h2 id="transitions">Leave and enter transitions</h2>
+<p>The old content plays its leave transition: first its running animations are cancelled, then it is disposed with <code>dispose({ deep: true })</code>; if a leave transition is defined (the <code>transition</code> prop or <code>motif.options.transition.out(...)</code>), it plays. The new content does <strong>not wait</strong> for the old one to finish: while the old content leaves, the new one is added right away, and their order is decided by the <code>mode</code> of the nearest <strong>element</strong> parent (see <a href="/docs/styling-and-transitions#transition-mode">Styling and animation - Enter and leave order</a>):</p>
+<table>
+<thead>
+<tr>
+<th><code>mode</code></th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'concurrent'</code> (default)</td>
+<td>While the old content leaves, the new content enters at the same time.</td>
+</tr>
+<tr>
+<td><code>'out-in'</code></td>
+<td>The new content is not placed in the DOM until the old one's leave finishes.</td>
+</tr>
+<tr>
+<td><code>'in-out'</code></td>
+<td>The old one's leave is postponed until the new one's enter finishes.</td>
+</tr>
+</tbody>
+</table>
+<p><code>Frame</code> has a comment node, so it does not carry the mode itself; it uses that of its nearest element parent. A conditional branch inside an element that carries the mode also passes through the nested <code>Frame</code>s and uses the same mode.</p>
+<p><code>dispose()</code>, <code>flush()</code> and <code>motif.clear()</code> also play the content's leave transition and wait for it to finish; <code>dispose({ skipLeaveTransition: true })</code> is passed on to the content with the same option.</p>
+<h2 id="where-used">Where the framework sets up a Frame</h2>
+<p>The framework sets up a <code>Frame</code> itself in these places: <code>{condition &amp;&amp; &lt;X/&gt;}</code> (<code>bindings.when</code>), the ternary operator (<code>bindings.ternary</code>), <code>switch</code> (<code>bindings.switchCase</code>), <code>{() =&gt; …}</code> children that return a component (<code>bindings.method</code>), and <a href="/docs/lazy">Lazy</a>. <code>RouterView</code> is a separate component, but it uses the same navigation logic on a page change (the queue lock, <code>Lazy</code> for a <code>Promise</code>); the difference is that it does not wait for the leaving page to be disposed (see <a href="/docs/router-view#leaving-page">The page that leaves</a>). Apart from that, the rules above apply to all of them.</p>
+<h2 id="next">Next step</h2>
+<p>For content through a dynamic <code>import()</code>, see <a href="/docs/lazy">Lazy</a>; for the usage side of branch changes, <a href="/docs/conditionals-and-lists">Conditional Rendering and Lists</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

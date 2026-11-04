@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Mobil tarzı yığın gezinmesi; tutulan sayfalar, geçiş animasyonu ve kaydırarak geri.">
+    <title>Yığın Gezinmesi — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/navigation-stack">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/navigation-stack">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/navigation-stack">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/navigation-stack">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/navigation-stack">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Yığın Gezinmesi">
+    <meta property="og:description" content="Mobil tarzı yığın gezinmesi; tutulan sayfalar, geçiş animasyonu ve kaydırarak geri.">
+    <script type="application/json" id="doc-data">{"slug":"navigation-stack","locale":"tr","title":"Yığın Gezinmesi","description":"Mobil tarzı yığın gezinmesi; tutulan sayfalar, geçiş animasyonu ve kaydırarak geri.","category":{"id":"4","title":"Yönlendirme"},"html":"\u003Ch2 id=\u0022stack\u0022\u003EYığın gezinmesi — \u003Ccode\u003Estack\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EVarsayılan davranışta sayfadan ayrılınca eski sayfa atılır, geri gelindiğinde yeniden oluşturulur. Mobil uygulamalarda beklenen ise \u003Cstrong\u003Eyığın\u003C/strong\u003E davranışıdır: ileri gidince önceki sayfa durumu, kaydırması ve formuyla korunur; geri gelince aynı örnek geri gelir. \u003Ccode\u003Estack\u003C/code\u003E bunu açar:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  mode: \u0026quot;history\u0026quot;,\n  stack: {\n    retain: true,        // önceki sayfalar DOM\u0027da gizli tutulsun (varsayılan false: bellekte, DOM\u0027dan ayrılmış)\n    depth: 5,            // en fazla kaç önceki sayfa tutulsun (varsayılan 5; taşan en eski sayfa atılır)\n    persist: false,      // yığındaki adresler sessionStorage\u0027a yazılsın (varsayılan false)\n    animation: \u0026quot;slide\u0026quot;,  // \u0027none\u0027 (varsayılan) | \u0027slide\u0027 | özel fonksiyon\n    duration: 300,       // \u0027slide\u0027 süresi (ms)\n    swipeBack: true,     // ekranın sol kenarından sağa kaydırarak geri (varsayılan kapalı)\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  mode: \u0026quot;history\u0026quot;,\n  stack: {\n    retain: true,        // önceki sayfalar DOM\u0027da gizli tutulsun (varsayılan false: bellekte, DOM\u0027dan ayrılmış)\n    depth: 5,            // en fazla kaç önceki sayfa tutulsun (varsayılan 5; taşan en eski sayfa atılır)\n    persist: false,      // yığındaki adresler sessionStorage\u0027a yazılsın (varsayılan false)\n    animation: \u0026quot;slide\u0026quot;,  // \u0027none\u0027 (varsayılan) | \u0027slide\u0027 | özel fonksiyon\n    duration: 300,       // \u0027slide\u0027 süresi (ms)\n    swipeBack: true,     // ekranın sol kenarından sağa kaydırarak geri (varsayılan kapalı)\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Estack: true\u003C/code\u003E varsayılan değerlerle açar. Seçenek verilmezse davranış yukarıda anlatıldığı gibidir; hiçbir şey değişmez. \u003Ccode\u003Eshell\u003C/code\u003E modunda geçmiş olmadığı için etkisizdir.\u003C/p\u003E\n\u003Cp\u003EKurallar:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003ETutulan sayfa geçmiş kaydına bağlıdır, rotaya değil.\u003C/strong\u003E \u003Ccode\u003E/notes/1\u003C/code\u003E → \u003Ccode\u003E/notes/2\u003C/code\u003E → geri: \u003Ccode\u003E/notes/1\u003C/code\u003E\u0027in kendi örneği geri gelir. (Yığın açıkken aynı rotaya farklı parametreyle ileri gitmek yeni bir örnek oluşturur; \u003Ccode\u003EonUpdate\u003C/code\u003E yine çağrılır.)\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003Eİleri gidince (push/forward) ayrılan sayfa tutulur; geri gidince (back) ayrılan sayfa atılır.\u003C/strong\u003E Tarayıcının ileri tuşu o sayfayı yeniden oluşturur. \u003Ccode\u003Ereplace\u003C/code\u003E ile değiştirilen sayfa tutulmaz. Geri dönüp yeni bir yere gidince ileri kayıtların sayfaları atılır.\u003C/li\u003E\n\u003Cli\u003ETutulan sayfa gizlenirken \u003Ccode\u003EonDeactivated\u003C/code\u003E, geri geldiğinde \u003Ccode\u003EonActivated\u003C/code\u003E ve rotanın \u003Ccode\u003EonShow\u003C/code\u003E kancası çalışır. Sayfanın içindeki kaydırılabilir öğelerin konumu korunur.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eretain: true\u003C/code\u003E ile gizli sayfa DOM\u0027da \u003Ccode\u003Edisplay: none\u003C/code\u003E, \u003Ccode\u003Einert\u003C/code\u003E ve \u003Ccode\u003Earia-hidden\u003C/code\u003E ile durur; stilleri geri gelince aynen geri konur. Sayfanın elemanı yoksa (fragment) DOM\u0027dan ayrılarak tutulur.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EkeepAlive\u003C/code\u003E rotalar kendi önbelleğini kullanmaya devam eder.\u003C/li\u003E\n\u003Cli\u003EUygulama ya da router serbest bırakılınca tutulan tüm sayfalar serbest bırakılır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003E\u003Cstrong\u003E\u003Ccode\u003Eapp.router.stack\u003C/code\u003E\u003C/strong\u003E yığının güncel listesini verir: \u003Ccode\u003E[{ index, uri, current, retained }]\u003C/code\u003E. Geri düğmesinde önceki sayfanın adını göstermek gibi işler için kullanın. \u003Ccode\u003Epersist: true\u003C/code\u003E ile bu liste sayfa yenilemesinden sonra da gelir; yenilemede önceki sayfalar yeniden oluşturulmaz, geri gidildikçe oluşturulur.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EGeçiş animasyonu.\u003C/strong\u003E \u003Ccode\u003Eanimation: \u0027slide\u0027\u003C/code\u003E ileri gidişte yeni sayfayı sağdan kaydırır, geri gidişte mevcut sayfayı sağa çıkarır; bu sırada diğer sayfa altta durur. Animasyon \u003Ccode\u003Eretain\u003C/code\u003E ayarından bağımsız çalışır: \u003Ccode\u003Eretain: false\u003C/code\u003E iken ayrılan sayfa animasyon bitene kadar DOM\u0027da kalır, sonra ayrılır. Kullanıcı sistemde \u0026quot;hareketi azalt\u0026quot; seçtiyse animasyon atlanır. Kendi animasyonunuzu yazmak için fonksiyon verin; iki sayfa üst üste konumlanmış olarak gelir, fonksiyon bitince stiller geri alınır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  stack: {\n    retain: true,\n    animation: async ({ direction, entering, leaving }) =\u0026gt; {\n      await Promise.all([\n        entering?.animate([{ opacity: 0 }, { opacity: 1 }], 200).finished,\n        leaving?.animate([{ opacity: 1 }, { opacity: 0 }], 200).finished,\n      ]);\n    },\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  stack: {\n    retain: true,\n    animation: async ({ direction, entering, leaving }) =\u0026gt; {\n      await Promise.all([\n        entering?.animate([{ opacity: 0 }, { opacity: 1 }], 200).finished,\n        leaving?.animate([{ opacity: 1 }, { opacity: 0 }], 200).finished,\n      ]);\n    },\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EYığın animasyonu çalışan gezinmede sayfaların kendi geçişleri (\u003Ccode\u003Emotif.options.transition\u003C/code\u003E, bkz. \u003Ca href=\u0022/docs/styling-and-transitions\u0022\u003EStil ve Animasyon\u003C/a\u003E) oynamaz; geçişi yalnızca yığın animasyonu yapar.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003ESayfaların kendi geçişleri.\u003C/strong\u003E \u003Ccode\u003Eanimation\u003C/code\u003E verilmezse yığın, sayfaların kendi giriş/çıkış geçişlerini kullanır; ayrıca bir yığın animasyonu tanımlamak gerekmez. Sıra yığın kapalıyken olduğu gibidir: önce ayrılan sayfanın çıkışı biter, sonra gelen sayfa girer.\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003Eİleri gidişte ayrılan sayfa çıkış geçişini oynatır, bittikten sonra yığında tutulur (\u003Ccode\u003Eretain\u003C/code\u003E ayarına göre ayrılır ya da gizlenir). Geri gidişte ayrılan sayfa çıkış geçişini oynatarak atılır.\u003C/li\u003E\n\u003Cli\u003EGelen sayfa giriş geçişini oynatır; yığından geri gelen tutulan sayfa da, \u003Ccode\u003Eretain\u003C/code\u003E hangi değerde olursa olsun, yeniden giriş geçişini oynatır.\u003C/li\u003E\n\u003Cli\u003EGeçişi olmayan sayfa anında ayrılır ya da gelir.\u003C/li\u003E\n\u003Cli\u003EGeçiş süresince sayfa öğesinde \u003Ccode\u003Edata-nav-direction\u003C/code\u003E özniteliği gezinmenin yönünü taşır (\u003Ccode\u003Einitial\u003C/code\u003E, \u003Ccode\u003Epush\u003C/code\u003E, \u003Ccode\u003Eback\u003C/code\u003E, \u003Ccode\u003Eforward\u003C/code\u003E, \u003Ccode\u003Ereplace\u003C/code\u003E, \u003Ccode\u003Etraverse\u003C/code\u003E); geçiş bitince kaldırılır. Aynı CSS\u0027le ileri ve geri için farklı animasyon yazılabilir:\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022css\u0022\u003E\u003Ccode\u003E.page-enter-active { animation: slide-from-right .3s ease; }\n.page-leave-active { animation: slide-to-left .3s ease forwards; }\n[data-nav-direction=\u0026quot;back\u0026quot;].page-enter-active { animation-name: slide-from-left; }\n[data-nav-direction=\u0026quot;back\u0026quot;].page-leave-active { animation-name: slide-to-right; }\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Cstrong\u003EKaydırarak geri.\u003C/strong\u003E \u003Ccode\u003EswipeBack: true\u003C/code\u003E ile ekranın sol kenarından (varsayılan 24px) başlayan yatay dokunuş sayfayı parmakla birlikte kaydırır. Önceki sayfanın sürükleme sırasında altta görünmesi için \u003Ccode\u003Eretain: true\u003C/code\u003E gerekir; \u003Ccode\u003Eretain: false\u003C/code\u003E iken önceki sayfa DOM\u0027da olmadığından altta sayfanın arka planı görünür, bırakınca geri gidiş yine çalışır. Genişliğin %35\u0027ini (\u003Ccode\u003Ethreshold\u003C/code\u003E) geçen ya da hızlı bir fiske geri gider, aksi hâlde sayfa yerine oturur. Guard geri gidişi iptal ederse sayfa geri kayar ve adres korunur. Kaydırarak yapılan geri gidişte sürükleme animasyonun kendisidir; sayfaların kendi geçişleri oynamaz. Ayarlar: \u003Ccode\u003EswipeBack: { edge: 24, threshold: 0.35 }\u003C/code\u003E. Dokunuş dinleyicisi yalnızca kenardan başlayan dokunuşta etkin hâle gelir; sayfanın dikey kaydırmasını ve yatay kaydırılan içerikleri etkilemez.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EServislerin nasıl kaydedilip enjekte edildiğini öğrenmek için \u003Ca href=\u0022/docs/dependency-injection\u0022\u003EBağımlılık Enjeksiyonuna Giriş\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"stack","text":"Yığın gezinmesi — stack","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"route-guards","title":"Rota Kancaları ve Guard\u0027lar"},"next":{"slug":"dependency-injection","title":"Bağımlılık Enjeksiyonuna Giriş"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Yönlendirme</p>
+        <h1>Yığın Gezinmesi</h1>
+        <p>Mobil tarzı yığın gezinmesi; tutulan sayfalar, geçiş animasyonu ve kaydırarak geri.</p>
+<h2 id="stack">Yığın gezinmesi — <code>stack</code></h2>
+<p>Varsayılan davranışta sayfadan ayrılınca eski sayfa atılır, geri gelindiğinde yeniden oluşturulur. Mobil uygulamalarda beklenen ise <strong>yığın</strong> davranışıdır: ileri gidince önceki sayfa durumu, kaydırması ve formuyla korunur; geri gelince aynı örnek geri gelir. <code>stack</code> bunu açar:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({
+  routes,
+  mode: &quot;history&quot;,
+  stack: {
+    retain: true,        // önceki sayfalar DOM'da gizli tutulsun (varsayılan false: bellekte, DOM'dan ayrılmış)
+    depth: 5,            // en fazla kaç önceki sayfa tutulsun (varsayılan 5; taşan en eski sayfa atılır)
+    persist: false,      // yığındaki adresler sessionStorage'a yazılsın (varsayılan false)
+    animation: &quot;slide&quot;,  // 'none' (varsayılan) | 'slide' | özel fonksiyon
+    duration: 300,       // 'slide' süresi (ms)
+    swipeBack: true,     // ekranın sol kenarından sağa kaydırarak geri (varsayılan kapalı)
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({
+  routes,
+  mode: &quot;history&quot;,
+  stack: {
+    retain: true,        // önceki sayfalar DOM'da gizli tutulsun (varsayılan false: bellekte, DOM'dan ayrılmış)
+    depth: 5,            // en fazla kaç önceki sayfa tutulsun (varsayılan 5; taşan en eski sayfa atılır)
+    persist: false,      // yığındaki adresler sessionStorage'a yazılsın (varsayılan false)
+    animation: &quot;slide&quot;,  // 'none' (varsayılan) | 'slide' | özel fonksiyon
+    duration: 300,       // 'slide' süresi (ms)
+    swipeBack: true,     // ekranın sol kenarından sağa kaydırarak geri (varsayılan kapalı)
+  },
+});</code></pre>
+</div>
+<p><code>stack: true</code> varsayılan değerlerle açar. Seçenek verilmezse davranış yukarıda anlatıldığı gibidir; hiçbir şey değişmez. <code>shell</code> modunda geçmiş olmadığı için etkisizdir.</p>
+<p>Kurallar:</p>
+<ul>
+<li><strong>Tutulan sayfa geçmiş kaydına bağlıdır, rotaya değil.</strong> <code>/notes/1</code> → <code>/notes/2</code> → geri: <code>/notes/1</code>'in kendi örneği geri gelir. (Yığın açıkken aynı rotaya farklı parametreyle ileri gitmek yeni bir örnek oluşturur; <code>onUpdate</code> yine çağrılır.)</li>
+<li><strong>İleri gidince (push/forward) ayrılan sayfa tutulur; geri gidince (back) ayrılan sayfa atılır.</strong> Tarayıcının ileri tuşu o sayfayı yeniden oluşturur. <code>replace</code> ile değiştirilen sayfa tutulmaz. Geri dönüp yeni bir yere gidince ileri kayıtların sayfaları atılır.</li>
+<li>Tutulan sayfa gizlenirken <code>onDeactivated</code>, geri geldiğinde <code>onActivated</code> ve rotanın <code>onShow</code> kancası çalışır. Sayfanın içindeki kaydırılabilir öğelerin konumu korunur.</li>
+<li><code>retain: true</code> ile gizli sayfa DOM'da <code>display: none</code>, <code>inert</code> ve <code>aria-hidden</code> ile durur; stilleri geri gelince aynen geri konur. Sayfanın elemanı yoksa (fragment) DOM'dan ayrılarak tutulur.</li>
+<li><code>keepAlive</code> rotalar kendi önbelleğini kullanmaya devam eder.</li>
+<li>Uygulama ya da router serbest bırakılınca tutulan tüm sayfalar serbest bırakılır.</li>
+</ul>
+<p><strong><code>app.router.stack</code></strong> yığının güncel listesini verir: <code>[{ index, uri, current, retained }]</code>. Geri düğmesinde önceki sayfanın adını göstermek gibi işler için kullanın. <code>persist: true</code> ile bu liste sayfa yenilemesinden sonra da gelir; yenilemede önceki sayfalar yeniden oluşturulmaz, geri gidildikçe oluşturulur.</p>
+<p><strong>Geçiş animasyonu.</strong> <code>animation: 'slide'</code> ileri gidişte yeni sayfayı sağdan kaydırır, geri gidişte mevcut sayfayı sağa çıkarır; bu sırada diğer sayfa altta durur. Animasyon <code>retain</code> ayarından bağımsız çalışır: <code>retain: false</code> iken ayrılan sayfa animasyon bitene kadar DOM'da kalır, sonra ayrılır. Kullanıcı sistemde &quot;hareketi azalt&quot; seçtiyse animasyon atlanır. Kendi animasyonunuzu yazmak için fonksiyon verin; iki sayfa üst üste konumlanmış olarak gelir, fonksiyon bitince stiller geri alınır:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({
+  routes,
+  stack: {
+    retain: true,
+    animation: async ({ direction, entering, leaving }) =&gt; {
+      await Promise.all([
+        entering?.animate([{ opacity: 0 }, { opacity: 1 }], 200).finished,
+        leaving?.animate([{ opacity: 1 }, { opacity: 0 }], 200).finished,
+      ]);
+    },
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({
+  routes,
+  stack: {
+    retain: true,
+    animation: async ({ direction, entering, leaving }) =&gt; {
+      await Promise.all([
+        entering?.animate([{ opacity: 0 }, { opacity: 1 }], 200).finished,
+        leaving?.animate([{ opacity: 1 }, { opacity: 0 }], 200).finished,
+      ]);
+    },
+  },
+});</code></pre>
+</div>
+<p>Yığın animasyonu çalışan gezinmede sayfaların kendi geçişleri (<code>motif.options.transition</code>, bkz. <a href="/tr/docs/styling-and-transitions">Stil ve Animasyon</a>) oynamaz; geçişi yalnızca yığın animasyonu yapar.</p>
+<p><strong>Sayfaların kendi geçişleri.</strong> <code>animation</code> verilmezse yığın, sayfaların kendi giriş/çıkış geçişlerini kullanır; ayrıca bir yığın animasyonu tanımlamak gerekmez. Sıra yığın kapalıyken olduğu gibidir: önce ayrılan sayfanın çıkışı biter, sonra gelen sayfa girer.</p>
+<ul>
+<li>İleri gidişte ayrılan sayfa çıkış geçişini oynatır, bittikten sonra yığında tutulur (<code>retain</code> ayarına göre ayrılır ya da gizlenir). Geri gidişte ayrılan sayfa çıkış geçişini oynatarak atılır.</li>
+<li>Gelen sayfa giriş geçişini oynatır; yığından geri gelen tutulan sayfa da, <code>retain</code> hangi değerde olursa olsun, yeniden giriş geçişini oynatır.</li>
+<li>Geçişi olmayan sayfa anında ayrılır ya da gelir.</li>
+<li>Geçiş süresince sayfa öğesinde <code>data-nav-direction</code> özniteliği gezinmenin yönünü taşır (<code>initial</code>, <code>push</code>, <code>back</code>, <code>forward</code>, <code>replace</code>, <code>traverse</code>); geçiş bitince kaldırılır. Aynı CSS'le ileri ve geri için farklı animasyon yazılabilir:</li>
+</ul>
+<div class="doc-code">
+<pre data-lang="css"><code>.page-enter-active { animation: slide-from-right .3s ease; }
+.page-leave-active { animation: slide-to-left .3s ease forwards; }
+[data-nav-direction=&quot;back&quot;].page-enter-active { animation-name: slide-from-left; }
+[data-nav-direction=&quot;back&quot;].page-leave-active { animation-name: slide-to-right; }</code></pre>
+</div>
+<p><strong>Kaydırarak geri.</strong> <code>swipeBack: true</code> ile ekranın sol kenarından (varsayılan 24px) başlayan yatay dokunuş sayfayı parmakla birlikte kaydırır. Önceki sayfanın sürükleme sırasında altta görünmesi için <code>retain: true</code> gerekir; <code>retain: false</code> iken önceki sayfa DOM'da olmadığından altta sayfanın arka planı görünür, bırakınca geri gidiş yine çalışır. Genişliğin %35'ini (<code>threshold</code>) geçen ya da hızlı bir fiske geri gider, aksi hâlde sayfa yerine oturur. Guard geri gidişi iptal ederse sayfa geri kayar ve adres korunur. Kaydırarak yapılan geri gidişte sürükleme animasyonun kendisidir; sayfaların kendi geçişleri oynamaz. Ayarlar: <code>swipeBack: { edge: 24, threshold: 0.35 }</code>. Dokunuş dinleyicisi yalnızca kenardan başlayan dokunuşta etkin hâle gelir; sayfanın dikey kaydırmasını ve yatay kaydırılan içerikleri etkilemez.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Servislerin nasıl kaydedilip enjekte edildiğini öğrenmek için <a href="/tr/docs/dependency-injection">Bağımlılık Enjeksiyonuna Giriş</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

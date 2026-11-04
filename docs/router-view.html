@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="RouterView, where route components are placed, nested and named outlets, and how a route component is built; with and without JSX.">
+    <title>RouterView — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/router-view">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/router-view">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/router-view">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/router-view">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/router-view">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RouterView">
+    <meta property="og:description" content="RouterView, where route components are placed, nested and named outlets, and how a route component is built; with and without JSX.">
+    <script type="application/json" id="doc-data">{"slug":"router-view","locale":"en","title":"RouterView","description":"RouterView, where route components are placed, nested and named outlets, and how a route component is built; with and without JSX.","category":{"id":"4","title":"Routing"},"html":"\u003Ch2 id=\u0022router-view\u0022\u003E\u003Ccode\u003ERouterView\u003C/code\u003E — placing a route\u0027s output\u003C/h2\u003E\n\u003Cp\u003EThe place where route components are shown on screen is \u003Ccode\u003ERouterView\u003C/code\u003E. Put it inside a layout; without JSX it is built with \u003Ccode\u003EmotifComponent(RouterView)\u003C/code\u003E. The component of a layout route puts a \u003Ccode\u003ERouterView\u003C/code\u003E where its child routes should go. The layout in the example places a \u003Ccode\u003ERouterView\u003C/code\u003E next to its own content (\u003Ccode\u003Emain.detail\u003C/code\u003E) and reads the route\u0027s \u003Ccode\u003Emeta\u003C/code\u003E data with \u003Ccode\u003EuseNavigation()\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService)!;\n  nav = useNavigation();\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  }\n\n  override view() {\n    return (\n      \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {this.notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService)!;\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder as Folder;\n\n  return (\n    \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n      \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[folder()].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n          {notes.list(folder()).map((note) =\u0026gt; (\n            \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${folder()}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n          ))}\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/section\u0026gt;\n      \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/main\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService)!;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService)!;\n  nav = useNavigation();\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      const list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n        section.class.add(\u0026quot;list\u0026quot;);\n        const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n        const rows = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n          div.class.add(\u0026quot;rows\u0026quot;);\n          div.controls.add(motifComponent({\n            initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; this.notes.list(this.folder), (note: Note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n              indexkey: () =\u0026gt; note.id,\n              initializeComponent: (a: ComponentBase) =\u0026gt; {\n                a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n                a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n              },\n            })),\n          }));\n        });\n        section.controls.add(title, rows);\n      });\n      const detail = motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n        main.class.add(\u0026quot;detail\u0026quot;);\n        main.controls.add(motifComponent(RouterView));\n      });\n      root.controls.add(list, detail);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService)!;\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder as Folder;\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n    root.class.add(\u0026quot;notes\u0026quot;);\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[folder()].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(folder()), (note: Note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a: ComponentBase) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${folder()}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    root.controls.add(list, detail);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder(): Folder {\n    return this.nav.meta.folder as Folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService)!;\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div: ComponentBase) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(this.folder), (note: Note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a: ComponentBase) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    return [list, detail];\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService);\n  nav = useNavigation();\n\n  get folder() {\n    return this.nav.meta.folder;\n  }\n\n  view() {\n    return (\n      \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {this.notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService);\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder;\n\n  return (\n    \u0026lt;div class=\u0026quot;notes\u0026quot;\u0026gt;\n      \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[folder()].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n          {notes.list(folder()).map((note) =\u0026gt; (\n            \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${folder()}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n          ))}\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/section\u0026gt;\n      \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/main\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder() {\n    return this.nav.meta.folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n          \u0026lt;h2\u0026gt;{() =\u0026gt; FOLDERS[this.folder].title}\u0026lt;/h2\u0026gt;\n          \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n            {notes.list(this.folder).map((note) =\u0026gt; (\n              \u0026lt;a key={note.id} rel=\u0026quot;router\u0026quot; href={\u0060/${this.folder}/${note.id}\u0060}\u0026gt;{note.title}\u0026lt;/a\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n        \u0026lt;main class=\u0026quot;detail\u0026quot;\u0026gt;\n          \u0026lt;RouterView /\u0026gt;\n        \u0026lt;/main\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default class NotesLayout extends Component {\n  notes = this.getService(NotesService);\n  nav = useNavigation();\n\n  get folder() {\n    return this.nav.meta.folder;\n  }\n\n  view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n      root.class.add(\u0026quot;notes\u0026quot;);\n      const list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n        section.class.add(\u0026quot;list\u0026quot;);\n        const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n        const rows = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n          div.class.add(\u0026quot;rows\u0026quot;);\n          div.controls.add(motifComponent({\n            initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; this.notes.list(this.folder), (note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n              indexkey: () =\u0026gt; note.id,\n              initializeComponent: (a) =\u0026gt; {\n                a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n                a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n              },\n            })),\n          }));\n        });\n        section.controls.add(title, rows);\n      });\n      const detail = motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n        main.class.add(\u0026quot;detail\u0026quot;);\n        main.controls.add(motifComponent(RouterView));\n      });\n      root.controls.add(list, detail);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport default function NotesLayout() {\n  const notes = FromService(NotesService);\n  const nav = useNavigation();\n  const folder = () =\u0026gt; nav.meta.folder;\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n    root.class.add(\u0026quot;notes\u0026quot;);\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[folder()].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(folder()), (note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${folder()}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    root.controls.add(list, detail);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nconst NotesLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  get folder() {\n    return this.nav.meta.folder;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;notes\u0026quot;);\n  },\n\n  view() {\n    const notes = FromService(NotesService);\n    const list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n      section.class.add(\u0026quot;list\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; FOLDERS[this.folder].title))));\n      const rows = motifComponent(\u0026quot;div\u0026quot;, (div) =\u0026gt; {\n        div.class.add(\u0026quot;rows\u0026quot;);\n        div.controls.add(motifComponent({\n          initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; notes.list(this.folder), (note) =\u0026gt; motifComponent(\u0026quot;a\u0026quot;, {\n            indexkey: () =\u0026gt; note.id,\n            initializeComponent: (a) =\u0026gt; {\n              a.attr.add({ rel: \u0026quot;router\u0026quot;, href: () =\u0026gt; \u0060/${this.folder}/${note.id}\u0060 });\n              a.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n            },\n          })),\n        }));\n      });\n      section.controls.add(title, rows);\n    });\n    const detail = motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n      main.class.add(\u0026quot;detail\u0026quot;);\n      main.controls.add(motifComponent(RouterView));\n    });\n    return [list, detail];\n  },\n});\n\nexport default NotesLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EIf navigation stays on the same layout route, the layout stays in place and only the component in the \u003Ccode\u003ERouterView\u003C/code\u003E changes; when moving to another route, the layout is rebuilt as well (see \u003Ca href=\u0022/docs/routing#from-address-to-screen\u0022\u003EHow an address gets on screen\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003ERouterView\u003C/code\u003E has no element of its own (it is a component without an element, a fragment): the route component sits directly where the \u003Ccode\u003ERouterView\u003C/code\u003E is, inside \u003Ccode\u003Emain.detail\u003C/code\u003E in the example. Attributes written on the tag, such as \u003Ccode\u003Eclass\u003C/code\u003E and \u003Ccode\u003Estyle\u003C/code\u003E, do not show up in the DOM because there is no element to write them on; if you need a container around the output, put the \u003Ccode\u003ERouterView\u003C/code\u003E inside an element (see \u003Ca href=\u0022/docs/components#root-element\u0022\u003ERoot element\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022route-component\u0022\u003EHow a route component is built\u003C/h2\u003E\n\u003Cp\u003EThe \u003Ccode\u003Edefault\u003C/code\u003E export of the module loaded with \u003Ccode\u003Econtrol: () =\u0026gt; import(\u0027./pages/SettingsPage\u0027)\u003C/code\u003E is used as the route component; with a module that has no \u003Ccode\u003Edefault\u003C/code\u003E export, the page cannot be built, \u003Ccode\u003EMJX304\u003C/code\u003E is reported (with \u003Ccode\u003EMJX127\u003C/code\u003E as the cause) and the error route is shown. A class is built with \u003Ccode\u003Enew SomeClass(app)\u003C/code\u003E and a function with \u003Ccode\u003Efn(app)\u003C/code\u003E: the first argument is the running \u003Ccode\u003EApplication\u003C/code\u003E, and a route component takes no props from a tag. A function that returns an \u003Ca href=\u0022/docs/components#options-components\u0022\u003EOptions API\u003C/a\u003E object (or the object itself) becomes a route component too: the function is still called with \u003Ccode\u003Efn(app)\u003C/code\u003E, the returned object is turned into a component as in JSX, and \u003Ccode\u003Ector\u003C/code\u003E receives no props (\u003Ccode\u003Eundefined\u003C/code\u003E). The \u003Ccode\u003Edefault\u003C/code\u003E loaded by \u003Ca href=\u0022/docs/lazy\u0022\u003ELazy\u003C/a\u003E can be one of these forms as well; \u003Ccode\u003ELazy\u003C/code\u003E builds it without arguments.\u003C/p\u003E\n\u003Cp\u003EIf the component is registered in DI (an \u003Ccode\u003E@Injectable\u003C/code\u003E class, or a \u003Ccode\u003Eservices.addTransient\u003C/code\u003E / \u003Ccode\u003EaddScoped\u003C/code\u003E / \u003Ccode\u003EaddSingleton\u003C/code\u003E registration), the instance is resolved from the provider, and the registration\u0027s lifetime decides the page\u0027s lifetime:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ELifetime\u003C/th\u003E\n\u003Cth\u003EPage\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etransient\u003C/code\u003E (the default of \u003Ccode\u003E@Injectable\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003EA new page is built on every visit and disposed on leaving.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Escoped\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOne page is built in each navigation\u0027s scope and disposed on leaving. With \u003Ccode\u003EkeepAlive: true\u003C/code\u003E, a cached page outlives its own navigation scope.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Esingleton\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA single page for the whole application: like a route given a ready instance, it is not disposed on leaving but detached from the outlet (\u003Ccode\u003EonDeactivated\u003C/code\u003E), and the same instance is attached again on return (\u003Ccode\u003EonActivated\u003C/code\u003E). It is disposed with \u003Ccode\u003Eapp.dispose()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022named-router-view\u0022\u003ENamed \u003Ccode\u003ERouterView\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EBy default a route\u0027s component sits in the parent route\u0027s \u003Ccode\u003ERouterView\u003C/code\u003E named \u003Ccode\u003Edefault\u003C/code\u003E; for it to go into another outlet, give \u003Ccode\u003Eextend.targetOutlet\u003C/code\u003E on the route. A layout can carry several \u003Ccode\u003ERouterView\u003C/code\u003Es; an outlet without a name is \u003Ccode\u003Edefault\u003C/code\u003E. In the example the second outlet is named \u003Ccode\u003Epage\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterView /\u0026gt;\n\u0026lt;RouterView name=\u0026quot;page\u0026quot; /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Econst folders = motifComponent(RouterView);\nconst page = motifComponent(RouterView, { name: \u0026quot;page\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterView /\u0026gt;\n\u0026lt;RouterView name=\u0026quot;page\u0026quot; /\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Econst folders = motifComponent(RouterView);\nconst page = motifComponent(RouterView, { name: \u0026quot;page\u0026quot; });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/routes.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/routes.ts\u0022\u003E\u003Ccode\u003Econst settings: RouteItem = { path: \u0026quot;/settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;), extend: { targetOutlet: \u0026quot;page\u0026quot; } };\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/routes.js\u0022\u003E\u003Ccode\u003Econst settings = { path: \u0026quot;/settings\u0026quot;, control: () =\u0026gt; import(\u0026quot;./pages/SettingsPage\u0026quot;), extend: { targetOutlet: \u0026quot;page\u0026quot; } };\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EEach route goes into a single outlet; only one route is shown at a time at the same level, so while \u003Ccode\u003E/settings\u003C/code\u003E is open the default outlet stays empty, and when you return to a folder the \u003Ccode\u003Epage\u003C/code\u003E outlet is emptied.\u003C/p\u003E\n\u003Cp\u003EIf you do not give \u003Ccode\u003Eapp.run\u003C/code\u003E a root component, MotifJS automatically places a \u003Ccode\u003ERouterView\u003C/code\u003E with \u003Ccode\u003Ename: \u0027default\u0027\u003C/code\u003E at the root, and the first link of the route table lands there.\u003C/p\u003E\n\u003Cp\u003EIf the layout\u0027s \u003Ccode\u003ERouterView\u003C/code\u003E has not been built yet (for example because it is inside a section waiting with \u003Ccode\u003Ex-wait\u003C/code\u003E), the child route waits and is attached the moment the \u003Ccode\u003ERouterView\u003C/code\u003E is built. If it is not built within 3000 ms in development mode, an \u003Ccode\u003EMJX301\u003C/code\u003E warning is written; the warning usually means the layout forgot to put a \u003Ccode\u003ERouterView\u003C/code\u003E in.\u003C/p\u003E\n\u003Cp\u003EA \u003Ccode\u003ERouterView\u003C/code\u003E built after a navigation has finished fills up the same way: when the layout swaps its output with a \u003Ccode\u003EFrame\u003C/code\u003E, or closes and opens it with \u003Ccode\u003E{condition \u0026amp;\u0026amp; \u0026lt;RouterView /\u0026gt;}\u003C/code\u003E, the component of the route on screen goes into the new \u003Ccode\u003ERouterView\u003C/code\u003E. No navigation happens for this; guards, \u003Ccode\u003EonEntering\u003C/code\u003E and \u003Ccode\u003EonEnter\u003C/code\u003E do not run, \u003Ccode\u003EonShow\u003C/code\u003E does. A page disposed together with the old \u003Ccode\u003ERouterView\u003C/code\u003E is built again, and if the old outlet has a leave transition, the new page does not wait for it. \u003Ccode\u003EkeepAlive\u003C/code\u003E, ready-instance, \u003Ccode\u003Esingleton\u003C/code\u003E and \u003Ccode\u003Escoped\u003C/code\u003E pages are not disposed; the same instance is moved to the new \u003Ccode\u003ERouterView\u003C/code\u003E (\u003Ccode\u003EonDeactivated\u003C/code\u003E, then \u003Ccode\u003EonActivated\u003C/code\u003E). If the \u003Ccode\u003ERouterView\u003C/code\u003E is removed without a new one being put in its place, these pages wait, and no warning is written. If the page cannot be built, \u003Ccode\u003EMJX304\u003C/code\u003E is reported and the error route is shown.\u003C/p\u003E\n\u003Ch2 id=\u0022leaving-page\u0022\u003EThe page that leaves\u003C/h2\u003E\n\u003Cp\u003EThe enter and leave transitions of route pages play during navigation too: the page that leaves finishes its leave transition, and then the incoming page is placed and enters (see \u003Ca href=\u0022/docs/styling-and-transitions#transition-visibility\u0022\u003EStyling and Animation\u003C/a\u003E).\u003C/p\u003E\n\u003Cp\u003EThe new page does not wait for the leaving page to be disposed. The router takes the leaving page off the screen, places the new page, and disposes the leaving page after the new page has come on screen:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003EAs soon as the page leaves, its bindings and the \u003Ccode\u003Econtext.on\u003C/code\u003E / \u003Ccode\u003Econtext.onRouterChanged\u003C/code\u003E subscriptions tied to its components stop; content it sent to a slot with \u003Ccode\u003ETransportTo\u003C/code\u003E leaves the slot. The element of a page with its own leave transition is removed when the transition finishes, and that of a page without one right away.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EonDisposing\u003C/code\u003E, \u003Ccode\u003EonDisposed\u003C/code\u003E and cleanup work tied with \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E (such as calling \u003Ccode\u003Edestroy()\u003C/code\u003E on library components) run after the new page has come on screen, and see the route that was navigated to. A long cleanup does not delay the arrival of the new page.\u003C/li\u003E\n\u003Cli\u003EThe leaving page uses the \u003Ccode\u003Escoped\u003C/code\u003E instances of its own navigation until its disposal finishes; those instances are disposed after the page (see \u003Ca href=\u0022/docs/service-lifetimes#scoped\u0022\u003ELifetimes and Scopes\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EkeepAlive\u003C/code\u003E, ready-instance and \u003Ccode\u003Esingleton\u003C/code\u003E pages, and pages kept in the stack, are not disposed but detached from the outlet.\u003C/li\u003E\n\u003Cli\u003EIf a new navigation starts before one has finished, the page that the interrupted navigation built but could not show is disposed; when that route is visited later, the page is built again. \u003Ccode\u003EkeepAlive\u003C/code\u003E, ready-instance and \u003Ccode\u003Esingleton\u003C/code\u003E pages are kept.\u003C/li\u003E\n\u003Cli\u003EThe result of \u003Ccode\u003Eapp.navigate\u003C/code\u003E and \u003Ccode\u003EonRouterChanged\u003C/code\u003E arrive before the leaving page is disposed. \u003Ccode\u003Eapp.dispose()\u003C/code\u003E also disposes the pages waiting to be disposed.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo link pages to each other, go on to \u003Ca href=\u0022/docs/router-links\u0022\u003ELinks\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"router-view","text":"RouterView — placing a route\u0027s output","level":2},{"id":"route-component","text":"How a route component is built","level":2},{"id":"named-router-view","text":"Named RouterView","level":2},{"id":"leaving-page","text":"The page that leaves","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"routes","title":"The Route Table"},"next":{"slug":"router-links","title":"Links"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Routing</p>
+        <h1>RouterView</h1>
+        <p>RouterView, where route components are placed, nested and named outlets, and how a route component is built; with and without JSX.</p>
+<h2 id="router-view"><code>RouterView</code> — placing a route's output</h2>
+<p>The place where route components are shown on screen is <code>RouterView</code>. Put it inside a layout; without JSX it is built with <code>motifComponent(RouterView)</code>. The component of a layout route puts a <code>RouterView</code> where its child routes should go. The layout in the example places a <code>RouterView</code> next to its own content (<code>main.detail</code>) and reads the route's <code>meta</code> data with <code>useNavigation()</code>:</p>
+<div class="doc-code" data-file="src/layouts/NotesLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/layouts/NotesLayout.tsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService)!;
+  nav = useNavigation();
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  }
+
+  override view() {
+    return (
+      &lt;div class=&quot;notes&quot;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {this.notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/NotesLayout.tsx"><code>import { FromService, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService)!;
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder as Folder;
+
+  return (
+    &lt;div class=&quot;notes&quot;&gt;
+      &lt;section class=&quot;list&quot;&gt;
+        &lt;h2&gt;{() =&gt; FOLDERS[folder()].title}&lt;/h2&gt;
+        &lt;div class=&quot;rows&quot;&gt;
+          {notes.list(folder()).map((note) =&gt; (
+            &lt;a key={note.id} rel=&quot;router&quot; href={`/${folder()}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/section&gt;
+      &lt;main class=&quot;detail&quot;&gt;
+        &lt;RouterView /&gt;
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/layouts/NotesLayout.tsx"><code>import { FromService, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService)!;
+    return (
+      &lt;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/&gt;
+    );
+  },
+});
+
+export default NotesLayout;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/NotesLayout.ts"><code>import { Component, ComponentBase, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService)!;
+  nav = useNavigation();
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  }
+
+  override view() {
+    return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+        section.class.add(&quot;list&quot;);
+        const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+        const rows = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+          div.class.add(&quot;rows&quot;);
+          div.controls.add(motifComponent({
+            initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; this.notes.list(this.folder), (note: Note) =&gt; motifComponent(&quot;a&quot;, {
+              indexkey: () =&gt; note.id,
+              initializeComponent: (a: ComponentBase) =&gt; {
+                a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+                a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+              },
+            })),
+          }));
+        });
+        section.controls.add(title, rows);
+      });
+      const detail = motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+        main.class.add(&quot;detail&quot;);
+        main.controls.add(motifComponent(RouterView));
+      });
+      root.controls.add(list, detail);
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/NotesLayout.ts"><code>import { ComponentBase, FromService, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService)!;
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder as Folder;
+
+  return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+    root.class.add(&quot;notes&quot;);
+    const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; FOLDERS[folder()].title))));
+      const rows = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; notes.list(folder()), (note: Note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a: ComponentBase) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${folder()}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    root.controls.add(list, detail);
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/NotesLayout.ts"><code>import { ComponentBase, FromService, motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder(): Folder {
+    return this.nav.meta.folder as Folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService)!;
+    const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+      const rows = motifComponent(&quot;div&quot;, (div: ComponentBase) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; notes.list(this.folder), (note: Note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a: ComponentBase) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    return [list, detail];
+  },
+});
+
+export default NotesLayout;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/layouts/NotesLayout.jsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService);
+  nav = useNavigation();
+
+  get folder() {
+    return this.nav.meta.folder;
+  }
+
+  view() {
+    return (
+      &lt;div class=&quot;notes&quot;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {this.notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/NotesLayout.jsx"><code>import { FromService, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService);
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder;
+
+  return (
+    &lt;div class=&quot;notes&quot;&gt;
+      &lt;section class=&quot;list&quot;&gt;
+        &lt;h2&gt;{() =&gt; FOLDERS[folder()].title}&lt;/h2&gt;
+        &lt;div class=&quot;rows&quot;&gt;
+          {notes.list(folder()).map((note) =&gt; (
+            &lt;a key={note.id} rel=&quot;router&quot; href={`/${folder()}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/section&gt;
+      &lt;main class=&quot;detail&quot;&gt;
+        &lt;RouterView /&gt;
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/layouts/NotesLayout.jsx"><code>import { FromService, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder() {
+    return this.nav.meta.folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService);
+    return (
+      &lt;&gt;
+        &lt;section class=&quot;list&quot;&gt;
+          &lt;h2&gt;{() =&gt; FOLDERS[this.folder].title}&lt;/h2&gt;
+          &lt;div class=&quot;rows&quot;&gt;
+            {notes.list(this.folder).map((note) =&gt; (
+              &lt;a key={note.id} rel=&quot;router&quot; href={`/${this.folder}/${note.id}`}&gt;{note.title}&lt;/a&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+        &lt;main class=&quot;detail&quot;&gt;
+          &lt;RouterView /&gt;
+        &lt;/main&gt;
+      &lt;/&gt;
+    );
+  },
+});
+
+export default NotesLayout;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/NotesLayout.js"><code>import { Component, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default class NotesLayout extends Component {
+  notes = this.getService(NotesService);
+  nav = useNavigation();
+
+  get folder() {
+    return this.nav.meta.folder;
+  }
+
+  view() {
+    return motifComponent(&quot;div&quot;, (root) =&gt; {
+      root.class.add(&quot;notes&quot;);
+      const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+        section.class.add(&quot;list&quot;);
+        const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+        const rows = motifComponent(&quot;div&quot;, (div) =&gt; {
+          div.class.add(&quot;rows&quot;);
+          div.controls.add(motifComponent({
+            initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; this.notes.list(this.folder), (note) =&gt; motifComponent(&quot;a&quot;, {
+              indexkey: () =&gt; note.id,
+              initializeComponent: (a) =&gt; {
+                a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+                a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+              },
+            })),
+          }));
+        });
+        section.controls.add(title, rows);
+      });
+      const detail = motifComponent(&quot;main&quot;, (main) =&gt; {
+        main.class.add(&quot;detail&quot;);
+        main.controls.add(motifComponent(RouterView));
+      });
+      root.controls.add(list, detail);
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/NotesLayout.js"><code>import { FromService, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export default function NotesLayout() {
+  const notes = FromService(NotesService);
+  const nav = useNavigation();
+  const folder = () =&gt; nav.meta.folder;
+
+  return motifComponent(&quot;div&quot;, (root) =&gt; {
+    root.class.add(&quot;notes&quot;);
+    const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; FOLDERS[folder()].title))));
+      const rows = motifComponent(&quot;div&quot;, (div) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; notes.list(folder()), (note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${folder()}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    root.controls.add(list, detail);
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/NotesLayout.js"><code>import { FromService, motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+const NotesLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  get folder() {
+    return this.nav.meta.folder;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;notes&quot;);
+  },
+
+  view() {
+    const notes = FromService(NotesService);
+    const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+      section.class.add(&quot;list&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; FOLDERS[this.folder].title))));
+      const rows = motifComponent(&quot;div&quot;, (div) =&gt; {
+        div.class.add(&quot;rows&quot;);
+        div.controls.add(motifComponent({
+          initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; notes.list(this.folder), (note) =&gt; motifComponent(&quot;a&quot;, {
+            indexkey: () =&gt; note.id,
+            initializeComponent: (a) =&gt; {
+              a.attr.add({ rel: &quot;router&quot;, href: () =&gt; `/${this.folder}/${note.id}` });
+              a.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+            },
+          })),
+        }));
+      });
+      section.controls.add(title, rows);
+    });
+    const detail = motifComponent(&quot;main&quot;, (main) =&gt; {
+      main.class.add(&quot;detail&quot;);
+      main.controls.add(motifComponent(RouterView));
+    });
+    return [list, detail];
+  },
+});
+
+export default NotesLayout;</code></pre>
+</div>
+<p>If navigation stays on the same layout route, the layout stays in place and only the component in the <code>RouterView</code> changes; when moving to another route, the layout is rebuilt as well (see <a href="/docs/routing#from-address-to-screen">How an address gets on screen</a>).</p>
+<p><code>RouterView</code> has no element of its own (it is a component without an element, a fragment): the route component sits directly where the <code>RouterView</code> is, inside <code>main.detail</code> in the example. Attributes written on the tag, such as <code>class</code> and <code>style</code>, do not show up in the DOM because there is no element to write them on; if you need a container around the output, put the <code>RouterView</code> inside an element (see <a href="/docs/components#root-element">Root element</a>).</p>
+<h2 id="route-component">How a route component is built</h2>
+<p>The <code>default</code> export of the module loaded with <code>control: () =&gt; import('./pages/SettingsPage')</code> is used as the route component; with a module that has no <code>default</code> export, the page cannot be built, <code>MJX304</code> is reported (with <code>MJX127</code> as the cause) and the error route is shown. A class is built with <code>new SomeClass(app)</code> and a function with <code>fn(app)</code>: the first argument is the running <code>Application</code>, and a route component takes no props from a tag. A function that returns an <a href="/docs/components#options-components">Options API</a> object (or the object itself) becomes a route component too: the function is still called with <code>fn(app)</code>, the returned object is turned into a component as in JSX, and <code>ctor</code> receives no props (<code>undefined</code>). The <code>default</code> loaded by <a href="/docs/lazy">Lazy</a> can be one of these forms as well; <code>Lazy</code> builds it without arguments.</p>
+<p>If the component is registered in DI (an <code>@Injectable</code> class, or a <code>services.addTransient</code> / <code>addScoped</code> / <code>addSingleton</code> registration), the instance is resolved from the provider, and the registration's lifetime decides the page's lifetime:</p>
+<table>
+<thead>
+<tr>
+<th>Lifetime</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>transient</code> (the default of <code>@Injectable</code>)</td>
+<td>A new page is built on every visit and disposed on leaving.</td>
+</tr>
+<tr>
+<td><code>scoped</code></td>
+<td>One page is built in each navigation's scope and disposed on leaving. With <code>keepAlive: true</code>, a cached page outlives its own navigation scope.</td>
+</tr>
+<tr>
+<td><code>singleton</code></td>
+<td>A single page for the whole application: like a route given a ready instance, it is not disposed on leaving but detached from the outlet (<code>onDeactivated</code>), and the same instance is attached again on return (<code>onActivated</code>). It is disposed with <code>app.dispose()</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="named-router-view">Named <code>RouterView</code></h2>
+<p>By default a route's component sits in the parent route's <code>RouterView</code> named <code>default</code>; for it to go into another outlet, give <code>extend.targetOutlet</code> on the route. A layout can carry several <code>RouterView</code>s; an outlet without a name is <code>default</code>. In the example the second outlet is named <code>page</code>:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/MainLayout.tsx"><code>&lt;RouterView /&gt;
+&lt;RouterView name=&quot;page&quot; /&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/MainLayout.ts"><code>const folders = motifComponent(RouterView);
+const page = motifComponent(RouterView, { name: &quot;page&quot; });</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/MainLayout.jsx"><code>&lt;RouterView /&gt;
+&lt;RouterView name=&quot;page&quot; /&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/MainLayout.js"><code>const folders = motifComponent(RouterView);
+const page = motifComponent(RouterView, { name: &quot;page&quot; });</code></pre>
+</div>
+<div class="doc-code" data-file="src/routes.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/routes.ts"><code>const settings: RouteItem = { path: &quot;/settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;), extend: { targetOutlet: &quot;page&quot; } };</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/routes.js"><code>const settings = { path: &quot;/settings&quot;, control: () =&gt; import(&quot;./pages/SettingsPage&quot;), extend: { targetOutlet: &quot;page&quot; } };</code></pre>
+</div>
+<p>Each route goes into a single outlet; only one route is shown at a time at the same level, so while <code>/settings</code> is open the default outlet stays empty, and when you return to a folder the <code>page</code> outlet is emptied.</p>
+<p>If you do not give <code>app.run</code> a root component, MotifJS automatically places a <code>RouterView</code> with <code>name: 'default'</code> at the root, and the first link of the route table lands there.</p>
+<p>If the layout's <code>RouterView</code> has not been built yet (for example because it is inside a section waiting with <code>x-wait</code>), the child route waits and is attached the moment the <code>RouterView</code> is built. If it is not built within 3000 ms in development mode, an <code>MJX301</code> warning is written; the warning usually means the layout forgot to put a <code>RouterView</code> in.</p>
+<p>A <code>RouterView</code> built after a navigation has finished fills up the same way: when the layout swaps its output with a <code>Frame</code>, or closes and opens it with <code>{condition &amp;&amp; &lt;RouterView /&gt;}</code>, the component of the route on screen goes into the new <code>RouterView</code>. No navigation happens for this; guards, <code>onEntering</code> and <code>onEnter</code> do not run, <code>onShow</code> does. A page disposed together with the old <code>RouterView</code> is built again, and if the old outlet has a leave transition, the new page does not wait for it. <code>keepAlive</code>, ready-instance, <code>singleton</code> and <code>scoped</code> pages are not disposed; the same instance is moved to the new <code>RouterView</code> (<code>onDeactivated</code>, then <code>onActivated</code>). If the <code>RouterView</code> is removed without a new one being put in its place, these pages wait, and no warning is written. If the page cannot be built, <code>MJX304</code> is reported and the error route is shown.</p>
+<h2 id="leaving-page">The page that leaves</h2>
+<p>The enter and leave transitions of route pages play during navigation too: the page that leaves finishes its leave transition, and then the incoming page is placed and enters (see <a href="/docs/styling-and-transitions#transition-visibility">Styling and Animation</a>).</p>
+<p>The new page does not wait for the leaving page to be disposed. The router takes the leaving page off the screen, places the new page, and disposes the leaving page after the new page has come on screen:</p>
+<ul>
+<li>As soon as the page leaves, its bindings and the <code>context.on</code> / <code>context.onRouterChanged</code> subscriptions tied to its components stop; content it sent to a slot with <code>TransportTo</code> leaves the slot. The element of a page with its own leave transition is removed when the transition finishes, and that of a page without one right away.</li>
+<li><code>onDisposing</code>, <code>onDisposed</code> and cleanup work tied with <code>motif.setDisposable</code> (such as calling <code>destroy()</code> on library components) run after the new page has come on screen, and see the route that was navigated to. A long cleanup does not delay the arrival of the new page.</li>
+<li>The leaving page uses the <code>scoped</code> instances of its own navigation until its disposal finishes; those instances are disposed after the page (see <a href="/docs/service-lifetimes#scoped">Lifetimes and Scopes</a>).</li>
+<li><code>keepAlive</code>, ready-instance and <code>singleton</code> pages, and pages kept in the stack, are not disposed but detached from the outlet.</li>
+<li>If a new navigation starts before one has finished, the page that the interrupted navigation built but could not show is disposed; when that route is visited later, the page is built again. <code>keepAlive</code>, ready-instance and <code>singleton</code> pages are kept.</li>
+<li>The result of <code>app.navigate</code> and <code>onRouterChanged</code> arrive before the leaving page is disposed. <code>app.dispose()</code> also disposes the pages waiting to be disposed.</li>
+</ul>
+<h2 id="next">Next step</h2>
+<p>To link pages to each other, go on to <a href="/docs/router-links">Links</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

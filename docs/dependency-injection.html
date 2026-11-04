@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Registering services and resolving them from components; a full example from registration to use, and the DI error codes; with and without JSX.">
+    <title>Introduction to Dependency Injection — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/dependency-injection">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/dependency-injection">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/dependency-injection">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/dependency-injection">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/dependency-injection">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Introduction to Dependency Injection">
+    <meta property="og:description" content="Registering services and resolving them from components; a full example from registration to use, and the DI error codes; with and without JSX.">
+    <script type="application/json" id="doc-data">{"slug":"dependency-injection","locale":"en","title":"Introduction to Dependency Injection","description":"Registering services and resolving them from components; a full example from registration to use, and the DI error codes; with and without JSX.","category":{"id":"5","title":"Dependency Injection"},"html":"\u003Cp\u003EMotifJS includes a built-in dependency injection (DI) system. You register services when the application starts, and then resolve them from components or from other services. A service is a class or a value that holds state and work shared between components. A component does not build the service itself; it asks the provider (\u003Ccode\u003EServiceProvider\u003C/code\u003E) for it, and the provider gives either the same instance or a new one, depending on the registration\u0027s lifetime.\u003C/p\u003E\n\u003Ch2 id=\u0022full-example\u0022\u003EFrom registration to use\u003C/h2\u003E\n\u003Cp\u003EServices are registered on the \u003Ccode\u003Eservices\u003C/code\u003E collection of \u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E, before \u003Ccode\u003Ebuild()\u003C/code\u003E. \u003Ccode\u003EaddSingleton(token, { useClass })\u003C/code\u003E registers the class with a single instance; a singleton given \u003Ccode\u003Estartup: true\u003C/code\u003E is created at the start of \u003Ccode\u003Eapp.run()\u003C/code\u003E without a component asking for it. The two registrations in the example (\u003Ccode\u003ENotesService\u003C/code\u003E and \u003Ccode\u003ESettingsService\u003C/code\u003E from the \u003Ca href=\u0022/docs/components\u0022\u003EComponents\u003C/a\u003E page):\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/main.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;./services/notes\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(NotesService, { useClass: NotesService });\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EA component gets a registered service from the provider: a class component and an Options object use \u003Ccode\u003Ethis.getService(token)\u003C/code\u003E, and a function component uses \u003Ccode\u003EFromService(token)\u003C/code\u003E. When the service\u0027s reactive state is read inside a getter, the binding refreshes as the state changes. \u003Ccode\u003EFolderBadge\u003C/code\u003E in the example shows the number of notes in a folder:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component\u0026lt;HTMLSpanElement, { folder: Folder }\u0026gt; {\n  notes = this.getService(NotesService)!;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  override view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(this.props.folder)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props: { folder: Folder }) {\n  const notes = FromService(NotesService)!;\n  return \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; notes.count(props.folder)}\u0026lt;/span\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/FolderBadge.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props: { folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(props.folder)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/FolderBadge.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component\u0026lt;HTMLSpanElement, { folder: Folder }\u0026gt; {\n  static override elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService)!;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  override view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(this.props.folder)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/FolderBadge.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props: { folder: Folder }) {\n  const notes = FromService(NotesService)!;\n  return motifComponent(\u0026quot;span\u0026quot;, (badge: ComponentBase) =\u0026gt; {\n    badge.class.add(\u0026quot;badge\u0026quot;);\n    badge.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; notes.count(props.folder))));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/FolderBadge.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService, type Folder } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props: { folder: Folder }) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService)!;\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(props.folder)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/FolderBadge.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component {\n  static elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService);\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(this.props.folder)}\u0026lt;/\u0026gt;;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/FolderBadge.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props) {\n  const notes = FromService(NotesService);\n  return \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; notes.count(props.folder)}\u0026lt;/span\u0026gt;;\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/FolderBadge.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return \u0026lt;\u0026gt;{() =\u0026gt; this.notes.count(props.folder)}\u0026lt;/\u0026gt;;\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/FolderBadge.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class FolderBadge extends Component {\n  static elementTag = \u0026quot;span\u0026quot;;\n  notes = this.getService(NotesService);\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  }\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(this.props.folder)));\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/FolderBadge.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function FolderBadge(props) {\n  const notes = FromService(NotesService);\n  return motifComponent(\u0026quot;span\u0026quot;, (badge) =\u0026gt; {\n    badge.class.add(\u0026quot;badge\u0026quot;);\n    badge.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; notes.count(props.folder))));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/FolderBadge.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const FolderBadge = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;span\u0026quot;,\n\n  get notes() {\n    return this.getService(NotesService);\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;badge\u0026quot;);\n  },\n\n  view() {\n    return motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.text(() =\u0026gt; this.notes.count(props.folder)));\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe component is used with its tag:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;All notes \u0026lt;FolderBadge folder=\u0026quot;notes\u0026quot; /\u0026gt;\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;All notes \u0026quot;)), motifComponent(FolderBadge, { folder: \u0026quot;notes\u0026quot; })],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;RouterLink to=\u0026quot;/notes\u0026quot; activeClass=\u0026quot;active\u0026quot;\u0026gt;All notes \u0026lt;FolderBadge folder=\u0026quot;notes\u0026quot; /\u0026gt;\u0026lt;/RouterLink\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Econst all = motifComponent(RouterLink, {\n  to: \u0026quot;/notes\u0026quot;,\n  activeClass: \u0026quot;active\u0026quot;,\n  childs: [motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;All notes \u0026quot;)), motifComponent(FolderBadge, { folder: \u0026quot;notes\u0026quot; })],\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EEvery component that asks for a service registered as a singleton gets the same instance. If the service keeps its state in a \u003Ccode\u003Ereactive\u003C/code\u003E object, a change made by one component (for example \u003Ccode\u003Enotes.create()\u003C/code\u003E) refreshes every binding that reads that state; no separate event or notification is needed.\u003C/p\u003E\n\u003Cp\u003EA function component has no \u003Ccode\u003Ethis\u003C/code\u003E, so \u003Ccode\u003EFromService\u003C/code\u003E takes the service from the application\u0027s provider; for a \u003Ccode\u003Escoped\u003C/code\u003E service, this also gives the handle of the current navigation. The details are on the \u003Ca href=\u0022/docs/service-resolution\u0022\u003EResolving Services\u003C/a\u003E page, the other registration forms and automatic registration with \u003Ccode\u003E@Injectable\u003C/code\u003E on the \u003Ca href=\u0022/docs/service-registration\u0022\u003ERegistering Services\u003C/a\u003E page, and how long a service lives on the \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003ELifetimes and Scopes\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch2 id=\u0022error-codes\u0022\u003EDI error codes\u003C/h2\u003E\n\u003Cp\u003EThrown codes arrive as an error on the line that made the call; warnings are written only in development mode, to the console and to the DevTools warning list, and do not go to the \u003Ccode\u003EerrorHandler\u003C/code\u003E listeners (see \u003Ca href=\u0022/docs/error-handling\u0022\u003EError Handling\u003C/a\u003E). All the codes are on the \u003Ca href=\u0022/docs/error-codes#di\u0022\u003EError and Warning Codes\u003C/a\u003E page:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ECode\u003C/th\u003E\n\u003Cth\u003EWhen\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX401\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA token that is not registered was asked for with \u003Ccode\u003Eget\u003C/code\u003E, \u003Ccode\u003EgetAsync\u003C/code\u003E or \u003Ccode\u003Einject\u003C/code\u003E; thrown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX402\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA service registered with an async factory or a Promise was asked for with \u003Ccode\u003Eget\u003C/code\u003E (a \u003Ccode\u003Estartup\u003C/code\u003E service included); thrown, use \u003Ccode\u003EgetAsync\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX403\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe registration definition is invalid; thrown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX404\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA circular dependency; thrown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX405\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA second \u003Ccode\u003EApplicationBuilder\u003C/code\u003E was set up; thrown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX406\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.run\u003C/code\u003E could not find the host element given as a selector; thrown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX407\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EgetService\u003C/code\u003E could not find a provider for the component; a warning in development mode, returns \u003Ccode\u003Enull\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX408\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003EgetService\u003C/code\u003E resolution failed; a warning in development mode, returns \u003Ccode\u003Enull\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX409\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Einject\u003C/code\u003E was called outside the setup of a service; thrown.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX410\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESeveral sources were given in one registration; a warning in development mode, the precedence is \u003Ccode\u003EuseValue\u003C/code\u003E \u0026gt; \u003Ccode\u003EuseFactory\u003C/code\u003E \u0026gt; \u003Ccode\u003EuseClass\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX411\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Edeps\u003C/code\u003E is not an array; a warning in development mode, the invalid \u003Ccode\u003Edeps\u003C/code\u003E is ignored.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX413\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA function that cannot be constructed (an arrow function, an \u003Ccode\u003Easync\u003C/code\u003E function, an object method) was registered as a class; thrown on the registration line.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX414\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EFromService\u003C/code\u003E could not resolve; a warning in development mode, returns \u003Ccode\u003Enull\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX415\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Estartup\u003C/code\u003E was given to a registration that is not a singleton; a warning in development mode, the service is created on its first resolution.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn how services are registered, go on to \u003Ca href=\u0022/docs/service-registration\u0022\u003ERegistering Services\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"full-example","text":"From registration to use","level":2},{"id":"error-codes","text":"DI error codes","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"navigation-stack","title":"Stack Navigation"},"next":{"slug":"service-registration","title":"Registering Services"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Dependency Injection</p>
+        <h1>Introduction to Dependency Injection</h1>
+        <p>Registering services and resolving them from components; a full example from registration to use, and the DI error codes; with and without JSX.</p>
+<p>MotifJS includes a built-in dependency injection (DI) system. You register services when the application starts, and then resolve them from components or from other services. A service is a class or a value that holds state and work shared between components. A component does not build the service itself; it asks the provider (<code>ServiceProvider</code>) for it, and the provider gives either the same instance or a new one, depending on the registration's lifetime.</p>
+<h2 id="full-example">From registration to use</h2>
+<p>Services are registered on the <code>services</code> collection of <code>Application.CreateBuilder()</code>, before <code>build()</code>. <code>addSingleton(token, { useClass })</code> registers the class with a single instance; a singleton given <code>startup: true</code> is created at the start of <code>app.run()</code> without a component asking for it. The two registrations in the example (<code>NotesService</code> and <code>SettingsService</code> from the <a href="/docs/components">Components</a> page):</p>
+<div class="doc-code" data-file="src/main.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/main.ts"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/main.js"><code>import { Application } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;./services/notes&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(NotesService, { useClass: NotesService });
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();</code></pre>
+</div>
+<p>A component gets a registered service from the provider: a class component and an Options object use <code>this.getService(token)</code>, and a function component uses <code>FromService(token)</code>. When the service's reactive state is read inside a getter, the binding refreshes as the state changes. <code>FolderBadge</code> in the example shows the number of notes in a folder:</p>
+<div class="doc-code" data-file="src/parts/FolderBadge.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/FolderBadge.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component&lt;HTMLSpanElement, { folder: Folder }&gt; {
+  notes = this.getService(NotesService)!;
+
+  override onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  override view() {
+    return &lt;&gt;{() =&gt; this.notes.count(this.props.folder)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/FolderBadge.tsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props: { folder: Folder }) {
+  const notes = FromService(NotesService)!;
+  return &lt;span class=&quot;badge&quot;&gt;{() =&gt; notes.count(props.folder)}&lt;/span&gt;;
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/FolderBadge.tsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props: { folder: Folder }) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; this.notes.count(props.folder)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/FolderBadge.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component&lt;HTMLSpanElement, { folder: Folder }&gt; {
+  static override elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService)!;
+
+  override onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  override view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; this.notes.count(this.props.folder)));
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/FolderBadge.ts"><code>import { ComponentBase, FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props: { folder: Folder }) {
+  const notes = FromService(NotesService)!;
+  return motifComponent(&quot;span&quot;, (badge: ComponentBase) =&gt; {
+    badge.class.add(&quot;badge&quot;);
+    badge.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; notes.count(props.folder))));
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/FolderBadge.ts"><code>import { ComponentBase, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService, type Folder } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props: { folder: Folder }) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService)!;
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.text(() =&gt; this.notes.count(props.folder)));
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/FolderBadge.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component {
+  static elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService);
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  view() {
+    return &lt;&gt;{() =&gt; this.notes.count(this.props.folder)}&lt;/&gt;;
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/FolderBadge.jsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props) {
+  const notes = FromService(NotesService);
+  return &lt;span class=&quot;badge&quot;&gt;{() =&gt; notes.count(props.folder)}&lt;/span&gt;;
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/FolderBadge.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return &lt;&gt;{() =&gt; this.notes.count(props.folder)}&lt;/&gt;;
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/FolderBadge.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export class FolderBadge extends Component {
+  static elementTag = &quot;span&quot;;
+  notes = this.getService(NotesService);
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  }
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; this.notes.count(this.props.folder)));
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/FolderBadge.js"><code>import { FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export function FolderBadge(props) {
+  const notes = FromService(NotesService);
+  return motifComponent(&quot;span&quot;, (badge) =&gt; {
+    badge.class.add(&quot;badge&quot;);
+    badge.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; notes.count(props.folder))));
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/FolderBadge.js"><code>import { motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NotesService } from &quot;../services/notes&quot;;
+
+export const FolderBadge = (props) =&gt; motifOptions({
+  el: &quot;span&quot;,
+
+  get notes() {
+    return this.getService(NotesService);
+  },
+
+  onConfigured() {
+    this.class.add(&quot;badge&quot;);
+  },
+
+  view() {
+    return motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.text(() =&gt; this.notes.count(props.folder)));
+  },
+});</code></pre>
+</div>
+<p>The component is used with its tag:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/layouts/MainLayout.tsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;All notes &lt;FolderBadge folder=&quot;notes&quot; /&gt;&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/layouts/MainLayout.ts"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;All notes &quot;)), motifComponent(FolderBadge, { folder: &quot;notes&quot; })],
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/layouts/MainLayout.jsx"><code>&lt;RouterLink to=&quot;/notes&quot; activeClass=&quot;active&quot;&gt;All notes &lt;FolderBadge folder=&quot;notes&quot; /&gt;&lt;/RouterLink&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/layouts/MainLayout.js"><code>const all = motifComponent(RouterLink, {
+  to: &quot;/notes&quot;,
+  activeClass: &quot;active&quot;,
+  childs: [motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;All notes &quot;)), motifComponent(FolderBadge, { folder: &quot;notes&quot; })],
+});</code></pre>
+</div>
+<p>Every component that asks for a service registered as a singleton gets the same instance. If the service keeps its state in a <code>reactive</code> object, a change made by one component (for example <code>notes.create()</code>) refreshes every binding that reads that state; no separate event or notification is needed.</p>
+<p>A function component has no <code>this</code>, so <code>FromService</code> takes the service from the application's provider; for a <code>scoped</code> service, this also gives the handle of the current navigation. The details are on the <a href="/docs/service-resolution">Resolving Services</a> page, the other registration forms and automatic registration with <code>@Injectable</code> on the <a href="/docs/service-registration">Registering Services</a> page, and how long a service lives on the <a href="/docs/service-lifetimes">Lifetimes and Scopes</a> page.</p>
+<h2 id="error-codes">DI error codes</h2>
+<p>Thrown codes arrive as an error on the line that made the call; warnings are written only in development mode, to the console and to the DevTools warning list, and do not go to the <code>errorHandler</code> listeners (see <a href="/docs/error-handling">Error Handling</a>). All the codes are on the <a href="/docs/error-codes#di">Error and Warning Codes</a> page:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MJX401</code></td>
+<td>A token that is not registered was asked for with <code>get</code>, <code>getAsync</code> or <code>inject</code>; thrown.</td>
+</tr>
+<tr>
+<td><code>MJX402</code></td>
+<td>A service registered with an async factory or a Promise was asked for with <code>get</code> (a <code>startup</code> service included); thrown, use <code>getAsync</code>.</td>
+</tr>
+<tr>
+<td><code>MJX403</code></td>
+<td>The registration definition is invalid; thrown.</td>
+</tr>
+<tr>
+<td><code>MJX404</code></td>
+<td>A circular dependency; thrown.</td>
+</tr>
+<tr>
+<td><code>MJX405</code></td>
+<td>A second <code>ApplicationBuilder</code> was set up; thrown.</td>
+</tr>
+<tr>
+<td><code>MJX406</code></td>
+<td><code>app.run</code> could not find the host element given as a selector; thrown.</td>
+</tr>
+<tr>
+<td><code>MJX407</code></td>
+<td><code>getService</code> could not find a provider for the component; a warning in development mode, returns <code>null</code>.</td>
+</tr>
+<tr>
+<td><code>MJX408</code></td>
+<td>The <code>getService</code> resolution failed; a warning in development mode, returns <code>null</code>.</td>
+</tr>
+<tr>
+<td><code>MJX409</code></td>
+<td><code>inject</code> was called outside the setup of a service; thrown.</td>
+</tr>
+<tr>
+<td><code>MJX410</code></td>
+<td>Several sources were given in one registration; a warning in development mode, the precedence is <code>useValue</code> &gt; <code>useFactory</code> &gt; <code>useClass</code>.</td>
+</tr>
+<tr>
+<td><code>MJX411</code></td>
+<td><code>deps</code> is not an array; a warning in development mode, the invalid <code>deps</code> is ignored.</td>
+</tr>
+<tr>
+<td><code>MJX413</code></td>
+<td>A function that cannot be constructed (an arrow function, an <code>async</code> function, an object method) was registered as a class; thrown on the registration line.</td>
+</tr>
+<tr>
+<td><code>MJX414</code></td>
+<td><code>FromService</code> could not resolve; a warning in development mode, returns <code>null</code>.</td>
+</tr>
+<tr>
+<td><code>MJX415</code></td>
+<td><code>startup</code> was given to a registration that is not a singleton; a warning in development mode, the service is created on its first resolution.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Next step</h2>
+<p>To learn how services are registered, go on to <a href="/docs/service-registration">Registering Services</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Set up the build, write your first component and mount the application, with or without JSX.">
+    <title>Getting Started — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/getting-started">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/getting-started">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/getting-started">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/getting-started">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/getting-started">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Getting Started">
+    <meta property="og:description" content="Set up the build, write your first component and mount the application, with or without JSX.">
+    <script type="application/json" id="doc-data">{"slug":"getting-started","locale":"en","title":"Getting Started","description":"Set up the build, write your first component and mount the application, with or without JSX.","category":{"id":"1","title":"Get started"},"html":"\u003Cp\u003EThis section covers setting up the MotifJS build chain, writing the first component and getting the application on screen. The examples come in two forms: with JSX (\u003Ccode\u003E.tsx\u003C/code\u003E) and without JSX, using component calls directly (\u003Ccode\u003E.ts\u003C/code\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022requirements\u0022\u003ERequirements\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EVite\u003C/strong\u003E (the recommended bundler) or Rollup\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003ETypeScript or JavaScript.\u003C/strong\u003E Views written with JSX live in \u003Ccode\u003E.tsx\u003C/code\u003E/\u003Ccode\u003E.jsx\u003C/code\u003E files, and views written without JSX live in \u003Ccode\u003E.ts\u003C/code\u003E/\u003Ccode\u003E.js\u003C/code\u003E files. If you use TypeScript, your project needs version 5.4 or later (the core\u0027s type declarations use \u003Ccode\u003ENoInfer\u003C/code\u003E). \u003Ccode\u003E@motifx/compiler\u003C/code\u003E brings its own TypeScript dependency (5.x/6.x) for type-aware checks (\u003Ccode\u003Emotif-lint\u003C/code\u003E) and for reading the plugin\u0027s \u003Ccode\u003Etsconfig.json\u003C/code\u003E, and it works independently of the version in your project.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003E@motifx/core\u003C/code\u003E\u003C/strong\u003E — the core library. It ships as ESM (\u003Ccode\u003Edist/index.esm.js\u003C/code\u003E), CommonJS (\u003Ccode\u003Edist/index.cjs\u003C/code\u003E) and, for use without a bundler and without JSX, UMD (\u003Ccode\u003Edist/index.umd.min.js\u003C/code\u003E, the package\u0027s \u003Ccode\u003Eunpkg\u003C/code\u003E/\u003Ccode\u003Ejsdelivr\u003C/code\u003E entry; see \u003Ca href=\u0022#umd\u0022\u003EWithout a bundler\u003C/a\u003E)\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003E\u003Ccode\u003E@motifx/compiler\u003C/code\u003E\u003C/strong\u003E — the build plugin. It compiles JSX into component calls, transforms decorators (\u003Ccode\u003E@Injectable\u003C/code\u003E) in \u003Ccode\u003E.ts\u003C/code\u003E/\u003Ccode\u003E.js\u003C/code\u003E files and strips development-only code from production builds. Install it even in a project that does not use JSX.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003ENode.js 18 or later\u003C/strong\u003E — the \u003Ccode\u003E@motifx/compiler\u003C/code\u003E plugin and its commands (\u003Ca href=\u0022/docs/jsx#motif-lint\u0022\u003E\u003Ccode\u003Emotif-lint\u003C/code\u003E\u003C/a\u003E, \u003Ca href=\u0022/docs/jsx#explain\u0022\u003E\u003Ccode\u003Emotif-explain\u003C/code\u003E\u003C/a\u003E) run on Node; your bundler\u0027s own Node requirement applies as well.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EThe two packages (\u003Ccode\u003E@motifx/compiler\u003C/code\u003E and \u003Ccode\u003E@motifx/core\u003C/code\u003E) are always published with the same version number, whether or not one of them changed, and they are installed at the same version. The surface that compiled code relies on in the runtime (the compiler contract) changes only in a major version. If the runtime does not support the contract number declared by the compiled code, development mode prints an \u003Ccode\u003EMJX121\u003C/code\u003E warning (the mismatch is noticed while modules load, but the warning appears when \u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E is called).\u003C/p\u003E\n\u003Ch2 id=\u0022installation\u0022\u003EInstallation\u003C/h2\u003E\n\u003Ch3 id=\u0022create-motifjs\u0022\u003ENew project\u003C/h3\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022sh\u0022\u003E\u003Ccode\u003Enpm create motifjs@latest notes\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Epnpm create motifjs\u003C/code\u003E, \u003Ccode\u003Eyarn create motifjs\u003C/code\u003E, \u003Ccode\u003Ebun create motifjs\u003C/code\u003E and \u003Ccode\u003Enpx create-motifjs\u003C/code\u003E do the same thing. create-motifjs is the MotifJS community\u0027s project generator and needs Node 20.19 or later. It asks for the language (TypeScript or JavaScript), whether components are written with or without JSX, the AI agent docs and DevTools, and creates a Vite project with the compiler plugin and \u003Ccode\u003Emotif-lint\u003C/code\u003E already set up. Today the only template is \u003Ccode\u003Estarter\u003C/code\u003E, a complete notes application.\u003C/p\u003E\n\u003Ch3 id=\u0022add-to-project\u0022\u003EAdding to an existing project\u003C/h3\u003E\n\u003Cp\u003EThe core is a dependency of the application, and the compiler is a development dependency:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022sh\u0022\u003E\u003Ccode\u003Enpm install @motifx/core\nnpm install -D @motifx/compiler\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EWith pnpm, yarn and bun the same two packages are installed with \u003Ccode\u003Eadd\u003C/code\u003E, the compiler again as a development dependency. Then make the two settings in \u003Ca href=\u0022#build-setup\u0022\u003EBuild setup\u003C/a\u003E.\u003C/p\u003E\n\u003Ch3 id=\u0022umd\u0022\u003EWithout a bundler\u003C/h3\u003E\n\u003Cp\u003EThe core\u0027s UMD file is the package\u0027s \u003Ccode\u003Eunpkg\u003C/code\u003E / \u003Ccode\u003Ejsdelivr\u003C/code\u003E entry and exposes every export on the global \u003Ccode\u003Emotif\u003C/code\u003E object:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022index.html\u0022\u003E\n\u003Cpre data-lang=\u0022html\u0022 data-file=\u0022index.html\u0022\u003E\u003Ccode\u003E\u0026lt;!doctype html\u0026gt;\n\u0026lt;html\u0026gt;\n  \u0026lt;head\u0026gt;\u0026lt;meta charset=\u0026quot;utf-8\u0026quot; /\u0026gt;\u0026lt;title\u0026gt;MotifJS App\u0026lt;/title\u0026gt;\u0026lt;/head\u0026gt;\n  \u0026lt;body\u0026gt;\n    \u0026lt;div id=\u0026quot;app\u0026quot;\u0026gt;\u0026lt;/div\u0026gt;\n    \u0026lt;script src=\u0026quot;https://unpkg.com/@motifx/core\u0026quot;\u0026gt;\u0026lt;/script\u0026gt;\n    \u0026lt;script src=\u0026quot;/main.js\u0026quot;\u0026gt;\u0026lt;/script\u0026gt;\n  \u0026lt;/body\u0026gt;\n\u0026lt;/html\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Emain.js\u003C/code\u003E starts with \u003Ccode\u003Econst { Application, motifComponent, reactive } = motif;\u003C/code\u003E. JSX and decorator syntax need the compiler, so here the view is written \u003Ca href=\u0022/docs/imperative\u0022\u003Ewithout JSX\u003C/a\u003E, services are registered with \u003Ccode\u003Ebuilder.services\u003C/code\u003E, and code marked \u003Ccode\u003E@DEV-ONLY\u003C/code\u003E is not stripped. In production, pin the address to a version: \u003Ccode\u003Ehttps://unpkg.com/@motifx/core@\u0026lt;version\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022build-setup\u0022\u003EBuild setup\u003C/h2\u003E\n\u003Cp\u003EMotifJS JSX is not handled by a standard \u003Ccode\u003EjsxFactory\u003C/code\u003E but by its own compiler (\u003Ccode\u003E@motifx/compiler\u003C/code\u003E). The compiler turns every JSX element into a \u003Ccode\u003EmotifComponent\u003C/code\u003E call, and the reactive expressions inside it (text, conditions, lists) into \u003Ccode\u003Ebindings.*\u003C/code\u003E calls. That is why two settings are needed:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003EAdd the \u003Ccode\u003E@motifx/compiler\u003C/code\u003E plugin to the bundler. The plugin runs before Vite\u0027s own transform (\u003Ccode\u003Eenforce: \u0027pre\u0027\u003C/code\u003E) and leaves no JSX behind, so Vite needs no separate JSX setting.\u003C/li\u003E\n\u003Cli\u003ESet \u003Ccode\u003E\u0026quot;jsx\u0026quot;: \u0026quot;preserve\u0026quot;\u003C/code\u003E in \u003Ccode\u003Etsconfig.json\u003C/code\u003E: TypeScript checks the types of the JSX but does not compile it. A project without JSX does not need this line.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022vite.config.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022vite.config.ts\u0022\u003E\u003Ccode\u003Eimport { defineConfig } from \u0027vite\u0027;\nimport compiler from \u0027@motifx/compiler\u0027;\n\nexport default defineConfig({\n  plugins: [compiler()],\n  resolve: {\n    extensions: [\u0027.tsx\u0027, \u0027.ts\u0027, \u0027.jsx\u0027, \u0027.js\u0027],\n  },\n  server: { port: 3000 },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022vite.config.js\u0022\u003E\u003Ccode\u003Eimport { defineConfig } from \u0027vite\u0027;\nimport compiler from \u0027@motifx/compiler\u0027;\n\nexport default defineConfig({\n  plugins: [compiler()],\n  resolve: {\n    extensions: [\u0027.tsx\u0027, \u0027.ts\u0027, \u0027.jsx\u0027, \u0027.js\u0027],\n  },\n  server: { port: 3000 },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022tsconfig.json\u0022\u003E\n\u003Cpre data-lang=\u0022jsonc\u0022 data-file=\u0022tsconfig.json\u0022\u003E\u003Ccode\u003E{\n  \u0026quot;compilerOptions\u0026quot;: {\n    \u0026quot;target\u0026quot;: \u0026quot;ES2022\u0026quot;,\n    \u0026quot;module\u0026quot;: \u0026quot;esnext\u0026quot;,\n    \u0026quot;moduleResolution\u0026quot;: \u0026quot;bundler\u0026quot;,\n    \u0026quot;strict\u0026quot;: true,\n    \u0026quot;jsx\u0026quot;: \u0026quot;preserve\u0026quot;,\n    \u0026quot;useDefineForClassFields\u0026quot;: true,\n    \u0026quot;lib\u0026quot;: [\u0026quot;ESNext\u0026quot;, \u0026quot;DOM\u0026quot;, \u0026quot;DOM.Iterable\u0026quot;],\n    \u0026quot;types\u0026quot;: [\u0026quot;vite/client\u0026quot;]\n  },\n  \u0026quot;include\u0026quot;: [\u0026quot;src\u0026quot;]\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cblockquote\u003E\n\u003Cp\u003E\u003Cstrong\u003EWhy \u003Ccode\u003Ejsx: \u0026quot;preserve\u0026quot;\u003C/code\u003E?\u003C/strong\u003E In MotifJS, JSX does not turn into a \u0026quot;render function call\u0026quot; but into compiled output that sets up reactive bindings. For example, the compiler turns the expression \u003Ccode\u003E{model.count}\u003C/code\u003E into a \u003Ccode\u003Esender.bindings.add(\u0026quot;textContent\u0026quot;, model, \u0026quot;count\u0026quot;)\u003C/code\u003E call. Only \u003Ccode\u003E@motifx/compiler\u003C/code\u003E knows this transform; TypeScript only checks the types, and \u003Ccode\u003E@motifx/compiler\u003C/code\u003E is what compiles the JSX.\u003C/p\u003E\n\u003C/blockquote\u003E\n\u003Cp\u003EThe plugin compiles \u003Ccode\u003E.jsx\u003C/code\u003E and \u003Ccode\u003E.tsx\u003C/code\u003E files. In \u003Ccode\u003E.ts\u003C/code\u003E/\u003Ccode\u003E.js\u003C/code\u003E files it transforms decorators (\u003Ccode\u003E@Injectable\u003C/code\u003E) (see \u003Ca href=\u0022/docs/service-registration#injectable-decorator\u0022\u003ERegistering Services\u003C/a\u003E), names module-level stores for DevTools during \u003Ccode\u003Evite dev\u003C/code\u003E, and strips development-only code from production builds. In \u003Ccode\u003E.ts\u003C/code\u003E/\u003Ccode\u003E.mts\u003C/code\u003E/\u003Ccode\u003E.cts\u003C/code\u003E files it adds a \u003Ccode\u003Estatic elementTag\u003C/code\u003E from an element generic such as \u003Ccode\u003EComponent\u0026lt;HTMLUListElement\u0026gt;\u003C/code\u003E (see \u003Ca href=\u0022/docs/components#root-element\u0022\u003ERoot element\u003C/a\u003E). In files under \u003Ccode\u003Enode_modules\u003C/code\u003E, only development-only code is stripped. In Vite 8 (Rolldown), if the application has not set \u003Ccode\u003EoptimizeDeps.rolldownOptions.transform.jsx\u003C/code\u003E for dependency scanning, the plugin sets it to \u003Ccode\u003E\u0027preserve\u0027\u003C/code\u003E, so \u003Ccode\u003E.jsx\u003C/code\u003E files are read without looking for another JSX runtime.\u003C/p\u003E\n\u003Cp\u003ERollup uses the same \u003Ccode\u003Ecompiler()\u003C/code\u003E plugin; there is no separate Rollup or Babel plugin. Rollup has no mode of its own, so tell the plugin about production builds: \u003Ccode\u003Ecompiler({ production: !process.env.ROLLUP_WATCH })\u003C/code\u003E. The plugin also strips types from the \u003Ccode\u003E.tsx\u003C/code\u003E and \u003Ccode\u003E.jsx\u003C/code\u003E files it compiles. Stripping types from plain \u003Ccode\u003E.ts\u003C/code\u003E files and resolving imports written without an extension or by package name is the job of the usual Rollup plugins: \u003Ccode\u003Erollup-plugin-esbuild\u003C/code\u003E or \u003Ccode\u003E@rollup/plugin-typescript\u003C/code\u003E, plus \u003Ccode\u003E@rollup/plugin-node-resolve\u003C/code\u003E with the \u003Ccode\u003E.tsx\u003C/code\u003E and \u003Ccode\u003E.ts\u003C/code\u003E extensions added. The \u003Ccode\u003Evite/client\u003C/code\u003E types and \u003Ccode\u003Eimport.meta.env\u003C/code\u003E are specific to Vite.\u003C/p\u003E\n\u003Ch3 id=\u0022dev-only\u0022\u003EDevelopment-only code\u003C/h3\u003E\n\u003Cp\u003EA production build strips code marked as development-only from application files and from packages under \u003Ccode\u003Enode_modules\u003C/code\u003E. MotifJS marks its own DevTools hooks this way, so this code never makes it into a production bundle, whatever \u003Ccode\u003Eapp.useDevelopment()\u003C/code\u003E says. The \u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E line is written with the same mark, so the production bundle contains neither that line nor the DevTools object.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/main.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/main.tsx\u0022\u003E\u003Ccode\u003E/* @DEV-ONLY */ app.useDevelopment(true);\n\n/* @DEV-ONLY-BEGIN */\napp.useReactiveMonitor({ enabled: true, threshold: 200, name: \u0027app\u0027 });\n(globalThis as any).app = app;\n/* @DEV-ONLY-END */\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003E/* @DEV-ONLY */ app.useDevelopment(true);\n\n/* @DEV-ONLY-BEGIN */\napp.useReactiveMonitor({ enabled: true, threshold: 200, name: \u0027app\u0027 });\n(globalThis as any).app = app;\n/* @DEV-ONLY-END */\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/main.jsx\u0022\u003E\u003Ccode\u003E/* @DEV-ONLY */ app.useDevelopment(true);\n\n/* @DEV-ONLY-BEGIN */\napp.useReactiveMonitor({ enabled: true, threshold: 200, name: \u0027app\u0027 });\nglobalThis.app = app;\n/* @DEV-ONLY-END */\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003E/* @DEV-ONLY */ app.useDevelopment(true);\n\n/* @DEV-ONLY-BEGIN */\napp.useReactiveMonitor({ enabled: true, threshold: 200, name: \u0027app\u0027 });\nglobalThis.app = app;\n/* @DEV-ONLY-END */\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe single-line mark strips the statement or class member that follows it. To strip several statements or members in a row, use the \u003Ccode\u003E@DEV-ONLY-BEGIN\u003C/code\u003E / \u003Ccode\u003E@DEV-ONLY-END\u003C/code\u003E pair; the pair sits between statements and class members.\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003E@DEV-ONLY\u003C/code\u003E strips the single statement or class member (method, field, accessor) that comes right after it; everything between \u003Ccode\u003E@DEV-ONLY-BEGIN\u003C/code\u003E and \u003Ccode\u003E@DEV-ONLY-END\u003C/code\u003E, the marks included, is stripped.\u003C/li\u003E\n\u003Cli\u003EA mark is a block comment that contains only the mark; a \u003Ccode\u003E//\u003C/code\u003E line that mentions the mark is not a mark.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003E@DEV-ONLY\u003C/code\u003E works at any depth (inside a method, in front of an \u003Ccode\u003Eif\u003C/code\u003E or a \u003Ccode\u003Econst\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EBEGIN\u003C/code\u003E and \u003Ccode\u003EEND\u003C/code\u003E sit in the same block, between statements, imports or class members. A \u003Ccode\u003EBEGIN\u003C/code\u003E without \u003Ccode\u003EEND\u003C/code\u003E, an \u003Ccode\u003EEND\u003C/code\u003E without \u003Ccode\u003EBEGIN\u003C/code\u003E, a nested \u003Ccode\u003EBEGIN\u003C/code\u003E or a range mark inside an expression stops the build with an error at the mark, in \u003Ccode\u003Evite dev\u003C/code\u003E as well.\u003C/li\u003E\n\u003Cli\u003EProduction means \u003Ccode\u003Evite build\u003C/code\u003E in Vite, and the \u003Ccode\u003Eproduction\u003C/code\u003E option or \u003Ccode\u003ENODE_ENV=production\u003C/code\u003E in Rollup. In Vite the decision follows Vite\u0027s \u003Ccode\u003EisProduction\u003C/code\u003E value, that is, \u003Ccode\u003ENODE_ENV=production\u003C/code\u003E: if \u003Ccode\u003ENODE_ENV=development\u003C/code\u003E is set in the environment, \u003Ccode\u003Evite build\u003C/code\u003E does not strip the code either. Nothing is stripped during development.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022plugin-options\u0022\u003EPlugin options\u003C/h3\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022vite.config.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022vite.config.ts\u0022\u003E\u003Ccode\u003Ecompiler({\n  diagnostics: false,\n  explain: \u0027pages/Home\u0027,\n  exclude: \u0027legacy/\u0027,\n  storeNames: true,\n  production: true,\n})\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022vite.config.js\u0022\u003E\u003Ccode\u003Ecompiler({\n  diagnostics: false,\n  explain: \u0027pages/Home\u0027,\n  exclude: \u0027legacy/\u0027,\n  storeNames: true,\n  production: true,\n})\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ediagnostics\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWith \u003Ccode\u003Efalse\u003C/code\u003E, compile-time warnings (\u003Ccode\u003EMJX001\u003C/code\u003E–\u003Ccode\u003EMJX004\u003C/code\u003E, \u003Ccode\u003EMJX007\u003C/code\u003E, \u003Ccode\u003EMJX015\u003C/code\u003E, \u003Ccode\u003EMJX016\u003C/code\u003E) are not printed; on by default (see \u003Ca href=\u0022/docs/jsx#compile-time-diagnostics\u0022\u003ECompile-time warnings\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eexplain\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPrints what every JSX expression compiles to in the matching files: \u003Ccode\u003Etrue\u003C/code\u003E means every file, a string matches paths that contain it, a \u003Ccode\u003ERegExp\u003C/code\u003E uses \u003Ccode\u003Etest(id)\u003C/code\u003E (see \u003Ca href=\u0022/docs/jsx#explain\u0022\u003EWhat did this expression compile to?\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eexclude\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EFiles the plugin keeps its hands off: a string matches paths that contain it (\u003Ccode\u003Eincludes\u003C/code\u003E), a \u003Ccode\u003ERegExp\u003C/code\u003E uses \u003Ccode\u003Etest(id)\u003C/code\u003E, or an \u003Ccode\u003E(id) =\u0026gt; boolean\u003C/code\u003E function. MotifJS does not compile the JSX in these files, which is left to Vite\u0027s own transform; in a production build the development-only code inside them is still stripped.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EstoreNames\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ENames module-level stores for DevTools; on by default in \u003Ccode\u003Evite dev\u003C/code\u003E and off in production builds. In Rollup it is off and is turned on with \u003Ccode\u003EstoreNames: true\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eproduction\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EStrips development-only code; the default is \u003Ccode\u003Evite build\u003C/code\u003E in Vite and \u003Ccode\u003ENODE_ENV=production\u003C/code\u003E elsewhere.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022html-host\u0022\u003EHTML host\u003C/h2\u003E\n\u003Cp\u003EThe application needs a root element to be mounted into, and a \u003Ccode\u003E\u0026lt;script\u0026gt;\u003C/code\u003E tag loads the entry file:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022index.html\u0022\u003E\n\u003Cpre data-lang=\u0022html\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022index.html\u0022\u003E\u003Ccode\u003E\u0026lt;!doctype html\u0026gt;\n\u0026lt;html\u0026gt;\n  \u0026lt;head\u0026gt;\u0026lt;meta charset=\u0026quot;utf-8\u0026quot; /\u0026gt;\u0026lt;title\u0026gt;MotifJS App\u0026lt;/title\u0026gt;\u0026lt;/head\u0026gt;\n  \u0026lt;body\u0026gt;\n    \u0026lt;div id=\u0026quot;app\u0026quot;\u0026gt;\u0026lt;/div\u0026gt;\n    \u0026lt;script type=\u0026quot;module\u0026quot; src=\u0026quot;/src/main.tsx\u0026quot;\u0026gt;\u0026lt;/script\u0026gt;\n  \u0026lt;/body\u0026gt;\n\u0026lt;/html\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022html\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022index.html\u0022\u003E\u003Ccode\u003E\u0026lt;!doctype html\u0026gt;\n\u0026lt;html\u0026gt;\n  \u0026lt;head\u0026gt;\u0026lt;meta charset=\u0026quot;utf-8\u0026quot; /\u0026gt;\u0026lt;title\u0026gt;MotifJS App\u0026lt;/title\u0026gt;\u0026lt;/head\u0026gt;\n  \u0026lt;body\u0026gt;\n    \u0026lt;div id=\u0026quot;app\u0026quot;\u0026gt;\u0026lt;/div\u0026gt;\n    \u0026lt;script type=\u0026quot;module\u0026quot; src=\u0026quot;/src/main.ts\u0026quot;\u0026gt;\u0026lt;/script\u0026gt;\n  \u0026lt;/body\u0026gt;\n\u0026lt;/html\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022html\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022index.html\u0022\u003E\u003Ccode\u003E\u0026lt;!doctype html\u0026gt;\n\u0026lt;html\u0026gt;\n  \u0026lt;head\u0026gt;\u0026lt;meta charset=\u0026quot;utf-8\u0026quot; /\u0026gt;\u0026lt;title\u0026gt;MotifJS App\u0026lt;/title\u0026gt;\u0026lt;/head\u0026gt;\n  \u0026lt;body\u0026gt;\n    \u0026lt;div id=\u0026quot;app\u0026quot;\u0026gt;\u0026lt;/div\u0026gt;\n    \u0026lt;script type=\u0026quot;module\u0026quot; src=\u0026quot;/src/main.jsx\u0026quot;\u0026gt;\u0026lt;/script\u0026gt;\n  \u0026lt;/body\u0026gt;\n\u0026lt;/html\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022html\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022index.html\u0022\u003E\u003Ccode\u003E\u0026lt;!doctype html\u0026gt;\n\u0026lt;html\u0026gt;\n  \u0026lt;head\u0026gt;\u0026lt;meta charset=\u0026quot;utf-8\u0026quot; /\u0026gt;\u0026lt;title\u0026gt;MotifJS App\u0026lt;/title\u0026gt;\u0026lt;/head\u0026gt;\n  \u0026lt;body\u0026gt;\n    \u0026lt;div id=\u0026quot;app\u0026quot;\u0026gt;\u0026lt;/div\u0026gt;\n    \u0026lt;script type=\u0026quot;module\u0026quot; src=\u0026quot;/src/main.js\u0026quot;\u0026gt;\u0026lt;/script\u0026gt;\n  \u0026lt;/body\u0026gt;\n\u0026lt;/html\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022first-component\u0022\u003EFirst component\u003C/h2\u003E\n\u003Cp\u003EA settings page: \u003Ccode\u003ESettingsService\u003C/code\u003E holds the theme and density, writes them to \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E as \u003Ccode\u003Edata-theme\u003C/code\u003E / \u003Ccode\u003Edata-density\u003C/code\u003E and saves them to \u003Ccode\u003ElocalStorage\u003C/code\u003E. \u003Ccode\u003ESettingsPage\u003C/code\u003E shows the options as buttons, the selected one is marked with \u003Ccode\u003Earia-pressed\u003C/code\u003E, and a summary line follows the choice. The class, function and Options API forms use the same core, and each is written both with and without JSX.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/services/settings.ts\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport type Theme = \u0026quot;system\u0026quot; | \u0026quot;light\u0026quot; | \u0026quot;dark\u0026quot;;\nexport type Density = \u0026quot;comfortable\u0026quot; | \u0026quot;compact\u0026quot;;\n\nexport const THEMES: readonly Theme[] = [\u0026quot;system\u0026quot;, \u0026quot;light\u0026quot;, \u0026quot;dark\u0026quot;];\nexport const DENSITIES: readonly Density[] = [\u0026quot;comfortable\u0026quot;, \u0026quot;compact\u0026quot;];\n\nconst STORAGE_KEY = \u0026quot;settings\u0026quot;;\n\nexport class SettingsService {\n  readonly state = reactive({ theme: \u0026quot;system\u0026quot; as Theme, density: \u0026quot;comfortable\u0026quot; as Density });\n\n  constructor() {\n    try {\n      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? \u0026quot;{}\u0026quot;);\n      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;\n      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;\n    } catch {}\n    this.apply();\n  }\n\n  setTheme(theme: Theme) {\n    this.state.theme = theme;\n    this.save();\n  }\n\n  setDensity(density: Density) {\n    this.state.density = density;\n    this.save();\n  }\n\n  private save() {\n    this.apply();\n    try {\n      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));\n    } catch {}\n  }\n\n  private apply() {\n    const root = document.documentElement;\n    if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n    else root.dataset.theme = this.state.theme;\n    if (this.state.density === \u0026quot;comfortable\u0026quot;) delete root.dataset.density;\n    else root.dataset.density = this.state.density;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/services/settings.js\u0022\u003E\u003Ccode\u003Eimport { reactive } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const THEMES = [\u0026quot;system\u0026quot;, \u0026quot;light\u0026quot;, \u0026quot;dark\u0026quot;];\nexport const DENSITIES = [\u0026quot;comfortable\u0026quot;, \u0026quot;compact\u0026quot;];\n\nconst STORAGE_KEY = \u0026quot;settings\u0026quot;;\n\nexport class SettingsService {\n  state = reactive({ theme: \u0026quot;system\u0026quot;, density: \u0026quot;comfortable\u0026quot; });\n\n  constructor() {\n    try {\n      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? \u0026quot;{}\u0026quot;);\n      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;\n      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;\n    } catch {}\n    this.apply();\n  }\n\n  setTheme(theme) {\n    this.state.theme = theme;\n    this.save();\n  }\n\n  setDensity(density) {\n    this.state.density = density;\n    this.save();\n  }\n\n  save() {\n    this.apply();\n    try {\n      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));\n    } catch {}\n  }\n\n  apply() {\n    const root = document.documentElement;\n    if (this.state.theme === \u0026quot;system\u0026quot;) delete root.dataset.theme;\n    else root.dataset.theme = this.state.theme;\n    if (this.state.density === \u0026quot;comfortable\u0026quot;) delete root.dataset.density;\n    else root.dataset.density = this.state.density;\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES, type Density, type Theme } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS: Record\u0026lt;Theme | Density, string\u0026gt; = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport class SettingsPage extends Component {\n  settings = this.getService(SettingsService)!;\n\n  override view() {\n    return (\n      \u0026lt;main class=\u0026quot;page\u0026quot;\u0026gt;\n        \u0026lt;h1\u0026gt;Settings\u0026lt;/h1\u0026gt;\n        {this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; this.settings.state.theme === theme, (theme) =\u0026gt; this.settings.setTheme(theme))}\n        {this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; this.settings.state.density === density, (density) =\u0026gt; this.settings.setDensity(density))}\n        \u0026lt;p\u0026gt;{() =\u0026gt; \u0060Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.\u0060}\u0026lt;/p\u0026gt;\n      \u0026lt;/main\u0026gt;\n    );\n  }\n\n  private setting\u0026lt;T extends Theme | Density\u0026gt;(name: string, options: readonly T[], isChosen: (option: T) =\u0026gt; boolean, choose: (option: T) =\u0026gt; void) {\n    return (\n      \u0026lt;section class=\u0026quot;setting\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{name}\u0026lt;/span\u0026gt;\n        \u0026lt;div class=\u0026quot;seg\u0026quot; role=\u0026quot;group\u0026quot; aria-label={name}\u0026gt;\n          {options.map((option) =\u0026gt; (\n            \u0026lt;button key={option} type=\u0026quot;button\u0026quot; aria-pressed={() =\u0026gt; isChosen(option)} onclick={() =\u0026gt; choose(option)}\u0026gt;\n              {LABELS[option]}\n            \u0026lt;/button\u0026gt;\n          ))}\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/section\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES, type Density, type Theme } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS: Record\u0026lt;Theme | Density, string\u0026gt; = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport function SettingsPage() {\n  const settings = FromService(SettingsService)!;\n\n  const setting = \u0026lt;T extends Theme | Density\u0026gt;(name: string, options: readonly T[], isChosen: (option: T) =\u0026gt; boolean, choose: (option: T) =\u0026gt; void) =\u0026gt; (\n    \u0026lt;section class=\u0026quot;setting\u0026quot;\u0026gt;\n      \u0026lt;span\u0026gt;{name}\u0026lt;/span\u0026gt;\n      \u0026lt;div class=\u0026quot;seg\u0026quot; role=\u0026quot;group\u0026quot; aria-label={name}\u0026gt;\n        {options.map((option) =\u0026gt; (\n          \u0026lt;button key={option} type=\u0026quot;button\u0026quot; aria-pressed={() =\u0026gt; isChosen(option)} onclick={() =\u0026gt; choose(option)}\u0026gt;\n            {LABELS[option]}\n          \u0026lt;/button\u0026gt;\n        ))}\n      \u0026lt;/div\u0026gt;\n    \u0026lt;/section\u0026gt;\n  );\n\n  return (\n    \u0026lt;main class=\u0026quot;page\u0026quot;\u0026gt;\n      \u0026lt;h1\u0026gt;Settings\u0026lt;/h1\u0026gt;\n      {setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme))}\n      {setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density))}\n      \u0026lt;p\u0026gt;{() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060}\u0026lt;/p\u0026gt;\n    \u0026lt;/main\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/pages/SettingsPage.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES, type Density, type Theme } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS: Record\u0026lt;Theme | Density, string\u0026gt; = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport const SettingsPage = () =\u0026gt; {\n  const settings = FromService(SettingsService)!;\n\n  return motifOptions({\n    el: \u0026quot;main\u0026quot;,\n\n    view() {\n      this.class.add(\u0026quot;page\u0026quot;);\n      return (\n        \u0026lt;\u0026gt;\n          \u0026lt;h1\u0026gt;Settings\u0026lt;/h1\u0026gt;\n          {this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme))}\n          {this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density))}\n          \u0026lt;p\u0026gt;{() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060}\u0026lt;/p\u0026gt;\n        \u0026lt;/\u0026gt;\n      );\n    },\n\n    setting\u0026lt;T extends Theme | Density\u0026gt;(name: string, options: readonly T[], isChosen: (option: T) =\u0026gt; boolean, choose: (option: T) =\u0026gt; void) {\n      return (\n        \u0026lt;section class=\u0026quot;setting\u0026quot;\u0026gt;\n          \u0026lt;span\u0026gt;{name}\u0026lt;/span\u0026gt;\n          \u0026lt;div class=\u0026quot;seg\u0026quot; role=\u0026quot;group\u0026quot; aria-label={name}\u0026gt;\n            {options.map((option) =\u0026gt; (\n              \u0026lt;button key={option} type=\u0026quot;button\u0026quot; aria-pressed={() =\u0026gt; isChosen(option)} onclick={() =\u0026gt; choose(option)}\u0026gt;\n                {LABELS[option]}\n              \u0026lt;/button\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n      );\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES, type Density, type Theme } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS: Record\u0026lt;Theme | Density, string\u0026gt; = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport class SettingsPage extends Component {\n  settings = this.getService(SettingsService)!;\n\n  override view() {\n    return motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n      main.class.add(\u0026quot;page\u0026quot;);\n      const heading = motifComponent(\u0026quot;h1\u0026quot;, (h1: ComponentBase) =\u0026gt; h1.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Settings\u0026quot;))));\n      const summary = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n        p.bindings.text(() =\u0026gt; \u0060Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.\u0060);\n      });\n      main.controls.add(\n        heading,\n        this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; this.settings.state.theme === theme, (theme) =\u0026gt; this.settings.setTheme(theme)),\n        this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; this.settings.state.density === density, (density) =\u0026gt; this.settings.setDensity(density)),\n        summary,\n      );\n    });\n  }\n\n  private setting\u0026lt;T extends Theme | Density\u0026gt;(name: string, options: readonly T[], isChosen: (option: T) =\u0026gt; boolean, choose: (option: T) =\u0026gt; void) {\n    return motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n      section.class.add(\u0026quot;setting\u0026quot;);\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(name))));\n      const group = motifComponent(\u0026quot;div\u0026quot;, (seg: ComponentBase) =\u0026gt; {\n        seg.class.add(\u0026quot;seg\u0026quot;);\n        seg.attr.add({ role: \u0026quot;group\u0026quot;, \u0026quot;aria-label\u0026quot;: name });\n        for (const option of options) {\n          const button = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; isChosen(option) });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; choose(option));\n            button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(LABELS[option])));\n          });\n          seg.controls.add(button);\n        }\n      });\n      section.controls.add(label, group);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES, type Density, type Theme } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS: Record\u0026lt;Theme | Density, string\u0026gt; = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport function SettingsPage() {\n  const settings = FromService(SettingsService)!;\n\n  const setting = \u0026lt;T extends Theme | Density\u0026gt;(name: string, options: readonly T[], isChosen: (option: T) =\u0026gt; boolean, choose: (option: T) =\u0026gt; void) =\u0026gt;\n    motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n      section.class.add(\u0026quot;setting\u0026quot;);\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(name))));\n      const group = motifComponent(\u0026quot;div\u0026quot;, (seg: ComponentBase) =\u0026gt; {\n        seg.class.add(\u0026quot;seg\u0026quot;);\n        seg.attr.add({ role: \u0026quot;group\u0026quot;, \u0026quot;aria-label\u0026quot;: name });\n        for (const option of options) {\n          const button = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; isChosen(option) });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; choose(option));\n            button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(LABELS[option])));\n          });\n          seg.controls.add(button);\n        }\n      });\n      section.controls.add(label, group);\n    });\n\n  return motifComponent(\u0026quot;main\u0026quot;, (main: ComponentBase) =\u0026gt; {\n    main.class.add(\u0026quot;page\u0026quot;);\n    const heading = motifComponent(\u0026quot;h1\u0026quot;, (h1: ComponentBase) =\u0026gt; h1.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Settings\u0026quot;))));\n    const summary = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n      p.bindings.text(() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060);\n    });\n    main.controls.add(\n      heading,\n      setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme)),\n      setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density)),\n      summary,\n    );\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/pages/SettingsPage.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES, type Density, type Theme } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS: Record\u0026lt;Theme | Density, string\u0026gt; = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport const SettingsPage = () =\u0026gt; {\n  const settings = FromService(SettingsService)!;\n\n  return motifOptions({\n    el: \u0026quot;main\u0026quot;,\n\n    view() {\n      this.class.add(\u0026quot;page\u0026quot;);\n      const heading = motifComponent(\u0026quot;h1\u0026quot;, (h1: ComponentBase) =\u0026gt; h1.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Settings\u0026quot;))));\n      const summary = motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n        p.bindings.text(() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060);\n      });\n      return [\n        heading,\n        this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme)),\n        this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density)),\n        summary,\n      ];\n    },\n\n    setting\u0026lt;T extends Theme | Density\u0026gt;(name: string, options: readonly T[], isChosen: (option: T) =\u0026gt; boolean, choose: (option: T) =\u0026gt; void) {\n      return motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n        section.class.add(\u0026quot;setting\u0026quot;);\n        const label = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(name))));\n        const group = motifComponent(\u0026quot;div\u0026quot;, (seg: ComponentBase) =\u0026gt; {\n          seg.class.add(\u0026quot;seg\u0026quot;);\n          seg.attr.add({ role: \u0026quot;group\u0026quot;, \u0026quot;aria-label\u0026quot;: name });\n          for (const option of options) {\n            const button = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n              button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; isChosen(option) });\n              button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; choose(option));\n              button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(LABELS[option])));\n            });\n            seg.controls.add(button);\n          }\n        });\n        section.controls.add(label, group);\n      });\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport class SettingsPage extends Component {\n  settings = this.getService(SettingsService);\n\n  view() {\n    return (\n      \u0026lt;main class=\u0026quot;page\u0026quot;\u0026gt;\n        \u0026lt;h1\u0026gt;Settings\u0026lt;/h1\u0026gt;\n        {this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; this.settings.state.theme === theme, (theme) =\u0026gt; this.settings.setTheme(theme))}\n        {this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; this.settings.state.density === density, (density) =\u0026gt; this.settings.setDensity(density))}\n        \u0026lt;p\u0026gt;{() =\u0026gt; \u0060Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.\u0060}\u0026lt;/p\u0026gt;\n      \u0026lt;/main\u0026gt;\n    );\n  }\n\n  setting(name, options, isChosen, choose) {\n    return (\n      \u0026lt;section class=\u0026quot;setting\u0026quot;\u0026gt;\n        \u0026lt;span\u0026gt;{name}\u0026lt;/span\u0026gt;\n        \u0026lt;div class=\u0026quot;seg\u0026quot; role=\u0026quot;group\u0026quot; aria-label={name}\u0026gt;\n          {options.map((option) =\u0026gt; (\n            \u0026lt;button key={option} type=\u0026quot;button\u0026quot; aria-pressed={() =\u0026gt; isChosen(option)} onclick={() =\u0026gt; choose(option)}\u0026gt;\n              {LABELS[option]}\n            \u0026lt;/button\u0026gt;\n          ))}\n        \u0026lt;/div\u0026gt;\n      \u0026lt;/section\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport function SettingsPage() {\n  const settings = FromService(SettingsService);\n\n  const setting = (name, options, isChosen, choose) =\u0026gt; (\n    \u0026lt;section class=\u0026quot;setting\u0026quot;\u0026gt;\n      \u0026lt;span\u0026gt;{name}\u0026lt;/span\u0026gt;\n      \u0026lt;div class=\u0026quot;seg\u0026quot; role=\u0026quot;group\u0026quot; aria-label={name}\u0026gt;\n        {options.map((option) =\u0026gt; (\n          \u0026lt;button key={option} type=\u0026quot;button\u0026quot; aria-pressed={() =\u0026gt; isChosen(option)} onclick={() =\u0026gt; choose(option)}\u0026gt;\n            {LABELS[option]}\n          \u0026lt;/button\u0026gt;\n        ))}\n      \u0026lt;/div\u0026gt;\n    \u0026lt;/section\u0026gt;\n  );\n\n  return (\n    \u0026lt;main class=\u0026quot;page\u0026quot;\u0026gt;\n      \u0026lt;h1\u0026gt;Settings\u0026lt;/h1\u0026gt;\n      {setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme))}\n      {setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density))}\n      \u0026lt;p\u0026gt;{() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060}\u0026lt;/p\u0026gt;\n    \u0026lt;/main\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/pages/SettingsPage.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport const SettingsPage = () =\u0026gt; {\n  const settings = FromService(SettingsService);\n\n  return motifOptions({\n    el: \u0026quot;main\u0026quot;,\n\n    view() {\n      this.class.add(\u0026quot;page\u0026quot;);\n      return (\n        \u0026lt;\u0026gt;\n          \u0026lt;h1\u0026gt;Settings\u0026lt;/h1\u0026gt;\n          {this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme))}\n          {this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density))}\n          \u0026lt;p\u0026gt;{() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060}\u0026lt;/p\u0026gt;\n        \u0026lt;/\u0026gt;\n      );\n    },\n\n    setting(name, options, isChosen, choose) {\n      return (\n        \u0026lt;section class=\u0026quot;setting\u0026quot;\u0026gt;\n          \u0026lt;span\u0026gt;{name}\u0026lt;/span\u0026gt;\n          \u0026lt;div class=\u0026quot;seg\u0026quot; role=\u0026quot;group\u0026quot; aria-label={name}\u0026gt;\n            {options.map((option) =\u0026gt; (\n              \u0026lt;button key={option} type=\u0026quot;button\u0026quot; aria-pressed={() =\u0026gt; isChosen(option)} onclick={() =\u0026gt; choose(option)}\u0026gt;\n                {LABELS[option]}\n              \u0026lt;/button\u0026gt;\n            ))}\n          \u0026lt;/div\u0026gt;\n        \u0026lt;/section\u0026gt;\n      );\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport class SettingsPage extends Component {\n  settings = this.getService(SettingsService);\n\n  view() {\n    return motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n      main.class.add(\u0026quot;page\u0026quot;);\n      const heading = motifComponent(\u0026quot;h1\u0026quot;, (h1) =\u0026gt; h1.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Settings\u0026quot;))));\n      const summary = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n        p.bindings.text(() =\u0026gt; \u0060Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.\u0060);\n      });\n      main.controls.add(\n        heading,\n        this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; this.settings.state.theme === theme, (theme) =\u0026gt; this.settings.setTheme(theme)),\n        this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; this.settings.state.density === density, (density) =\u0026gt; this.settings.setDensity(density)),\n        summary,\n      );\n    });\n  }\n\n  setting(name, options, isChosen, choose) {\n    return motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n      section.class.add(\u0026quot;setting\u0026quot;);\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(name))));\n      const group = motifComponent(\u0026quot;div\u0026quot;, (seg) =\u0026gt; {\n        seg.class.add(\u0026quot;seg\u0026quot;);\n        seg.attr.add({ role: \u0026quot;group\u0026quot;, \u0026quot;aria-label\u0026quot;: name });\n        for (const option of options) {\n          const button = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; isChosen(option) });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; choose(option));\n            button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(LABELS[option])));\n          });\n          seg.controls.add(button);\n        }\n      });\n      section.controls.add(label, group);\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport function SettingsPage() {\n  const settings = FromService(SettingsService);\n\n  const setting = (name, options, isChosen, choose) =\u0026gt;\n    motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n      section.class.add(\u0026quot;setting\u0026quot;);\n      const label = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(name))));\n      const group = motifComponent(\u0026quot;div\u0026quot;, (seg) =\u0026gt; {\n        seg.class.add(\u0026quot;seg\u0026quot;);\n        seg.attr.add({ role: \u0026quot;group\u0026quot;, \u0026quot;aria-label\u0026quot;: name });\n        for (const option of options) {\n          const button = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n            button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; isChosen(option) });\n            button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; choose(option));\n            button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(LABELS[option])));\n          });\n          seg.controls.add(button);\n        }\n      });\n      section.controls.add(label, group);\n    });\n\n  return motifComponent(\u0026quot;main\u0026quot;, (main) =\u0026gt; {\n    main.class.add(\u0026quot;page\u0026quot;);\n    const heading = motifComponent(\u0026quot;h1\u0026quot;, (h1) =\u0026gt; h1.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Settings\u0026quot;))));\n    const summary = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n      p.bindings.text(() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060);\n    });\n    main.controls.add(\n      heading,\n      setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme)),\n      setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density)),\n      summary,\n    );\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/pages/SettingsPage.js\u0022\u003E\u003Ccode\u003Eimport { FromService, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { DENSITIES, SettingsService, THEMES } from \u0026quot;../services/settings\u0026quot;;\n\nconst LABELS = { system: \u0026quot;System\u0026quot;, light: \u0026quot;Light\u0026quot;, dark: \u0026quot;Dark\u0026quot;, comfortable: \u0026quot;Comfortable\u0026quot;, compact: \u0026quot;Compact\u0026quot; };\n\nexport const SettingsPage = () =\u0026gt; {\n  const settings = FromService(SettingsService);\n\n  return motifOptions({\n    el: \u0026quot;main\u0026quot;,\n\n    view() {\n      this.class.add(\u0026quot;page\u0026quot;);\n      const heading = motifComponent(\u0026quot;h1\u0026quot;, (h1) =\u0026gt; h1.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Settings\u0026quot;))));\n      const summary = motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n        p.bindings.text(() =\u0026gt; \u0060Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.\u0060);\n      });\n      return [\n        heading,\n        this.setting(\u0026quot;Theme\u0026quot;, THEMES, (theme) =\u0026gt; settings.state.theme === theme, (theme) =\u0026gt; settings.setTheme(theme)),\n        this.setting(\u0026quot;Density\u0026quot;, DENSITIES, (density) =\u0026gt; settings.state.density === density, (density) =\u0026gt; settings.setDensity(density)),\n        summary,\n      ];\n    },\n\n    setting(name, options, isChosen, choose) {\n      return motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n        section.class.add(\u0026quot;setting\u0026quot;);\n        const label = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; span.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(name))));\n        const group = motifComponent(\u0026quot;div\u0026quot;, (seg) =\u0026gt; {\n          seg.class.add(\u0026quot;seg\u0026quot;);\n          seg.attr.add({ role: \u0026quot;group\u0026quot;, \u0026quot;aria-label\u0026quot;: name });\n          for (const option of options) {\n            const button = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n              button.attr.add({ type: \u0026quot;button\u0026quot;, \u0026quot;aria-pressed\u0026quot;: () =\u0026gt; isChosen(option) });\n              button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; choose(option));\n              button.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(LABELS[option])));\n            });\n            seg.controls.add(button);\n          }\n        });\n        section.controls.add(label, group);\n      });\n    },\n  });\n};\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EIn the example:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Earia-pressed={() =\u0026gt; …}\u003C/code\u003E is a getter: it is recomputed on all three buttons on every choice, and the ones whose value changes are the previous and the new choice. A plain value (\u003Ccode\u003Etype=\u0026quot;button\u0026quot;\u003C/code\u003E) is written once.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003E{() =\u0026gt; …}\u003C/code\u003E / \u003Ccode\u003Ebindings.text(() =\u0026gt; …)\u003C/code\u003E is a live text binding. In JSX, a member expression such as \u003Ccode\u003E{LABELS[option]}\u003C/code\u003E is a binding too, because the compiler turns it into a getter; in the form without JSX, \u003Ccode\u003EsetText(LABELS[option])\u003C/code\u003E writes the text once.\u003C/li\u003E\n\u003Cli\u003EThe service is registered in the \u003Ccode\u003Emain\u003C/code\u003E file with \u003Ccode\u003Ebuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true })\u003C/code\u003E. A singleton given \u003Ccode\u003Estartup: true\u003C/code\u003E is created at the start of \u003Ccode\u003Eapp.run()\u003C/code\u003E without waiting for a component to ask for it; if it was asked for earlier, it is not created again. In the example the class component gets the service with \u003Ccode\u003Ethis.getService\u003C/code\u003E, and the function and Options components with \u003Ccode\u003EFromService\u003C/code\u003E (the Options component can use \u003Ccode\u003Ethis.getService\u003C/code\u003E too). Because the service is a singleton, the page sees the same settings every time it opens. Registering through \u003Ccode\u003E@Injectable\u003C/code\u003E is covered in \u003Ca href=\u0022/docs/service-registration#injectable-decorator\u0022\u003ERegistering Services\u003C/a\u003E.\u003C/li\u003E\n\u003Cli\u003EIn JSX, \u003Ccode\u003E.map\u003C/code\u003E compiles to a list binding. The options are fixed, so the form without JSX adds the buttons with a plain loop; for a list that changes, use \u003Ccode\u003Ebindings.list\u003C/code\u003E (see \u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EConditional Rendering and Lists\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003EIn the form without JSX, plain text is a \u003Ccode\u003E\u0026quot;text\u0026quot;\u003C/code\u003E component: \u003Ccode\u003EmotifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;…\u0026quot;))\u003C/code\u003E. The page class does not declare an element; \u003Ccode\u003Eview()\u003C/code\u003E returns the content, and \u003Ccode\u003EmotifComponent(\u0026quot;main\u0026quot;, …)\u003C/code\u003E is the single element of that content, not the component\u0027s own element (see \u003Ca href=\u0022/docs/components#root-element\u0022\u003ERoot element\u003C/a\u003E). In the Options form the component\u0027s element is given with \u003Ccode\u003Eel\u003C/code\u003E, and \u003Ccode\u003Eview()\u003C/code\u003E returns the content.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022mount-app\u0022\u003EMount the application\u003C/h2\u003E\n\u003Cp\u003EThe \u003Ccode\u003EApplication\u003C/code\u003E class is the application\u0027s entry point. The usual flow:\u003C/p\u003E\n\u003Col\u003E\n\u003Cli\u003ECreate a \u003Cstrong\u003Ebuilder\u003C/strong\u003E with \u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003ERegister services on \u003Ccode\u003Ebuilder.services\u003C/code\u003E if needed (see \u003Ca href=\u0022/docs/dependency-injection\u0022\u003EIntroduction to Dependency Injection\u003C/a\u003E).\u003C/li\u003E\n\u003Cli\u003EProduce the \u003Ccode\u003EApplication\u003C/code\u003E instance with \u003Ccode\u003Ebuilder.build()\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EOptionally define routing with \u003Ccode\u003Eapp.useRouter(...)\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EMount the application on a DOM element with \u003Ccode\u003Eapp.run(host, rootComponent)\u003C/code\u003E.\u003C/li\u003E\n\u003C/ol\u003E\n\u003Cp\u003EA class component is passed as an instance; it can also be built with the \u003Ccode\u003E\u0026lt;SettingsPage /\u0026gt;\u003C/code\u003E tag in JSX or with \u003Ccode\u003EmotifComponent(SettingsPage)\u003C/code\u003E when writing without JSX. Function and Options components are written as tags in JSX; without JSX, a function component is called and an Options component is built with \u003Ccode\u003EmotifComponent(SettingsPage)\u003C/code\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/main.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/main.tsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new SettingsPage());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript,declarative/options/typescript\u0022 data-file=\u0022src/main.tsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, \u0026lt;SettingsPage /\u0026gt;);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new SettingsPage());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, SettingsPage());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, motifComponent(SettingsPage));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/main.jsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new SettingsPage());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript,declarative/options/javascript\u0022 data-file=\u0022src/main.jsx\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, \u0026lt;SettingsPage /\u0026gt;);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, new SettingsPage());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, SettingsPage());\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { SettingsPage } from \u0026quot;./pages/SettingsPage\u0026quot;;\nimport { SettingsService } from \u0026quot;./services/settings\u0026quot;;\n\nconst builder = Application.CreateBuilder();\nbuilder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });\nconst app = builder.build();\napp.run(\u0026quot;#app\u0026quot;, motifComponent(SettingsPage));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EThe first argument of \u003Ccode\u003Eapp.run\u003C/code\u003E accepts a CSS selector (\u003Ccode\u003E\u0026quot;#app\u0026quot;\u003C/code\u003E), an \u003Ccode\u003EHTMLElement\u003C/code\u003E or a \u003Ccode\u003ENode\u003C/code\u003E; if the selector matches nothing, an \u003Ccode\u003EMJX406\u003C/code\u003E error is thrown. The second argument is the \u003Cstrong\u003Eroot component\u003C/strong\u003E. The host\u0027s existing content is kept, and the root component is appended after it. If the second argument is left out, MotifJS places a \u003Ccode\u003ERouterView\u003C/code\u003E at the root by itself (for router-based applications; see below). \u003Ccode\u003EApplication.CreateBuilder()\u003C/code\u003E is called once per application; a second call throws \u003Ccode\u003EMJX405\u003C/code\u003E (it can be called again after \u003Ccode\u003Eapp.dispose()\u003C/code\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022router-start\u0022\u003ERouter-based startup\u003C/h3\u003E\n\u003Cp\u003EIn multi-page applications, use routing instead of a root component. In that case do not pass a second argument to \u003Ccode\u003Erun\u003C/code\u003E; MotifJS adds the root \u003Ccode\u003ERouterView\u003C/code\u003E itself. When a second argument is given, the root is your component and you put the \u003Ccode\u003ERouterView\u003C/code\u003E in its view yourself:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/main.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/main.ts\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { routes } from \u0026quot;./routes\u0026quot;;\n\nconst app = Application.CreateBuilder().build();\n\n/* @DEV-ONLY */ app.useDevelopment(true);\napp.useLogging(true);\n\napp.useRouter({\n  routes,\n  mode: \u0026quot;history\u0026quot;,\n  fallbacks: {\n    notFound: () =\u0026gt; import(\u0026quot;./pages/NotFoundPage\u0026quot;),\n  },\n});\n\napp.run(\u0026quot;#app\u0026quot;);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/main.js\u0022\u003E\u003Ccode\u003Eimport { Application } from \u0026quot;@motifx/core\u0026quot;;\nimport { routes } from \u0026quot;./routes\u0026quot;;\n\nconst app = Application.CreateBuilder().build();\n\n/* @DEV-ONLY */ app.useDevelopment(true);\napp.useLogging(true);\n\napp.useRouter({\n  routes,\n  mode: \u0026quot;history\u0026quot;,\n  fallbacks: {\n    notFound: () =\u0026gt; import(\u0026quot;./pages/NotFoundPage\u0026quot;),\n  },\n});\n\napp.run(\u0026quot;#app\u0026quot;);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EuseDevelopment\u003C/code\u003E turns on development mode: MJX warnings, route checks when it is called before \u003Ccode\u003EuseRouter\u003C/code\u003E, and DevTools. \u003Ccode\u003EuseLogging\u003C/code\u003E turns on console error logging (on by default). The \u003Ccode\u003Emode\u003C/code\u003E values are \u003Ccode\u003E\u0027history\u0027 | \u0027hash\u0027 | \u0027file\u0027 | \u0027shell\u0027\u003C/code\u003E. Route definitions are covered in detail on the \u003Ca href=\u0022/docs/routes\u0022\u003ERoute Table\u003C/a\u003E page, and placing a \u003Ccode\u003ERouterView\u003C/code\u003E on the \u003Ca href=\u0022/docs/router-view\u0022\u003ERouterView\u003C/a\u003E page. The module loaded through \u003Ccode\u003EnotFound\u003C/code\u003E must export the page as \u003Ccode\u003Edefault\u003C/code\u003E; for a named export, map it: \u003Ccode\u003EnotFound: () =\u0026gt; import(\u0026quot;./pages/NotFoundPage\u0026quot;).then((m) =\u0026gt; m.NotFoundPage)\u003C/code\u003E. A module without a \u003Ccode\u003Edefault\u003C/code\u003E export is reported as \u003Ccode\u003EMJX127\u003C/code\u003E (the \u003Ccode\u003Ecause\u003C/code\u003E of \u003Ccode\u003EMJX304\u003C/code\u003E), and the error view is shown instead of the 404 page (see \u003Ca href=\u0022/docs/routes#lazy\u0022\u003ELazy loading\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022dev-helpers\u0022\u003EDevelopment helpers\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EApplication\u003C/code\u003E has chainable configuration methods:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMethod\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useDevelopment(true)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETurns on development mode: \u003Ccode\u003EMJX\u003C/code\u003E warnings are written to the console (\u003Ccode\u003Econsole.warn\u003C/code\u003E), and so are errors the framework catches internally and passes over quietly; when called before \u003Ccode\u003EuseRouter\u003C/code\u003E, route definitions are checked. \u003Ccode\u003EMJX\u003C/code\u003E warnings are not buffered: warnings raised before development mode is turned on (other than \u003Ccode\u003EMJX121\u003C/code\u003E) are not printed later, which is why \u003Ccode\u003EuseDevelopment\u003C/code\u003E is called before \u003Ccode\u003Erun\u003C/code\u003E. DevTools is turned on as well: the \u003Ccode\u003EglobalThis.__MOTIF_DEVTOOLS__\u003C/code\u003E object is created (\u003Ca href=\u0022/docs/devtools\u0022\u003EThe DevTools Contract\u003C/a\u003E); \u003Ccode\u003EuseDevelopment(false)\u003C/code\u003E turns DevTools off and removes the object. Read it with \u003Ccode\u003Eapp.isDevelopmentModeEnabled\u003C/code\u003E. In a production build the core\u0027s DevTools hooks are stripped from the code (\u003Ca href=\u0022#dev-only\u0022\u003EDevelopment-only code\u003C/a\u003E), so DevTools produces no data.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useLogging(true)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETurns writing errors to the console on or off (on by default). It does not turn off \u003Ccode\u003EMJX\u003C/code\u003E warnings; those follow development mode (\u003Ccode\u003EuseDevelopment\u003C/code\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useReactiveMonitor({ enabled: true, threshold: 200, name: \u0027app\u0027 })\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ETurns on tracking of reactive dependency leaks (recommended during development; when the threshold is exceeded an \u003Ccode\u003EMJX507\u003C/code\u003E warning is printed, and this warning only shows while \u003Ccode\u003EuseDevelopment(true)\u003C/code\u003E is on; see \u003Ca href=\u0022/docs/memory-and-dispose#leak-monitor\u0022\u003ELeak tracking\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eapp.useTransitions({ mode: \u0027out-in\u0027 })\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPicks the default mode for enter/leave transitions (see \u003Ca href=\u0022/docs/styling-and-transitions#transition-mode\u0022\u003EEnter/leave mode\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EErrors thrown in hooks (\u003Ccode\u003EMJX122\u003C/code\u003E), event handlers (\u003Ccode\u003EMJX123\u003C/code\u003E), effect/binding functions (\u003Ccode\u003EMJX208\u003C/code\u003E) and \u003Ccode\u003Eusing\u003C/code\u003E handlers (\u003Ccode\u003EMJX129\u003C/code\u003E) are reported regardless of development mode, in production too: they are written to \u003Ccode\u003Econsole.error\u003C/code\u003E (unless \u003Ccode\u003EuseLogging(false)\u003C/code\u003E) and passed to \u003Ccode\u003EerrorHandler.addListener(fn)\u003C/code\u003E listeners as a \u003Ccode\u003EMotifError\u003C/code\u003E (\u003Ccode\u003Eerror.code\u003C/code\u003E, \u003Ccode\u003Eerror.cause\u003C/code\u003E; see \u003Ca href=\u0022/docs/error-handling#error-handler\u0022\u003EError Handling\u003C/a\u003E). The application keeps running.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo build the parts of the application, go on to \u003Ca href=\u0022/docs/components\u0022\u003EComponents\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"requirements","text":"Requirements","level":2},{"id":"installation","text":"Installation","level":2},{"id":"create-motifjs","text":"New project","level":3},{"id":"add-to-project","text":"Adding to an existing project","level":3},{"id":"umd","text":"Without a bundler","level":3},{"id":"build-setup","text":"Build setup","level":2},{"id":"dev-only","text":"Development-only code","level":3},{"id":"plugin-options","text":"Plugin options","level":3},{"id":"html-host","text":"HTML host","level":2},{"id":"first-component","text":"First component","level":2},{"id":"mount-app","text":"Mount the application","level":2},{"id":"router-start","text":"Router-based startup","level":3},{"id":"dev-helpers","text":"Development helpers","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"index","title":"MotifJS Documentation"},"next":{"slug":"components","title":"Components"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Get started</p>
+        <h1>Getting Started</h1>
+        <p>Set up the build, write your first component and mount the application, with or without JSX.</p>
+<p>This section covers setting up the MotifJS build chain, writing the first component and getting the application on screen. The examples come in two forms: with JSX (<code>.tsx</code>) and without JSX, using component calls directly (<code>.ts</code>).</p>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li><strong>Vite</strong> (the recommended bundler) or Rollup</li>
+<li><strong>TypeScript or JavaScript.</strong> Views written with JSX live in <code>.tsx</code>/<code>.jsx</code> files, and views written without JSX live in <code>.ts</code>/<code>.js</code> files. If you use TypeScript, your project needs version 5.4 or later (the core's type declarations use <code>NoInfer</code>). <code>@motifx/compiler</code> brings its own TypeScript dependency (5.x/6.x) for type-aware checks (<code>motif-lint</code>) and for reading the plugin's <code>tsconfig.json</code>, and it works independently of the version in your project.</li>
+<li><strong><code>@motifx/core</code></strong> — the core library. It ships as ESM (<code>dist/index.esm.js</code>), CommonJS (<code>dist/index.cjs</code>) and, for use without a bundler and without JSX, UMD (<code>dist/index.umd.min.js</code>, the package's <code>unpkg</code>/<code>jsdelivr</code> entry; see <a href="#umd">Without a bundler</a>)</li>
+<li><strong><code>@motifx/compiler</code></strong> — the build plugin. It compiles JSX into component calls, transforms decorators (<code>@Injectable</code>) in <code>.ts</code>/<code>.js</code> files and strips development-only code from production builds. Install it even in a project that does not use JSX.</li>
+<li><strong>Node.js 18 or later</strong> — the <code>@motifx/compiler</code> plugin and its commands (<a href="/docs/jsx#motif-lint"><code>motif-lint</code></a>, <a href="/docs/jsx#explain"><code>motif-explain</code></a>) run on Node; your bundler's own Node requirement applies as well.</li>
+</ul>
+<p>The two packages (<code>@motifx/compiler</code> and <code>@motifx/core</code>) are always published with the same version number, whether or not one of them changed, and they are installed at the same version. The surface that compiled code relies on in the runtime (the compiler contract) changes only in a major version. If the runtime does not support the contract number declared by the compiled code, development mode prints an <code>MJX121</code> warning (the mismatch is noticed while modules load, but the warning appears when <code>app.useDevelopment(true)</code> is called).</p>
+<h2 id="installation">Installation</h2>
+<h3 id="create-motifjs">New project</h3>
+<div class="doc-code">
+<pre data-lang="sh"><code>npm create motifjs@latest notes</code></pre>
+</div>
+<p><code>pnpm create motifjs</code>, <code>yarn create motifjs</code>, <code>bun create motifjs</code> and <code>npx create-motifjs</code> do the same thing. create-motifjs is the MotifJS community's project generator and needs Node 20.19 or later. It asks for the language (TypeScript or JavaScript), whether components are written with or without JSX, the AI agent docs and DevTools, and creates a Vite project with the compiler plugin and <code>motif-lint</code> already set up. Today the only template is <code>starter</code>, a complete notes application.</p>
+<h3 id="add-to-project">Adding to an existing project</h3>
+<p>The core is a dependency of the application, and the compiler is a development dependency:</p>
+<div class="doc-code">
+<pre data-lang="sh"><code>npm install @motifx/core
+npm install -D @motifx/compiler</code></pre>
+</div>
+<p>With pnpm, yarn and bun the same two packages are installed with <code>add</code>, the compiler again as a development dependency. Then make the two settings in <a href="#build-setup">Build setup</a>.</p>
+<h3 id="umd">Without a bundler</h3>
+<p>The core's UMD file is the package's <code>unpkg</code> / <code>jsdelivr</code> entry and exposes every export on the global <code>motif</code> object:</p>
+<div class="doc-code" data-file="index.html">
+<pre data-lang="html" data-file="index.html"><code>&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;title&gt;MotifJS App&lt;/title&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;
+    &lt;script src=&quot;https://unpkg.com/@motifx/core&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;/main.js&quot;&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+<p><code>main.js</code> starts with <code>const { Application, motifComponent, reactive } = motif;</code>. JSX and decorator syntax need the compiler, so here the view is written <a href="/docs/imperative">without JSX</a>, services are registered with <code>builder.services</code>, and code marked <code>@DEV-ONLY</code> is not stripped. In production, pin the address to a version: <code>https://unpkg.com/@motifx/core@&lt;version&gt;</code>.</p>
+<h2 id="build-setup">Build setup</h2>
+<p>MotifJS JSX is not handled by a standard <code>jsxFactory</code> but by its own compiler (<code>@motifx/compiler</code>). The compiler turns every JSX element into a <code>motifComponent</code> call, and the reactive expressions inside it (text, conditions, lists) into <code>bindings.*</code> calls. That is why two settings are needed:</p>
+<ol>
+<li>Add the <code>@motifx/compiler</code> plugin to the bundler. The plugin runs before Vite's own transform (<code>enforce: 'pre'</code>) and leaves no JSX behind, so Vite needs no separate JSX setting.</li>
+<li>Set <code>&quot;jsx&quot;: &quot;preserve&quot;</code> in <code>tsconfig.json</code>: TypeScript checks the types of the JSX but does not compile it. A project without JSX does not need this line.</li>
+</ol>
+<div class="doc-code" data-file="vite.config.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="vite.config.ts"><code>import { defineConfig } from 'vite';
+import compiler from '@motifx/compiler';
+
+export default defineConfig({
+  plugins: [compiler()],
+  resolve: {
+    extensions: ['.tsx', '.ts', '.jsx', '.js'],
+  },
+  server: { port: 3000 },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="vite.config.js"><code>import { defineConfig } from 'vite';
+import compiler from '@motifx/compiler';
+
+export default defineConfig({
+  plugins: [compiler()],
+  resolve: {
+    extensions: ['.tsx', '.ts', '.jsx', '.js'],
+  },
+  server: { port: 3000 },
+});</code></pre>
+</div>
+<div class="doc-code" data-file="tsconfig.json">
+<pre data-lang="jsonc" data-file="tsconfig.json"><code>{
+  &quot;compilerOptions&quot;: {
+    &quot;target&quot;: &quot;ES2022&quot;,
+    &quot;module&quot;: &quot;esnext&quot;,
+    &quot;moduleResolution&quot;: &quot;bundler&quot;,
+    &quot;strict&quot;: true,
+    &quot;jsx&quot;: &quot;preserve&quot;,
+    &quot;useDefineForClassFields&quot;: true,
+    &quot;lib&quot;: [&quot;ESNext&quot;, &quot;DOM&quot;, &quot;DOM.Iterable&quot;],
+    &quot;types&quot;: [&quot;vite/client&quot;]
+  },
+  &quot;include&quot;: [&quot;src&quot;]
+}</code></pre>
+</div>
+<blockquote>
+<p><strong>Why <code>jsx: &quot;preserve&quot;</code>?</strong> In MotifJS, JSX does not turn into a &quot;render function call&quot; but into compiled output that sets up reactive bindings. For example, the compiler turns the expression <code>{model.count}</code> into a <code>sender.bindings.add(&quot;textContent&quot;, model, &quot;count&quot;)</code> call. Only <code>@motifx/compiler</code> knows this transform; TypeScript only checks the types, and <code>@motifx/compiler</code> is what compiles the JSX.</p>
+</blockquote>
+<p>The plugin compiles <code>.jsx</code> and <code>.tsx</code> files. In <code>.ts</code>/<code>.js</code> files it transforms decorators (<code>@Injectable</code>) (see <a href="/docs/service-registration#injectable-decorator">Registering Services</a>), names module-level stores for DevTools during <code>vite dev</code>, and strips development-only code from production builds. In <code>.ts</code>/<code>.mts</code>/<code>.cts</code> files it adds a <code>static elementTag</code> from an element generic such as <code>Component&lt;HTMLUListElement&gt;</code> (see <a href="/docs/components#root-element">Root element</a>). In files under <code>node_modules</code>, only development-only code is stripped. In Vite 8 (Rolldown), if the application has not set <code>optimizeDeps.rolldownOptions.transform.jsx</code> for dependency scanning, the plugin sets it to <code>'preserve'</code>, so <code>.jsx</code> files are read without looking for another JSX runtime.</p>
+<p>Rollup uses the same <code>compiler()</code> plugin; there is no separate Rollup or Babel plugin. Rollup has no mode of its own, so tell the plugin about production builds: <code>compiler({ production: !process.env.ROLLUP_WATCH })</code>. The plugin also strips types from the <code>.tsx</code> and <code>.jsx</code> files it compiles. Stripping types from plain <code>.ts</code> files and resolving imports written without an extension or by package name is the job of the usual Rollup plugins: <code>rollup-plugin-esbuild</code> or <code>@rollup/plugin-typescript</code>, plus <code>@rollup/plugin-node-resolve</code> with the <code>.tsx</code> and <code>.ts</code> extensions added. The <code>vite/client</code> types and <code>import.meta.env</code> are specific to Vite.</p>
+<h3 id="dev-only">Development-only code</h3>
+<p>A production build strips code marked as development-only from application files and from packages under <code>node_modules</code>. MotifJS marks its own DevTools hooks this way, so this code never makes it into a production bundle, whatever <code>app.useDevelopment()</code> says. The <code>app.useDevelopment(true)</code> line is written with the same mark, so the production bundle contains neither that line nor the DevTools object.</p>
+<div class="doc-code" data-file="src/main.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/main.tsx"><code>/* @DEV-ONLY */ app.useDevelopment(true);
+
+/* @DEV-ONLY-BEGIN */
+app.useReactiveMonitor({ enabled: true, threshold: 200, name: 'app' });
+(globalThis as any).app = app;
+/* @DEV-ONLY-END */</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/main.ts"><code>/* @DEV-ONLY */ app.useDevelopment(true);
+
+/* @DEV-ONLY-BEGIN */
+app.useReactiveMonitor({ enabled: true, threshold: 200, name: 'app' });
+(globalThis as any).app = app;
+/* @DEV-ONLY-END */</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/main.jsx"><code>/* @DEV-ONLY */ app.useDevelopment(true);
+
+/* @DEV-ONLY-BEGIN */
+app.useReactiveMonitor({ enabled: true, threshold: 200, name: 'app' });
+globalThis.app = app;
+/* @DEV-ONLY-END */</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/main.js"><code>/* @DEV-ONLY */ app.useDevelopment(true);
+
+/* @DEV-ONLY-BEGIN */
+app.useReactiveMonitor({ enabled: true, threshold: 200, name: 'app' });
+globalThis.app = app;
+/* @DEV-ONLY-END */</code></pre>
+</div>
+<p>The single-line mark strips the statement or class member that follows it. To strip several statements or members in a row, use the <code>@DEV-ONLY-BEGIN</code> / <code>@DEV-ONLY-END</code> pair; the pair sits between statements and class members.</p>
+<ul>
+<li><code>@DEV-ONLY</code> strips the single statement or class member (method, field, accessor) that comes right after it; everything between <code>@DEV-ONLY-BEGIN</code> and <code>@DEV-ONLY-END</code>, the marks included, is stripped.</li>
+<li>A mark is a block comment that contains only the mark; a <code>//</code> line that mentions the mark is not a mark.</li>
+<li><code>@DEV-ONLY</code> works at any depth (inside a method, in front of an <code>if</code> or a <code>const</code>).</li>
+<li><code>BEGIN</code> and <code>END</code> sit in the same block, between statements, imports or class members. A <code>BEGIN</code> without <code>END</code>, an <code>END</code> without <code>BEGIN</code>, a nested <code>BEGIN</code> or a range mark inside an expression stops the build with an error at the mark, in <code>vite dev</code> as well.</li>
+<li>Production means <code>vite build</code> in Vite, and the <code>production</code> option or <code>NODE_ENV=production</code> in Rollup. In Vite the decision follows Vite's <code>isProduction</code> value, that is, <code>NODE_ENV=production</code>: if <code>NODE_ENV=development</code> is set in the environment, <code>vite build</code> does not strip the code either. Nothing is stripped during development.</li>
+</ul>
+<h3 id="plugin-options">Plugin options</h3>
+<div class="doc-code" data-file="vite.config.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="vite.config.ts"><code>compiler({
+  diagnostics: false,
+  explain: 'pages/Home',
+  exclude: 'legacy/',
+  storeNames: true,
+  production: true,
+})</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="vite.config.js"><code>compiler({
+  diagnostics: false,
+  explain: 'pages/Home',
+  exclude: 'legacy/',
+  storeNames: true,
+  production: true,
+})</code></pre>
+</div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>diagnostics</code></td>
+<td>With <code>false</code>, compile-time warnings (<code>MJX001</code>–<code>MJX004</code>, <code>MJX007</code>, <code>MJX015</code>, <code>MJX016</code>) are not printed; on by default (see <a href="/docs/jsx#compile-time-diagnostics">Compile-time warnings</a>).</td>
+</tr>
+<tr>
+<td><code>explain</code></td>
+<td>Prints what every JSX expression compiles to in the matching files: <code>true</code> means every file, a string matches paths that contain it, a <code>RegExp</code> uses <code>test(id)</code> (see <a href="/docs/jsx#explain">What did this expression compile to?</a>).</td>
+</tr>
+<tr>
+<td><code>exclude</code></td>
+<td>Files the plugin keeps its hands off: a string matches paths that contain it (<code>includes</code>), a <code>RegExp</code> uses <code>test(id)</code>, or an <code>(id) =&gt; boolean</code> function. MotifJS does not compile the JSX in these files, which is left to Vite's own transform; in a production build the development-only code inside them is still stripped.</td>
+</tr>
+<tr>
+<td><code>storeNames</code></td>
+<td>Names module-level stores for DevTools; on by default in <code>vite dev</code> and off in production builds. In Rollup it is off and is turned on with <code>storeNames: true</code>.</td>
+</tr>
+<tr>
+<td><code>production</code></td>
+<td>Strips development-only code; the default is <code>vite build</code> in Vite and <code>NODE_ENV=production</code> elsewhere.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="html-host">HTML host</h2>
+<p>The application needs a root element to be mounted into, and a <code>&lt;script&gt;</code> tag loads the entry file:</p>
+<div class="doc-code" data-file="index.html">
+<pre data-lang="html" data-variant="declarative/typescript" data-file="index.html"><code>&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;title&gt;MotifJS App&lt;/title&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;
+    &lt;script type=&quot;module&quot; src=&quot;/src/main.tsx&quot;&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<pre data-lang="html" data-variant="imperative/typescript" data-file="index.html"><code>&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;title&gt;MotifJS App&lt;/title&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;
+    &lt;script type=&quot;module&quot; src=&quot;/src/main.ts&quot;&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<pre data-lang="html" data-variant="declarative/javascript" data-file="index.html"><code>&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;title&gt;MotifJS App&lt;/title&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;
+    &lt;script type=&quot;module&quot; src=&quot;/src/main.jsx&quot;&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<pre data-lang="html" data-variant="imperative/javascript" data-file="index.html"><code>&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;title&gt;MotifJS App&lt;/title&gt;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;
+    &lt;script type=&quot;module&quot; src=&quot;/src/main.js&quot;&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+<h2 id="first-component">First component</h2>
+<p>A settings page: <code>SettingsService</code> holds the theme and density, writes them to <code>&lt;html&gt;</code> as <code>data-theme</code> / <code>data-density</code> and saves them to <code>localStorage</code>. <code>SettingsPage</code> shows the options as buttons, the selected one is marked with <code>aria-pressed</code>, and a summary line follows the choice. The class, function and Options API forms use the same core, and each is written both with and without JSX.</p>
+<div class="doc-code" data-file="src/services/settings.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/services/settings.ts"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export type Theme = &quot;system&quot; | &quot;light&quot; | &quot;dark&quot;;
+export type Density = &quot;comfortable&quot; | &quot;compact&quot;;
+
+export const THEMES: readonly Theme[] = [&quot;system&quot;, &quot;light&quot;, &quot;dark&quot;];
+export const DENSITIES: readonly Density[] = [&quot;comfortable&quot;, &quot;compact&quot;];
+
+const STORAGE_KEY = &quot;settings&quot;;
+
+export class SettingsService {
+  readonly state = reactive({ theme: &quot;system&quot; as Theme, density: &quot;comfortable&quot; as Density });
+
+  constructor() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? &quot;{}&quot;);
+      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;
+      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;
+    } catch {}
+    this.apply();
+  }
+
+  setTheme(theme: Theme) {
+    this.state.theme = theme;
+    this.save();
+  }
+
+  setDensity(density: Density) {
+    this.state.density = density;
+    this.save();
+  }
+
+  private save() {
+    this.apply();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));
+    } catch {}
+  }
+
+  private apply() {
+    const root = document.documentElement;
+    if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+    else root.dataset.theme = this.state.theme;
+    if (this.state.density === &quot;comfortable&quot;) delete root.dataset.density;
+    else root.dataset.density = this.state.density;
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/services/settings.js"><code>import { reactive } from &quot;@motifx/core&quot;;
+
+export const THEMES = [&quot;system&quot;, &quot;light&quot;, &quot;dark&quot;];
+export const DENSITIES = [&quot;comfortable&quot;, &quot;compact&quot;];
+
+const STORAGE_KEY = &quot;settings&quot;;
+
+export class SettingsService {
+  state = reactive({ theme: &quot;system&quot;, density: &quot;comfortable&quot; });
+
+  constructor() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? &quot;{}&quot;);
+      if (THEMES.includes(saved.theme)) this.state.theme = saved.theme;
+      if (DENSITIES.includes(saved.density)) this.state.density = saved.density;
+    } catch {}
+    this.apply();
+  }
+
+  setTheme(theme) {
+    this.state.theme = theme;
+    this.save();
+  }
+
+  setDensity(density) {
+    this.state.density = density;
+    this.save();
+  }
+
+  save() {
+    this.apply();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ theme: this.state.theme, density: this.state.density }));
+    } catch {}
+  }
+
+  apply() {
+    const root = document.documentElement;
+    if (this.state.theme === &quot;system&quot;) delete root.dataset.theme;
+    else root.dataset.theme = this.state.theme;
+    if (this.state.density === &quot;comfortable&quot;) delete root.dataset.density;
+    else root.dataset.density = this.state.density;
+  }
+}</code></pre>
+</div>
+<div class="doc-code" data-file="src/pages/SettingsPage.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/pages/SettingsPage.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES, type Density, type Theme } from &quot;../services/settings&quot;;
+
+const LABELS: Record&lt;Theme | Density, string&gt; = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export class SettingsPage extends Component {
+  settings = this.getService(SettingsService)!;
+
+  override view() {
+    return (
+      &lt;main class=&quot;page&quot;&gt;
+        &lt;h1&gt;Settings&lt;/h1&gt;
+        {this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; this.settings.state.theme === theme, (theme) =&gt; this.settings.setTheme(theme))}
+        {this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; this.settings.state.density === density, (density) =&gt; this.settings.setDensity(density))}
+        &lt;p&gt;{() =&gt; `Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.`}&lt;/p&gt;
+      &lt;/main&gt;
+    );
+  }
+
+  private setting&lt;T extends Theme | Density&gt;(name: string, options: readonly T[], isChosen: (option: T) =&gt; boolean, choose: (option: T) =&gt; void) {
+    return (
+      &lt;section class=&quot;setting&quot;&gt;
+        &lt;span&gt;{name}&lt;/span&gt;
+        &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label={name}&gt;
+          {options.map((option) =&gt; (
+            &lt;button key={option} type=&quot;button&quot; aria-pressed={() =&gt; isChosen(option)} onclick={() =&gt; choose(option)}&gt;
+              {LABELS[option]}
+            &lt;/button&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/section&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/pages/SettingsPage.tsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES, type Density, type Theme } from &quot;../services/settings&quot;;
+
+const LABELS: Record&lt;Theme | Density, string&gt; = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export function SettingsPage() {
+  const settings = FromService(SettingsService)!;
+
+  const setting = &lt;T extends Theme | Density&gt;(name: string, options: readonly T[], isChosen: (option: T) =&gt; boolean, choose: (option: T) =&gt; void) =&gt; (
+    &lt;section class=&quot;setting&quot;&gt;
+      &lt;span&gt;{name}&lt;/span&gt;
+      &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label={name}&gt;
+        {options.map((option) =&gt; (
+          &lt;button key={option} type=&quot;button&quot; aria-pressed={() =&gt; isChosen(option)} onclick={() =&gt; choose(option)}&gt;
+            {LABELS[option]}
+          &lt;/button&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/section&gt;
+  );
+
+  return (
+    &lt;main class=&quot;page&quot;&gt;
+      &lt;h1&gt;Settings&lt;/h1&gt;
+      {setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme))}
+      {setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density))}
+      &lt;p&gt;{() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`}&lt;/p&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/pages/SettingsPage.tsx"><code>import { FromService, motifOptions } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES, type Density, type Theme } from &quot;../services/settings&quot;;
+
+const LABELS: Record&lt;Theme | Density, string&gt; = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export const SettingsPage = () =&gt; {
+  const settings = FromService(SettingsService)!;
+
+  return motifOptions({
+    el: &quot;main&quot;,
+
+    view() {
+      this.class.add(&quot;page&quot;);
+      return (
+        &lt;&gt;
+          &lt;h1&gt;Settings&lt;/h1&gt;
+          {this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme))}
+          {this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density))}
+          &lt;p&gt;{() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`}&lt;/p&gt;
+        &lt;/&gt;
+      );
+    },
+
+    setting&lt;T extends Theme | Density&gt;(name: string, options: readonly T[], isChosen: (option: T) =&gt; boolean, choose: (option: T) =&gt; void) {
+      return (
+        &lt;section class=&quot;setting&quot;&gt;
+          &lt;span&gt;{name}&lt;/span&gt;
+          &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label={name}&gt;
+            {options.map((option) =&gt; (
+              &lt;button key={option} type=&quot;button&quot; aria-pressed={() =&gt; isChosen(option)} onclick={() =&gt; choose(option)}&gt;
+                {LABELS[option]}
+              &lt;/button&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+      );
+    },
+  });
+};</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/pages/SettingsPage.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES, type Density, type Theme } from &quot;../services/settings&quot;;
+
+const LABELS: Record&lt;Theme | Density, string&gt; = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export class SettingsPage extends Component {
+  settings = this.getService(SettingsService)!;
+
+  override view() {
+    return motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+      main.class.add(&quot;page&quot;);
+      const heading = motifComponent(&quot;h1&quot;, (h1: ComponentBase) =&gt; h1.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Settings&quot;))));
+      const summary = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+        p.bindings.text(() =&gt; `Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.`);
+      });
+      main.controls.add(
+        heading,
+        this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; this.settings.state.theme === theme, (theme) =&gt; this.settings.setTheme(theme)),
+        this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; this.settings.state.density === density, (density) =&gt; this.settings.setDensity(density)),
+        summary,
+      );
+    });
+  }
+
+  private setting&lt;T extends Theme | Density&gt;(name: string, options: readonly T[], isChosen: (option: T) =&gt; boolean, choose: (option: T) =&gt; void) {
+    return motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+      section.class.add(&quot;setting&quot;);
+      const label = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(name))));
+      const group = motifComponent(&quot;div&quot;, (seg: ComponentBase) =&gt; {
+        seg.class.add(&quot;seg&quot;);
+        seg.attr.add({ role: &quot;group&quot;, &quot;aria-label&quot;: name });
+        for (const option of options) {
+          const button = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+            button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; isChosen(option) });
+            button.motif.on(&quot;click&quot;, () =&gt; choose(option));
+            button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(LABELS[option])));
+          });
+          seg.controls.add(button);
+        }
+      });
+      section.controls.add(label, group);
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/pages/SettingsPage.ts"><code>import { ComponentBase, FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES, type Density, type Theme } from &quot;../services/settings&quot;;
+
+const LABELS: Record&lt;Theme | Density, string&gt; = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export function SettingsPage() {
+  const settings = FromService(SettingsService)!;
+
+  const setting = &lt;T extends Theme | Density&gt;(name: string, options: readonly T[], isChosen: (option: T) =&gt; boolean, choose: (option: T) =&gt; void) =&gt;
+    motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+      section.class.add(&quot;setting&quot;);
+      const label = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(name))));
+      const group = motifComponent(&quot;div&quot;, (seg: ComponentBase) =&gt; {
+        seg.class.add(&quot;seg&quot;);
+        seg.attr.add({ role: &quot;group&quot;, &quot;aria-label&quot;: name });
+        for (const option of options) {
+          const button = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+            button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; isChosen(option) });
+            button.motif.on(&quot;click&quot;, () =&gt; choose(option));
+            button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(LABELS[option])));
+          });
+          seg.controls.add(button);
+        }
+      });
+      section.controls.add(label, group);
+    });
+
+  return motifComponent(&quot;main&quot;, (main: ComponentBase) =&gt; {
+    main.class.add(&quot;page&quot;);
+    const heading = motifComponent(&quot;h1&quot;, (h1: ComponentBase) =&gt; h1.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Settings&quot;))));
+    const summary = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+      p.bindings.text(() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`);
+    });
+    main.controls.add(
+      heading,
+      setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme)),
+      setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density)),
+      summary,
+    );
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/pages/SettingsPage.ts"><code>import { ComponentBase, FromService, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES, type Density, type Theme } from &quot;../services/settings&quot;;
+
+const LABELS: Record&lt;Theme | Density, string&gt; = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export const SettingsPage = () =&gt; {
+  const settings = FromService(SettingsService)!;
+
+  return motifOptions({
+    el: &quot;main&quot;,
+
+    view() {
+      this.class.add(&quot;page&quot;);
+      const heading = motifComponent(&quot;h1&quot;, (h1: ComponentBase) =&gt; h1.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Settings&quot;))));
+      const summary = motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+        p.bindings.text(() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`);
+      });
+      return [
+        heading,
+        this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme)),
+        this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density)),
+        summary,
+      ];
+    },
+
+    setting&lt;T extends Theme | Density&gt;(name: string, options: readonly T[], isChosen: (option: T) =&gt; boolean, choose: (option: T) =&gt; void) {
+      return motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+        section.class.add(&quot;setting&quot;);
+        const label = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; span.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(name))));
+        const group = motifComponent(&quot;div&quot;, (seg: ComponentBase) =&gt; {
+          seg.class.add(&quot;seg&quot;);
+          seg.attr.add({ role: &quot;group&quot;, &quot;aria-label&quot;: name });
+          for (const option of options) {
+            const button = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+              button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; isChosen(option) });
+              button.motif.on(&quot;click&quot;, () =&gt; choose(option));
+              button.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(LABELS[option])));
+            });
+            seg.controls.add(button);
+          }
+        });
+        section.controls.add(label, group);
+      });
+    },
+  });
+};</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/pages/SettingsPage.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES } from &quot;../services/settings&quot;;
+
+const LABELS = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export class SettingsPage extends Component {
+  settings = this.getService(SettingsService);
+
+  view() {
+    return (
+      &lt;main class=&quot;page&quot;&gt;
+        &lt;h1&gt;Settings&lt;/h1&gt;
+        {this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; this.settings.state.theme === theme, (theme) =&gt; this.settings.setTheme(theme))}
+        {this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; this.settings.state.density === density, (density) =&gt; this.settings.setDensity(density))}
+        &lt;p&gt;{() =&gt; `Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.`}&lt;/p&gt;
+      &lt;/main&gt;
+    );
+  }
+
+  setting(name, options, isChosen, choose) {
+    return (
+      &lt;section class=&quot;setting&quot;&gt;
+        &lt;span&gt;{name}&lt;/span&gt;
+        &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label={name}&gt;
+          {options.map((option) =&gt; (
+            &lt;button key={option} type=&quot;button&quot; aria-pressed={() =&gt; isChosen(option)} onclick={() =&gt; choose(option)}&gt;
+              {LABELS[option]}
+            &lt;/button&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/section&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/pages/SettingsPage.jsx"><code>import { FromService } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES } from &quot;../services/settings&quot;;
+
+const LABELS = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export function SettingsPage() {
+  const settings = FromService(SettingsService);
+
+  const setting = (name, options, isChosen, choose) =&gt; (
+    &lt;section class=&quot;setting&quot;&gt;
+      &lt;span&gt;{name}&lt;/span&gt;
+      &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label={name}&gt;
+        {options.map((option) =&gt; (
+          &lt;button key={option} type=&quot;button&quot; aria-pressed={() =&gt; isChosen(option)} onclick={() =&gt; choose(option)}&gt;
+            {LABELS[option]}
+          &lt;/button&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/section&gt;
+  );
+
+  return (
+    &lt;main class=&quot;page&quot;&gt;
+      &lt;h1&gt;Settings&lt;/h1&gt;
+      {setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme))}
+      {setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density))}
+      &lt;p&gt;{() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`}&lt;/p&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/pages/SettingsPage.jsx"><code>import { FromService, motifOptions } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES } from &quot;../services/settings&quot;;
+
+const LABELS = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export const SettingsPage = () =&gt; {
+  const settings = FromService(SettingsService);
+
+  return motifOptions({
+    el: &quot;main&quot;,
+
+    view() {
+      this.class.add(&quot;page&quot;);
+      return (
+        &lt;&gt;
+          &lt;h1&gt;Settings&lt;/h1&gt;
+          {this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme))}
+          {this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density))}
+          &lt;p&gt;{() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`}&lt;/p&gt;
+        &lt;/&gt;
+      );
+    },
+
+    setting(name, options, isChosen, choose) {
+      return (
+        &lt;section class=&quot;setting&quot;&gt;
+          &lt;span&gt;{name}&lt;/span&gt;
+          &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label={name}&gt;
+            {options.map((option) =&gt; (
+              &lt;button key={option} type=&quot;button&quot; aria-pressed={() =&gt; isChosen(option)} onclick={() =&gt; choose(option)}&gt;
+                {LABELS[option]}
+              &lt;/button&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/section&gt;
+      );
+    },
+  });
+};</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/pages/SettingsPage.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES } from &quot;../services/settings&quot;;
+
+const LABELS = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export class SettingsPage extends Component {
+  settings = this.getService(SettingsService);
+
+  view() {
+    return motifComponent(&quot;main&quot;, (main) =&gt; {
+      main.class.add(&quot;page&quot;);
+      const heading = motifComponent(&quot;h1&quot;, (h1) =&gt; h1.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Settings&quot;))));
+      const summary = motifComponent(&quot;p&quot;, (p) =&gt; {
+        p.bindings.text(() =&gt; `Theme ${LABELS[this.settings.state.theme]}, density ${LABELS[this.settings.state.density]}.`);
+      });
+      main.controls.add(
+        heading,
+        this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; this.settings.state.theme === theme, (theme) =&gt; this.settings.setTheme(theme)),
+        this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; this.settings.state.density === density, (density) =&gt; this.settings.setDensity(density)),
+        summary,
+      );
+    });
+  }
+
+  setting(name, options, isChosen, choose) {
+    return motifComponent(&quot;section&quot;, (section) =&gt; {
+      section.class.add(&quot;setting&quot;);
+      const label = motifComponent(&quot;span&quot;, (span) =&gt; span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(name))));
+      const group = motifComponent(&quot;div&quot;, (seg) =&gt; {
+        seg.class.add(&quot;seg&quot;);
+        seg.attr.add({ role: &quot;group&quot;, &quot;aria-label&quot;: name });
+        for (const option of options) {
+          const button = motifComponent(&quot;button&quot;, (button) =&gt; {
+            button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; isChosen(option) });
+            button.motif.on(&quot;click&quot;, () =&gt; choose(option));
+            button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(LABELS[option])));
+          });
+          seg.controls.add(button);
+        }
+      });
+      section.controls.add(label, group);
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/pages/SettingsPage.js"><code>import { FromService, motifComponent } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES } from &quot;../services/settings&quot;;
+
+const LABELS = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export function SettingsPage() {
+  const settings = FromService(SettingsService);
+
+  const setting = (name, options, isChosen, choose) =&gt;
+    motifComponent(&quot;section&quot;, (section) =&gt; {
+      section.class.add(&quot;setting&quot;);
+      const label = motifComponent(&quot;span&quot;, (span) =&gt; span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(name))));
+      const group = motifComponent(&quot;div&quot;, (seg) =&gt; {
+        seg.class.add(&quot;seg&quot;);
+        seg.attr.add({ role: &quot;group&quot;, &quot;aria-label&quot;: name });
+        for (const option of options) {
+          const button = motifComponent(&quot;button&quot;, (button) =&gt; {
+            button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; isChosen(option) });
+            button.motif.on(&quot;click&quot;, () =&gt; choose(option));
+            button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(LABELS[option])));
+          });
+          seg.controls.add(button);
+        }
+      });
+      section.controls.add(label, group);
+    });
+
+  return motifComponent(&quot;main&quot;, (main) =&gt; {
+    main.class.add(&quot;page&quot;);
+    const heading = motifComponent(&quot;h1&quot;, (h1) =&gt; h1.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Settings&quot;))));
+    const summary = motifComponent(&quot;p&quot;, (p) =&gt; {
+      p.bindings.text(() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`);
+    });
+    main.controls.add(
+      heading,
+      setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme)),
+      setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density)),
+      summary,
+    );
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/pages/SettingsPage.js"><code>import { FromService, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { DENSITIES, SettingsService, THEMES } from &quot;../services/settings&quot;;
+
+const LABELS = { system: &quot;System&quot;, light: &quot;Light&quot;, dark: &quot;Dark&quot;, comfortable: &quot;Comfortable&quot;, compact: &quot;Compact&quot; };
+
+export const SettingsPage = () =&gt; {
+  const settings = FromService(SettingsService);
+
+  return motifOptions({
+    el: &quot;main&quot;,
+
+    view() {
+      this.class.add(&quot;page&quot;);
+      const heading = motifComponent(&quot;h1&quot;, (h1) =&gt; h1.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Settings&quot;))));
+      const summary = motifComponent(&quot;p&quot;, (p) =&gt; {
+        p.bindings.text(() =&gt; `Theme ${LABELS[settings.state.theme]}, density ${LABELS[settings.state.density]}.`);
+      });
+      return [
+        heading,
+        this.setting(&quot;Theme&quot;, THEMES, (theme) =&gt; settings.state.theme === theme, (theme) =&gt; settings.setTheme(theme)),
+        this.setting(&quot;Density&quot;, DENSITIES, (density) =&gt; settings.state.density === density, (density) =&gt; settings.setDensity(density)),
+        summary,
+      ];
+    },
+
+    setting(name, options, isChosen, choose) {
+      return motifComponent(&quot;section&quot;, (section) =&gt; {
+        section.class.add(&quot;setting&quot;);
+        const label = motifComponent(&quot;span&quot;, (span) =&gt; span.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(name))));
+        const group = motifComponent(&quot;div&quot;, (seg) =&gt; {
+          seg.class.add(&quot;seg&quot;);
+          seg.attr.add({ role: &quot;group&quot;, &quot;aria-label&quot;: name });
+          for (const option of options) {
+            const button = motifComponent(&quot;button&quot;, (button) =&gt; {
+              button.attr.add({ type: &quot;button&quot;, &quot;aria-pressed&quot;: () =&gt; isChosen(option) });
+              button.motif.on(&quot;click&quot;, () =&gt; choose(option));
+              button.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(LABELS[option])));
+            });
+            seg.controls.add(button);
+          }
+        });
+        section.controls.add(label, group);
+      });
+    },
+  });
+};</code></pre>
+</div>
+<p>In the example:</p>
+<ul>
+<li><code>aria-pressed={() =&gt; …}</code> is a getter: it is recomputed on all three buttons on every choice, and the ones whose value changes are the previous and the new choice. A plain value (<code>type=&quot;button&quot;</code>) is written once.</li>
+<li><code>{() =&gt; …}</code> / <code>bindings.text(() =&gt; …)</code> is a live text binding. In JSX, a member expression such as <code>{LABELS[option]}</code> is a binding too, because the compiler turns it into a getter; in the form without JSX, <code>setText(LABELS[option])</code> writes the text once.</li>
+<li>The service is registered in the <code>main</code> file with <code>builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true })</code>. A singleton given <code>startup: true</code> is created at the start of <code>app.run()</code> without waiting for a component to ask for it; if it was asked for earlier, it is not created again. In the example the class component gets the service with <code>this.getService</code>, and the function and Options components with <code>FromService</code> (the Options component can use <code>this.getService</code> too). Because the service is a singleton, the page sees the same settings every time it opens. Registering through <code>@Injectable</code> is covered in <a href="/docs/service-registration#injectable-decorator">Registering Services</a>.</li>
+<li>In JSX, <code>.map</code> compiles to a list binding. The options are fixed, so the form without JSX adds the buttons with a plain loop; for a list that changes, use <code>bindings.list</code> (see <a href="/docs/conditionals-and-lists">Conditional Rendering and Lists</a>).</li>
+<li>In the form without JSX, plain text is a <code>&quot;text&quot;</code> component: <code>motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;…&quot;))</code>. The page class does not declare an element; <code>view()</code> returns the content, and <code>motifComponent(&quot;main&quot;, …)</code> is the single element of that content, not the component's own element (see <a href="/docs/components#root-element">Root element</a>). In the Options form the component's element is given with <code>el</code>, and <code>view()</code> returns the content.</li>
+</ul>
+<h2 id="mount-app">Mount the application</h2>
+<p>The <code>Application</code> class is the application's entry point. The usual flow:</p>
+<ol>
+<li>Create a <strong>builder</strong> with <code>Application.CreateBuilder()</code>.</li>
+<li>Register services on <code>builder.services</code> if needed (see <a href="/docs/dependency-injection">Introduction to Dependency Injection</a>).</li>
+<li>Produce the <code>Application</code> instance with <code>builder.build()</code>.</li>
+<li>Optionally define routing with <code>app.useRouter(...)</code>.</li>
+<li>Mount the application on a DOM element with <code>app.run(host, rootComponent)</code>.</li>
+</ol>
+<p>A class component is passed as an instance; it can also be built with the <code>&lt;SettingsPage /&gt;</code> tag in JSX or with <code>motifComponent(SettingsPage)</code> when writing without JSX. Function and Options components are written as tags in JSX; without JSX, a function component is called and an Options component is built with <code>motifComponent(SettingsPage)</code>:</p>
+<div class="doc-code" data-file="src/main.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/main.tsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new SettingsPage());</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript,declarative/options/typescript" data-file="src/main.tsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, &lt;SettingsPage /&gt;);</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/main.ts"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new SettingsPage());</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/main.ts"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, SettingsPage());</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/main.ts"><code>import { Application, motifComponent } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, motifComponent(SettingsPage));</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/main.jsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new SettingsPage());</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript,declarative/options/javascript" data-file="src/main.jsx"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, &lt;SettingsPage /&gt;);</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/main.js"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, new SettingsPage());</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/main.js"><code>import { Application } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, SettingsPage());</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/main.js"><code>import { Application, motifComponent } from &quot;@motifx/core&quot;;
+import { SettingsPage } from &quot;./pages/SettingsPage&quot;;
+import { SettingsService } from &quot;./services/settings&quot;;
+
+const builder = Application.CreateBuilder();
+builder.services.addSingleton(SettingsService, { useClass: SettingsService, startup: true });
+const app = builder.build();
+app.run(&quot;#app&quot;, motifComponent(SettingsPage));</code></pre>
+</div>
+<p>The first argument of <code>app.run</code> accepts a CSS selector (<code>&quot;#app&quot;</code>), an <code>HTMLElement</code> or a <code>Node</code>; if the selector matches nothing, an <code>MJX406</code> error is thrown. The second argument is the <strong>root component</strong>. The host's existing content is kept, and the root component is appended after it. If the second argument is left out, MotifJS places a <code>RouterView</code> at the root by itself (for router-based applications; see below). <code>Application.CreateBuilder()</code> is called once per application; a second call throws <code>MJX405</code> (it can be called again after <code>app.dispose()</code>).</p>
+<h3 id="router-start">Router-based startup</h3>
+<p>In multi-page applications, use routing instead of a root component. In that case do not pass a second argument to <code>run</code>; MotifJS adds the root <code>RouterView</code> itself. When a second argument is given, the root is your component and you put the <code>RouterView</code> in its view yourself:</p>
+<div class="doc-code" data-file="src/main.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/main.ts"><code>import { Application } from &quot;@motifx/core&quot;;
+import { routes } from &quot;./routes&quot;;
+
+const app = Application.CreateBuilder().build();
+
+/* @DEV-ONLY */ app.useDevelopment(true);
+app.useLogging(true);
+
+app.useRouter({
+  routes,
+  mode: &quot;history&quot;,
+  fallbacks: {
+    notFound: () =&gt; import(&quot;./pages/NotFoundPage&quot;),
+  },
+});
+
+app.run(&quot;#app&quot;);</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/main.js"><code>import { Application } from &quot;@motifx/core&quot;;
+import { routes } from &quot;./routes&quot;;
+
+const app = Application.CreateBuilder().build();
+
+/* @DEV-ONLY */ app.useDevelopment(true);
+app.useLogging(true);
+
+app.useRouter({
+  routes,
+  mode: &quot;history&quot;,
+  fallbacks: {
+    notFound: () =&gt; import(&quot;./pages/NotFoundPage&quot;),
+  },
+});
+
+app.run(&quot;#app&quot;);</code></pre>
+</div>
+<p><code>useDevelopment</code> turns on development mode: MJX warnings, route checks when it is called before <code>useRouter</code>, and DevTools. <code>useLogging</code> turns on console error logging (on by default). The <code>mode</code> values are <code>'history' | 'hash' | 'file' | 'shell'</code>. Route definitions are covered in detail on the <a href="/docs/routes">Route Table</a> page, and placing a <code>RouterView</code> on the <a href="/docs/router-view">RouterView</a> page. The module loaded through <code>notFound</code> must export the page as <code>default</code>; for a named export, map it: <code>notFound: () =&gt; import(&quot;./pages/NotFoundPage&quot;).then((m) =&gt; m.NotFoundPage)</code>. A module without a <code>default</code> export is reported as <code>MJX127</code> (the <code>cause</code> of <code>MJX304</code>), and the error view is shown instead of the 404 page (see <a href="/docs/routes#lazy">Lazy loading</a>).</p>
+<h2 id="dev-helpers">Development helpers</h2>
+<p><code>Application</code> has chainable configuration methods:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app.useDevelopment(true)</code></td>
+<td>Turns on development mode: <code>MJX</code> warnings are written to the console (<code>console.warn</code>), and so are errors the framework catches internally and passes over quietly; when called before <code>useRouter</code>, route definitions are checked. <code>MJX</code> warnings are not buffered: warnings raised before development mode is turned on (other than <code>MJX121</code>) are not printed later, which is why <code>useDevelopment</code> is called before <code>run</code>. DevTools is turned on as well: the <code>globalThis.__MOTIF_DEVTOOLS__</code> object is created (<a href="/docs/devtools">The DevTools Contract</a>); <code>useDevelopment(false)</code> turns DevTools off and removes the object. Read it with <code>app.isDevelopmentModeEnabled</code>. In a production build the core's DevTools hooks are stripped from the code (<a href="#dev-only">Development-only code</a>), so DevTools produces no data.</td>
+</tr>
+<tr>
+<td><code>app.useLogging(true)</code></td>
+<td>Turns writing errors to the console on or off (on by default). It does not turn off <code>MJX</code> warnings; those follow development mode (<code>useDevelopment</code>).</td>
+</tr>
+<tr>
+<td><code>app.useReactiveMonitor({ enabled: true, threshold: 200, name: 'app' })</code></td>
+<td>Turns on tracking of reactive dependency leaks (recommended during development; when the threshold is exceeded an <code>MJX507</code> warning is printed, and this warning only shows while <code>useDevelopment(true)</code> is on; see <a href="/docs/memory-and-dispose#leak-monitor">Leak tracking</a>).</td>
+</tr>
+<tr>
+<td><code>app.useTransitions({ mode: 'out-in' })</code></td>
+<td>Picks the default mode for enter/leave transitions (see <a href="/docs/styling-and-transitions#transition-mode">Enter/leave mode</a>).</td>
+</tr>
+</tbody>
+</table>
+<p>Errors thrown in hooks (<code>MJX122</code>), event handlers (<code>MJX123</code>), effect/binding functions (<code>MJX208</code>) and <code>using</code> handlers (<code>MJX129</code>) are reported regardless of development mode, in production too: they are written to <code>console.error</code> (unless <code>useLogging(false)</code>) and passed to <code>errorHandler.addListener(fn)</code> listeners as a <code>MotifError</code> (<code>error.code</code>, <code>error.cause</code>; see <a href="/docs/error-handling#error-handler">Error Handling</a>). The application keeps running.</p>
+<h2 id="next">Next step</h2>
+<p>To build the parts of the application, go on to <a href="/docs/components">Components</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

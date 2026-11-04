@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Derleyici çıktısının çerçevenin açık API&#x27;si olması; tema, katman, yerleşim, kabuk ve eklenti, veri, sarmalayıcı, ayar ve geçiş paketlerinin hangi mekanizmaya dayandığı.">
+    <title>Motif Üstüne Paket Yazmak — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/package-authoring">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/package-authoring">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/package-authoring">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/package-authoring">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/package-authoring">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Motif Üstüne Paket Yazmak">
+    <meta property="og:description" content="Derleyici çıktısının çerçevenin açık API&#x27;si olması; tema, katman, yerleşim, kabuk ve eklenti, veri, sarmalayıcı, ayar ve geçiş paketlerinin hangi mekanizmaya dayandığı.">
+    <script type="application/json" id="doc-data">{"slug":"package-authoring","locale":"tr","title":"Motif Üstüne Paket Yazmak","description":"Derleyici çıktısının çerçevenin açık API\u0027si olması; tema, katman, yerleşim, kabuk ve eklenti, veri, sarmalayıcı, ayar ve geçiş paketlerinin hangi mekanizmaya dayandığı.","category":{"id":"6","title":"Rehberler"},"html":"\u003Cp\u003EBir MotifJS paketi uygulama koduyla aynı malzemeden yapılır: bileşenler, servisler ve reaktif nesneler. Paketin JSX ile mi JSX\u0027siz mi yazıldığı onu kullanan uygulamayı ilgilendirmez, çünkü derleyicinin JSX\u0027ten ürettiği kod da çerçevenin herkese açık API\u0027sidir; arada ayrı bir şablon temsili yoktur.\u003C/p\u003E\n\u003Ch2 id=\u0022compiled-output\u0022\u003EDerleyici çıktısı\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003ENot listesinden şu parçayı derleyici aşağıdaki tablodaki çağrılara çevirir:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003ENot listesinden şu parça, aynı parçanın JSX yazımından derleyicinin ürettiği çağrıların elle yazılmış hâlidir; tablo iki yazımı satır satır eşler:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n  \u0026lt;h2\u0026gt;{folder.title}\u0026lt;/h2\u0026gt;\n  \u0026lt;p x-wait={() =\u0026gt; !state.loading}\u0026gt;Notlar yükleniyor…\u0026lt;/p\u0026gt;\n  \u0026lt;ul\u0026gt;\n    {state.items.map((note) =\u0026gt; (\n      \u0026lt;li key={note.id} class={note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;}\u0026gt;{note.title}\u0026lt;/li\u0026gt;\n    ))}\n  \u0026lt;/ul\u0026gt;\n\u0026lt;/section\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Econst list = motifComponent(\u0026quot;section\u0026quot;, (section: ComponentBase) =\u0026gt; {\n  section.class.add(\u0026quot;list\u0026quot;);\n  const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; {\n    h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, folder, \u0026quot;title\u0026quot;)));\n  });\n  const loading = motifComponent(\u0026quot;p\u0026quot;, {\n    preconfig: (p: ComponentBase) =\u0026gt; p.bindings.wait(() =\u0026gt; !state.loading),\n    initializeComponent: (p: ComponentBase) =\u0026gt; p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.setText(\u0026quot;Notlar yükleniyor…\u0026quot;))),\n  });\n  const items = motifComponent(\u0026quot;ul\u0026quot;, (ul: ComponentBase) =\u0026gt; {\n    ul.controls.add(motifComponent({\n      initializeComponent: (holder: ComponentBase) =\u0026gt; holder.bindings.list(() =\u0026gt; state.items, (note: Note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li: ComponentBase) =\u0026gt; {\n          li.class.add([() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)]);\n          li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node: ComponentBase) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n        },\n      })),\n    }));\n  });\n  section.controls.add(title, loading, items);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;section class=\u0026quot;list\u0026quot;\u0026gt;\n  \u0026lt;h2\u0026gt;{folder.title}\u0026lt;/h2\u0026gt;\n  \u0026lt;p x-wait={() =\u0026gt; !state.loading}\u0026gt;Notlar yükleniyor…\u0026lt;/p\u0026gt;\n  \u0026lt;ul\u0026gt;\n    {state.items.map((note) =\u0026gt; (\n      \u0026lt;li key={note.id} class={note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;}\u0026gt;{note.title}\u0026lt;/li\u0026gt;\n    ))}\n  \u0026lt;/ul\u0026gt;\n\u0026lt;/section\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Econst list = motifComponent(\u0026quot;section\u0026quot;, (section) =\u0026gt; {\n  section.class.add(\u0026quot;list\u0026quot;);\n  const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; {\n    h2.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, folder, \u0026quot;title\u0026quot;)));\n  });\n  const loading = motifComponent(\u0026quot;p\u0026quot;, {\n    preconfig: (p) =\u0026gt; p.bindings.wait(() =\u0026gt; !state.loading),\n    initializeComponent: (p) =\u0026gt; p.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.setText(\u0026quot;Notlar yükleniyor…\u0026quot;))),\n  });\n  const items = motifComponent(\u0026quot;ul\u0026quot;, (ul) =\u0026gt; {\n    ul.controls.add(motifComponent({\n      initializeComponent: (holder) =\u0026gt; holder.bindings.list(() =\u0026gt; state.items, (note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, {\n        indexkey: () =\u0026gt; note.id,\n        initializeComponent: (li) =\u0026gt; {\n          li.class.add([() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)]);\n          li.controls.add(motifComponent(\u0026quot;text\u0026quot;, (node) =\u0026gt; node.bindings.add(\u0026quot;textContent\u0026quot;, note, \u0026quot;title\u0026quot;)));\n        },\n      })),\n    }));\n  });\n  section.controls.add(title, loading, items);\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EJSX ifadesi\u003C/th\u003E\n\u003Cth\u003EDerlendiği çağrı\u003C/th\u003E\n\u003Cth\u003Eİzlenen\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass=\u0026quot;list\u0026quot;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Esection.class.add(\u0026quot;list\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eyok; bir kez yazılır\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{folder.title}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Emetin düğümünde \u003Ccode\u003Enode.bindings.add(\u0026quot;textContent\u0026quot;, folder, \u0026quot;title\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eyalnız \u003Ccode\u003Efolder.title\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ex-wait={() =\u0026gt; !state.loading}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ep.bindings.wait(() =\u0026gt; !state.loading)\u003C/code\u003E, eleman kurulmadan önce (\u003Ccode\u003Epreconfig\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003Egetter\u0027ın okuduğu her alan\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003E{state.items.map(…)}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Eelemansız tutucuda \u003Ccode\u003Eholder.bindings.list(() =\u0026gt; state.items, (note) =\u0026gt; motifComponent(\u0026quot;li\u0026quot;, …))\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Edizinin uzunluğu ve öğe kimliği\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey={note.id}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eindexkey: () =\u0026gt; note.id\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass={note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;}\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eli.class.add([() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)])\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Egetter\u0027ın okuduğu her alan\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003Eher eleman\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EmotifComponent(\u0026quot;h2\u0026quot;, …)\u003C/code\u003E ve ebeveynde \u003Ccode\u003Econtrols.add(h2)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E—\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003ESağ sütundaki çağrılar JSX\u0027siz yazımın kendisidir (bkz. \u003Ca href=\u0022/docs/imperative\u0022\u003EJSX\u0027siz Görünümler\u003C/a\u003E). Bir dosyanın bu tablosunu \u003Ccode\u003E@motifx/compiler\u003C/code\u003E ile gelen \u003Ccode\u003Emotif-explain\u003C/code\u003E verir; \u003Ccode\u003E--code\u003C/code\u003E üretilen kodun tamamını da yazar:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022bash\u0022\u003E\u003Ccode\u003Enpx motif-explain src/parts/NoteList.tsx\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EBu yüzden bir paket kendi bileşenlerini hangi yazımla yazarsa yazsın, uygulama onları aynı yollarla kullanır: JSX\u0027te etiketle (\u003Ccode\u003E\u0026lt;NoteList /\u0026gt;\u003C/code\u003E), JSX\u0027siz yazımda sınıf için \u003Ccode\u003Enew NoteList(props)\u003C/code\u003E, fonksiyon ve Options için \u003Ccode\u003EmotifComponent(NoteList, props)\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022package-types\u0022\u003EPaket türleri\u003C/h2\u003E\n\u003Cp\u003EAşağıdaki türlerin her biri çekirdekteki bir mekanizmaya dayanır; ayrıntı o mekanizmanın sayfasındadır.\u003C/p\u003E\n\u003Ch3 id=\u0022theme\u0022\u003ETema ve tasarım sistemi\u003C/h3\u003E\n\u003Cp\u003ETema bileşenlerin değil belgenin özelliğidir. Seçili tema ve yoğunluk bir singleton serviste reaktif durum olarak tutulur; servis bunu \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E elemanına öznitelik olarak yazar (\u003Ccode\u003Edata-theme\u003C/code\u003E), CSS de özniteliği okur. Servis \u003Ccode\u003Estartup: true\u003C/code\u003E ile kaydedilirse hiçbir bileşen onu istemeden uygulama açılırken çalışır (bkz. \u003Ca href=\u0022/docs/service-registration#startup\u0022\u003EBaşlangıçta oluşturulan singleton\u0027lar\u003C/a\u003E). Bir alt ağacın farklı görünmesi gerekiyorsa aynı öznitelik o ağacın kök elemanına yazılır; ayrı bir servis kapsamı gerekmez.\u003C/p\u003E\n\u003Cp\u003EPaketin CSS\u0027i bir \u003Ccode\u003E@layer\u003C/code\u003E içinde gelir: katmansız bir kural, uygulamanın bütün katmanlı kurallarını özgüllükten bağımsız ezer (bkz. \u003Ca href=\u0022/docs/publishing-libraries#css\u0022\u003EStil ve CSS\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022overlays\u0022\u003Eİletişim kutusu, bildirim ve açılır katman\u003C/h3\u003E\n\u003Cp\u003EBir iletişim kutusu onu açan bileşenin parçasıdır ama sayfanın en üst katmanında görünmelidir. Katman çekirdekte hazırdır: \u003Ccode\u003Eapp.layer\u003C/code\u003E \u003Ccode\u003E\u0026lt;body\u0026gt;\u003C/code\u003E\u0027nin sonundaki katman bileşenidir, \u003Ccode\u003Eapp.layerOf(açan)\u003C/code\u003E açan bileşen bir penceredeyse o pencerenin katmanını verir (bkz. \u003Ca href=\u0022/docs/component-tree#layer\u0022\u003ESayfa katmanı\u003C/a\u003E). Paket kutuyu \u003Ccode\u003Ethis.context.layerOf(this, kutu)\u003C/code\u003E ile doğrudan koyabilir; o zaman kutunun ömrü katmanındır ve kapanınca kaldırmak paketin işidir (\u003Ccode\u003Eremove\u003C/code\u003E ya da kutunun kendi \u003Ccode\u003Edispose\u003C/code\u003E\u0027u). Kutunun açan bileşenle birlikte kalkması gerekiyorsa paket katmana bir \u003Ccode\u003ETransport\u003C/code\u003E yuvası koyar ve içeriği açan bileşenin içinde bir \u003Ccode\u003ETransportTo\u003C/code\u003E ile yazar: içerik yuvada görünür, bağları ve olay işleyicileri yazıldığı bileşenin durumuyla çalışır, açan bileşen serbest bırakılınca içerik de yuvadan kalkar. Bildirimlerin aynı yuvada birikmesi için yuva \u003Ccode\u003Emode: \u0026quot;merge\u0026quot;\u003C/code\u003E ile kurulur (bkz. \u003Ca href=\u0022/docs/transport\u0022\u003ETransport ve TransportTo\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022layout\u0022\u003EYerleşim ve panel taşıma\u003C/h3\u003E\n\u003Cp\u003EBölme, sekme ve yanaşan panel paketlerinde bir panel bir bölgeden ötekine taşınır ama durumunu kaybetmemelidir. Bileşen başka bir ebeveynin \u003Ccode\u003Econtrols.add\u003C/code\u003E\u0027ine verilince eski ebeveyninden kendiliğinden ayrılır; serbest bırakılmaz, bağları ve durumu yerinde kalır. DOM\u0027dan söküldüğünde \u003Ccode\u003EonDeactivated\u003C/code\u003E, yeniden yerleşince \u003Ccode\u003EonActivated\u003C/code\u003E alır (bkz. \u003Ca href=\u0022/docs/memory-and-dispose#detach\u0022\u003ESerbest bırakmadan taşıma\u003C/a\u003E). Aynı taşımayı \u003Ccode\u003ETransporter.transport\u003C/code\u003E da yapar (bkz. \u003Ca href=\u0022/docs/transport#transporter\u0022\u003EProgramatik taşıma\u003C/a\u003E). Rota sayfası olan bir panelin örneğini gezinmeler arasında \u003Ccode\u003EkeepAlive: true\u003C/code\u003E korur (bkz. \u003Ca href=\u0022/docs/routes\u0022\u003ERota Tanımları\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022shell-plugins\u0022\u003EUygulama kabuğu ve eklentiler\u003C/h3\u003E\n\u003Cp\u003EKabuk paketi uygulamanın iskeletini verir: kenar çubuğu, araç çubuğu, durum satırı. Eklentiler bu iskelete parça ekler. İskeletin her bölgesi adlı bir \u003Ccode\u003ETransport\u003C/code\u003E yuvasıdır; eklenti kendi bileşeninde aynı adlı bir \u003Ccode\u003ETransportTo\u003C/code\u003E ile o bölgeye içerik gönderir. Yuvanın gönderenden önce ya da sonra kurulması sonucu değiştirmez. Eklentinin servisleri uygulamanın \u003Ccode\u003EServiceCollection\u003C/code\u003E\u0027ına kaydedilir, kabuk onları sağlayıcıdan alır (bkz. \u003Ca href=\u0022/docs/service-registration\u0022\u003EServis Kaydı\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022data\u0022\u003EVeri bileşenleri\u003C/h3\u003E\n\u003Cp\u003ETablo, ızgara ve uzun liste paketlerinde liste bağı satırı \u003Ccode\u003Ekey\u003C/code\u003E ile değil öğe nesnesiyle tanır: aynı nesne yeni sıraya geçince satırı taşınır, yeniden kurulmaz (bkz. \u003Ca href=\u0022/docs/conditionals-and-lists#key-and-identity\u0022\u003E\u003Ccode\u003Ekey\u003C/code\u003E ve öğe kimliği\u003C/a\u003E). Binlerce satır ya da sunucudan sayfa sayfa gelen veri için \u003Ccode\u003EVirtualization\u003C/code\u003E yalnız görünen satırları kurar ve veriyi \u003Ccode\u003EdataRequest\u003C/code\u003E ile ister (bkz. \u003Ca href=\u0022/docs/virtualization\u0022\u003ESanal Listeler\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022wrappers\u0022\u003EKütüphane sarmalayıcıları\u003C/h3\u003E\n\u003Cp\u003EKendi DOM\u0027unu yöneten bir kütüphane (grafik, harita, editör) bileşenin elemanına kurulur. Kurulum \u003Ccode\u003EonBuilt\u003C/code\u003E ya da \u003Ccode\u003EinitializeComponent\u003C/code\u003E içinde yapılır, kütüphanenin kendi temizliği \u003Ccode\u003Emotif.setDisposable\u003C/code\u003E ile bileşene bağlanır. Kuralların tamamı \u003Ca href=\u0022/docs/wrapping-libraries\u0022\u003EÜçüncü Parti Kütüphane Sarmalama\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n\u003Ch3 id=\u0022settings\u0022\u003EDil ve kullanıcı ayarları\u003C/h3\u003E\n\u003Cp\u003EDil, saat dilimi ve yoğunluk gibi ayarlar tek bir singleton serviste reaktif nesne olarak durur. Bileşenler değeri bir bağın içinde okur; ayar değişince yalnız o değeri okuyan bağlar yenilenir, bileşenler yeniden kurulmaz (bkz. \u003Ca href=\u0022/docs/reactivity\u0022\u003EReaktivite\u003C/a\u003E, \u003Ca href=\u0022/docs/service-lifetimes\u0022\u003EYaşam Süreleri ve Kapsamlar\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022transitions\u0022\u003EGeçiş paketleri\u003C/h3\u003E\n\u003Cp\u003EGeçiş paketi CSS sınıf adları ve keyframe tanımları verir. Sınıf tabanlı geçiş \u003Ccode\u003Etransition\u003C/code\u003E adıyla bağlanır (\u003Ccode\u003Efade\u003C/code\u003E → \u003Ccode\u003Efade-enter-from\u003C/code\u003E …), kodla tanımlanan animasyon \u003Ccode\u003Emotif.options.transition.in\u003C/code\u003E / \u003Ccode\u003Eout\u003C/code\u003E ile verilir. Giriş ve çıkışın sırasını uygulama \u003Ccode\u003Eapp.useTransitions({ mode })\u003C/code\u003E ile belirler (bkz. \u003Ca href=\u0022/docs/styling-and-transitions\u0022\u003EStil ve Animasyon\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022publishing\u0022\u003EPaketi yayımlamak\u003C/h2\u003E\n\u003Cp\u003EPaket biçimi, derleme, tipler, CSS, prop sözleşmesi ve yayın denetimi \u003Ca href=\u0022/docs/publishing-libraries\u0022\u003EMotifJS için npm Kütüphanesi Yayımlama\u003C/a\u003E sayfasındadır. Derlenmiş JSX taşıyan paket, kullanıldığı \u003Ccode\u003E@motifx/core\u003C/code\u003E\u0027un desteklediği bir derleyici sözleşmesiyle derlenmiş olmalıdır; desteklenmeyen sözleşmede geliştirme modunda \u003Ccode\u003EMJX121\u003C/code\u003E uyarısı yazılır.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EKendi DOM\u0027unu yöneten bir kütüphaneyi bileşene dönüştürmek için \u003Ca href=\u0022/docs/wrapping-libraries\u0022\u003EÜçüncü Parti Kütüphane Sarmalama\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"compiled-output","text":"Derleyici çıktısı","level":2},{"id":"package-types","text":"Paket türleri","level":2},{"id":"theme","text":"Tema ve tasarım sistemi","level":3},{"id":"overlays","text":"İletişim kutusu, bildirim ve açılır katman","level":3},{"id":"layout","text":"Yerleşim ve panel taşıma","level":3},{"id":"shell-plugins","text":"Uygulama kabuğu ve eklentiler","level":3},{"id":"data","text":"Veri bileşenleri","level":3},{"id":"wrappers","text":"Kütüphane sarmalayıcıları","level":3},{"id":"settings","text":"Dil ve kullanıcı ayarları","level":3},{"id":"transitions","text":"Geçiş paketleri","level":3},{"id":"publishing","text":"Paketi yayımlamak","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"service-disposal","title":"Servislerin Serbest Bırakılması"},"next":{"slug":"wrapping-libraries","title":"Üçüncü Parti Kütüphane Sarmalama"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Rehberler</p>
+        <h1>Motif Üstüne Paket Yazmak</h1>
+        <p>Derleyici çıktısının çerçevenin açık API&#x27;si olması; tema, katman, yerleşim, kabuk ve eklenti, veri, sarmalayıcı, ayar ve geçiş paketlerinin hangi mekanizmaya dayandığı.</p>
+<p>Bir MotifJS paketi uygulama koduyla aynı malzemeden yapılır: bileşenler, servisler ve reaktif nesneler. Paketin JSX ile mi JSX'siz mi yazıldığı onu kullanan uygulamayı ilgilendirmez, çünkü derleyicinin JSX'ten ürettiği kod da çerçevenin herkese açık API'sidir; arada ayrı bir şablon temsili yoktur.</p>
+<h2 id="compiled-output">Derleyici çıktısı</h2>
+<div class="doc-variant" data-variant="declarative">
+<p>Not listesinden şu parçayı derleyici aşağıdaki tablodaki çağrılara çevirir:</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p>Not listesinden şu parça, aynı parçanın JSX yazımından derleyicinin ürettiği çağrıların elle yazılmış hâlidir; tablo iki yazımı satır satır eşler:</p>
+</div>
+<div class="doc-code" data-file="src/parts/NoteList.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteList.tsx"><code>&lt;section class=&quot;list&quot;&gt;
+  &lt;h2&gt;{folder.title}&lt;/h2&gt;
+  &lt;p x-wait={() =&gt; !state.loading}&gt;Notlar yükleniyor…&lt;/p&gt;
+  &lt;ul&gt;
+    {state.items.map((note) =&gt; (
+      &lt;li key={note.id} class={note.pinned ? &quot;pinned&quot; : &quot;&quot;}&gt;{note.title}&lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+&lt;/section&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteList.ts"><code>const list = motifComponent(&quot;section&quot;, (section: ComponentBase) =&gt; {
+  section.class.add(&quot;list&quot;);
+  const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; {
+    h2.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, folder, &quot;title&quot;)));
+  });
+  const loading = motifComponent(&quot;p&quot;, {
+    preconfig: (p: ComponentBase) =&gt; p.bindings.wait(() =&gt; !state.loading),
+    initializeComponent: (p: ComponentBase) =&gt; p.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.setText(&quot;Notlar yükleniyor…&quot;))),
+  });
+  const items = motifComponent(&quot;ul&quot;, (ul: ComponentBase) =&gt; {
+    ul.controls.add(motifComponent({
+      initializeComponent: (holder: ComponentBase) =&gt; holder.bindings.list(() =&gt; state.items, (note: Note) =&gt; motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li: ComponentBase) =&gt; {
+          li.class.add([() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)]);
+          li.controls.add(motifComponent(&quot;text&quot;, (node: ComponentBase) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+        },
+      })),
+    }));
+  });
+  section.controls.add(title, loading, items);
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteList.jsx"><code>&lt;section class=&quot;list&quot;&gt;
+  &lt;h2&gt;{folder.title}&lt;/h2&gt;
+  &lt;p x-wait={() =&gt; !state.loading}&gt;Notlar yükleniyor…&lt;/p&gt;
+  &lt;ul&gt;
+    {state.items.map((note) =&gt; (
+      &lt;li key={note.id} class={note.pinned ? &quot;pinned&quot; : &quot;&quot;}&gt;{note.title}&lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+&lt;/section&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteList.js"><code>const list = motifComponent(&quot;section&quot;, (section) =&gt; {
+  section.class.add(&quot;list&quot;);
+  const title = motifComponent(&quot;h2&quot;, (h2) =&gt; {
+    h2.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, folder, &quot;title&quot;)));
+  });
+  const loading = motifComponent(&quot;p&quot;, {
+    preconfig: (p) =&gt; p.bindings.wait(() =&gt; !state.loading),
+    initializeComponent: (p) =&gt; p.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.setText(&quot;Notlar yükleniyor…&quot;))),
+  });
+  const items = motifComponent(&quot;ul&quot;, (ul) =&gt; {
+    ul.controls.add(motifComponent({
+      initializeComponent: (holder) =&gt; holder.bindings.list(() =&gt; state.items, (note) =&gt; motifComponent(&quot;li&quot;, {
+        indexkey: () =&gt; note.id,
+        initializeComponent: (li) =&gt; {
+          li.class.add([() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)]);
+          li.controls.add(motifComponent(&quot;text&quot;, (node) =&gt; node.bindings.add(&quot;textContent&quot;, note, &quot;title&quot;)));
+        },
+      })),
+    }));
+  });
+  section.controls.add(title, loading, items);
+});</code></pre>
+</div>
+<table>
+<thead>
+<tr>
+<th>JSX ifadesi</th>
+<th>Derlendiği çağrı</th>
+<th>İzlenen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class=&quot;list&quot;</code></td>
+<td><code>section.class.add(&quot;list&quot;)</code></td>
+<td>yok; bir kez yazılır</td>
+</tr>
+<tr>
+<td><code>{folder.title}</code></td>
+<td>metin düğümünde <code>node.bindings.add(&quot;textContent&quot;, folder, &quot;title&quot;)</code></td>
+<td>yalnız <code>folder.title</code></td>
+</tr>
+<tr>
+<td><code>x-wait={() =&gt; !state.loading}</code></td>
+<td><code>p.bindings.wait(() =&gt; !state.loading)</code>, eleman kurulmadan önce (<code>preconfig</code>)</td>
+<td>getter'ın okuduğu her alan</td>
+</tr>
+<tr>
+<td><code>{state.items.map(…)}</code></td>
+<td>elemansız tutucuda <code>holder.bindings.list(() =&gt; state.items, (note) =&gt; motifComponent(&quot;li&quot;, …))</code></td>
+<td>dizinin uzunluğu ve öğe kimliği</td>
+</tr>
+<tr>
+<td><code>key={note.id}</code></td>
+<td><code>indexkey: () =&gt; note.id</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>class={note.pinned ? &quot;pinned&quot; : &quot;&quot;}</code></td>
+<td><code>li.class.add([() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)])</code></td>
+<td>getter'ın okuduğu her alan</td>
+</tr>
+<tr>
+<td>her eleman</td>
+<td><code>motifComponent(&quot;h2&quot;, …)</code> ve ebeveynde <code>controls.add(h2)</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Sağ sütundaki çağrılar JSX'siz yazımın kendisidir (bkz. <a href="/tr/docs/imperative">JSX'siz Görünümler</a>). Bir dosyanın bu tablosunu <code>@motifx/compiler</code> ile gelen <code>motif-explain</code> verir; <code>--code</code> üretilen kodun tamamını da yazar:</p>
+<div class="doc-code">
+<pre data-lang="bash"><code>npx motif-explain src/parts/NoteList.tsx</code></pre>
+</div>
+<p>Bu yüzden bir paket kendi bileşenlerini hangi yazımla yazarsa yazsın, uygulama onları aynı yollarla kullanır: JSX'te etiketle (<code>&lt;NoteList /&gt;</code>), JSX'siz yazımda sınıf için <code>new NoteList(props)</code>, fonksiyon ve Options için <code>motifComponent(NoteList, props)</code>.</p>
+<h2 id="package-types">Paket türleri</h2>
+<p>Aşağıdaki türlerin her biri çekirdekteki bir mekanizmaya dayanır; ayrıntı o mekanizmanın sayfasındadır.</p>
+<h3 id="theme">Tema ve tasarım sistemi</h3>
+<p>Tema bileşenlerin değil belgenin özelliğidir. Seçili tema ve yoğunluk bir singleton serviste reaktif durum olarak tutulur; servis bunu <code>&lt;html&gt;</code> elemanına öznitelik olarak yazar (<code>data-theme</code>), CSS de özniteliği okur. Servis <code>startup: true</code> ile kaydedilirse hiçbir bileşen onu istemeden uygulama açılırken çalışır (bkz. <a href="/tr/docs/service-registration#startup">Başlangıçta oluşturulan singleton'lar</a>). Bir alt ağacın farklı görünmesi gerekiyorsa aynı öznitelik o ağacın kök elemanına yazılır; ayrı bir servis kapsamı gerekmez.</p>
+<p>Paketin CSS'i bir <code>@layer</code> içinde gelir: katmansız bir kural, uygulamanın bütün katmanlı kurallarını özgüllükten bağımsız ezer (bkz. <a href="/tr/docs/publishing-libraries#css">Stil ve CSS</a>).</p>
+<h3 id="overlays">İletişim kutusu, bildirim ve açılır katman</h3>
+<p>Bir iletişim kutusu onu açan bileşenin parçasıdır ama sayfanın en üst katmanında görünmelidir. Katman çekirdekte hazırdır: <code>app.layer</code> <code>&lt;body&gt;</code>'nin sonundaki katman bileşenidir, <code>app.layerOf(açan)</code> açan bileşen bir penceredeyse o pencerenin katmanını verir (bkz. <a href="/tr/docs/component-tree#layer">Sayfa katmanı</a>). Paket kutuyu <code>this.context.layerOf(this, kutu)</code> ile doğrudan koyabilir; o zaman kutunun ömrü katmanındır ve kapanınca kaldırmak paketin işidir (<code>remove</code> ya da kutunun kendi <code>dispose</code>'u). Kutunun açan bileşenle birlikte kalkması gerekiyorsa paket katmana bir <code>Transport</code> yuvası koyar ve içeriği açan bileşenin içinde bir <code>TransportTo</code> ile yazar: içerik yuvada görünür, bağları ve olay işleyicileri yazıldığı bileşenin durumuyla çalışır, açan bileşen serbest bırakılınca içerik de yuvadan kalkar. Bildirimlerin aynı yuvada birikmesi için yuva <code>mode: &quot;merge&quot;</code> ile kurulur (bkz. <a href="/tr/docs/transport">Transport ve TransportTo</a>).</p>
+<h3 id="layout">Yerleşim ve panel taşıma</h3>
+<p>Bölme, sekme ve yanaşan panel paketlerinde bir panel bir bölgeden ötekine taşınır ama durumunu kaybetmemelidir. Bileşen başka bir ebeveynin <code>controls.add</code>'ine verilince eski ebeveyninden kendiliğinden ayrılır; serbest bırakılmaz, bağları ve durumu yerinde kalır. DOM'dan söküldüğünde <code>onDeactivated</code>, yeniden yerleşince <code>onActivated</code> alır (bkz. <a href="/tr/docs/memory-and-dispose#detach">Serbest bırakmadan taşıma</a>). Aynı taşımayı <code>Transporter.transport</code> da yapar (bkz. <a href="/tr/docs/transport#transporter">Programatik taşıma</a>). Rota sayfası olan bir panelin örneğini gezinmeler arasında <code>keepAlive: true</code> korur (bkz. <a href="/tr/docs/routes">Rota Tanımları</a>).</p>
+<h3 id="shell-plugins">Uygulama kabuğu ve eklentiler</h3>
+<p>Kabuk paketi uygulamanın iskeletini verir: kenar çubuğu, araç çubuğu, durum satırı. Eklentiler bu iskelete parça ekler. İskeletin her bölgesi adlı bir <code>Transport</code> yuvasıdır; eklenti kendi bileşeninde aynı adlı bir <code>TransportTo</code> ile o bölgeye içerik gönderir. Yuvanın gönderenden önce ya da sonra kurulması sonucu değiştirmez. Eklentinin servisleri uygulamanın <code>ServiceCollection</code>'ına kaydedilir, kabuk onları sağlayıcıdan alır (bkz. <a href="/tr/docs/service-registration">Servis Kaydı</a>).</p>
+<h3 id="data">Veri bileşenleri</h3>
+<p>Tablo, ızgara ve uzun liste paketlerinde liste bağı satırı <code>key</code> ile değil öğe nesnesiyle tanır: aynı nesne yeni sıraya geçince satırı taşınır, yeniden kurulmaz (bkz. <a href="/tr/docs/conditionals-and-lists#key-and-identity"><code>key</code> ve öğe kimliği</a>). Binlerce satır ya da sunucudan sayfa sayfa gelen veri için <code>Virtualization</code> yalnız görünen satırları kurar ve veriyi <code>dataRequest</code> ile ister (bkz. <a href="/tr/docs/virtualization">Sanal Listeler</a>).</p>
+<h3 id="wrappers">Kütüphane sarmalayıcıları</h3>
+<p>Kendi DOM'unu yöneten bir kütüphane (grafik, harita, editör) bileşenin elemanına kurulur. Kurulum <code>onBuilt</code> ya da <code>initializeComponent</code> içinde yapılır, kütüphanenin kendi temizliği <code>motif.setDisposable</code> ile bileşene bağlanır. Kuralların tamamı <a href="/tr/docs/wrapping-libraries">Üçüncü Parti Kütüphane Sarmalama</a> sayfasındadır.</p>
+<h3 id="settings">Dil ve kullanıcı ayarları</h3>
+<p>Dil, saat dilimi ve yoğunluk gibi ayarlar tek bir singleton serviste reaktif nesne olarak durur. Bileşenler değeri bir bağın içinde okur; ayar değişince yalnız o değeri okuyan bağlar yenilenir, bileşenler yeniden kurulmaz (bkz. <a href="/tr/docs/reactivity">Reaktivite</a>, <a href="/tr/docs/service-lifetimes">Yaşam Süreleri ve Kapsamlar</a>).</p>
+<h3 id="transitions">Geçiş paketleri</h3>
+<p>Geçiş paketi CSS sınıf adları ve keyframe tanımları verir. Sınıf tabanlı geçiş <code>transition</code> adıyla bağlanır (<code>fade</code> → <code>fade-enter-from</code> …), kodla tanımlanan animasyon <code>motif.options.transition.in</code> / <code>out</code> ile verilir. Giriş ve çıkışın sırasını uygulama <code>app.useTransitions({ mode })</code> ile belirler (bkz. <a href="/tr/docs/styling-and-transitions">Stil ve Animasyon</a>).</p>
+<h2 id="publishing">Paketi yayımlamak</h2>
+<p>Paket biçimi, derleme, tipler, CSS, prop sözleşmesi ve yayın denetimi <a href="/tr/docs/publishing-libraries">MotifJS için npm Kütüphanesi Yayımlama</a> sayfasındadır. Derlenmiş JSX taşıyan paket, kullanıldığı <code>@motifx/core</code>'un desteklediği bir derleyici sözleşmesiyle derlenmiş olmalıdır; desteklenmeyen sözleşmede geliştirme modunda <code>MJX121</code> uyarısı yazılır.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Kendi DOM'unu yöneten bir kütüphaneyi bileşene dönüştürmek için <a href="/tr/docs/wrapping-libraries">Üçüncü Parti Kütüphane Sarmalama</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

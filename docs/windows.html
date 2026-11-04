@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Opening a component in a new window or in an always-on-top Picture-in-Picture window and taking it back; the window manager&#x27;s rules, style mirroring, Electron.">
+    <title>Windows — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/windows">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/windows">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/windows">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/windows">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/windows">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Windows">
+    <meta property="og:description" content="Opening a component in a new window or in an always-on-top Picture-in-Picture window and taking it back; the window manager&#x27;s rules, style mirroring, Electron.">
+    <script type="application/json" id="doc-data">{"slug":"windows","locale":"en","title":"Windows","description":"Opening a component in a new window or in an always-on-top Picture-in-Picture window and taking it back; the window manager\u0027s rules, style mirroring, Electron.","category":{"id":"3","title":"Application structure"},"html":"\u003Cp\u003EA MotifJS component can be moved to another window without being rebuilt: to a window opened with \u003Ccode\u003Ewindow.open\u003C/code\u003E, to the Picture-in-Picture window the browser keeps on top, or to a child window opened by Electron. The component object, its state, bindings, services and events stay in the page\u0027s JavaScript world; only the elements go to the other window. This is managed by \u003Ccode\u003Eapp.windows\u003C/code\u003E, reached as \u003Ccode\u003Ethis.context.windows\u003C/code\u003E from a component, \u003Ccode\u003EuseApplication().windows\u003C/code\u003E in a function component, and \u003Ccode\u003EApplication.main.windows\u003C/code\u003E from outside.\u003C/p\u003E\n\u003Ch2 id=\u0022open\u0022\u003EOpening a window\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.windows.open(component, options)\u003C/code\u003E opens the window, moves the component there and returns a handle. The browser call has to happen inside a user gesture, which is why \u003Ccode\u003Eopen\u003C/code\u003E is called from a click handler. The returned promise resolves once the content is in place. The toolbar that opens the open note\u0027s editor in a window or always on top:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component\u0026lt;HTMLDivElement\u0026gt; {\n  editor!: NoteEditor;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  override view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; })}\u0026gt;Open in window\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Always on top\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteTools.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component\u0026lt;HTMLDivElement\u0026gt; {\n  editor = new NoteEditor();\n\n  override onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  override initializeComponent() {\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Open in window\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Always on top\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    this.controls.add(popup, pip, this.editor);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  let editor!: NoteEditor;\n\n  return (\n    \u0026lt;div class=\u0026quot;tools\u0026quot;\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; })}\u0026gt;Open in window\u0026lt;/button\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Always on top\u0026lt;/button\u0026gt;\n      \u0026lt;NoteEditor ref={(field) =\u0026gt; (editor = field)} /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteTools.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  const editor = new NoteEditor();\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root: ComponentBase) =\u0026gt; {\n    root.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Open in window\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Always on top\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    root.controls.add(popup, pip, editor);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteTools.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: null as NoteEditor | null },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor!, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; })}\u0026gt;Open in window\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor!, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Always on top\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.data.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteTools.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: new NoteEditor() },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Open in window\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button: ComponentBase) =\u0026gt; {\n      button.setText(\u0026quot;Always on top\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    return [popup, pip, this.data.editor];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteTools.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  editor;\n\n  onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  view() {\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; })}\u0026gt;Open in window\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Always on top\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteTools.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport class NoteTools extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  editor = new NoteEditor();\n\n  onConfigured() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n  }\n\n  initializeComponent() {\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Open in window\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Always on top\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    this.controls.add(popup, pip, this.editor);\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteTools.jsx\u0022\u003E\u003Ccode\u003Eimport { useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  let editor;\n\n  return (\n    \u0026lt;div class=\u0026quot;tools\u0026quot;\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; })}\u0026gt;Open in window\u0026lt;/button\u0026gt;\n      \u0026lt;button onclick={() =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Always on top\u0026lt;/button\u0026gt;\n      \u0026lt;NoteEditor ref={(field) =\u0026gt; (editor = field)} /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteTools.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, useApplication } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport function NoteTools() {\n  const { windows } = useApplication();\n  const editor = new NoteEditor();\n\n  return motifComponent(\u0026quot;div\u0026quot;, (root) =\u0026gt; {\n    root.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Open in window\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Always on top\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; windows.open(editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    root.controls.add(popup, pip, editor);\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteTools.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: null },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; })}\u0026gt;Open in window\u0026lt;/button\u0026gt;\n        \u0026lt;button onclick={() =\u0026gt; this.context.windows.open(this.data.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 })}\u0026gt;Always on top\u0026lt;/button\u0026gt;\n        \u0026lt;NoteEditor ref={(editor) =\u0026gt; (this.data.editor = editor)} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteTools.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteEditor } from \u0026quot;./NoteEditor\u0026quot;;\n\nexport const NoteTools = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  data: { editor: new NoteEditor() },\n\n  view() {\n    this.class.add(\u0026quot;tools\u0026quot;);\n    const popup = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Open in window\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: \u0026quot;Note\u0026quot; }));\n    });\n    const pip = motifComponent(\u0026quot;button\u0026quot;, (button) =\u0026gt; {\n      button.setText(\u0026quot;Always on top\u0026quot;);\n      button.motif.on(\u0026quot;click\u0026quot;, () =\u0026gt; this.context.windows.open(this.data.editor, { kind: \u0026quot;pip\u0026quot;, width: 480, height: 360 }));\n    });\n    return [popup, pip, this.data.editor];\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EAn empty window is opened with \u003Ccode\u003Eapp.windows.create(options)\u003C/code\u003E, and content is given later with \u003Ccode\u003Ewin.add\u003C/code\u003E; \u003Ccode\u003Eopen\u003C/code\u003E is a shortcut for these two. A window you already have, the \u003Ccode\u003EcontentWindow\u003C/code\u003E of an \u003Ccode\u003E\u0026lt;iframe\u0026gt;\u003C/code\u003E, or a window you opened yourself becomes a managed window with \u003Ccode\u003Eapp.windows.attach(win, options)\u003C/code\u003E.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EOption\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekind\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E by default; \u003Ccode\u003E\u0026quot;pip\u0026quot;\u003C/code\u003E for an always-on-top Picture-in-Picture window.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efallback\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhat happens if \u003Ccode\u003E\u0026quot;pip\u0026quot;\u003C/code\u003E does not exist in the browser or the request is denied: \u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E by default; with \u003Ccode\u003E\u0026quot;none\u0026quot;\u003C/code\u003E the promise is rejected with \u003Ccode\u003EMJX419\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewidth\u003C/code\u003E, \u003Ccode\u003Eheight\u003C/code\u003E, \u003Ccode\u003Eleft\u003C/code\u003E, \u003Ccode\u003Etop\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe window\u0027s size and position.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ename\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003Ewindow.open\u003C/code\u003E name; if not given, every window gets a name of its own. In Electron this is the \u003Ccode\u003EframeName\u003C/code\u003E the main process sees.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efeatures\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPieces to add to the \u003Ccode\u003Ewindow.open\u003C/code\u003E feature string.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etitle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe window\u0027s title; the page\u0027s title if not given.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyles\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EMirroring styles and theme: \u003Ccode\u003E\u0026quot;live\u0026quot;\u003C/code\u003E by default, \u003Ccode\u003E\u0026quot;once\u0026quot;\u003C/code\u003E, \u003Ccode\u003E\u0026quot;none\u0026quot;\u003C/code\u003E, or a function that receives the window\u0027s document.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eorphans\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EContent whose origin is gone at closing time: \u003Ccode\u003E\u0026quot;dispose\u0026quot;\u003C/code\u003E by default; \u003Ccode\u003E\u0026quot;keep\u0026quot;\u003C/code\u003E leaves it detached. Applies only to components given with \u003Ccode\u003Ewin.add\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcloseWhenEmpty\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe window closes when the last content is disposed; \u003Ccode\u003Etrue\u003C/code\u003E by default. Only components given with \u003Ccode\u003Ewin.add\u003C/code\u003E are counted; content put directly into \u003Ccode\u003Ehost\u003C/code\u003E does not keep the window open.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcloseOnNavigate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe window closes when the route changes; \u003Ccode\u003Efalse\u003C/code\u003E by default.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EreturnOnClose\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOn close, the content returns to its origin; \u003Ccode\u003Etrue\u003C/code\u003E by default. With \u003Ccode\u003Efalse\u003C/code\u003E, a component that has an origin also falls under the \u003Ccode\u003Eorphans\u003C/code\u003E rule.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eowner\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe window is tied to this component\u0027s disposal; when the component goes, the window closes.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EonClosing\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECalled right before the window closes, while the content is still in the window; it receives \u003Ccode\u003E{ window, components, reason }\u003C/code\u003E. See \u003Ca href=\u0022#closing\u0022\u003EClosing rules\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022handle\u0022\u003EHandle\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eopen\u003C/code\u003E, \u003Ccode\u003Ecreate\u003C/code\u003E and \u003Ccode\u003Eattach\u003C/code\u003E return an \u003Ccode\u003EAppWindow\u003C/code\u003E.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMember\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewindow\u003C/code\u003E, \u003Ccode\u003Edocument\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe window itself and its document.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ehost\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe component that wraps the window\u0027s body; the content is its child.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekind\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe kind actually opened: \u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E, \u003Ccode\u003E\u0026quot;pip\u0026quot;\u003C/code\u003E, or \u003Ccode\u003E\u0026quot;attached\u0026quot;\u003C/code\u003E for one that came through \u003Ccode\u003Eattach\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ecomponents\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe components in the window, in the order they were added.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisOpen\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhether the window is open.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eadd(...components)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EMoves components into the window.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Erelease(component)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EPuts the component back at its origin; the window stays open.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efocus()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBrings the window to the front.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclose()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECloses the window; returns the result as \u003Ccode\u003E{ returned, disposed, kept }\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclosed\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA promise that resolves with the same result however the window closes.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsyncStyles()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERefreshes the style sheets by hand.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EA notification or dialog opened by a component in the window should appear in that window too. \u003Ccode\u003Eapp.layerOf(component)\u003C/code\u003E looks at the component\u0027s document: if the component is in a window of this manager it returns the window\u0027s \u003Ccode\u003Ehost\u003C/code\u003E, and if it is on the page it returns \u003Ccode\u003Eapp.layer\u003C/code\u003E, then adds the given components there (see \u003Ca href=\u0022/docs/component-tree#layer\u0022\u003EPage layer\u003C/a\u003E). Content put directly into \u003Ccode\u003Ehost\u003C/code\u003E this way does not enter the window\u0027s \u003Ccode\u003Ecomponents\u003C/code\u003E list; \u003Ccode\u003Eorphans\u003C/code\u003E and \u003Ccode\u003EreturnOnClose\u003C/code\u003E do not look at it, \u003Ccode\u003EcloseWhenEmpty\u003C/code\u003E does not count it (when the last component given with \u003Ccode\u003Ewin.add\u003C/code\u003E goes, the window closes even if there is still a dialog in \u003Ccode\u003Ehost\u003C/code\u003E), it is disposed together with \u003Ccode\u003Ehost\u003C/code\u003E when the window closes, and it does not appear in any list of the \u003Ccode\u003Eclosed\u003C/code\u003E result. Content that should not go away with the window is given with \u003Ccode\u003Ewin.add\u003C/code\u003E or written into a \u003Ccode\u003ETransport\u003C/code\u003E slot.\u003C/p\u003E\n\u003Ch2 id=\u0022origin\u0022\u003EContent, origin and returning\u003C/h2\u003E\n\u003Cp\u003EWhen a component is first taken into a window, the manager notes its parent on the page and its next sibling at that moment. The component leaves its old parent and gets \u003Ccode\u003EonDeactivated\u003C/code\u003E, enters the window\u0027s body with \u003Ccode\u003Econtrols.add\u003C/code\u003E and gets \u003Ccode\u003EonActivated\u003C/code\u003E; if \u003Ccode\u003EonMounted\u003C/code\u003E ran before, it does not run again, and if the component is being placed for the first time there, it runs in that window\u0027s queue. Other components can be put into the same window with \u003Ccode\u003Ewin.add\u003C/code\u003E; if a component is moved from one window to another, its origin does not change. The origin is kept only for a component given with \u003Ccode\u003Eopen\u003C/code\u003E or \u003Ccode\u003Eadd\u003C/code\u003E: the manager does not know about components the application moves itself into a window it connected with \u003Ccode\u003Eattach\u003C/code\u003E; nothing returns for them on close, and they do not appear in the \u003Ccode\u003Ecomponents\u003C/code\u003E list.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Ewin.release(component)\u003C/code\u003E and closing the window put the component back at its origin, in its old order: in front of the remembered sibling if that sibling is still there, in front of that sibling\u0027s sibling if the sibling is in the window too, and at the end if there is nobody. Several components taken into the window from the same parent find their old order in \u003Ccode\u003Econtrols\u003C/code\u003E when they come back. \u003Ccode\u003EreturnOnClose: false\u003C/code\u003E turns this return off; a component with an origin counts as having none, while \u003Ccode\u003Erelease\u003C/code\u003E still puts it back at its origin. If the origin is gone, for example because the route changed and the parent was disposed, \u003Ccode\u003Eorphans\u003C/code\u003E decides: the default is to dispose, and with \u003Ccode\u003E\u0026quot;keep\u0026quot;\u003C/code\u003E the component stays alive without a parent and arrives in the \u003Ccode\u003Ekept\u003C/code\u003E list of the \u003Ccode\u003Eclosed\u003C/code\u003E result. An application that wants to keep content whose origin is gone takes it with \u003Ccode\u003Ewin.release\u003C/code\u003E or with \u003Ccode\u003Econtrols.add\u003C/code\u003E to another parent before the window closes.\u003C/p\u003E\n\u003Cp\u003EA component in the window that is hidden and shown again stays in the window: the marker is left in the window, and \u003Ccode\u003Emotif.show()\u003C/code\u003E puts the component there. This also holds for a component whose element the application moves to another document itself. If the marker has been lost, or its holder has left the document, the component is rebuilt under its parent and an \u003Ccode\u003EMJX106\u003C/code\u003E warning is given.\u003C/p\u003E\n\u003Ch2 id=\u0022closing\u0022\u003EClosing rules\u003C/h2\u003E\n\u003Cp\u003EWhen the window is closed by the user, \u003Ccode\u003Ewin.close()\u003C/code\u003E is called, or the window gets \u003Ccode\u003Epagehide\u003C/code\u003E, the content returns to its origin and \u003Ccode\u003Eclosed\u003C/code\u003E resolves. If a component in the window is disposed by the application, it drops out of the list; if the last component goes as well, the window closes, and \u003Ccode\u003EcloseWhenEmpty: false\u003C/code\u003E keeps it open. If \u003Ccode\u003Eowner\u003C/code\u003E is given, the window closes when the owner component is disposed; \u003Ccode\u003EcloseOnNavigate\u003C/code\u003E closes it when the route changes. \u003Ccode\u003Eapp.dispose()\u003C/code\u003E and the page\u0027s own \u003Ccode\u003Epagehide\u003C/code\u003E close every window, and the content inside them is disposed; no empty window is left behind. \u003Ccode\u003Eapp.windows.closeAll()\u003C/code\u003E does the same job on request.\u003C/p\u003E\n\u003Cp\u003EIf \u003Ccode\u003EonClosing\u003C/code\u003E is given, the manager calls it before touching the content; when the user closes the window, this is that window\u0027s \u003Ccode\u003Epagehide\u003C/code\u003E moment and the document is still standing. At that moment the window counts as closed: \u003Ccode\u003EisOpen\u003C/code\u003E is \u003Ccode\u003Efalse\u003C/code\u003E, and \u003Ccode\u003Eadd\u003C/code\u003E throws MJX420. The hook receives \u003Ccode\u003E{ window, components, reason }\u003C/code\u003E. \u003Ccode\u003Ecomponents\u003C/code\u003E is a copy of the components in the window at that moment; \u003Ccode\u003Ereason\u003C/code\u003E is why it is closing: \u003Ccode\u003E\u0026quot;user\u0026quot;\u003C/code\u003E the user closed it or the window got \u003Ccode\u003Epagehide\u003C/code\u003E, \u003Ccode\u003E\u0026quot;code\u0026quot;\u003C/code\u003E \u003Ccode\u003Ewin.close()\u003C/code\u003E and \u003Ccode\u003EcloseAll\u003C/code\u003E, \u003Ccode\u003E\u0026quot;owner\u0026quot;\u003C/code\u003E the owner component was disposed, \u003Ccode\u003E\u0026quot;empty\u0026quot;\u003C/code\u003E the last component went, \u003Ccode\u003E\u0026quot;navigate\u0026quot;\u003C/code\u003E the route changed, \u003Ccode\u003E\u0026quot;page\u0026quot;\u003C/code\u003E the page is closing or \u003Ccode\u003Eapp.dispose()\u003C/code\u003E was called. A component taken to another parent with \u003Ccode\u003Econtrols.add\u003C/code\u003E in the hook neither returns nor is disposed; its origin is forgotten and it does not appear in the \u003Ccode\u003Eclosed\u003C/code\u003E result. \u003Ccode\u003Ewin.release\u003C/code\u003E can be called as well. If the hook throws, the error is reported with MJX423 and the closing goes on.\u003C/p\u003E\n\u003Ch2 id=\u0022styles\u0022\u003EStyles and theme\u003C/h2\u003E\n\u003Cp\u003EA new document has no style sheets. On opening, every \u003Ccode\u003E\u0026lt;link rel=\u0026quot;stylesheet\u0026quot;\u0026gt;\u003C/code\u003E and \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E on the page, wherever it is, is copied into the window\u0027s \u003Ccode\u003Ehead\u003C/code\u003E; those set up with \u003Ccode\u003EadoptedStyleSheets\u003C/code\u003E cannot be given to another document, so they are rebuilt from the text of their rules as a single \u003Ccode\u003E\u0026lt;style\u0026gt;\u003C/code\u003E. The \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Elang\u003C/code\u003E, \u003Ccode\u003Edir\u003C/code\u003E and \u003Ccode\u003Edata-*\u003C/code\u003E attributes of \u003Ccode\u003E\u0026lt;html\u0026gt;\u003C/code\u003E and \u003Ccode\u003E\u0026lt;body\u0026gt;\u003C/code\u003E are mirrored onto the window\u0027s root too; if the theme is set up with a \u003Ccode\u003Edata-theme\u003C/code\u003E or a root class, it is set up in the window as well.\u003C/p\u003E\n\u003Cp\u003EWith the default \u003Ccode\u003Estyles: \u0026quot;live\u0026quot;\u003C/code\u003E, this continues after opening: a style sheet added to, changed on or removed from the page, and every change to the root attributes, shows up in the open windows. The cost is two \u003Ccode\u003EMutationObserver\u003C/code\u003Es on the page while at least one window is open; they are released when no windows are left. A rule added to \u003Ccode\u003EadoptedStyleSheets\u003C/code\u003E later cannot be observed; you refresh it with \u003Ccode\u003Ewin.syncStyles()\u003C/code\u003E. \u003Ccode\u003E\u0026quot;once\u0026quot;\u003C/code\u003E copies only on opening, \u003Ccode\u003E\u0026quot;none\u0026quot;\u003C/code\u003E touches nothing, and if you give a function, it is called with the window\u0027s document and the rest is up to you.\u003C/p\u003E\n\u003Ch2 id=\u0022kinds\u0022\u003EKinds\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Epopup\u003C/code\u003E is opened with \u003Ccode\u003Ewindow.open(\u0026quot;\u0026quot;, name, features)\u003C/code\u003E; if the browser does not open it, because of a popup blocker or the lack of a user gesture, the promise is rejected with \u003Ccode\u003EMJX418\u003C/code\u003E. \u003Ccode\u003Epip\u003C/code\u003E is the browser\u0027s \u003Ccode\u003EdocumentPictureInPicture.requestWindow\u003C/code\u003E window: it needs a user gesture, opens a single window per page and today exists only in Chromium-based browsers; Firefox and Safari have Picture-in-Picture for video only. \u003Ccode\u003Eapp.windows.supports(\u0026quot;pip\u0026quot;)\u003C/code\u003E tells you in advance; since \u003Ccode\u003Efallback\u003C/code\u003E defaults to \u003Ccode\u003E\u0026quot;popup\u0026quot;\u003C/code\u003E, a one-line call works in every browser, and \u003Ccode\u003Ewin.kind\u003C/code\u003E gives what was actually opened.\u003C/p\u003E\n\u003Cp\u003EThe always-on-top window stays visible even when the main window is minimized. Meanwhile the browser may throttle your application\u0027s own \u003Ccode\u003EsetTimeout\u003C/code\u003E and \u003Ccode\u003ErequestAnimationFrame\u003C/code\u003E calls; the core\u0027s transitions and the \u003Ccode\u003EonMounted\u003C/code\u003E queue run from the element\u0027s window, so they are not throttled.\u003C/p\u003E\n\u003Cp\u003EIn Electron the main process decides on a \u003Ccode\u003Ewindow.open\u003C/code\u003E request; the window\u0027s name arrives as \u003Ccode\u003EframeName\u003C/code\u003E, and the window options are given there. An always-on-top window does not need Picture-in-Picture; it is achieved with \u003Ccode\u003EalwaysOnTop\u003C/code\u003E. Electron\u0027s Chromium recognizes \u003Ccode\u003EdocumentPictureInPicture\u003C/code\u003E but denies the request, so \u003Ccode\u003Efallback\u003C/code\u003E drops to a popup here too. A child window of the same origin lives in the same renderer process as its opener; the same holds for an application loaded with \u003Ccode\u003Efile://\u003C/code\u003E.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022electron/main.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022electron/main.ts\u0022\u003E\u003Ccode\u003Ewin.webContents.setWindowOpenHandler(({ url, frameName }) =\u0026gt; {\n  if (frameName === \u0026quot;motif-popup\u0026quot;) {\n    return { action: \u0026quot;allow\u0026quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };\n  }\n  if (/^https?:\\/\\//.test(url)) void shell.openExternal(url);\n  return { action: \u0026quot;deny\u0026quot; };\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022electron/main.js\u0022\u003E\u003Ccode\u003Ewin.webContents.setWindowOpenHandler(({ url, frameName }) =\u0026gt; {\n  if (frameName === \u0026quot;motif-popup\u0026quot;) {\n    return { action: \u0026quot;allow\u0026quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };\n  }\n  if (/^https?:\\/\\//.test(url)) void shell.openExternal(url);\n  return { action: \u0026quot;deny\u0026quot; };\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EOn the renderer side the window\u0027s name is given as an option: \u003Ccode\u003Eapp.windows.open(editor, { name: \u0026quot;motif-popup\u0026quot; })\u003C/code\u003E. A window opened from the main process with \u003Ccode\u003Enew BrowserWindow\u003C/code\u003E is a separate renderer process; components cannot be moved there, and the two windows talk over IPC or a \u003Ccode\u003EMessagePort\u003C/code\u003E.\u003C/p\u003E\n\u003Ch2 id=\u0022events\u0022\u003EList and events\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.windows.list\u003C/code\u003E is a reactive list of the open windows; read in a binding, it refreshes as windows open and close. \u003Ccode\u003Eapp.windows.of(component)\u003C/code\u003E gives the component\u0027s window, or \u003Ccode\u003Enull\u003C/code\u003E. The application events \u003Ccode\u003Ewindow-opened\u003C/code\u003E and \u003Ccode\u003Ewindow-closed\u003C/code\u003E carry the handle: \u003Ccode\u003Ethis.context.on(\u0026quot;window-closed\u0026quot;, (e) =\u0026gt; …)\u003C/code\u003E. A component moved into a window sees the router, the services and the application events just as before; a \u003Ccode\u003Erel=\u0026quot;router\u0026quot;\u003C/code\u003E link in the window navigates the page\u0027s router and does not reload the window.\u003C/p\u003E\n\u003Ch2 id=\u0022errors\u0022\u003EError codes\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ECode\u003C/th\u003E\n\u003Cth\u003EWhen\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX418\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe browser did not open the window; a popup blocker, or no user gesture.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX419\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWith \u003Ccode\u003Efallback: \u0026quot;none\u0026quot;\u003C/code\u003E, Picture-in-Picture does not exist or the request was denied.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX420\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eadd\u003C/code\u003E or \u003Ccode\u003Efocus\u003C/code\u003E on a closed handle.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX421\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA value that is not a window was given to \u003Ccode\u003Eattach\u003C/code\u003E, or the window belongs to another origin.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX422\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAn attempt was made to put a disposed component into a window.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EMJX423\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EonClosing\u003C/code\u003E threw; it is reported and the closing goes on.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EAll the codes are on the \u003Ca href=\u0022/docs/error-codes\u0022\u003EError and Warning Codes\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003E\u003Ca href=\u0022/docs/component-tree\u0022\u003Econtrols and the Component Tree\u003C/a\u003E covers the component tree and moving content into slots; for connecting another document to the application without opening a window, \u003Ccode\u003Eapp.connectDocument\u003C/code\u003E is on the \u003Ca href=\u0022/docs/api-reference#application\u0022\u003EAPI Reference\u003C/a\u003E page.\u003C/p\u003E\n","headings":[{"id":"open","text":"Opening a window","level":2},{"id":"handle","text":"Handle","level":2},{"id":"origin","text":"Content, origin and returning","level":2},{"id":"closing","text":"Closing rules","level":2},{"id":"styles","text":"Styles and theme","level":2},{"id":"kinds","text":"Kinds","level":2},{"id":"events","text":"List and events","level":2},{"id":"errors","text":"Error codes","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"resilience","title":"Resilience"},"next":{"slug":"routing","title":"Introduction to Routing"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Application structure</p>
+        <h1>Windows</h1>
+        <p>Opening a component in a new window or in an always-on-top Picture-in-Picture window and taking it back; the window manager&#x27;s rules, style mirroring, Electron.</p>
+<p>A MotifJS component can be moved to another window without being rebuilt: to a window opened with <code>window.open</code>, to the Picture-in-Picture window the browser keeps on top, or to a child window opened by Electron. The component object, its state, bindings, services and events stay in the page's JavaScript world; only the elements go to the other window. This is managed by <code>app.windows</code>, reached as <code>this.context.windows</code> from a component, <code>useApplication().windows</code> in a function component, and <code>Application.main.windows</code> from outside.</p>
+<h2 id="open">Opening a window</h2>
+<p><code>app.windows.open(component, options)</code> opens the window, moves the component there and returns a handle. The browser call has to happen inside a user gesture, which is why <code>open</code> is called from a click handler. The returned promise resolves once the content is in place. The toolbar that opens the open note's editor in a window or always on top:</p>
+<div class="doc-code" data-file="src/parts/NoteTools.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteTools.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component&lt;HTMLDivElement&gt; {
+  editor!: NoteEditor;
+
+  override onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  override view() {
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Note&quot; })}&gt;Open in window&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Always on top&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteTools.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component&lt;HTMLDivElement&gt; {
+  editor = new NoteEditor();
+
+  override onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  override initializeComponent() {
+    const popup = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Open in window&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Note&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Always on top&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    this.controls.add(popup, pip, this.editor);
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteTools.tsx"><code>import { useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  let editor!: NoteEditor;
+
+  return (
+    &lt;div class=&quot;tools&quot;&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Note&quot; })}&gt;Open in window&lt;/button&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Always on top&lt;/button&gt;
+      &lt;NoteEditor ref={(field) =&gt; (editor = field)} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteTools.ts"><code>import { ComponentBase, motifComponent, useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  const editor = new NoteEditor();
+
+  return motifComponent(&quot;div&quot;, (root: ComponentBase) =&gt; {
+    root.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Open in window&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Note&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Always on top&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    root.controls.add(popup, pip, editor);
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteTools.tsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: null as NoteEditor | null },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor!, { width: 720, height: 560, title: &quot;Note&quot; })}&gt;Open in window&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor!, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Always on top&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.data.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteTools.ts"><code>import { ComponentBase, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: new NoteEditor() },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Open in window&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: &quot;Note&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button: ComponentBase) =&gt; {
+      button.setText(&quot;Always on top&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    return [popup, pip, this.data.editor];
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteTools.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component {
+  static elementTag = &quot;div&quot;;
+  editor;
+
+  onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  view() {
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Note&quot; })}&gt;Open in window&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Always on top&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteTools.js"><code>import { Component, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export class NoteTools extends Component {
+  static elementTag = &quot;div&quot;;
+  editor = new NoteEditor();
+
+  onConfigured() {
+    this.class.add(&quot;tools&quot;);
+  }
+
+  initializeComponent() {
+    const popup = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Open in window&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { width: 720, height: 560, title: &quot;Note&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Always on top&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    this.controls.add(popup, pip, this.editor);
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteTools.jsx"><code>import { useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  let editor;
+
+  return (
+    &lt;div class=&quot;tools&quot;&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Note&quot; })}&gt;Open in window&lt;/button&gt;
+      &lt;button onclick={() =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Always on top&lt;/button&gt;
+      &lt;NoteEditor ref={(field) =&gt; (editor = field)} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteTools.js"><code>import { motifComponent, useApplication } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export function NoteTools() {
+  const { windows } = useApplication();
+  const editor = new NoteEditor();
+
+  return motifComponent(&quot;div&quot;, (root) =&gt; {
+    root.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Open in window&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { width: 720, height: 560, title: &quot;Note&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Always on top&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; windows.open(editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    root.controls.add(popup, pip, editor);
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteTools.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: null },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    return (
+      &lt;&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: &quot;Note&quot; })}&gt;Open in window&lt;/button&gt;
+        &lt;button onclick={() =&gt; this.context.windows.open(this.data.editor, { kind: &quot;pip&quot;, width: 480, height: 360 })}&gt;Always on top&lt;/button&gt;
+        &lt;NoteEditor ref={(editor) =&gt; (this.data.editor = editor)} /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteTools.js"><code>import { motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteEditor } from &quot;./NoteEditor&quot;;
+
+export const NoteTools = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  data: { editor: new NoteEditor() },
+
+  view() {
+    this.class.add(&quot;tools&quot;);
+    const popup = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Open in window&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { width: 720, height: 560, title: &quot;Note&quot; }));
+    });
+    const pip = motifComponent(&quot;button&quot;, (button) =&gt; {
+      button.setText(&quot;Always on top&quot;);
+      button.motif.on(&quot;click&quot;, () =&gt; this.context.windows.open(this.data.editor, { kind: &quot;pip&quot;, width: 480, height: 360 }));
+    });
+    return [popup, pip, this.data.editor];
+  },
+});</code></pre>
+</div>
+<p>An empty window is opened with <code>app.windows.create(options)</code>, and content is given later with <code>win.add</code>; <code>open</code> is a shortcut for these two. A window you already have, the <code>contentWindow</code> of an <code>&lt;iframe&gt;</code>, or a window you opened yourself becomes a managed window with <code>app.windows.attach(win, options)</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kind</code></td>
+<td><code>&quot;popup&quot;</code> by default; <code>&quot;pip&quot;</code> for an always-on-top Picture-in-Picture window.</td>
+</tr>
+<tr>
+<td><code>fallback</code></td>
+<td>What happens if <code>&quot;pip&quot;</code> does not exist in the browser or the request is denied: <code>&quot;popup&quot;</code> by default; with <code>&quot;none&quot;</code> the promise is rejected with <code>MJX419</code>.</td>
+</tr>
+<tr>
+<td><code>width</code>, <code>height</code>, <code>left</code>, <code>top</code></td>
+<td>The window's size and position.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>The <code>window.open</code> name; if not given, every window gets a name of its own. In Electron this is the <code>frameName</code> the main process sees.</td>
+</tr>
+<tr>
+<td><code>features</code></td>
+<td>Pieces to add to the <code>window.open</code> feature string.</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>The window's title; the page's title if not given.</td>
+</tr>
+<tr>
+<td><code>styles</code></td>
+<td>Mirroring styles and theme: <code>&quot;live&quot;</code> by default, <code>&quot;once&quot;</code>, <code>&quot;none&quot;</code>, or a function that receives the window's document.</td>
+</tr>
+<tr>
+<td><code>orphans</code></td>
+<td>Content whose origin is gone at closing time: <code>&quot;dispose&quot;</code> by default; <code>&quot;keep&quot;</code> leaves it detached. Applies only to components given with <code>win.add</code>.</td>
+</tr>
+<tr>
+<td><code>closeWhenEmpty</code></td>
+<td>The window closes when the last content is disposed; <code>true</code> by default. Only components given with <code>win.add</code> are counted; content put directly into <code>host</code> does not keep the window open.</td>
+</tr>
+<tr>
+<td><code>closeOnNavigate</code></td>
+<td>The window closes when the route changes; <code>false</code> by default.</td>
+</tr>
+<tr>
+<td><code>returnOnClose</code></td>
+<td>On close, the content returns to its origin; <code>true</code> by default. With <code>false</code>, a component that has an origin also falls under the <code>orphans</code> rule.</td>
+</tr>
+<tr>
+<td><code>owner</code></td>
+<td>The window is tied to this component's disposal; when the component goes, the window closes.</td>
+</tr>
+<tr>
+<td><code>onClosing</code></td>
+<td>Called right before the window closes, while the content is still in the window; it receives <code>{ window, components, reason }</code>. See <a href="#closing">Closing rules</a>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="handle">Handle</h2>
+<p><code>open</code>, <code>create</code> and <code>attach</code> return an <code>AppWindow</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>window</code>, <code>document</code></td>
+<td>The window itself and its document.</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td>The component that wraps the window's body; the content is its child.</td>
+</tr>
+<tr>
+<td><code>kind</code></td>
+<td>The kind actually opened: <code>&quot;popup&quot;</code>, <code>&quot;pip&quot;</code>, or <code>&quot;attached&quot;</code> for one that came through <code>attach</code>.</td>
+</tr>
+<tr>
+<td><code>components</code></td>
+<td>The components in the window, in the order they were added.</td>
+</tr>
+<tr>
+<td><code>isOpen</code></td>
+<td>Whether the window is open.</td>
+</tr>
+<tr>
+<td><code>add(...components)</code></td>
+<td>Moves components into the window.</td>
+</tr>
+<tr>
+<td><code>release(component)</code></td>
+<td>Puts the component back at its origin; the window stays open.</td>
+</tr>
+<tr>
+<td><code>focus()</code></td>
+<td>Brings the window to the front.</td>
+</tr>
+<tr>
+<td><code>close()</code></td>
+<td>Closes the window; returns the result as <code>{ returned, disposed, kept }</code>.</td>
+</tr>
+<tr>
+<td><code>closed</code></td>
+<td>A promise that resolves with the same result however the window closes.</td>
+</tr>
+<tr>
+<td><code>syncStyles()</code></td>
+<td>Refreshes the style sheets by hand.</td>
+</tr>
+</tbody>
+</table>
+<p>A notification or dialog opened by a component in the window should appear in that window too. <code>app.layerOf(component)</code> looks at the component's document: if the component is in a window of this manager it returns the window's <code>host</code>, and if it is on the page it returns <code>app.layer</code>, then adds the given components there (see <a href="/docs/component-tree#layer">Page layer</a>). Content put directly into <code>host</code> this way does not enter the window's <code>components</code> list; <code>orphans</code> and <code>returnOnClose</code> do not look at it, <code>closeWhenEmpty</code> does not count it (when the last component given with <code>win.add</code> goes, the window closes even if there is still a dialog in <code>host</code>), it is disposed together with <code>host</code> when the window closes, and it does not appear in any list of the <code>closed</code> result. Content that should not go away with the window is given with <code>win.add</code> or written into a <code>Transport</code> slot.</p>
+<h2 id="origin">Content, origin and returning</h2>
+<p>When a component is first taken into a window, the manager notes its parent on the page and its next sibling at that moment. The component leaves its old parent and gets <code>onDeactivated</code>, enters the window's body with <code>controls.add</code> and gets <code>onActivated</code>; if <code>onMounted</code> ran before, it does not run again, and if the component is being placed for the first time there, it runs in that window's queue. Other components can be put into the same window with <code>win.add</code>; if a component is moved from one window to another, its origin does not change. The origin is kept only for a component given with <code>open</code> or <code>add</code>: the manager does not know about components the application moves itself into a window it connected with <code>attach</code>; nothing returns for them on close, and they do not appear in the <code>components</code> list.</p>
+<p><code>win.release(component)</code> and closing the window put the component back at its origin, in its old order: in front of the remembered sibling if that sibling is still there, in front of that sibling's sibling if the sibling is in the window too, and at the end if there is nobody. Several components taken into the window from the same parent find their old order in <code>controls</code> when they come back. <code>returnOnClose: false</code> turns this return off; a component with an origin counts as having none, while <code>release</code> still puts it back at its origin. If the origin is gone, for example because the route changed and the parent was disposed, <code>orphans</code> decides: the default is to dispose, and with <code>&quot;keep&quot;</code> the component stays alive without a parent and arrives in the <code>kept</code> list of the <code>closed</code> result. An application that wants to keep content whose origin is gone takes it with <code>win.release</code> or with <code>controls.add</code> to another parent before the window closes.</p>
+<p>A component in the window that is hidden and shown again stays in the window: the marker is left in the window, and <code>motif.show()</code> puts the component there. This also holds for a component whose element the application moves to another document itself. If the marker has been lost, or its holder has left the document, the component is rebuilt under its parent and an <code>MJX106</code> warning is given.</p>
+<h2 id="closing">Closing rules</h2>
+<p>When the window is closed by the user, <code>win.close()</code> is called, or the window gets <code>pagehide</code>, the content returns to its origin and <code>closed</code> resolves. If a component in the window is disposed by the application, it drops out of the list; if the last component goes as well, the window closes, and <code>closeWhenEmpty: false</code> keeps it open. If <code>owner</code> is given, the window closes when the owner component is disposed; <code>closeOnNavigate</code> closes it when the route changes. <code>app.dispose()</code> and the page's own <code>pagehide</code> close every window, and the content inside them is disposed; no empty window is left behind. <code>app.windows.closeAll()</code> does the same job on request.</p>
+<p>If <code>onClosing</code> is given, the manager calls it before touching the content; when the user closes the window, this is that window's <code>pagehide</code> moment and the document is still standing. At that moment the window counts as closed: <code>isOpen</code> is <code>false</code>, and <code>add</code> throws MJX420. The hook receives <code>{ window, components, reason }</code>. <code>components</code> is a copy of the components in the window at that moment; <code>reason</code> is why it is closing: <code>&quot;user&quot;</code> the user closed it or the window got <code>pagehide</code>, <code>&quot;code&quot;</code> <code>win.close()</code> and <code>closeAll</code>, <code>&quot;owner&quot;</code> the owner component was disposed, <code>&quot;empty&quot;</code> the last component went, <code>&quot;navigate&quot;</code> the route changed, <code>&quot;page&quot;</code> the page is closing or <code>app.dispose()</code> was called. A component taken to another parent with <code>controls.add</code> in the hook neither returns nor is disposed; its origin is forgotten and it does not appear in the <code>closed</code> result. <code>win.release</code> can be called as well. If the hook throws, the error is reported with MJX423 and the closing goes on.</p>
+<h2 id="styles">Styles and theme</h2>
+<p>A new document has no style sheets. On opening, every <code>&lt;link rel=&quot;stylesheet&quot;&gt;</code> and <code>&lt;style&gt;</code> on the page, wherever it is, is copied into the window's <code>head</code>; those set up with <code>adoptedStyleSheets</code> cannot be given to another document, so they are rebuilt from the text of their rules as a single <code>&lt;style&gt;</code>. The <code>class</code>, <code>lang</code>, <code>dir</code> and <code>data-*</code> attributes of <code>&lt;html&gt;</code> and <code>&lt;body&gt;</code> are mirrored onto the window's root too; if the theme is set up with a <code>data-theme</code> or a root class, it is set up in the window as well.</p>
+<p>With the default <code>styles: &quot;live&quot;</code>, this continues after opening: a style sheet added to, changed on or removed from the page, and every change to the root attributes, shows up in the open windows. The cost is two <code>MutationObserver</code>s on the page while at least one window is open; they are released when no windows are left. A rule added to <code>adoptedStyleSheets</code> later cannot be observed; you refresh it with <code>win.syncStyles()</code>. <code>&quot;once&quot;</code> copies only on opening, <code>&quot;none&quot;</code> touches nothing, and if you give a function, it is called with the window's document and the rest is up to you.</p>
+<h2 id="kinds">Kinds</h2>
+<p><code>popup</code> is opened with <code>window.open(&quot;&quot;, name, features)</code>; if the browser does not open it, because of a popup blocker or the lack of a user gesture, the promise is rejected with <code>MJX418</code>. <code>pip</code> is the browser's <code>documentPictureInPicture.requestWindow</code> window: it needs a user gesture, opens a single window per page and today exists only in Chromium-based browsers; Firefox and Safari have Picture-in-Picture for video only. <code>app.windows.supports(&quot;pip&quot;)</code> tells you in advance; since <code>fallback</code> defaults to <code>&quot;popup&quot;</code>, a one-line call works in every browser, and <code>win.kind</code> gives what was actually opened.</p>
+<p>The always-on-top window stays visible even when the main window is minimized. Meanwhile the browser may throttle your application's own <code>setTimeout</code> and <code>requestAnimationFrame</code> calls; the core's transitions and the <code>onMounted</code> queue run from the element's window, so they are not throttled.</p>
+<p>In Electron the main process decides on a <code>window.open</code> request; the window's name arrives as <code>frameName</code>, and the window options are given there. An always-on-top window does not need Picture-in-Picture; it is achieved with <code>alwaysOnTop</code>. Electron's Chromium recognizes <code>documentPictureInPicture</code> but denies the request, so <code>fallback</code> drops to a popup here too. A child window of the same origin lives in the same renderer process as its opener; the same holds for an application loaded with <code>file://</code>.</p>
+<div class="doc-code" data-file="electron/main.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="electron/main.ts"><code>win.webContents.setWindowOpenHandler(({ url, frameName }) =&gt; {
+  if (frameName === &quot;motif-popup&quot;) {
+    return { action: &quot;allow&quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };
+  }
+  if (/^https?:\/\//.test(url)) void shell.openExternal(url);
+  return { action: &quot;deny&quot; };
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="electron/main.js"><code>win.webContents.setWindowOpenHandler(({ url, frameName }) =&gt; {
+  if (frameName === &quot;motif-popup&quot;) {
+    return { action: &quot;allow&quot;, overrideBrowserWindowOptions: { width: 560, height: 420, alwaysOnTop: true, frame: false } };
+  }
+  if (/^https?:\/\//.test(url)) void shell.openExternal(url);
+  return { action: &quot;deny&quot; };
+});</code></pre>
+</div>
+<p>On the renderer side the window's name is given as an option: <code>app.windows.open(editor, { name: &quot;motif-popup&quot; })</code>. A window opened from the main process with <code>new BrowserWindow</code> is a separate renderer process; components cannot be moved there, and the two windows talk over IPC or a <code>MessagePort</code>.</p>
+<h2 id="events">List and events</h2>
+<p><code>app.windows.list</code> is a reactive list of the open windows; read in a binding, it refreshes as windows open and close. <code>app.windows.of(component)</code> gives the component's window, or <code>null</code>. The application events <code>window-opened</code> and <code>window-closed</code> carry the handle: <code>this.context.on(&quot;window-closed&quot;, (e) =&gt; …)</code>. A component moved into a window sees the router, the services and the application events just as before; a <code>rel=&quot;router&quot;</code> link in the window navigates the page's router and does not reload the window.</p>
+<h2 id="errors">Error codes</h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MJX418</code></td>
+<td>The browser did not open the window; a popup blocker, or no user gesture.</td>
+</tr>
+<tr>
+<td><code>MJX419</code></td>
+<td>With <code>fallback: &quot;none&quot;</code>, Picture-in-Picture does not exist or the request was denied.</td>
+</tr>
+<tr>
+<td><code>MJX420</code></td>
+<td><code>add</code> or <code>focus</code> on a closed handle.</td>
+</tr>
+<tr>
+<td><code>MJX421</code></td>
+<td>A value that is not a window was given to <code>attach</code>, or the window belongs to another origin.</td>
+</tr>
+<tr>
+<td><code>MJX422</code></td>
+<td>An attempt was made to put a disposed component into a window.</td>
+</tr>
+<tr>
+<td><code>MJX423</code></td>
+<td><code>onClosing</code> threw; it is reported and the closing goes on.</td>
+</tr>
+</tbody>
+</table>
+<p>All the codes are on the <a href="/docs/error-codes">Error and Warning Codes</a> page.</p>
+<h2 id="next">Next step</h2>
+<p><a href="/docs/component-tree">controls and the Component Tree</a> covers the component tree and moving content into slots; for connecting another document to the application without opening a window, <code>app.connectDocument</code> is on the <a href="/docs/api-reference#application">API Reference</a> page.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Reaching a component&#x27;s element and its inner tags: `element`, `ref`, `onRefCreated`; `class`, `attr`, `style` and `setText`.">
+    <title>Element and Appearance — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/component-element">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-element">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-element">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-element">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/component-element">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Element and Appearance">
+    <meta property="og:description" content="Reaching a component&#x27;s element and its inner tags: `element`, `ref`, `onRefCreated`; `class`, `attr`, `style` and `setText`.">
+    <script type="application/json" id="doc-data">{"slug":"component-element","locale":"en","title":"Element and Appearance","description":"Reaching a component\u0027s element and its inner tags: \u0060element\u0060, \u0060ref\u0060, \u0060onRefCreated\u0060; \u0060class\u0060, \u0060attr\u0060, \u0060style\u0060 and \u0060setText\u0060.","category":{"id":"2","title":"Core concepts"},"html":"\u003Ch2 id=\u0022element-and-ref\u0022\u003EElement access inside a component (\u003Ccode\u003Eelement\u003C/code\u003E and \u003Ccode\u003Eref\u003C/code\u003E)\u003C/h2\u003E\n\u003Cp\u003EEvery component\u0027s real DOM node is reached through \u003Ccode\u003Eelement\u003C/code\u003E, and the element is ready as soon as the component is created. To hold the component of one of the inner tags, write \u003Ccode\u003Eref\u003C/code\u003E on that tag: in JSX \u003Ccode\u003Eref={this.title}\u003C/code\u003E (\u003Ccode\u003Eref={title}\u003C/code\u003E in a function component) or \u003Ccode\u003Eref={(c) =\u0026gt; …}\u003C/code\u003E, and without JSX the \u003Ccode\u003Eref\u003C/code\u003E key of the props object.\u003C/p\u003E\n\u003Cp\u003EThe editing area of the note page holds its title and body fields through \u003Ccode\u003Eref\u003C/code\u003E. When the page opens, it sizes the body field to the height of its content and, if the note is new, puts the cursor in the title; the body field grows as you type. \u003Ccode\u003EonEdit\u003C/code\u003E is a callback prop called on every change:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteFields extends Component\u0026lt;HTMLDivElement, { note: Note; onEdit?: () =\u0026gt; void }\u0026gt; {\n  title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  override onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  override view() {\n    const { note, onEdit } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; aria-label=\u0026quot;Title\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Start writing…\u0026quot;\n          aria-label=\u0026quot;Text\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteFields extends Component\u0026lt;HTMLDivElement, { note: Note; onEdit?: () =\u0026gt; void }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n  title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  override onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  override view() {\n    const { note, onEdit } = this.props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.title = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Untitled\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Title\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLTextAreaElement\u0026gt;) =\u0026gt; (this.body = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Start writing…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Text\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value: string) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport type { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteFields(props: { note: Note; onEdit?: () =\u0026gt; void }) {\n  const { note, onEdit } = props;\n  let title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  let body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return (\n    \u0026lt;div\n      class=\u0026quot;editor\u0026quot;\n      onMounted={() =\u0026gt; {\n        fit();\n        if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n      }}\n    \u0026gt;\n      \u0026lt;input ref={title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; aria-label=\u0026quot;Title\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n      \u0026lt;textarea\n        ref={body}\n        class=\u0026quot;editor__body\u0026quot;\n        rows={1}\n        placeholder=\u0026quot;Start writing…\u0026quot;\n        aria-label=\u0026quot;Text\u0026quot;\n        x-model={() =\u0026gt; note.body}\n        oninput={() =\u0026gt; {\n          fit();\n          onEdit?.();\n        }}\n      /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteFields(props: { note: Note; onEdit?: () =\u0026gt; void }) {\n  const { note, onEdit } = props;\n  let title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  let body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;editor\u0026quot;,\n    onMounted: () =\u0026gt; {\n      fit();\n      if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n    },\n    initializeComponent: (editor: ComponentBase) =\u0026gt; {\n      const titleField = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (title = field),\n        initializeComponent: (field: ComponentBase) =\u0026gt; {\n          field.class.add(\u0026quot;editor__title\u0026quot;);\n          field.attr.add({ placeholder: \u0026quot;Untitled\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Title\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n        },\n      });\n      const bodyField = motifComponent(\u0026quot;textarea\u0026quot;, {\n        ref: (field: Component\u0026lt;HTMLTextAreaElement\u0026gt;) =\u0026gt; (body = field),\n        initializeComponent: (field: ComponentBase) =\u0026gt; {\n          field.class.add(\u0026quot;editor__body\u0026quot;);\n          field.attr.add({ rows: 1, placeholder: \u0026quot;Start writing…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Text\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.body, (value: string) =\u0026gt; (note.body = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n            fit();\n            onEdit?.();\n          });\n        },\n      });\n      editor.controls.add(titleField, bodyField);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, type Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteFields = (props: { note: Note; onEdit?: () =\u0026gt; void }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n  body: undefined as Component\u0026lt;HTMLTextAreaElement\u0026gt; | undefined,\n\n  fit() {\n    this.body!.style({ height: \u0026quot;auto\u0026quot; });\n    this.body!.style({ height: \u0060${this.body!.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title!.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; aria-label=\u0026quot;Title\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Start writing…\u0026quot;\n          aria-label=\u0026quot;Text\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteFields = (props: { note: Note; onEdit?: () =\u0026gt; void }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n  body: undefined as Component\u0026lt;HTMLTextAreaElement\u0026gt; | undefined,\n\n  fit() {\n    this.body!.style({ height: \u0026quot;auto\u0026quot; });\n    this.body!.style({ height: \u0060${this.body!.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title!.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.title = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Untitled\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Title\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLTextAreaElement\u0026gt;) =\u0026gt; (this.body = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Start writing…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Text\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value: string) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteFields extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  title;\n  body;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  view() {\n    const { note, onEdit } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; aria-label=\u0026quot;Title\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Start writing…\u0026quot;\n          aria-label=\u0026quot;Text\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteFields extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  title;\n  body;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  view() {\n    const { note, onEdit } = this.props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field) =\u0026gt; (this.title = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Untitled\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Title\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field) =\u0026gt; (this.body = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Start writing…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Text\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eexport function NoteFields(props) {\n  const { note, onEdit } = props;\n  let title;\n  let body;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return (\n    \u0026lt;div\n      class=\u0026quot;editor\u0026quot;\n      onMounted={() =\u0026gt; {\n        fit();\n        if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n      }}\n    \u0026gt;\n      \u0026lt;input ref={title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; aria-label=\u0026quot;Title\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n      \u0026lt;textarea\n        ref={body}\n        class=\u0026quot;editor__body\u0026quot;\n        rows={1}\n        placeholder=\u0026quot;Start writing…\u0026quot;\n        aria-label=\u0026quot;Text\u0026quot;\n        x-model={() =\u0026gt; note.body}\n        oninput={() =\u0026gt; {\n          fit();\n          onEdit?.();\n        }}\n      /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteFields(props) {\n  const { note, onEdit } = props;\n  let title;\n  let body;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;editor\u0026quot;,\n    onMounted: () =\u0026gt; {\n      fit();\n      if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n    },\n    initializeComponent: (editor) =\u0026gt; {\n      const titleField = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (field) =\u0026gt; (title = field),\n        initializeComponent: (field) =\u0026gt; {\n          field.class.add(\u0026quot;editor__title\u0026quot;);\n          field.attr.add({ placeholder: \u0026quot;Untitled\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Title\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n        },\n      });\n      const bodyField = motifComponent(\u0026quot;textarea\u0026quot;, {\n        ref: (field) =\u0026gt; (body = field),\n        initializeComponent: (field) =\u0026gt; {\n          field.class.add(\u0026quot;editor__body\u0026quot;);\n          field.attr.add({ rows: 1, placeholder: \u0026quot;Start writing…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Text\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.body, (value) =\u0026gt; (note.body = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n            fit();\n            onEdit?.();\n          });\n        },\n      });\n      editor.controls.add(titleField, bodyField);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFields = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined,\n  body: undefined,\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; aria-label=\u0026quot;Title\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Start writing…\u0026quot;\n          aria-label=\u0026quot;Text\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFields = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined,\n  body: undefined,\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field) =\u0026gt; (this.title = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Untitled\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Title\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field) =\u0026gt; (this.body = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Start writing…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Text\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe note page places the fields with \u003Ccode\u003E\u0026lt;NoteFields note={note} onEdit={() =\u0026gt; this.edited(note)} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003EThe note page places the fields with \u003Ccode\u003Enew NoteFields({ note, onEdit: () =\u0026gt; this.edited(note) })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003EThe note page places the fields with \u003Ccode\u003EmotifComponent(NoteFields, { note, onEdit: () =\u0026gt; this.edited(note) })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eref={(s) =\u0026gt; ...}\u003C/code\u003E — the callback form; \u003Ccode\u003Es\u003C/code\u003E is the tag\u0027s component (on a plain DOM tag, the \u003Ccode\u003EComponent\u003C/code\u003E that wraps the element; on a component tag, the component instance; on a function component, the returned root). Without JSX this is the only form: \u003Ccode\u003EmotifComponent(\u0026quot;input\u0026quot;, { ref: (s) =\u0026gt; (this.title = s), … })\u003C/code\u003E (\u003Ccode\u003E(title = s)\u003C/code\u003E in a function component).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref={this.x}\u003C/code\u003E / \u003Ccode\u003Eref={name}\u003C/code\u003E — the compiler resolves the target. If the target is a method, a field holding a function or a local function, it is \u003Cstrong\u003Ecalled\u003C/strong\u003E with the tag\u0027s component. If it is a declared field (without a value or with a plain value) or a variable without an initial value, the component is \u003Cstrong\u003Eassigned\u003C/strong\u003E to it. For targets that cannot be decided at compile time (a member that is not declared or comes from a base class, a parameter, \u003Ccode\u003Eprops.x\u003C/code\u003E, a field typed as a function, a getter), the decision is made at run time: if the value is a function it is called, otherwise it is assigned. To pass an imported function as a ref, write the callback form: \u003Ccode\u003Eref={(s) =\u0026gt; registerField(s)}\u003C/code\u003E. With \u003Ccode\u003Eref={registerField}\u003C/code\u003E the generated code also contains a branch that assigns to the imported name; that works on the development server, but \u003Ccode\u003Evite build\u003C/code\u003E (Rollup) stops with an \u0026quot;Illegal reassignment of import\u0026quot; error.\u003C/li\u003E\n\u003Cli\u003EBoth forms mean the same on a plain DOM tag and on a component tag; \u003Ccode\u003Ex-ref\u003C/code\u003E (and \u003Ccode\u003Ex:ref\u003C/code\u003E) is the same as \u003Ccode\u003Eref\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref\u003C/code\u003E is called exactly once, while the tag\u0027s component is being built (before \u003Ccode\u003Ebuild()\u003C/code\u003E), and it is not written to the DOM as an attribute. On a class or Options component tag, by the time the ref is called, \u003Ccode\u003Eprops\u003C/code\u003E, the tag\u0027s common attributes (\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E …) and \u003Ccode\u003Eoptions\u003C/code\u003E have been applied. On a plain DOM tag, at the moment of the ref, \u003Ccode\u003Eoptions\u003C/code\u003E and the attributes that go to the constructor (those spread with \u003Ccode\u003E{...p}\u003C/code\u003E, and without JSX those put directly in the object) have been applied; attributes written directly on the tag in JSX (\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Eplaceholder\u003C/code\u003E …) and, without JSX, those added inside \u003Ccode\u003EinitializeComponent\u003C/code\u003E are written during the build, after the ref. On a function component tag, the ref is called as soon as the function returns its root. In a class component the ref runs inside the base class\u0027s constructor; fields defined in the subclass body (\u003Ccode\u003Emarker = \u0027ready\u0027\u003C/code\u003E) are set up after the constructor returns, as JavaScript requires, so they do not exist yet inside the ref. A ref is meant for assigning the component to a field in the parent component (\u003Ccode\u003Eref={(b) =\u0026gt; (this.okButton = b)}\u003C/code\u003E), not for writing to the class\u0027s own fields.\u003C/li\u003E\n\u003Cli\u003EIf \u003Ccode\u003Eref\u003C/code\u003E and \u003Ccode\u003Ex-ref\u003C/code\u003E are both written on the same tag, each runs once, in source order.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref\u003C/code\u003E is not a prop; it works only on the component it is given to: on a class component it applies to the component itself, and on a function component to the returned root. It is not part of the \u003Ccode\u003Eprops\u003C/code\u003E passed to the function, nor of \u003Ccode\u003Ethis.props\u003C/code\u003E, so spreading with \u003Ccode\u003E{...props}\u003C/code\u003E / \u003Ccode\u003E{...this.props}\u003C/code\u003E does not carry it to an inner component.\u003C/li\u003E\n\u003Cli\u003EIt is the same when building without JSX: \u003Ccode\u003EmotifComponent(Setting, { ref: (c) =\u0026gt; ... })\u003C/code\u003E applies the ref to the component itself (to the returned root for a function component), and the ref does not stay in the \u003Ccode\u003Eprops\u003C/code\u003E passed to the function or in \u003Ccode\u003Ethis.props\u003C/code\u003E. In the class form, \u003Ccode\u003Enew Setting({ ref: (c) =\u0026gt; ... })\u003C/code\u003E is the same; in the function and Options forms you use \u003Ccode\u003EmotifComponent\u003C/code\u003E, not \u003Ccode\u003Enew\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EThe rule is simple: if \u003Ccode\u003Eref\u003C/code\u003E is a function, it is \u003Cstrong\u003Ecalled\u003C/strong\u003E with the component and removed from the props. On a class, an Options component or a plain tag, if it is an object, the component is \u003Cstrong\u003Eassigned\u003C/strong\u003E to that field (\u003Ccode\u003Eprops.ref\u003C/code\u003E): for the class-style \u003Ccode\u003ESetting\u003C/code\u003E, after \u003Ccode\u003Econst p = { name: \u0026quot;Archive\u0026quot;, hint: \u0026quot;\u0026quot;, ref: {} }; const s = new Setting(p);\u003C/code\u003E, \u003Ccode\u003Ep.ref === s\u003C/code\u003E. On a function component no assignment is made to an object-style ref; use the callback form.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eelement\u003C/code\u003E exists before mounting too; its content arrives when the component is built. Work that needs the element to be attached to the document (focus, measurements) is done in \u003Ccode\u003EonMounted\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003ETo expose an inner item to the outside, use a separate prop name (for example \u003Ccode\u003EtitleRef\u003C/code\u003E) and call it from the inner tag\u0027s \u003Ccode\u003Eref\u003C/code\u003E: \u003Ccode\u003E\u0026lt;input ref={(c) =\u0026gt; props.titleRef?.(c)} … /\u0026gt;\u003C/code\u003E. Outside, write \u003Ccode\u003E\u0026lt;NoteFields note={note} titleRef={(c) =\u0026gt; (this.title = c)} /\u0026gt;\u003C/code\u003E (\u003Ccode\u003Etitle = c\u003C/code\u003E in a function component). A \u003Ccode\u003Eref\u003C/code\u003E written on a component tag, on the other hand, gives the component itself; in a function component that is the returned root \u003Ccode\u003Ediv\u003C/code\u003E. Writing \u003Ccode\u003Eref={props.titleRef}\u003C/code\u003E also works: if the value is a function, it is called with the inner component.\u003C/p\u003E\n\u003Ch3 id=\u0022on-ref-created\u0022\u003E\u003Ccode\u003EonRefCreated\u003C/code\u003E — a shared hook for refs\u003C/h3\u003E\n\u003Cp\u003EIf a class component defines an \u003Ccode\u003EonRefCreated(sender)\u003C/code\u003E method, it is called right after each \u003Ccode\u003Eref={this.x}\u003C/code\u003E / \u003Ccode\u003Eref={name}\u003C/code\u003E inside \u003Ccode\u003Eview()\u003C/code\u003E has been applied to its target. \u003Ccode\u003Esender\u003C/code\u003E is the component of the tag that got the ref; by then the target field has been assigned, or the target method called. It is not called for the callback form \u003Ccode\u003Eref={(s) =\u0026gt; ...}\u003C/code\u003E. Without JSX, \u003Ccode\u003Eref\u003C/code\u003E is always a callback, so this hook only works in JSX.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative/class\u0022\u003E\n\u003Cp\u003EInstead of writing \u003Ccode\u003Eoninput\u003C/code\u003E on every field separately, the editing area can attach the listener in one place:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteFields extends Component\u0026lt;HTMLDivElement, { note: Note; onEdit?: () =\u0026gt; void }\u0026gt; {\n  title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  override view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;\n        \u0026lt;textarea ref={this.body} class=\u0026quot;editor__body\u0026quot; placeholder=\u0026quot;Start writing…\u0026quot; x-model={() =\u0026gt; note.body} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n\n  onRefCreated(field: Component) {\n    field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; this.props.onEdit?.());\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteFields extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  title;\n  body;\n\n  view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Untitled\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;\n        \u0026lt;textarea ref={this.body} class=\u0026quot;editor__body\u0026quot; placeholder=\u0026quot;Start writing…\u0026quot; x-model={() =\u0026gt; note.body} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n\n  onRefCreated(field) {\n    field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; this.props.onEdit?.());\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative,function,options\u0022\u003E\n\u003Cp\u003EIn the form you picked this hook does not run; every ref is given in the callback form, and the shared work is done inside that callback.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EEach ref is applied the moment the tag\u0027s component is created, and \u003Ccode\u003EonRefCreated\u003C/code\u003E runs once after each of them. Tags inside a plain tag are created while that tag is being built, that is, after its siblings have been created, so with nesting the order can differ from the order in the source: in \u003Ccode\u003E\u0026lt;form\u0026gt;\u0026lt;label\u0026gt;\u0026lt;input ref={this.title} /\u0026gt;\u0026lt;/label\u0026gt;\u0026lt;textarea ref={this.body} /\u0026gt;\u0026lt;/form\u0026gt;\u003C/code\u003E, \u003Ccode\u003Ebody\u003C/code\u003E is applied first and \u003Ccode\u003Etitle\u003C/code\u003E second. The hook is a member of the class that writes the JSX (the \u003Ccode\u003Ethis\u003C/code\u003E of \u003Ccode\u003Eview()\u003C/code\u003E), not of the component that got the ref. It is called for JSX in the class\u0027s methods and fields (arrow functions included); it is not called in function components, in module-level JSX, in \u003Ccode\u003Efunction\u003C/code\u003E expressions inside a class method, or in object methods. An Options component\u0027s \u003Ccode\u003Eview()\u003C/code\u003E is an object method too: a \u003Ccode\u003Eref={this.x}\u003C/code\u003E there is assigned, but an \u003Ccode\u003EonRefCreated\u003C/code\u003E member written on the object is not called.\u003C/p\u003E\n\u003Ch2 id=\u0022appearance\u0022\u003EAppearance: \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003EsetText\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EThe class, attributes, inline style and text of a component\u0027s element are managed through the component.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003EIn the example above, these are \u003Ccode\u003Ethis.class.add(\u0026quot;editor\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Efield.attr.add({ … })\u003C/code\u003E and \u003Ccode\u003Ethis.body.style({ height: … })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EIn the example above, these are \u003Ccode\u003Eclass=\u0026quot;editor\u0026quot;\u003C/code\u003E given on the root element (the \u003Ccode\u003Eclass: \u0026quot;editor\u0026quot;\u003C/code\u003E key without JSX), \u003Ccode\u003Efield.attr.add({ … })\u003C/code\u003E and \u003Ccode\u003Ebody.style({ height: … })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ECall\u003C/th\u003E\n\u003Cth\u003EWhat it does\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass.add(\u0026quot;a\u0026quot;, \u0026quot;b\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAdds classes. A function (\u003Ccode\u003E() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)\u003C/code\u003E) and an object such as \u003Ccode\u003E{ active: () =\u0026gt; open() }\u003C/code\u003E are live; an array can be given too.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass.remove(\u0026quot;a\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Eclass.remove(\u0026quot;**\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERemoves a class; \u003Ccode\u003E\u0026quot;**\u0026quot;\u003C/code\u003E removes every class and every live source.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass.has(\u0026quot;a\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhether the element has the class.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eattr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; busy })\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWrites attributes. A function value is live; \u003Ccode\u003Efalse\u003C/code\u003E, \u003Ccode\u003Enull\u003C/code\u003E and \u003Ccode\u003Eundefined\u003C/code\u003E remove the attribute, and \u003Ccode\u003Etrue\u003C/code\u003E writes it with an empty value.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eattr.remove(\u0026quot;disabled\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Eattr.has(\u0026quot;disabled\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Eattr.get(\u0026quot;href\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ERemoves an attribute, asks whether it exists, reads its value.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle({ height: \u0026quot;120px\u0026quot; })\u003C/code\u003E, \u003Ccode\u003Estyle(\u0026quot;color: red\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWrites the inline style; an object changes only the properties it gives, and a string replaces the whole style.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle(() =\u0026gt; ({ opacity: … }))\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA live style, written again when a value the function reads changes.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsetText(\u0026quot;Saved\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EChanges the element\u0027s text (\u003Ccode\u003EtextContent\u003C/code\u003E); the child nodes inside it are removed. For live text use \u003Ccode\u003Ebindings.text(() =\u0026gt; …)\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E and \u003Ccode\u003Estyle\u003C/code\u003E do nothing on a component without an element, because its root is a comment node (see \u003Ca href=\u0022/docs/components#root-element\u0022\u003ERoot element\u003C/a\u003E). \u003Ccode\u003Eclass.add\u003C/code\u003E keeps a count of the same class coming from several sources; the details and their JSX counterparts are on the \u003Ca href=\u0022/docs/styling-and-transitions#imperative-class-style\u0022\u003EStyling and Animation\u003C/a\u003E page.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo show and hide a component, listen to events and release its resources, go on to \u003Ca href=\u0022/docs/component-motif\u0022\u003EThe motif Namespace\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"element-and-ref","text":"Element access inside a component (element and ref)","level":2},{"id":"on-ref-created","text":"onRefCreated — a shared hook for refs","level":3},{"id":"appearance","text":"Appearance: class, attr, style, setText","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"component-tree","title":"controls and the Component Tree"},"next":{"slug":"component-motif","title":"The motif Namespace"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Core concepts</p>
+        <h1>Element and Appearance</h1>
+        <p>Reaching a component&#x27;s element and its inner tags: `element`, `ref`, `onRefCreated`; `class`, `attr`, `style` and `setText`.</p>
+<h2 id="element-and-ref">Element access inside a component (<code>element</code> and <code>ref</code>)</h2>
+<p>Every component's real DOM node is reached through <code>element</code>, and the element is ready as soon as the component is created. To hold the component of one of the inner tags, write <code>ref</code> on that tag: in JSX <code>ref={this.title}</code> (<code>ref={title}</code> in a function component) or <code>ref={(c) =&gt; …}</code>, and without JSX the <code>ref</code> key of the props object.</p>
+<p>The editing area of the note page holds its title and body fields through <code>ref</code>. When the page opens, it sizes the body field to the height of its content and, if the note is new, puts the cursor in the title; the body field grows as you type. <code>onEdit</code> is a callback prop called on every change:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteFields.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteFields extends Component&lt;HTMLDivElement, { note: Note; onEdit?: () =&gt; void }&gt; {
+  title!: Component&lt;HTMLInputElement&gt;;
+  body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  override onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  override view() {
+    const { note, onEdit } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; aria-label=&quot;Title&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Start writing…&quot;
+          aria-label=&quot;Text&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteFields.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteFields extends Component&lt;HTMLDivElement, { note: Note; onEdit?: () =&gt; void }&gt; {
+  static override elementTag = &quot;div&quot;;
+  title!: Component&lt;HTMLInputElement&gt;;
+  body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  override onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  override view() {
+    const { note, onEdit } = this.props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.title = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Untitled&quot;, &quot;aria-label&quot;: &quot;Title&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field: Component&lt;HTMLTextAreaElement&gt;) =&gt; (this.body = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Start writing…&quot;, &quot;aria-label&quot;: &quot;Text&quot; });
+        field.bindings.model(() =&gt; note.body, (value: string) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteFields.tsx"><code>import type { Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteFields(props: { note: Note; onEdit?: () =&gt; void }) {
+  const { note, onEdit } = props;
+  let title!: Component&lt;HTMLInputElement&gt;;
+  let body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return (
+    &lt;div
+      class=&quot;editor&quot;
+      onMounted={() =&gt; {
+        fit();
+        if (!note.title &amp;&amp; !note.body) title.element.focus();
+      }}
+    &gt;
+      &lt;input ref={title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; aria-label=&quot;Title&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+      &lt;textarea
+        ref={body}
+        class=&quot;editor__body&quot;
+        rows={1}
+        placeholder=&quot;Start writing…&quot;
+        aria-label=&quot;Text&quot;
+        x-model={() =&gt; note.body}
+        oninput={() =&gt; {
+          fit();
+          onEdit?.();
+        }}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteFields.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteFields(props: { note: Note; onEdit?: () =&gt; void }) {
+  const { note, onEdit } = props;
+  let title!: Component&lt;HTMLInputElement&gt;;
+  let body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;editor&quot;,
+    onMounted: () =&gt; {
+      fit();
+      if (!note.title &amp;&amp; !note.body) title.element.focus();
+    },
+    initializeComponent: (editor: ComponentBase) =&gt; {
+      const titleField = motifComponent(&quot;input&quot;, {
+        ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (title = field),
+        initializeComponent: (field: ComponentBase) =&gt; {
+          field.class.add(&quot;editor__title&quot;);
+          field.attr.add({ placeholder: &quot;Untitled&quot;, &quot;aria-label&quot;: &quot;Title&quot;, autocomplete: &quot;off&quot; });
+          field.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+          field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+        },
+      });
+      const bodyField = motifComponent(&quot;textarea&quot;, {
+        ref: (field: Component&lt;HTMLTextAreaElement&gt;) =&gt; (body = field),
+        initializeComponent: (field: ComponentBase) =&gt; {
+          field.class.add(&quot;editor__body&quot;);
+          field.attr.add({ rows: 1, placeholder: &quot;Start writing…&quot;, &quot;aria-label&quot;: &quot;Text&quot; });
+          field.bindings.model(() =&gt; note.body, (value: string) =&gt; (note.body = value));
+          field.motif.on(&quot;input&quot;, () =&gt; {
+            fit();
+            onEdit?.();
+          });
+        },
+      });
+      editor.controls.add(titleField, bodyField);
+    },
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteFields.tsx"><code>import { motifOptions, type Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteFields = (props: { note: Note; onEdit?: () =&gt; void }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+  body: undefined as Component&lt;HTMLTextAreaElement&gt; | undefined,
+
+  fit() {
+    this.body!.style({ height: &quot;auto&quot; });
+    this.body!.style({ height: `${this.body!.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title!.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; aria-label=&quot;Title&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Start writing…&quot;
+          aria-label=&quot;Text&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteFields.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteFields = (props: { note: Note; onEdit?: () =&gt; void }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+  body: undefined as Component&lt;HTMLTextAreaElement&gt; | undefined,
+
+  fit() {
+    this.body!.style({ height: &quot;auto&quot; });
+    this.body!.style({ height: `${this.body!.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title!.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.title = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Untitled&quot;, &quot;aria-label&quot;: &quot;Title&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field: Component&lt;HTMLTextAreaElement&gt;) =&gt; (this.body = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Start writing…&quot;, &quot;aria-label&quot;: &quot;Text&quot; });
+        field.bindings.model(() =&gt; note.body, (value: string) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteFields.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class NoteFields extends Component {
+  static elementTag = &quot;div&quot;;
+  title;
+  body;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  view() {
+    const { note, onEdit } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; aria-label=&quot;Title&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Start writing…&quot;
+          aria-label=&quot;Text&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteFields.js"><code>import { Component, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+
+export class NoteFields extends Component {
+  static elementTag = &quot;div&quot;;
+  title;
+  body;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  view() {
+    const { note, onEdit } = this.props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field) =&gt; (this.title = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Untitled&quot;, &quot;aria-label&quot;: &quot;Title&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field) =&gt; (this.body = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Start writing…&quot;, &quot;aria-label&quot;: &quot;Text&quot; });
+        field.bindings.model(() =&gt; note.body, (value) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteFields.jsx"><code>export function NoteFields(props) {
+  const { note, onEdit } = props;
+  let title;
+  let body;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return (
+    &lt;div
+      class=&quot;editor&quot;
+      onMounted={() =&gt; {
+        fit();
+        if (!note.title &amp;&amp; !note.body) title.element.focus();
+      }}
+    &gt;
+      &lt;input ref={title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; aria-label=&quot;Title&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+      &lt;textarea
+        ref={body}
+        class=&quot;editor__body&quot;
+        rows={1}
+        placeholder=&quot;Start writing…&quot;
+        aria-label=&quot;Text&quot;
+        x-model={() =&gt; note.body}
+        oninput={() =&gt; {
+          fit();
+          onEdit?.();
+        }}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteFields.js"><code>import { motifComponent } from &quot;@motifx/core&quot;;
+
+export function NoteFields(props) {
+  const { note, onEdit } = props;
+  let title;
+  let body;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;editor&quot;,
+    onMounted: () =&gt; {
+      fit();
+      if (!note.title &amp;&amp; !note.body) title.element.focus();
+    },
+    initializeComponent: (editor) =&gt; {
+      const titleField = motifComponent(&quot;input&quot;, {
+        ref: (field) =&gt; (title = field),
+        initializeComponent: (field) =&gt; {
+          field.class.add(&quot;editor__title&quot;);
+          field.attr.add({ placeholder: &quot;Untitled&quot;, &quot;aria-label&quot;: &quot;Title&quot;, autocomplete: &quot;off&quot; });
+          field.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+          field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+        },
+      });
+      const bodyField = motifComponent(&quot;textarea&quot;, {
+        ref: (field) =&gt; (body = field),
+        initializeComponent: (field) =&gt; {
+          field.class.add(&quot;editor__body&quot;);
+          field.attr.add({ rows: 1, placeholder: &quot;Start writing…&quot;, &quot;aria-label&quot;: &quot;Text&quot; });
+          field.bindings.model(() =&gt; note.body, (value) =&gt; (note.body = value));
+          field.motif.on(&quot;input&quot;, () =&gt; {
+            fit();
+            onEdit?.();
+          });
+        },
+      });
+      editor.controls.add(titleField, bodyField);
+    },
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteFields.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+
+export const NoteFields = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined,
+  body: undefined,
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; aria-label=&quot;Title&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Start writing…&quot;
+          aria-label=&quot;Text&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteFields.js"><code>import { motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+
+export const NoteFields = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined,
+  body: undefined,
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field) =&gt; (this.title = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Untitled&quot;, &quot;aria-label&quot;: &quot;Title&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field) =&gt; (this.body = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Start writing…&quot;, &quot;aria-label&quot;: &quot;Text&quot; });
+        field.bindings.model(() =&gt; note.body, (value) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>The note page places the fields with <code>&lt;NoteFields note={note} onEdit={() =&gt; this.edited(note)} /&gt;</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>The note page places the fields with <code>new NoteFields({ note, onEdit: () =&gt; this.edited(note) })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>The note page places the fields with <code>motifComponent(NoteFields, { note, onEdit: () =&gt; this.edited(note) })</code>.</p>
+</div>
+<ul>
+<li><code>ref={(s) =&gt; ...}</code> — the callback form; <code>s</code> is the tag's component (on a plain DOM tag, the <code>Component</code> that wraps the element; on a component tag, the component instance; on a function component, the returned root). Without JSX this is the only form: <code>motifComponent(&quot;input&quot;, { ref: (s) =&gt; (this.title = s), … })</code> (<code>(title = s)</code> in a function component).</li>
+<li><code>ref={this.x}</code> / <code>ref={name}</code> — the compiler resolves the target. If the target is a method, a field holding a function or a local function, it is <strong>called</strong> with the tag's component. If it is a declared field (without a value or with a plain value) or a variable without an initial value, the component is <strong>assigned</strong> to it. For targets that cannot be decided at compile time (a member that is not declared or comes from a base class, a parameter, <code>props.x</code>, a field typed as a function, a getter), the decision is made at run time: if the value is a function it is called, otherwise it is assigned. To pass an imported function as a ref, write the callback form: <code>ref={(s) =&gt; registerField(s)}</code>. With <code>ref={registerField}</code> the generated code also contains a branch that assigns to the imported name; that works on the development server, but <code>vite build</code> (Rollup) stops with an &quot;Illegal reassignment of import&quot; error.</li>
+<li>Both forms mean the same on a plain DOM tag and on a component tag; <code>x-ref</code> (and <code>x:ref</code>) is the same as <code>ref</code>.</li>
+<li><code>ref</code> is called exactly once, while the tag's component is being built (before <code>build()</code>), and it is not written to the DOM as an attribute. On a class or Options component tag, by the time the ref is called, <code>props</code>, the tag's common attributes (<code>class</code>, <code>id</code> …) and <code>options</code> have been applied. On a plain DOM tag, at the moment of the ref, <code>options</code> and the attributes that go to the constructor (those spread with <code>{...p}</code>, and without JSX those put directly in the object) have been applied; attributes written directly on the tag in JSX (<code>class</code>, <code>id</code>, <code>placeholder</code> …) and, without JSX, those added inside <code>initializeComponent</code> are written during the build, after the ref. On a function component tag, the ref is called as soon as the function returns its root. In a class component the ref runs inside the base class's constructor; fields defined in the subclass body (<code>marker = 'ready'</code>) are set up after the constructor returns, as JavaScript requires, so they do not exist yet inside the ref. A ref is meant for assigning the component to a field in the parent component (<code>ref={(b) =&gt; (this.okButton = b)}</code>), not for writing to the class's own fields.</li>
+<li>If <code>ref</code> and <code>x-ref</code> are both written on the same tag, each runs once, in source order.</li>
+<li><code>ref</code> is not a prop; it works only on the component it is given to: on a class component it applies to the component itself, and on a function component to the returned root. It is not part of the <code>props</code> passed to the function, nor of <code>this.props</code>, so spreading with <code>{...props}</code> / <code>{...this.props}</code> does not carry it to an inner component.</li>
+<li>It is the same when building without JSX: <code>motifComponent(Setting, { ref: (c) =&gt; ... })</code> applies the ref to the component itself (to the returned root for a function component), and the ref does not stay in the <code>props</code> passed to the function or in <code>this.props</code>. In the class form, <code>new Setting({ ref: (c) =&gt; ... })</code> is the same; in the function and Options forms you use <code>motifComponent</code>, not <code>new</code>.</li>
+<li>The rule is simple: if <code>ref</code> is a function, it is <strong>called</strong> with the component and removed from the props. On a class, an Options component or a plain tag, if it is an object, the component is <strong>assigned</strong> to that field (<code>props.ref</code>): for the class-style <code>Setting</code>, after <code>const p = { name: &quot;Archive&quot;, hint: &quot;&quot;, ref: {} }; const s = new Setting(p);</code>, <code>p.ref === s</code>. On a function component no assignment is made to an object-style ref; use the callback form.</li>
+<li><code>element</code> exists before mounting too; its content arrives when the component is built. Work that needs the element to be attached to the document (focus, measurements) is done in <code>onMounted</code>.</li>
+</ul>
+<p>To expose an inner item to the outside, use a separate prop name (for example <code>titleRef</code>) and call it from the inner tag's <code>ref</code>: <code>&lt;input ref={(c) =&gt; props.titleRef?.(c)} … /&gt;</code>. Outside, write <code>&lt;NoteFields note={note} titleRef={(c) =&gt; (this.title = c)} /&gt;</code> (<code>title = c</code> in a function component). A <code>ref</code> written on a component tag, on the other hand, gives the component itself; in a function component that is the returned root <code>div</code>. Writing <code>ref={props.titleRef}</code> also works: if the value is a function, it is called with the inner component.</p>
+<h3 id="on-ref-created"><code>onRefCreated</code> — a shared hook for refs</h3>
+<p>If a class component defines an <code>onRefCreated(sender)</code> method, it is called right after each <code>ref={this.x}</code> / <code>ref={name}</code> inside <code>view()</code> has been applied to its target. <code>sender</code> is the component of the tag that got the ref; by then the target field has been assigned, or the target method called. It is not called for the callback form <code>ref={(s) =&gt; ...}</code>. Without JSX, <code>ref</code> is always a callback, so this hook only works in JSX.</p>
+<div class="doc-variant" data-variant="declarative/class">
+<p>Instead of writing <code>oninput</code> on every field separately, the editing area can attach the listener in one place:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="typescript" data-file="src/parts/NoteFields.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteFields extends Component&lt;HTMLDivElement, { note: Note; onEdit?: () =&gt; void }&gt; {
+  title!: Component&lt;HTMLInputElement&gt;;
+  body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  override view() {
+    const { note } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; x-model={() =&gt; note.title} /&gt;
+        &lt;textarea ref={this.body} class=&quot;editor__body&quot; placeholder=&quot;Start writing…&quot; x-model={() =&gt; note.body} /&gt;
+      &lt;/&gt;
+    );
+  }
+
+  onRefCreated(field: Component) {
+    field.motif.on(&quot;input&quot;, () =&gt; this.props.onEdit?.());
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="javascript" data-file="src/parts/NoteFields.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class NoteFields extends Component {
+  static elementTag = &quot;div&quot;;
+  title;
+  body;
+
+  view() {
+    const { note } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Untitled&quot; x-model={() =&gt; note.title} /&gt;
+        &lt;textarea ref={this.body} class=&quot;editor__body&quot; placeholder=&quot;Start writing…&quot; x-model={() =&gt; note.body} /&gt;
+      &lt;/&gt;
+    );
+  }
+
+  onRefCreated(field) {
+    field.motif.on(&quot;input&quot;, () =&gt; this.props.onEdit?.());
+  }
+}</code></pre>
+</div>
+</div>
+<div class="doc-variant" data-variant="imperative,function,options">
+<p>In the form you picked this hook does not run; every ref is given in the callback form, and the shared work is done inside that callback.</p>
+</div>
+<p>Each ref is applied the moment the tag's component is created, and <code>onRefCreated</code> runs once after each of them. Tags inside a plain tag are created while that tag is being built, that is, after its siblings have been created, so with nesting the order can differ from the order in the source: in <code>&lt;form&gt;&lt;label&gt;&lt;input ref={this.title} /&gt;&lt;/label&gt;&lt;textarea ref={this.body} /&gt;&lt;/form&gt;</code>, <code>body</code> is applied first and <code>title</code> second. The hook is a member of the class that writes the JSX (the <code>this</code> of <code>view()</code>), not of the component that got the ref. It is called for JSX in the class's methods and fields (arrow functions included); it is not called in function components, in module-level JSX, in <code>function</code> expressions inside a class method, or in object methods. An Options component's <code>view()</code> is an object method too: a <code>ref={this.x}</code> there is assigned, but an <code>onRefCreated</code> member written on the object is not called.</p>
+<h2 id="appearance">Appearance: <code>class</code>, <code>attr</code>, <code>style</code>, <code>setText</code></h2>
+<p>The class, attributes, inline style and text of a component's element are managed through the component.</p>
+<div class="doc-variant" data-variant="class,options">
+<p>In the example above, these are <code>this.class.add(&quot;editor&quot;)</code>, <code>field.attr.add({ … })</code> and <code>this.body.style({ height: … })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>In the example above, these are <code>class=&quot;editor&quot;</code> given on the root element (the <code>class: &quot;editor&quot;</code> key without JSX), <code>field.attr.add({ … })</code> and <code>body.style({ height: … })</code>.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class.add(&quot;a&quot;, &quot;b&quot;)</code></td>
+<td>Adds classes. A function (<code>() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)</code>) and an object such as <code>{ active: () =&gt; open() }</code> are live; an array can be given too.</td>
+</tr>
+<tr>
+<td><code>class.remove(&quot;a&quot;)</code>, <code>class.remove(&quot;**&quot;)</code></td>
+<td>Removes a class; <code>&quot;**&quot;</code> removes every class and every live source.</td>
+</tr>
+<tr>
+<td><code>class.has(&quot;a&quot;)</code></td>
+<td>Whether the element has the class.</td>
+</tr>
+<tr>
+<td><code>attr.add({ type: &quot;button&quot;, disabled: () =&gt; busy })</code></td>
+<td>Writes attributes. A function value is live; <code>false</code>, <code>null</code> and <code>undefined</code> remove the attribute, and <code>true</code> writes it with an empty value.</td>
+</tr>
+<tr>
+<td><code>attr.remove(&quot;disabled&quot;)</code>, <code>attr.has(&quot;disabled&quot;)</code>, <code>attr.get(&quot;href&quot;)</code></td>
+<td>Removes an attribute, asks whether it exists, reads its value.</td>
+</tr>
+<tr>
+<td><code>style({ height: &quot;120px&quot; })</code>, <code>style(&quot;color: red&quot;)</code></td>
+<td>Writes the inline style; an object changes only the properties it gives, and a string replaces the whole style.</td>
+</tr>
+<tr>
+<td><code>style(() =&gt; ({ opacity: … }))</code></td>
+<td>A live style, written again when a value the function reads changes.</td>
+</tr>
+<tr>
+<td><code>setText(&quot;Saved&quot;)</code></td>
+<td>Changes the element's text (<code>textContent</code>); the child nodes inside it are removed. For live text use <code>bindings.text(() =&gt; …)</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><code>class</code>, <code>attr</code> and <code>style</code> do nothing on a component without an element, because its root is a comment node (see <a href="/docs/components#root-element">Root element</a>). <code>class.add</code> keeps a count of the same class coming from several sources; the details and their JSX counterparts are on the <a href="/docs/styling-and-transitions#imperative-class-style">Styling and Animation</a> page.</p>
+<h2 id="next">Next step</h2>
+<p>To show and hide a component, listen to events and release its resources, go on to <a href="/docs/component-motif">The motif Namespace</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

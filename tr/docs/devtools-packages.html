@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Paketler için registerDevtools (describe, inspect, sources, commands, panels, olaylar, reveal), operation&#x27;lar ve yazma kayıtları; bir paketin kendi DevTools panelinin çekirdek tarafı.">
+    <title>Paketler için DevTools — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/devtools-packages">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/devtools-packages">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/devtools-packages">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/devtools-packages">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/devtools-packages">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Paketler için DevTools">
+    <meta property="og:description" content="Paketler için registerDevtools (describe, inspect, sources, commands, panels, olaylar, reveal), operation&#x27;lar ve yazma kayıtları; bir paketin kendi DevTools panelinin çekirdek tarafı.">
+    <script type="application/json" id="doc-data">{"slug":"devtools-packages","locale":"tr","title":"Paketler için DevTools","description":"Paketler için registerDevtools (describe, inspect, sources, commands, panels, olaylar, reveal), operation\u0027lar ve yazma kayıtları; bir paketin kendi DevTools panelinin çekirdek tarafı.","category":{"id":"6","title":"Rehberler"},"html":"\u003Cp\u003EBir paket (bileşen kütüphanesi, veri katmanı, store) bir DevTools arayüzüne bağımlı olmadan kendi durumunu DevTools\u0027ta gösterebilir: çekirdeğe kaydolur, arayüz verdiğini okur. Bu sayfa çekirdek tarafını anlatır: \u003Ccode\u003EregisterDevtools\u003C/code\u003E ne alır, tutamacı ne yapar, paket hangi işin neyi değiştirdiğini nasıl söyler. Arayüzün okuduğu nesne \u003Ca href=\u0022/docs/devtools\u0022\u003EDevTools sözleşmesi\u003C/a\u003E sayfasındadır. \u003Ca href=\u0022https://github.com/motifjs-community/motifjs-devtools\u0022\u003E\u003Ccode\u003E@motifx-community/devtools\u003C/code\u003E\u003C/a\u003E panelinin panel metadata\u0027sından ne çizdiği, widget\u0027ları, route\u0027ları ve sınırları o paketin \u003Ccode\u003Edocs/extensions.md\u003C/code\u003E dosyasında anlatılır, burada değil.\u003C/p\u003E\n\u003Ch2 id=\u0022extensions\u0022\u003EPaketler için \u003Ccode\u003EregisterDevtools\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EBir paket kendi durumunu \u003Ccode\u003E@motifx/core/devtools\u003C/code\u003E alt yolundan açar. \u003Ccode\u003Edescribe\u003C/code\u003E ve \u003Ccode\u003Einspect\u003C/code\u003E veri verir; \u003Ccode\u003Esources\u003C/code\u003E, \u003Ccode\u003Ecommands\u003C/code\u003E ve \u003Ccode\u003Epanels\u003C/code\u003E ile arayüz istediğinde okur, sayfaya komut gönderir ve ne çizeceğini bilir. Örnekte \u003Ca href=\u0022/docs/wrapping-libraries\u0022\u003EÜçüncü Parti Kütüphane Sarmalama\u003C/a\u003E sayfasındaki klasör grafiği, kurduğu grafikleri bileşene göre tutar ve verisini DevTools\u0027a verir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/devtools.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/devtools.ts\u0022\u003E\u003Ccode\u003Eimport { registerDevtools } from \u0026quot;@motifx/core/devtools\u0026quot;;\nimport type { ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Chart } from \u0026quot;chart.js/auto\u0026quot;;\n\nconst charts = new Map\u0026lt;object, Chart\u0026gt;();\n\nconst devtools = registerDevtools(\u0026quot;folder-chart\u0026quot;, {\n  describe: () =\u0026gt; ({ charts: charts.size }),\n  inspect: (component) =\u0026gt; charts.get(component)?.data.datasets[0].data,\n  sources: {\n    charts: { read: () =\u0026gt; [...charts.values()].map(summaryOf), key: \u0026quot;id\u0026quot;, events: { update: \u0026quot;refresh\u0026quot; } },\n    chart: { read: (params: { id: string }) =\u0026gt; detailOf(params.id) },\n  },\n  commands: {\n    redraw: (args: { id: string }) =\u0026gt; chartById(args.id)?.update(),\n  },\n  panels: [{\n    id: \u0026quot;charts\u0026quot;, title: \u0026quot;Folder charts\u0026quot;, icon: \u0026quot;chart\u0026quot;, order: 40,\n    capabilities: { read: true, subscribe: true, write: true },\n    layout: { /* arayüzün çizeceği şey; onun kendi şeması */ },\n  }],\n});\n\nfunction track(canvas: ComponentBase, chart: Chart) {\n  charts.set(canvas, chart);\n  canvas.motif.setDisposable(() =\u0026gt; charts.delete(canvas));\n}\n\nfunction updated(canvas: ComponentBase, counts: number[]) {\n  devtools.emit(\u0026quot;update\u0026quot;, { path: devtools.pathOf(canvas), counts });\n  devtools.changed(\u0026quot;charts\u0026quot;);\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/devtools.js\u0022\u003E\u003Ccode\u003Eimport { registerDevtools } from \u0026quot;@motifx/core/devtools\u0026quot;;\n\nconst charts = new Map();\n\nconst devtools = registerDevtools(\u0026quot;folder-chart\u0026quot;, {\n  describe: () =\u0026gt; ({ charts: charts.size }),\n  inspect: (component) =\u0026gt; charts.get(component)?.data.datasets[0].data,\n  sources: {\n    charts: { read: () =\u0026gt; [...charts.values()].map(summaryOf), key: \u0026quot;id\u0026quot;, events: { update: \u0026quot;refresh\u0026quot; } },\n    chart: { read: (params) =\u0026gt; detailOf(params.id) },\n  },\n  commands: {\n    redraw: (args) =\u0026gt; chartById(args.id)?.update(),\n  },\n  panels: [{\n    id: \u0026quot;charts\u0026quot;, title: \u0026quot;Folder charts\u0026quot;, icon: \u0026quot;chart\u0026quot;, order: 40,\n    capabilities: { read: true, subscribe: true, write: true },\n    layout: { /* arayüzün çizeceği şey; onun kendi şeması */ },\n  }],\n});\n\nfunction track(canvas, chart) {\n  charts.set(canvas, chart);\n  canvas.motif.setDisposable(() =\u0026gt; charts.delete(canvas));\n}\n\nfunction updated(canvas, counts) {\n  devtools.emit(\u0026quot;update\u0026quot;, { path: devtools.pathOf(canvas), counts });\n  devtools.changed(\u0026quot;charts\u0026quot;);\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003EKayıt her zaman yapılabilir; paket import edildiği anda kayıt olabilir. \u003Ccode\u003Edescribe\u003C/code\u003E, \u003Ccode\u003Einspect\u003C/code\u003E, \u003Ccode\u003Esources\u003C/code\u003E, \u003Ccode\u003Ecommands\u003C/code\u003E ve fonksiyon olarak verilen \u003Ccode\u003Epanels\u003C/code\u003E yalnız arayüz istediğinde çağrılır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Edescribe()\u003C/code\u003E sonucu \u003Ccode\u003EreadExtension(ad)\u003C/code\u003E ile, \u003Ccode\u003Einspect(component)\u003C/code\u003E sonucu \u003Ccode\u003Einspect(path).extensions[ad]\u003C/code\u003E içinde okunur. \u003Ccode\u003Eundefined\u003C/code\u003E dönen paket o bileşen için listelenmez.\u003C/li\u003E\n\u003Cli\u003EHata fırlatan bir fonksiyonun sonucu \u003Ccode\u003E{ error }\u003C/code\u003E (\u003Ccode\u003Edescribe\u003C/code\u003E, \u003Ccode\u003Einspect\u003C/code\u003E) ya da \u003Ccode\u003E{ ok: false, error }\u003C/code\u003E (kaynaklar, komutlar, \u003Ccode\u003Epanels\u003C/code\u003E) olur; diğer veriler etkilenmez.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Epanels\u003C/code\u003E arayüzün bu paket için ne çizeceğini söyler: \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Etitle\u003C/code\u003E, \u003Ccode\u003Eicon\u003C/code\u003E, \u003Ccode\u003Eorder\u003C/code\u003E, \u003Ccode\u003Ecapabilities\u003C/code\u003E ve arayüzün kendi şemasının tanımladığı başka ne varsa (\u003Ccode\u003Elayout\u003C/code\u003E, \u003Ccode\u003Eroutes\u003C/code\u003E). Çekirdek onu olduğu gibi saklar, yalnız \u003Ccode\u003Eid\u003C/code\u003E ve \u003Ccode\u003Ecapabilities\u003C/code\u003E\u0027i okur. Fonksiyon olarak verilirse her okumada çağrılır. \u003Ccode\u003EreadExtensionPanels(ad)\u003C/code\u003E \u003Ccode\u003E{ panels, sources, commands }\u003C/code\u003E döner: paneller, her kaynağın \u003Ccode\u003Eread\u003C/code\u003E\u0027i dışındaki ayarları (\u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Eevents\u003C/code\u003E, \u003Ccode\u003Emax\u003C/code\u003E) ve komut adları.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Esources\u003C/code\u003E arayüzün parametreyle okuduğu adlı fonksiyonlardır. \u003Ccode\u003EreadExtensionSource(ad, panel, kaynak, params)\u003C/code\u003E \u003Ccode\u003Eread(params)\u003C/code\u003E\u0027ı bekler ve \u003Ccode\u003E{ ok: true, value }\u003C/code\u003E döner. \u003Ccode\u003Ekey\u003C/code\u003E satırı tanımlayan alanı adlandırır, \u003Ccode\u003Eevents\u003C/code\u003E paketin kendi olay türlerini arayüzün onlarla yapacağı işe eşler (\u003Ccode\u003Eupsert\u003C/code\u003E, \u003Ccode\u003Eappend\u003C/code\u003E, \u003Ccode\u003Eremove\u003C/code\u003E, \u003Ccode\u003Erefresh\u003C/code\u003E), \u003Ccode\u003Emax\u003C/code\u003E arayüzün tutacağı satır sayısını sınırlar; çekirdek bu üçünü arayüze taşır, kendisi kullanmaz.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ecommands\u003C/code\u003E arayüzün \u003Ca href=\u0022/docs/devtools#writes\u0022\u003E\u003Ccode\u003EcallExtension\u003C/code\u003E\u003C/a\u003E ile çalıştırdığı adlı fonksiyonlardır. Komut promise döndürebilir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Ecapabilities\u003C/code\u003E her okuma ve çağrıda panel başına okunur: \u003Ccode\u003Eread\u003C/code\u003E \u003Ccode\u003EreadExtensionSource\u003C/code\u003E\u0027a, \u003Ccode\u003Ewrite\u003C/code\u003E \u003Ccode\u003EcallExtension\u003C/code\u003E\u0027a izin verir, \u003Ccode\u003Esubscribe\u003C/code\u003E paketin olaylarını geçirir. Yazılmayan alan \u003Ccode\u003Efalse\u003C/code\u003E\u0027tur. Red cevapları \u003Ccode\u003E{ ok: false, error }\u003C/code\u003E biçiminde \u003Ccode\u003Enot allowed\u003C/code\u003E, \u003Ccode\u003Eno extension\u003C/code\u003E, \u003Ccode\u003Eno source\u003C/code\u003E ya da \u003Ccode\u003Eno command\u003C/code\u003E taşır. \u003Ccode\u003Esources\u003C/code\u003E ve \u003Ccode\u003Ecommands\u003C/code\u003E\u0027ta yalnız kendi anahtarlar bulunur; \u003Ccode\u003Econstructor\u003C/code\u003E ve \u003Ccode\u003E__proto__\u003C/code\u003E bulunmaz.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eemit(tür, yük)\u003C/code\u003E olayı \u003Ccode\u003Eext:\u0026lt;ad\u0026gt;:\u0026lt;tür\u0026gt;\u003C/code\u003E adıyla yayar; DevTools kapalıyken hiçbir şey yapmaz, kaydın \u003Ccode\u003Epanels\u003C/code\u003E\u0027ı varsa ve hiçbirinde \u003Ccode\u003Esubscribe\u003C/code\u003E yoksa da yapmaz. \u003Ccode\u003Epanels\u003C/code\u003E\u0027sız kayıt eskisi gibi yayar.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Echanged(kaynak?)\u003C/code\u003E arayüzün panelleri (argümansız) ya da o kaynağı yeniden okuması için \u003Ccode\u003Eextension:changed\u003C/code\u003E yayar; \u003Ccode\u003Ereveal(hedef)\u003C/code\u003E \u003Ccode\u003E{ panel, route?, params?, state? }\u003C/code\u003E ile \u003Ccode\u003Eextension:reveal\u003C/code\u003E yayar. İkisi de yalnız DevTools açıkken ve kayıt kendi adının güncel kaydıyken.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EpathOf(component)\u003C/code\u003E bileşenin DevTools yolunu verir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Edispose()\u003C/code\u003E kaydı kaldırır ve \u003Ccode\u003Eextension:disposed\u003C/code\u003E yayar. Aynı adla yapılan yeni kayıt eskisinin yerine geçer; eski kaydın \u003Ccode\u003Edispose()\u003C/code\u003E\u0027u yenisini silmez. DevTools açıkken yapılan kayıt \u003Ccode\u003Eextension:registered\u003C/code\u003E yayar.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EgetExtensions()\u003C/code\u003E kayıtlı paketlerin adlarını listeler.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EÇekirdeğin okumadığı her şey (\u003Ccode\u003Eid\u003C/code\u003E ve \u003Ccode\u003Ecapabilities\u003C/code\u003E dışında panelin biçimi, \u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Eevents\u003C/code\u003E ve \u003Ccode\u003Emax\u003C/code\u003E\u0027ın anlamı, \u003Ccode\u003Ereveal\u003C/code\u003E hedefinin içeriği) arayüzle paket arasındaki sözleşmedir; çekirdek olduğu gibi taşır.\u003C/p\u003E\n\u003Ch2 id=\u0022operations\u0022\u003EOperation\u0027lar ve yazma kayıtları\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003E@motifx/core/devtools\u003C/code\u003E, bir paketin \u003Cem\u003Ehangi işin neyi\u003C/em\u003E değiştirdiğini söyleyebilmesi için gerekeni de dışa verir: operation\u0027lar ve yazma kayıtları. Geçmiş tutan, zaman çizelgesi çizen ya da bir değişikliği açıklayan paketler içindir; uygulama kodunun bunlara ihtiyacı yoktur.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EOperation\u003C/strong\u003E o an çalışan iştir: bir tıklama işleyicisi, bir gezinme, bir paketin aksiyonu. Çekirdeğin bir fonksiyon çalışırken tuttuğu tek bir değerdir, çalışan effect\u0027i tuttuğu gibi. Uygulamaya ya da bileşen ağacına bağlı değildir, aşağıya aktarılmaz, bileşenler onu görmez. Yazmalar, flush tetikleyicileri ve operation olayları onun \u003Ccode\u003Eid\u003C/code\u003E\u0027sini taşır.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022\u003E\u003Ccode\u003Eimport { runOperation, startOperation, resumeOperation, endOperation, currentOperation } from \u0026quot;@motifx/core/devtools\u0026quot;;\n\nrunOperation({ kind: \u0026quot;action\u0026quot;, name: \u0026quot;cart/add\u0026quot;, data: { id: 7 } }, () =\u0026gt; {\n    cart.items.push(item);                    // bu operation içinde yazıldı\n});\n\nawait runOperation({ kind: \u0026quot;action\u0026quot;, name: \u0026quot;orders/load\u0026quot; }, async () =\u0026gt; {\n    const operation = currentOperation();\n    const rows = await api.orders();\n    resumeOperation(operation, () =\u0026gt; { state.orders = rows; });\n});\n\nconst operation = startOperation({ kind: \u0026quot;action\u0026quot;, name: \u0026quot;chat/send\u0026quot; });\nresumeOperation(operation, () =\u0026gt; { state.sending = true; });\nsocket.onAnswer(() =\u0026gt; resumeOperation(operation, () =\u0026gt; {\n    state.sending = false;\n    endOperation(operation);\n}));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003EstartOperation(bilgi)\u003C/code\u003E \u003Ccode\u003E{ id, kind, name?, data?, parent? }\u003C/code\u003E verir. \u003Ccode\u003Eid\u003C/code\u003E\u0027yi (artan bir sayı) ve \u003Ccode\u003Eparent\u003C/code\u003E\u0027ı (o anda çalışan operation) çekirdek verir; \u003Ccode\u003Ebilgi\u003C/code\u003Eden başka hiçbir alan kopyalanmaz. \u003Ccode\u003Ekind\u003C/code\u003E paketin seçtiği herhangi bir metindir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EresumeOperation(operation, fn)\u003C/code\u003E \u003Ccode\u003Efn\u003C/code\u003E çalışırken onu güncel operation yapar ve öncekini geri koyar; \u003Ccode\u003Enull\u003C/code\u003E \u003Ccode\u003Efn\u003C/code\u003E\u0027i operation dışında çalıştırır. İstendiği kadar çağrılabilir.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EendOperation(operation, hata?)\u003C/code\u003E bir kez bitirir; sonraki çağrılar bir şey yapmaz. Bitmiş bir operation\u0027ı yeniden sürdürmek yine onun altına kaydeder ve geliştirmede bir kez uyarır (\u003Ccode\u003EMJX211\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003ErunOperation(bilgi, fn)\u003C/code\u003E üçünün tek çağrısıdır. \u003Ccode\u003Efn\u003C/code\u003E promise döndürürse operation promise sonuçlanınca biter ve \u003Ccode\u003ErunOperation\u003C/code\u003E onu izleyen bir promise döndürür: aynı değer, aynı ret. DevTools kapalıyken \u003Ccode\u003Efn\u003C/code\u003E\u0027in sonucunu olduğu gibi döndürür.\u003C/li\u003E\n\u003Cli\u003EJavaScript \u003Ccode\u003Eawait\u003C/code\u003E boyunca hiçbir değer taşımaz; \u003Ccode\u003Eawait\u003C/code\u003E\u0027ten sonra güncel operation yoktur, yukarıdaki kod onu \u003Ccode\u003EresumeOperation\u003C/code\u003E ile geri getirir. \u003Ccode\u003EcurrentOperation()\u003C/code\u003E\u0027ın \u003Ccode\u003Eawait\u003C/code\u003E\u0027ten sonra ne verdiğine güvenmeyin.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eoperation:started\u003C/code\u003E operation\u0027ı, \u003Ccode\u003Eoperation:finished\u003C/code\u003E \u003Ccode\u003E{ id, duration, error? }\u003C/code\u003E taşır; ikisi de yalnız DevTools açıkken. \u003Ccode\u003EstartOperation\u003C/code\u003E, \u003Ccode\u003EresumeOperation\u003C/code\u003E ve \u003Ccode\u003EendOperation\u003C/code\u003E üretimde de kalır; maliyetleri bir atamadır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003E\u003Ccode\u003EonWrite(fn)\u003C/code\u003E DevTools açıkken her reaktif yazmayı bildirir ve durduran bir fonksiyon döndürür. Her kaydın \u003Ccode\u003Etarget\u003C/code\u003E\u0027ı (ham nesne, dizi, \u003Ccode\u003EMap\u003C/code\u003E, \u003Ccode\u003ESet\u003C/code\u003E ya da signal) ve bir operation içindeyse \u003Ccode\u003EoperationId\u003C/code\u003E\u0027si vardır:\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003E\u003Ccode\u003Ekind\u003C/code\u003E\u003C/th\u003E\n\u003Cth\u003ENe zaman\u003C/th\u003E\n\u003Cth\u003EAlanlar\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eadd\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Enesnede yeni anahtar, dizide sonun ötesinde bir indeks, \u003Ccode\u003EMap\u003C/code\u003E\u0027te yeni anahtar ya da \u003Ccode\u003ESet\u003C/code\u003E\u0027te yeni değer\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Evalue\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eupdate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003Edeğişen değer: nesne anahtarı, dizi indeksi, uzayan \u003Ccode\u003Elength\u003C/code\u003E, \u003Ccode\u003EMap\u003C/code\u003E değeri, \u003Ccode\u003Esignal.value\u003C/code\u003E (\u003Ccode\u003Ekey: \u0027value\u0027\u003C/code\u003E)\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Eprevious\u003C/code\u003E, \u003Ccode\u003Evalue\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edelete\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Edelete obj.key\u003C/code\u003E, \u003Ccode\u003Emap.delete(k)\u003C/code\u003E, \u003Ccode\u003Eset.delete(v)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Ekey\u003C/code\u003E, \u003Ccode\u003Eprevious\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclear\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Emap.clear()\u003C/code\u003E, \u003Ccode\u003Eset.clear()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eremoved\u003C/code\u003E: map\u0027in \u003Ccode\u003E[key, value]\u003C/code\u003E çiftleri, set\u0027in değerleri\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Esplice\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Epush\u003C/code\u003E, \u003Ccode\u003Epop\u003C/code\u003E, \u003Ccode\u003Eshift\u003C/code\u003E, \u003Ccode\u003Eunshift\u003C/code\u003E, \u003Ccode\u003Esplice\u003C/code\u003E, \u003Ccode\u003Esort\u003C/code\u003E, \u003Ccode\u003Ereverse\u003C/code\u003E, kısalan \u003Ccode\u003Elength\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Emethod\u003C/code\u003E, \u003Ccode\u003Eindex\u003C/code\u003E, \u003Ccode\u003Eremoved\u003C/code\u003E, \u003Ccode\u003Eadded\u003C/code\u003E\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Emutate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Esignal.mutate(fn)\u003C/code\u003E; çekirdek \u003Ccode\u003Efn\u003C/code\u003E\u0027in neyi değiştirdiğini göremez\u003C/td\u003E\n\u003Ctd\u003E–\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cul\u003E\n\u003Cli\u003EDeğerler saklandıkları gibi gelir: kopya değil, referans. Snapshot isteyen dinleyici kendisi alır.\u003C/li\u003E\n\u003Cli\u003EHiçbir şeyi değiştirmeyen yazma (aynı değer yeniden, sırayı koruyan \u003Ccode\u003Esort\u003C/code\u003E) bildirilmez. Bir dizi metodu tek kayıttır; içinde yaptığı indeks yazmaları bildirilmez. \u003Ccode\u003Eitems.length = 1\u003C/code\u003E kesilen öğeleri \u003Ccode\u003Emethod: \u0027length\u0027\u003C/code\u003E ile bir \u003Ccode\u003Esplice\u003C/code\u003E olarak bildirir.\u003C/li\u003E\n\u003Cli\u003EBirden fazla dinleyici kaydedilebilir; hata fırlatan atlanır. Dinleyicinin kendi yaptığı yazmalar bildirilmez; dinleyici kayıtlarını reaktif durumda tutabilir.\u003C/li\u003E\n\u003Cli\u003EKayıtlar geliştirme içindir. Çekirdekteki her bildirim bir \u003Ccode\u003E@DEV-ONLY\u003C/code\u003E ifadesidir, üretim derlemesi onları kaldırır; derleyicisiz kullanımda her biri DevTools kapalıyken false olan tek bir kontroldür. Uygulamanın ne yaptığının üretimdeki geçmişi uygulamanın kendisinindir: bir servis metodu ve tersi.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EDışa aktarılan bütün sembollerin özeti için \u003Ca href=\u0022/docs/api-reference\u0022\u003EAPI Referansı\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"extensions","text":"Paketler için registerDevtools","level":2},{"id":"operations","text":"Operation\u0027lar ve yazma kayıtları","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"devtools","title":"DevTools sözleşmesi"},"next":{"slug":"component-libraries","title":"Bileşen Kütüphanesi Yazmak"},"updatedAt":"2026-11-04T17:05:51.989522+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Rehberler</p>
+        <h1>Paketler için DevTools</h1>
+        <p>Paketler için registerDevtools (describe, inspect, sources, commands, panels, olaylar, reveal), operation&#x27;lar ve yazma kayıtları; bir paketin kendi DevTools panelinin çekirdek tarafı.</p>
+<p>Bir paket (bileşen kütüphanesi, veri katmanı, store) bir DevTools arayüzüne bağımlı olmadan kendi durumunu DevTools'ta gösterebilir: çekirdeğe kaydolur, arayüz verdiğini okur. Bu sayfa çekirdek tarafını anlatır: <code>registerDevtools</code> ne alır, tutamacı ne yapar, paket hangi işin neyi değiştirdiğini nasıl söyler. Arayüzün okuduğu nesne <a href="/tr/docs/devtools">DevTools sözleşmesi</a> sayfasındadır. <a href="https://github.com/motifjs-community/motifjs-devtools"><code>@motifx-community/devtools</code></a> panelinin panel metadata'sından ne çizdiği, widget'ları, route'ları ve sınırları o paketin <code>docs/extensions.md</code> dosyasında anlatılır, burada değil.</p>
+<h2 id="extensions">Paketler için <code>registerDevtools</code></h2>
+<p>Bir paket kendi durumunu <code>@motifx/core/devtools</code> alt yolundan açar. <code>describe</code> ve <code>inspect</code> veri verir; <code>sources</code>, <code>commands</code> ve <code>panels</code> ile arayüz istediğinde okur, sayfaya komut gönderir ve ne çizeceğini bilir. Örnekte <a href="/tr/docs/wrapping-libraries">Üçüncü Parti Kütüphane Sarmalama</a> sayfasındaki klasör grafiği, kurduğu grafikleri bileşene göre tutar ve verisini DevTools'a verir:</p>
+<div class="doc-code" data-file="src/devtools.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/devtools.ts"><code>import { registerDevtools } from &quot;@motifx/core/devtools&quot;;
+import type { ComponentBase } from &quot;@motifx/core&quot;;
+import type { Chart } from &quot;chart.js/auto&quot;;
+
+const charts = new Map&lt;object, Chart&gt;();
+
+const devtools = registerDevtools(&quot;folder-chart&quot;, {
+  describe: () =&gt; ({ charts: charts.size }),
+  inspect: (component) =&gt; charts.get(component)?.data.datasets[0].data,
+  sources: {
+    charts: { read: () =&gt; [...charts.values()].map(summaryOf), key: &quot;id&quot;, events: { update: &quot;refresh&quot; } },
+    chart: { read: (params: { id: string }) =&gt; detailOf(params.id) },
+  },
+  commands: {
+    redraw: (args: { id: string }) =&gt; chartById(args.id)?.update(),
+  },
+  panels: [{
+    id: &quot;charts&quot;, title: &quot;Folder charts&quot;, icon: &quot;chart&quot;, order: 40,
+    capabilities: { read: true, subscribe: true, write: true },
+    layout: { /* arayüzün çizeceği şey; onun kendi şeması */ },
+  }],
+});
+
+function track(canvas: ComponentBase, chart: Chart) {
+  charts.set(canvas, chart);
+  canvas.motif.setDisposable(() =&gt; charts.delete(canvas));
+}
+
+function updated(canvas: ComponentBase, counts: number[]) {
+  devtools.emit(&quot;update&quot;, { path: devtools.pathOf(canvas), counts });
+  devtools.changed(&quot;charts&quot;);
+}</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/devtools.js"><code>import { registerDevtools } from &quot;@motifx/core/devtools&quot;;
+
+const charts = new Map();
+
+const devtools = registerDevtools(&quot;folder-chart&quot;, {
+  describe: () =&gt; ({ charts: charts.size }),
+  inspect: (component) =&gt; charts.get(component)?.data.datasets[0].data,
+  sources: {
+    charts: { read: () =&gt; [...charts.values()].map(summaryOf), key: &quot;id&quot;, events: { update: &quot;refresh&quot; } },
+    chart: { read: (params) =&gt; detailOf(params.id) },
+  },
+  commands: {
+    redraw: (args) =&gt; chartById(args.id)?.update(),
+  },
+  panels: [{
+    id: &quot;charts&quot;, title: &quot;Folder charts&quot;, icon: &quot;chart&quot;, order: 40,
+    capabilities: { read: true, subscribe: true, write: true },
+    layout: { /* arayüzün çizeceği şey; onun kendi şeması */ },
+  }],
+});
+
+function track(canvas, chart) {
+  charts.set(canvas, chart);
+  canvas.motif.setDisposable(() =&gt; charts.delete(canvas));
+}
+
+function updated(canvas, counts) {
+  devtools.emit(&quot;update&quot;, { path: devtools.pathOf(canvas), counts });
+  devtools.changed(&quot;charts&quot;);
+}</code></pre>
+</div>
+<ul>
+<li>Kayıt her zaman yapılabilir; paket import edildiği anda kayıt olabilir. <code>describe</code>, <code>inspect</code>, <code>sources</code>, <code>commands</code> ve fonksiyon olarak verilen <code>panels</code> yalnız arayüz istediğinde çağrılır.</li>
+<li><code>describe()</code> sonucu <code>readExtension(ad)</code> ile, <code>inspect(component)</code> sonucu <code>inspect(path).extensions[ad]</code> içinde okunur. <code>undefined</code> dönen paket o bileşen için listelenmez.</li>
+<li>Hata fırlatan bir fonksiyonun sonucu <code>{ error }</code> (<code>describe</code>, <code>inspect</code>) ya da <code>{ ok: false, error }</code> (kaynaklar, komutlar, <code>panels</code>) olur; diğer veriler etkilenmez.</li>
+<li><code>panels</code> arayüzün bu paket için ne çizeceğini söyler: <code>id</code>, <code>title</code>, <code>icon</code>, <code>order</code>, <code>capabilities</code> ve arayüzün kendi şemasının tanımladığı başka ne varsa (<code>layout</code>, <code>routes</code>). Çekirdek onu olduğu gibi saklar, yalnız <code>id</code> ve <code>capabilities</code>'i okur. Fonksiyon olarak verilirse her okumada çağrılır. <code>readExtensionPanels(ad)</code> <code>{ panels, sources, commands }</code> döner: paneller, her kaynağın <code>read</code>'i dışındaki ayarları (<code>key</code>, <code>events</code>, <code>max</code>) ve komut adları.</li>
+<li><code>sources</code> arayüzün parametreyle okuduğu adlı fonksiyonlardır. <code>readExtensionSource(ad, panel, kaynak, params)</code> <code>read(params)</code>'ı bekler ve <code>{ ok: true, value }</code> döner. <code>key</code> satırı tanımlayan alanı adlandırır, <code>events</code> paketin kendi olay türlerini arayüzün onlarla yapacağı işe eşler (<code>upsert</code>, <code>append</code>, <code>remove</code>, <code>refresh</code>), <code>max</code> arayüzün tutacağı satır sayısını sınırlar; çekirdek bu üçünü arayüze taşır, kendisi kullanmaz.</li>
+<li><code>commands</code> arayüzün <a href="/tr/docs/devtools#writes"><code>callExtension</code></a> ile çalıştırdığı adlı fonksiyonlardır. Komut promise döndürebilir.</li>
+<li><code>capabilities</code> her okuma ve çağrıda panel başına okunur: <code>read</code> <code>readExtensionSource</code>'a, <code>write</code> <code>callExtension</code>'a izin verir, <code>subscribe</code> paketin olaylarını geçirir. Yazılmayan alan <code>false</code>'tur. Red cevapları <code>{ ok: false, error }</code> biçiminde <code>not allowed</code>, <code>no extension</code>, <code>no source</code> ya da <code>no command</code> taşır. <code>sources</code> ve <code>commands</code>'ta yalnız kendi anahtarlar bulunur; <code>constructor</code> ve <code>__proto__</code> bulunmaz.</li>
+<li><code>emit(tür, yük)</code> olayı <code>ext:&lt;ad&gt;:&lt;tür&gt;</code> adıyla yayar; DevTools kapalıyken hiçbir şey yapmaz, kaydın <code>panels</code>'ı varsa ve hiçbirinde <code>subscribe</code> yoksa da yapmaz. <code>panels</code>'sız kayıt eskisi gibi yayar.</li>
+<li><code>changed(kaynak?)</code> arayüzün panelleri (argümansız) ya da o kaynağı yeniden okuması için <code>extension:changed</code> yayar; <code>reveal(hedef)</code> <code>{ panel, route?, params?, state? }</code> ile <code>extension:reveal</code> yayar. İkisi de yalnız DevTools açıkken ve kayıt kendi adının güncel kaydıyken.</li>
+<li><code>pathOf(component)</code> bileşenin DevTools yolunu verir.</li>
+<li><code>dispose()</code> kaydı kaldırır ve <code>extension:disposed</code> yayar. Aynı adla yapılan yeni kayıt eskisinin yerine geçer; eski kaydın <code>dispose()</code>'u yenisini silmez. DevTools açıkken yapılan kayıt <code>extension:registered</code> yayar.</li>
+<li><code>getExtensions()</code> kayıtlı paketlerin adlarını listeler.</li>
+</ul>
+<p>Çekirdeğin okumadığı her şey (<code>id</code> ve <code>capabilities</code> dışında panelin biçimi, <code>key</code>, <code>events</code> ve <code>max</code>'ın anlamı, <code>reveal</code> hedefinin içeriği) arayüzle paket arasındaki sözleşmedir; çekirdek olduğu gibi taşır.</p>
+<h2 id="operations">Operation'lar ve yazma kayıtları</h2>
+<p><code>@motifx/core/devtools</code>, bir paketin <em>hangi işin neyi</em> değiştirdiğini söyleyebilmesi için gerekeni de dışa verir: operation'lar ve yazma kayıtları. Geçmiş tutan, zaman çizelgesi çizen ya da bir değişikliği açıklayan paketler içindir; uygulama kodunun bunlara ihtiyacı yoktur.</p>
+<p><strong>Operation</strong> o an çalışan iştir: bir tıklama işleyicisi, bir gezinme, bir paketin aksiyonu. Çekirdeğin bir fonksiyon çalışırken tuttuğu tek bir değerdir, çalışan effect'i tuttuğu gibi. Uygulamaya ya da bileşen ağacına bağlı değildir, aşağıya aktarılmaz, bileşenler onu görmez. Yazmalar, flush tetikleyicileri ve operation olayları onun <code>id</code>'sini taşır.</p>
+<div class="doc-code">
+<pre data-lang="ts"><code>import { runOperation, startOperation, resumeOperation, endOperation, currentOperation } from &quot;@motifx/core/devtools&quot;;
+
+runOperation({ kind: &quot;action&quot;, name: &quot;cart/add&quot;, data: { id: 7 } }, () =&gt; {
+    cart.items.push(item);                    // bu operation içinde yazıldı
+});
+
+await runOperation({ kind: &quot;action&quot;, name: &quot;orders/load&quot; }, async () =&gt; {
+    const operation = currentOperation();
+    const rows = await api.orders();
+    resumeOperation(operation, () =&gt; { state.orders = rows; });
+});
+
+const operation = startOperation({ kind: &quot;action&quot;, name: &quot;chat/send&quot; });
+resumeOperation(operation, () =&gt; { state.sending = true; });
+socket.onAnswer(() =&gt; resumeOperation(operation, () =&gt; {
+    state.sending = false;
+    endOperation(operation);
+}));</code></pre>
+</div>
+<ul>
+<li><code>startOperation(bilgi)</code> <code>{ id, kind, name?, data?, parent? }</code> verir. <code>id</code>'yi (artan bir sayı) ve <code>parent</code>'ı (o anda çalışan operation) çekirdek verir; <code>bilgi</code>den başka hiçbir alan kopyalanmaz. <code>kind</code> paketin seçtiği herhangi bir metindir.</li>
+<li><code>resumeOperation(operation, fn)</code> <code>fn</code> çalışırken onu güncel operation yapar ve öncekini geri koyar; <code>null</code> <code>fn</code>'i operation dışında çalıştırır. İstendiği kadar çağrılabilir.</li>
+<li><code>endOperation(operation, hata?)</code> bir kez bitirir; sonraki çağrılar bir şey yapmaz. Bitmiş bir operation'ı yeniden sürdürmek yine onun altına kaydeder ve geliştirmede bir kez uyarır (<code>MJX211</code>).</li>
+<li><code>runOperation(bilgi, fn)</code> üçünün tek çağrısıdır. <code>fn</code> promise döndürürse operation promise sonuçlanınca biter ve <code>runOperation</code> onu izleyen bir promise döndürür: aynı değer, aynı ret. DevTools kapalıyken <code>fn</code>'in sonucunu olduğu gibi döndürür.</li>
+<li>JavaScript <code>await</code> boyunca hiçbir değer taşımaz; <code>await</code>'ten sonra güncel operation yoktur, yukarıdaki kod onu <code>resumeOperation</code> ile geri getirir. <code>currentOperation()</code>'ın <code>await</code>'ten sonra ne verdiğine güvenmeyin.</li>
+<li><code>operation:started</code> operation'ı, <code>operation:finished</code> <code>{ id, duration, error? }</code> taşır; ikisi de yalnız DevTools açıkken. <code>startOperation</code>, <code>resumeOperation</code> ve <code>endOperation</code> üretimde de kalır; maliyetleri bir atamadır.</li>
+</ul>
+<p><code>onWrite(fn)</code> DevTools açıkken her reaktif yazmayı bildirir ve durduran bir fonksiyon döndürür. Her kaydın <code>target</code>'ı (ham nesne, dizi, <code>Map</code>, <code>Set</code> ya da signal) ve bir operation içindeyse <code>operationId</code>'si vardır:</p>
+<table>
+<thead>
+<tr>
+<th><code>kind</code></th>
+<th>Ne zaman</th>
+<th>Alanlar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add</code></td>
+<td>nesnede yeni anahtar, dizide sonun ötesinde bir indeks, <code>Map</code>'te yeni anahtar ya da <code>Set</code>'te yeni değer</td>
+<td><code>key</code>, <code>value</code></td>
+</tr>
+<tr>
+<td><code>update</code></td>
+<td>değişen değer: nesne anahtarı, dizi indeksi, uzayan <code>length</code>, <code>Map</code> değeri, <code>signal.value</code> (<code>key: 'value'</code>)</td>
+<td><code>key</code>, <code>previous</code>, <code>value</code></td>
+</tr>
+<tr>
+<td><code>delete</code></td>
+<td><code>delete obj.key</code>, <code>map.delete(k)</code>, <code>set.delete(v)</code></td>
+<td><code>key</code>, <code>previous</code></td>
+</tr>
+<tr>
+<td><code>clear</code></td>
+<td><code>map.clear()</code>, <code>set.clear()</code></td>
+<td><code>removed</code>: map'in <code>[key, value]</code> çiftleri, set'in değerleri</td>
+</tr>
+<tr>
+<td><code>splice</code></td>
+<td><code>push</code>, <code>pop</code>, <code>shift</code>, <code>unshift</code>, <code>splice</code>, <code>sort</code>, <code>reverse</code>, kısalan <code>length</code></td>
+<td><code>method</code>, <code>index</code>, <code>removed</code>, <code>added</code></td>
+</tr>
+<tr>
+<td><code>mutate</code></td>
+<td><code>signal.mutate(fn)</code>; çekirdek <code>fn</code>'in neyi değiştirdiğini göremez</td>
+<td>–</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Değerler saklandıkları gibi gelir: kopya değil, referans. Snapshot isteyen dinleyici kendisi alır.</li>
+<li>Hiçbir şeyi değiştirmeyen yazma (aynı değer yeniden, sırayı koruyan <code>sort</code>) bildirilmez. Bir dizi metodu tek kayıttır; içinde yaptığı indeks yazmaları bildirilmez. <code>items.length = 1</code> kesilen öğeleri <code>method: 'length'</code> ile bir <code>splice</code> olarak bildirir.</li>
+<li>Birden fazla dinleyici kaydedilebilir; hata fırlatan atlanır. Dinleyicinin kendi yaptığı yazmalar bildirilmez; dinleyici kayıtlarını reaktif durumda tutabilir.</li>
+<li>Kayıtlar geliştirme içindir. Çekirdekteki her bildirim bir <code>@DEV-ONLY</code> ifadesidir, üretim derlemesi onları kaldırır; derleyicisiz kullanımda her biri DevTools kapalıyken false olan tek bir kontroldür. Uygulamanın ne yaptığının üretimdeki geçmişi uygulamanın kendisinindir: bir servis metodu ve tersi.</li>
+</ul>
+<h2 id="next">Sonraki adım</h2>
+<p>Dışa aktarılan bütün sembollerin özeti için <a href="/tr/docs/api-reference">API Referansı</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="navigate ve navigateByName, canlı rota durumu, gezinme yönü ve kayıt durumu, kaydırma hafızası.">
+    <title>Gezinme ve Rota Durumu — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/navigation">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/navigation">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/navigation">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/navigation">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/navigation">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Gezinme ve Rota Durumu">
+    <meta property="og:description" content="navigate ve navigateByName, canlı rota durumu, gezinme yönü ve kayıt durumu, kaydırma hafızası.">
+    <script type="application/json" id="doc-data">{"slug":"navigation","locale":"tr","title":"Gezinme ve Rota Durumu","description":"navigate ve navigateByName, canlı rota durumu, gezinme yönü ve kayıt durumu, kaydırma hafızası.","category":{"id":"4","title":"Yönlendirme"},"html":"\u003Ch2 id=\u0022navigate\u0022\u003EProgramatik gezinme\u003C/h2\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003EKoddan gezinmek için bileşen içinde \u003Ccode\u003Ethis.context\u003C/code\u003E (çalışan \u003Ccode\u003EApplication\u003C/code\u003E), bileşen dışında uygulama örneği ya da \u003Ccode\u003EuseNavigation()\u003C/code\u003E kullanılır:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EKoddan gezinmek için fonksiyon bileşeninde \u003Ccode\u003EuseNavigation()\u003C/code\u003E, bileşen dışında uygulama örneği kullanılır:\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022class/typescript,options/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst note = this.notes.create();\nthis.context.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022function/typescript\u0022 data-file=\u0022src/layouts/NotesLayout.ts\u0022\u003E\u003Ccode\u003Econst nav = useNavigation();\nconst note = notes.create();\nnav.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022class/javascript,options/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst note = this.notes.create();\nthis.context.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022function/javascript\u0022 data-file=\u0022src/layouts/NotesLayout.js\u0022\u003E\u003Ccode\u003Econst nav = useNavigation();\nconst note = notes.create();\nnav.navigate(\u0060/notes/${note.id}\u0060);\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EUygulama örneğinden, gezinme seçenekleriyle:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/5\u0026quot;);\nawait app.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 42 });\n\nconst first = app.provider.get(NotesService).list(\u0026quot;notes\u0026quot;)[0];\nawait app.navigate(\u0060/notes/${first.id}\u0060, { replace: true });\nawait app.router.navigate(\u0026quot;/archive\u0026quot;, { replace: true });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/5\u0026quot;);\nawait app.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 42 });\n\nconst first = app.provider.get(NotesService).list(\u0026quot;notes\u0026quot;)[0];\nawait app.navigate(\u0060/notes/${first.id}\u0060, { replace: true });\nawait app.router.navigate(\u0026quot;/archive\u0026quot;, { replace: true });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.navigate(uri, seçenekler?)\u003C/code\u003E ile \u003Ccode\u003Eapp.router.navigate(uri, seçenekler?)\u003C/code\u003E aynı \u003Ccode\u003ENavigationOptions\u003C/code\u003E tipini alır; \u003Ccode\u003Eapp.navigate\u003C/code\u003E seçenekleri router\u0027a iletir.\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESeçenek\u003C/th\u003E\n\u003Cth\u003EEtki\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ereplace\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYeni geçmiş kaydı eklemek yerine mevcut kaydı değiştirir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGeçmiş kaydına yazılan değer (bkz. \u003Ca href=\u0022#direction-state\u0022\u003EGezinme yönü ve kayıt durumu\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eforce\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EEkrandaki adrese yapılan gezinme normalde yok sayılır; \u003Ccode\u003Eforce: true\u003C/code\u003E ile middleware, guard\u0027lar ve \u003Ccode\u003EonRouterChanged\u003C/code\u003E yine çalışır. Ekrandaki sayfa yeniden oluşturulmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Escroll\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGezinme sonunda kaydırma: \u003Ccode\u003E\u0027top\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027smooth\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027instant\u0027\u003C/code\u003E ya da \u003Ccode\u003E{ top, left, behavior }\u003C/code\u003E. Verildiğinde \u003Ccode\u003EscrollMemory\u003C/code\u003E\u0027yi ezer.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.navigate\u003C/code\u003E gezinmenin sonucunu döndürür: tamamlanan gezinmede gösterilen rotanın \u003Ccode\u003EResolveResult\u003C/code\u003E\u0027ı (bulunamayan adreste ve hata sayfasında \u003Ccode\u003Eok: false\u003C/code\u003E), yok sayılan gezinmede \u003Ccode\u003E{ ok: true, skipped: true, uri }\u003C/code\u003E, guard ya da \u003Ccode\u003EonLeave\u003C/code\u003E iptalinde \u003Ccode\u003E{ ok: false, cancelled: true, reason }\u003C/code\u003E (\u003Ccode\u003Ereason\u003C/code\u003E: \u003Ccode\u003E\u0027guard\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027onLeave\u0027\u003C/code\u003E ya da \u003Ccode\u003EonLeave\u003C/code\u003E\u0027in verdiği metin), middleware\u0027in durdurduğu gezinmede \u003Ccode\u003E{ ok: false, uri, cancelled: true, reason: \u0027middleware\u0027 }\u003C/code\u003E, gezinme bitmeden router \u003Ccode\u003ErestartRouter()\u003C/code\u003E ile yeniden başlatıldıysa ya da \u003Ccode\u003Eapp.dispose()\u003C/code\u003E ile kapatıldıysa \u003Ccode\u003E{ ok: false, uri, cancelled: true, reason: \u0027restart\u0027 | \u0027dispose\u0027 }\u003C/code\u003E; gezinme beklenmedik bir hatayla düşerse \u003Ccode\u003EMJX317\u003C/code\u003E raporlanır ve sonuç \u003Ccode\u003E{ ok: false, uri, cancelled: true, reason: \u0027error\u0027, error }\u003C/code\u003E olur. \u003Ccode\u003Eapp.router.navigate\u003C/code\u003E ve \u003Ccode\u003Eapp.router.navigateByName\u003C/code\u003E aynı sonucu döndürür.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003EuseNavigation()\u003C/code\u003E \u003Ccode\u003Eapp.router\u003C/code\u003E ile aynı nesneyi döndürür:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/pages/NotePage.ts\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst nav = useNavigation();\nawait nav.navigate(\u0026quot;/archive\u0026quot;);\nawait nav.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 7 });\nnav.params;    // mevcut yol parametreleri: { id: \u00277\u0027 }\nnav.route;     // mevcut rota\nnav.uri;       // mevcut URI\nnav.fullPath;  // tam yol\nnav.meta;      // rota meta verisi: { folder: \u0027notes\u0027 }\nnav.chain;     // zincirdeki her rotanın kendi yolu, parametreler doldurulmuş: [\u0027/\u0027, \u0027/notes\u0027, \u0027/7\u0027]\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/pages/NotePage.js\u0022\u003E\u003Ccode\u003Eimport { useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst nav = useNavigation();\nawait nav.navigate(\u0026quot;/archive\u0026quot;);\nawait nav.navigateByName(\u0026quot;notes-note\u0026quot;, { id: 7 });\nnav.params;    // mevcut yol parametreleri: { id: \u00277\u0027 }\nnav.route;     // mevcut rota\nnav.uri;       // mevcut URI\nnav.fullPath;  // tam yol\nnav.meta;      // rota meta verisi: { folder: \u0027notes\u0027 }\nnav.chain;     // zincirdeki her rotanın kendi yolu, parametreler doldurulmuş: [\u0027/\u0027, \u0027/notes\u0027, \u0027/7\u0027]\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Ch3 id=\u0022live-route-state\u0022\u003ECanlı rota durumu\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003Eapp.router\u003C/code\u003E uygulama boyunca tek nesnedir. Bir alana, \u003Ccode\u003EuseApplication().router\u003C/code\u003E\u0027dan ya da \u003Ccode\u003EuseNavigation()\u003C/code\u003E\u0027dan alınan router her okumada güncel rotayı verir. Rota alanları (\u003Ccode\u003Eparams\u003C/code\u003E, \u003Ccode\u003Eroute\u003C/code\u003E, \u003Ccode\u003Euri\u003C/code\u003E, \u003Ccode\u003Eok\u003C/code\u003E, \u003Ccode\u003Emeta\u003C/code\u003E, \u003Ccode\u003Eextend\u003C/code\u003E, \u003Ccode\u003EfullPath\u003C/code\u003E, \u003Ccode\u003EaliasOf\u003C/code\u003E, \u003Ccode\u003Echain\u003C/code\u003E, \u003Ccode\u003Edirection\u003C/code\u003E, \u003Ccode\u003Estate\u003C/code\u003E, \u003Ccode\u003Estack\u003C/code\u003E) reaktiftir: bir fonksiyon içinde okunduklarında gezinmede yeniden çalışırlar. Gezinme boyunca yerinde kalan bir layout, rota alanlarını getter içinde okuyarak her gezinmede güncellenir; yeniden kurulmaz. Örnekte iki öznitelik rotanın \u003Ccode\u003Emeta\u003C/code\u003E ve \u003Ccode\u003Eparams\u003C/code\u003E değerlerinden hesaplanır:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  override view() {\n    return (\n      \u0026lt;div\n        class=\u0026quot;app\u0026quot;\n        data-layout={() =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n        data-pane={() =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n      \u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return (\n    \u0026lt;div\n      class=\u0026quot;app\u0026quot;\n      data-layout={() =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n      data-pane={() =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n    \u0026gt;\n      \u0026lt;RouterView /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/layouts/MainLayout.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return \u0026lt;RouterView /\u0026gt;;\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  override view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (app: ComponentBase) =\u0026gt; {\n      app.class.add(\u0026quot;app\u0026quot;);\n      app.attr.add({\n        \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n        \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n      });\n      app.controls.add(motifComponent(RouterView));\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return motifComponent(\u0026quot;div\u0026quot;, (app: ComponentBase) =\u0026gt; {\n    app.class.add(\u0026quot;app\u0026quot;);\n    app.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n    app.controls.add(motifComponent(RouterView));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/layouts/MainLayout.ts\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return motifComponent(RouterView);\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  view() {\n    return (\n      \u0026lt;div\n        class=\u0026quot;app\u0026quot;\n        data-layout={() =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n        data-pane={() =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n      \u0026gt;\n        \u0026lt;RouterView /\u0026gt;\n      \u0026lt;/div\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return (\n    \u0026lt;div\n      class=\u0026quot;app\u0026quot;\n      data-layout={() =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;)}\n      data-pane={() =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;)}\n    \u0026gt;\n      \u0026lt;RouterView /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/layouts/MainLayout.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return \u0026lt;RouterView /\u0026gt;;\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default class MainLayout extends Component {\n  nav = useNavigation();\n\n  view() {\n    return motifComponent(\u0026quot;div\u0026quot;, (app) =\u0026gt; {\n      app.class.add(\u0026quot;app\u0026quot;);\n      app.attr.add({\n        \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n        \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n      });\n      app.controls.add(motifComponent(RouterView));\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nexport default function MainLayout() {\n  const nav = useNavigation();\n  return motifComponent(\u0026quot;div\u0026quot;, (app) =\u0026gt; {\n    app.class.add(\u0026quot;app\u0026quot;);\n    app.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (nav.meta.folder \u0026amp;\u0026amp; !nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n    app.controls.add(motifComponent(RouterView));\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/layouts/MainLayout.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifOptions, RouterView, useNavigation } from \u0026quot;@motifx/core\u0026quot;;\n\nconst MainLayout = () =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  nav: useNavigation(),\n\n  onConfigured() {\n    this.class.add(\u0026quot;app\u0026quot;);\n    this.attr.add({\n      \u0026quot;data-layout\u0026quot;: () =\u0026gt; (this.nav.meta.folder ? \u0026quot;notes\u0026quot; : \u0026quot;page\u0026quot;),\n      \u0026quot;data-pane\u0026quot;: () =\u0026gt; (this.nav.meta.folder \u0026amp;\u0026amp; !this.nav.params.id ? \u0026quot;list\u0026quot; : \u0026quot;detail\u0026quot;),\n    });\n  },\n\n  view() {\n    return motifComponent(RouterView);\n  },\n});\n\nexport default MainLayout;\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EÖznitelikler \u003Ccode\u003E/notes\u003C/code\u003E\u0027ta \u003Ccode\u003Enotes\u003C/code\u003E / \u003Ccode\u003Elist\u003C/code\u003E, \u003Ccode\u003E/notes/3\u003C/code\u003E\u0027te \u003Ccode\u003Enotes\u003C/code\u003E / \u003Ccode\u003Edetail\u003C/code\u003E, \u003Ccode\u003E/settings\u003C/code\u003E\u0027te \u003Ccode\u003Epage\u003C/code\u003E / \u003Ccode\u003Edetail\u003C/code\u003E olur; layout yeniden kurulmaz, yalnız öznitelikler güncellenir.\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003ECanlı okuma nesne üzerinden yapılır.\u003C/strong\u003E \u003Ccode\u003Econst { params } = useNavigation()\u003C/code\u003E ya da \u003Ccode\u003Econst id = nav.params.id\u003C/code\u003E o anın değerini alır ve sonradan değişmez; güncel değer için her seferinde \u003Ccode\u003Enav.params.id\u003C/code\u003E okuyun.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003ERota, ayrılan sayfa ekrandan kaldırıldıktan sonra ve yeni sayfa bağlanmadan önce değişir\u003C/strong\u003E (yığın gezinmesinde geçiş animasyonundan önce); \u003Ccode\u003Escoped\u003C/code\u003E servisler de aynı anda yeni gezinmeye geçer. \u003Ccode\u003EkeepAlive\u003C/code\u003E önbelleğine alınan sayfa \u003Ccode\u003EonDeactivated\u003C/code\u003E içinde kendi rotasını görür. Serbest bırakılan sayfanın \u003Ccode\u003EonDisposing\u003C/code\u003E ve \u003Ccode\u003EonDisposed\u003C/code\u003E kancaları yeni sayfa ekrana geldikten sonra çalışır ve gidilen rotayı görür (bkz. \u003Ca href=\u0022/docs/router-view#leaving-page\u0022\u003EAyrılan sayfa\u003C/a\u003E). Router\u0027ın kurduğu yeni sayfa, yapıcısında ve alan başlangıç değerlerinde gidilen rotayı görür.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EGuard ve rota kancaları\u003C/strong\u003E (\u003Ccode\u003EuseGuard\u003C/code\u003E, \u003Ccode\u003EonEntering\u003C/code\u003E, \u003Ccode\u003EonUpdate\u003C/code\u003E) rota değişmeden önce çalışır; gidilen rota bağlam nesnesindedir (\u003Ccode\u003Eto\u003C/code\u003E, \u003Ccode\u003Eparams\u003C/code\u003E). İptal edilen gezinmede rota değişmez.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EÖnbellekteki \u003Ccode\u003EkeepAlive\u003C/code\u003E sayfalar\u003C/strong\u003E gizliyken de güncel rotayı okur: bağları başka bir rotaya geçildiğinde o rotanın değerleriyle yeniden çalışır. Rotaya bağlı işi (veri yükleme gibi) \u003Ccode\u003EonActivated\u003C/code\u003E içinde yapın.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EuseRouter()\u003C/code\u003E çağrılmadan önce rota alanları boştur (\u003Ccode\u003Eparams\u003C/code\u003E \u003Ccode\u003E{}\u003C/code\u003E, \u003Ccode\u003Euri\u003C/code\u003E \u003Ccode\u003E\u0027\u0027\u003C/code\u003E, \u003Ccode\u003Eroute\u003C/code\u003E \u003Ccode\u003Enull\u003C/code\u003E, \u003Ccode\u003Echain\u003C/code\u003E \u003Ccode\u003E[]\u003C/code\u003E) ve \u003Ccode\u003Enavigate\u003C/code\u003E \u003Ccode\u003EMJX309\u003C/code\u003E fırlatır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch3 id=\u0022listen\u0022\u003ERota değişimini dinlemek\u003C/h3\u003E\n\u003Cp\u003EEkrana yansıyan değerler için reaktif alanları bir fonksiyon içinde okumak yeter; yukarıdaki \u003Ccode\u003EMainLayout\u003C/code\u003E bunu yapar. Bir gezinmeden sonra yan bir iş yapılacaksa (sekme başlığı, odak, ölçüm) \u003Ccode\u003EonRouterChanged\u003C/code\u003E dinlenir. \u003Ccode\u003Eapp.onRouterChanged(fn)\u003C/code\u003E aboneliği kaldıran bir fonksiyon döndürür. Bileşen içinde \u003Ccode\u003Econtext.onRouterChanged(fn)\u003C/code\u003E yazıldığında (sınıfta ve Options\u0027ta \u003Ccode\u003Ethis.context\u003C/code\u003E, fonksiyon bileşeninde \u003Ca href=\u0022/docs/components#function-root\u0022\u003Ekök bileşenin\u003C/a\u003E \u003Ccode\u003Econtext\u003C/code\u003E\u0027i) abonelik bileşenin ömrüne bağlanır: bileşen serbest bırakılınca kendiliğinden kalkar, ayrıca kaldırmak gerekmez. Yük \u003Ccode\u003E{ uri, params, meta, route, ok, initial, redirectedFrom?, direction?, state? }\u003C/code\u003E biçimindedir; açılış gezinmesinde \u003Ccode\u003Einitial\u003C/code\u003E \u003Ccode\u003Etrue\u003C/code\u003E olur (bkz. \u003Ca href=\u0022/docs/route-guards#guards\u0022\u003EGezinme guard\u0027ları\u003C/a\u003E).\u003C/p\u003E\n\u003Ch3 id=\u0022direction-state\u0022\u003EGezinme yönü ve kayıt durumu — \u003Ccode\u003Edirection\u003C/code\u003E, \u003Ccode\u003Estate\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003EHer gezinmenin yönü \u003Ccode\u003Edirection\u003C/code\u003E alanında gelir: \u003Ccode\u003E\u0027initial\u0027\u003C/code\u003E (açılış), \u003Ccode\u003E\u0027push\u0027\u003C/code\u003E (yeni geçmiş kaydı; adres çubuğuna elle yazılan adres ya da düz bir çapa bağlantısının açtığı kayıt da buna dahil), \u003Ccode\u003E\u0027replace\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027back\u0027\u003C/code\u003E, \u003Ccode\u003E\u0027forward\u0027\u003C/code\u003E ya da sırası bilinemeyen geçmiş hareketi için \u003Ccode\u003E\u0027traverse\u0027\u003C/code\u003E. Yön guard\u0027lara (\u003Ccode\u003Eto.direction\u003C/code\u003E), \u003Ccode\u003EonRouterChanged\u003C/code\u003E yüküne ve \u003Ccode\u003Eapp.router.direction\u003C/code\u003E\u0027a yansır. Geçişleri yöne göre seçmek (ileride sola, geride sağa kaydırma) için kullanın.\u003C/p\u003E\n\u003Cp\u003E\u003Ccode\u003Enavigate(uri, { state })\u003C/code\u003E ile verilen değer o geçmiş kaydına yazılır ve kayda \u003Cstrong\u003Egeri/ileri ile dönüldüğünde de\u003C/strong\u003E geri gelir; sayfa yenilense bile korunur. Adrese yazılmadan taşınması gereken veriler (listeden hangi filtreyle gelindi, açık sekme gibi) için uygundur:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/7\u0026quot;, { state: { from: \u0026quot;archive\u0026quot;, query: \u0026quot;toplantı\u0026quot; } });\n\napp.router.state;                // { from: \u0027archive\u0027, query: \u0027toplantı\u0027 } — geri/ileri ile dönüldüğünde de\napp.useGuard(({ to }, next) =\u0026gt; { console.log(to.direction, to.state); next(); });\napp.onRouterChanged(({ direction, state }) =\u0026gt; console.log(direction, state));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eawait app.navigate(\u0026quot;/notes/7\u0026quot;, { state: { from: \u0026quot;archive\u0026quot;, query: \u0026quot;toplantı\u0026quot; } });\n\napp.router.state;                // { from: \u0027archive\u0027, query: \u0027toplantı\u0027 } — geri/ileri ile dönüldüğünde de\napp.useGuard(({ to }, next) =\u0026gt; { console.log(to.direction, to.state); next(); });\napp.onRouterChanged(({ direction, state }) =\u0026gt; console.log(direction, state));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EDüz nesneler olduğu gibi saklanır (router yalnızca kendi damgasını ekler, \u003Ccode\u003Eapp.router.state\u003C/code\u003E onu çıkarır); \u003Ccode\u003EDate\u003C/code\u003E, \u003Ccode\u003EMap\u003C/code\u003E gibi düz olmayan değerlere hiç dokunulmaz. \u003Ccode\u003Estate\u003C/code\u003E verilmemiş kayıtta \u003Ccode\u003Eapp.router.state\u003C/code\u003E \u003Ccode\u003Eundefined\u003C/code\u003E\u0027dır.\u003C/p\u003E\n\u003Ch2 id=\u0022scroll-memory\u0022\u003EKaydırma hafızası — \u003Ccode\u003EscrollMemory\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003ETek sayfalık uygulamada gezinme belgeyi değiştirir ama kaydırma konumunu değiştirmez; tarayıcı da bunu SPA için kendiliğinden yönetmez. \u003Ccode\u003EscrollMemory\u003C/code\u003E açıldığında router her yolun son kaydırma konumunu tutar ve o yola dönüldüğünde (geri/ileri, bağlantı, yenileme) konumu yerine koyar:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EKurallar:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EHiç görülmemiş yol\u003C/strong\u003E sayfa başından başlar (\u003Ccode\u003Etop: false\u003C/code\u003E ile kapatılır).\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EAdreste çıpa varsa\u003C/strong\u003E (\u003Ccode\u003E/notes/5#history\u003C/code\u003E) çıpa hafızayı ezer; ilgili \u003Ccode\u003Eid\u003C/code\u003E\u0027ye kaydırılır. Sabit bir üst şerit varsa CSS\u0027te \u003Ccode\u003Escroll-margin-top\u003C/code\u003E verin.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EKaydırma anında yapılır\u003C/strong\u003E, CSS\u0027te \u003Ccode\u003Escroll-behavior: smooth\u003C/code\u003E olsa da: kayıtlı konuma dönüş, yeni sayfanın başı, başka sayfadan gelinen çıpa ve geri/ileri, tarayıcının sayfa geçişlerindeki gibi beklemeden yerine oturur. Aynı sayfa içindeki çıpa bağlantısı (\u003Ccode\u003E/notes/5\u003C/code\u003E → \u003Ccode\u003E/notes/5#history\u003C/code\u003E, \u003Ccode\u003Ehistory\u003C/code\u003E modunda düz \u003Ccode\u003E\u0026lt;a href=\u0026quot;#history\u0026quot;\u0026gt;\u003C/code\u003E dahil) CSS\u0027teki \u003Ccode\u003Escroll-behavior\u003C/code\u003E kuralına uyar; \u003Ccode\u003Esmooth\u003C/code\u003E verildiyse yumuşak kayar.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EGezinmeye özel \u003Ccode\u003Escroll\u003C/code\u003E seçeneği\u003C/strong\u003E hafızayı ezer: \u003Ccode\u003Eapp.router.navigate(\u0027/x\u0027, { scroll: \u0027top\u0027 })\u003C/code\u003E her zaman başa alır; \u003Ccode\u003Econtainer\u003C/code\u003E ayarlıysa kabı, değilse pencereyi kaydırır. Gidilen sayfadan ayrılırken konum yine o sayfanın adına kaydedilir.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EKonumlar bellekte tutulur:\u003C/strong\u003E \u003Ccode\u003ErestartRouter()\u003C/code\u003E ile yeniden başlatmada korunur, sayfa yenilenince silinir. Yenilemeden sonra da hatırlanacaksa kaydı siz yaparsınız; nereye yazılacağı (tarayıcı deposu, sunucu) size kalmıştır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003EKayıt için \u003Ccode\u003Eapp.router\u003C/code\u003E üç metot verir: \u003Ccode\u003EsaveScrollPositions(fn)\u003C/code\u003E kayıt gereken her anda (sayfadan ayrılırken, \u003Ccode\u003Epagehide\u003C/code\u003E, sayfa gizlenince ve \u003Ccode\u003Eapp.dispose()\u003C/code\u003E) geri çağrıyı güncel konumlarla çağırır ve aboneliği kaldıran bir fonksiyon döndürür; abonelik yeniden başlatmada da sürer. \u003Ccode\u003ErestoreScrollPositions(positions)\u003C/code\u003E verilen konumları hafızaya ekler (\u003Ccode\u003Elimit\u003C/code\u003E uygulanır); açılışta, \u003Ccode\u003Erun()\u003C/code\u003E\u0027dan önce de çağrılabilir. \u003Ccode\u003EscrollPositions()\u003C/code\u003E o anki konumları, ekrandaki sayfanınki dahil, \u003Ccode\u003E{ \u0026quot;/notes\u0026quot;: 1200 }\u003C/code\u003E biçiminde döndürür. \u003Ccode\u003EscrollMemory\u003C/code\u003E kapalıyken \u003Ccode\u003EscrollPositions()\u003C/code\u003E boş nesne döndürür, \u003Ccode\u003ErestoreScrollPositions\u003C/code\u003E etkisizdir ve geri çağrı hiç çağrılmaz.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\napp.router.restoreScrollPositions(JSON.parse(localStorage.getItem(\u0026quot;scroll\u0026quot;) ?? \u0026quot;{}\u0026quot;));\napp.router.saveScrollPositions((positions) =\u0026gt; localStorage.setItem(\u0026quot;scroll\u0026quot;, JSON.stringify(positions)));\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({ routes, mode: \u0026quot;history\u0026quot;, scrollMemory: true });\napp.router.restoreScrollPositions(JSON.parse(localStorage.getItem(\u0026quot;scroll\u0026quot;) ?? \u0026quot;{}\u0026quot;));\napp.router.saveScrollPositions((positions) =\u0026gt; localStorage.setItem(\u0026quot;scroll\u0026quot;, JSON.stringify(positions)));\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003EAyar nesnesiyle ince ayar:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/app.ts\u0022\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/app.ts\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  scrollMemory: {\n    top: true,          // görülmemiş yolda başa dön (varsayılan)\n    anchor: true,       // çıpa kayıtlı konumu ezsin (varsayılan)\n    settleMs: 1200,     // içeriğin oturmasını bekleme üst sınırı\n    limit: 60,          // kaç yol hatırlansın\n    // Aynı sayfaya iki adresten geliniyorsa tek anahtara indirin:\n    key: (path) =\u0026gt; path.replace(/^\\/notlar/, \u0026quot;/notes\u0026quot;),\n    // Pencere yerine bir kabın kaydırmasını hatırla (seçici, öğe ya da öğe döndüren fonksiyon):\n    container: \u0026quot;main.detail\u0026quot;,\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/app.js\u0022\u003E\u003Ccode\u003Eapp.useRouter({\n  routes,\n  scrollMemory: {\n    top: true,          // görülmemiş yolda başa dön (varsayılan)\n    anchor: true,       // çıpa kayıtlı konumu ezsin (varsayılan)\n    settleMs: 1200,     // içeriğin oturmasını bekleme üst sınırı\n    limit: 60,          // kaç yol hatırlansın\n    // Aynı sayfaya iki adresten geliniyorsa tek anahtara indirin:\n    key: (path) =\u0026gt; path.replace(/^\\/notlar/, \u0026quot;/notes\u0026quot;),\n    // Pencere yerine bir kabın kaydırmasını hatırla (seçici, öğe ya da öğe döndüren fonksiyon):\n    container: \u0026quot;main.detail\u0026quot;,\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Cstrong\u003EKaydırma bir kabın içindeyse\u003C/strong\u003E (sabit başlık ve sekme çubuğu olan mobil kabuklar gibi) \u003Ccode\u003Econtainer\u003C/code\u003E verin. Kap her gezinmede yeniden aranır, yani ilk açılışta henüz DOM\u0027da olmaması sorun değildir; bulunamazsa pencere kaydırması kullanılır.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003Eİçerik asenkron çiziliyorsa\u003C/strong\u003E (uzak veri, markdown, sanal liste, \u003Ccode\u003Ex-chunk\u003C/code\u003E ile dilimlenen satırlar) endişelenmeyin: geri koyma tek seferlik değil, hedefe ulaşılana ya da \u003Ccode\u003EsettleMs\u003C/code\u003E dolana kadar her karede yeniden denenir. Kullanıcı bu sırada tekerlek/dokunuş/tuş/fare tıklamasıyla araya girerse deneme bırakılır.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EMaliyeti:\u003C/strong\u003E durağan hâlde sıfır. \u003Ccode\u003Escroll\u003C/code\u003E olayı dinlenmez; konum her gezinmede bir kez okunur: guard\u0027lar geçtikten sonra, adres uygulanmadan ve içerik değiştirilmeden hemen önce. O an ayrılan sayfa hâlâ ekrandadır ve konumu gerçektir; iptal edilen gezinmede konum okunmaz. Açıkken \u003Ccode\u003Ehistory.scrollRestoration\u003C/code\u003E \u003Ccode\u003E\u0027manual\u0027\u003C/code\u003E yapılır; \u003Ccode\u003Epagehide\u003C/code\u003E / sayfa gizlenince de ekrandaki sayfanın konumu hafızaya alınır ve kayıt geri çağrısı çağrılır. Kapalıyken (varsayılan) hiçbir dinleyici bağlanmaz ve \u003Ccode\u003Ehistory.scrollRestoration\u003C/code\u003Ea dokunulmaz.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003EÇıpa kaynağı moda göre değişir.\u003C/strong\u003E Adres çubuğundaki \u003Ccode\u003E#…\u003C/code\u003E yalnızca \u003Ccode\u003Ehistory\u003C/code\u003E modunda çıpa olarak okunur. \u003Ccode\u003Ehash\u003C/code\u003E / \u003Ccode\u003Efile\u003C/code\u003E (ve \u003Ccode\u003Eshell\u003C/code\u003E) modunda yalnızca rotanın kendi çıpası (\u003Ccode\u003E/sayfa#bolum\u003C/code\u003E) kullanılır; adresin \u003Ccode\u003E#\u003C/code\u003E kısmı rota olduğu için çıpa sayılmaz. Hafıza bu modlarda varsayılan \u003Ccode\u003Eanchor\u003C/code\u003E ayarıyla çalışır.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EGezinmeyi denetlemek ve durdurmak için \u003Ca href=\u0022/docs/route-guards\u0022\u003ERota Kancaları ve Guard\u0027lar\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"navigate","text":"Programatik gezinme","level":2},{"id":"live-route-state","text":"Canlı rota durumu","level":3},{"id":"listen","text":"Rota değişimini dinlemek","level":3},{"id":"direction-state","text":"Gezinme yönü ve kayıt durumu — direction, state","level":3},{"id":"scroll-memory","text":"Kaydırma hafızası — scrollMemory","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"router-links","title":"Bağlantılar"},"next":{"slug":"route-guards","title":"Rota Kancaları ve Guard\u0027lar"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Yönlendirme</p>
+        <h1>Gezinme ve Rota Durumu</h1>
+        <p>navigate ve navigateByName, canlı rota durumu, gezinme yönü ve kayıt durumu, kaydırma hafızası.</p>
+<h2 id="navigate">Programatik gezinme</h2>
+<div class="doc-variant" data-variant="class,options">
+<p>Koddan gezinmek için bileşen içinde <code>this.context</code> (çalışan <code>Application</code>), bileşen dışında uygulama örneği ya da <code>useNavigation()</code> kullanılır:</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Koddan gezinmek için fonksiyon bileşeninde <code>useNavigation()</code>, bileşen dışında uygulama örneği kullanılır:</p>
+</div>
+<div class="doc-code" data-file="src/layouts/NotesLayout.ts">
+<pre data-lang="ts" data-variant="class/typescript,options/typescript" data-file="src/layouts/NotesLayout.ts"><code>const note = this.notes.create();
+this.context.navigate(`/notes/${note.id}`);</code></pre>
+<pre data-lang="ts" data-variant="function/typescript" data-file="src/layouts/NotesLayout.ts"><code>const nav = useNavigation();
+const note = notes.create();
+nav.navigate(`/notes/${note.id}`);</code></pre>
+<pre data-lang="js" data-variant="class/javascript,options/javascript" data-file="src/layouts/NotesLayout.js"><code>const note = this.notes.create();
+this.context.navigate(`/notes/${note.id}`);</code></pre>
+<pre data-lang="js" data-variant="function/javascript" data-file="src/layouts/NotesLayout.js"><code>const nav = useNavigation();
+const note = notes.create();
+nav.navigate(`/notes/${note.id}`);</code></pre>
+</div>
+<p>Uygulama örneğinden, gezinme seçenekleriyle:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>await app.navigate(&quot;/notes/5&quot;);
+await app.navigateByName(&quot;notes-note&quot;, { id: 42 });
+
+const first = app.provider.get(NotesService).list(&quot;notes&quot;)[0];
+await app.navigate(`/notes/${first.id}`, { replace: true });
+await app.router.navigate(&quot;/archive&quot;, { replace: true });</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>await app.navigate(&quot;/notes/5&quot;);
+await app.navigateByName(&quot;notes-note&quot;, { id: 42 });
+
+const first = app.provider.get(NotesService).list(&quot;notes&quot;)[0];
+await app.navigate(`/notes/${first.id}`, { replace: true });
+await app.router.navigate(&quot;/archive&quot;, { replace: true });</code></pre>
+</div>
+<p><code>app.navigate(uri, seçenekler?)</code> ile <code>app.router.navigate(uri, seçenekler?)</code> aynı <code>NavigationOptions</code> tipini alır; <code>app.navigate</code> seçenekleri router'a iletir.</p>
+<table>
+<thead>
+<tr>
+<th>Seçenek</th>
+<th>Etki</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>replace</code></td>
+<td>Yeni geçmiş kaydı eklemek yerine mevcut kaydı değiştirir.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>Geçmiş kaydına yazılan değer (bkz. <a href="#direction-state">Gezinme yönü ve kayıt durumu</a>).</td>
+</tr>
+<tr>
+<td><code>force</code></td>
+<td>Ekrandaki adrese yapılan gezinme normalde yok sayılır; <code>force: true</code> ile middleware, guard'lar ve <code>onRouterChanged</code> yine çalışır. Ekrandaki sayfa yeniden oluşturulmaz.</td>
+</tr>
+<tr>
+<td><code>scroll</code></td>
+<td>Gezinme sonunda kaydırma: <code>'top'</code>, <code>'smooth'</code>, <code>'instant'</code> ya da <code>{ top, left, behavior }</code>. Verildiğinde <code>scrollMemory</code>'yi ezer.</td>
+</tr>
+</tbody>
+</table>
+<p><code>app.navigate</code> gezinmenin sonucunu döndürür: tamamlanan gezinmede gösterilen rotanın <code>ResolveResult</code>'ı (bulunamayan adreste ve hata sayfasında <code>ok: false</code>), yok sayılan gezinmede <code>{ ok: true, skipped: true, uri }</code>, guard ya da <code>onLeave</code> iptalinde <code>{ ok: false, cancelled: true, reason }</code> (<code>reason</code>: <code>'guard'</code>, <code>'onLeave'</code> ya da <code>onLeave</code>'in verdiği metin), middleware'in durdurduğu gezinmede <code>{ ok: false, uri, cancelled: true, reason: 'middleware' }</code>, gezinme bitmeden router <code>restartRouter()</code> ile yeniden başlatıldıysa ya da <code>app.dispose()</code> ile kapatıldıysa <code>{ ok: false, uri, cancelled: true, reason: 'restart' | 'dispose' }</code>; gezinme beklenmedik bir hatayla düşerse <code>MJX317</code> raporlanır ve sonuç <code>{ ok: false, uri, cancelled: true, reason: 'error', error }</code> olur. <code>app.router.navigate</code> ve <code>app.router.navigateByName</code> aynı sonucu döndürür.</p>
+<p><code>useNavigation()</code> <code>app.router</code> ile aynı nesneyi döndürür:</p>
+<div class="doc-code" data-file="src/pages/NotePage.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/pages/NotePage.ts"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+
+const nav = useNavigation();
+await nav.navigate(&quot;/archive&quot;);
+await nav.navigateByName(&quot;notes-note&quot;, { id: 7 });
+nav.params;    // mevcut yol parametreleri: { id: '7' }
+nav.route;     // mevcut rota
+nav.uri;       // mevcut URI
+nav.fullPath;  // tam yol
+nav.meta;      // rota meta verisi: { folder: 'notes' }
+nav.chain;     // zincirdeki her rotanın kendi yolu, parametreler doldurulmuş: ['/', '/notes', '/7']</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/pages/NotePage.js"><code>import { useNavigation } from &quot;@motifx/core&quot;;
+
+const nav = useNavigation();
+await nav.navigate(&quot;/archive&quot;);
+await nav.navigateByName(&quot;notes-note&quot;, { id: 7 });
+nav.params;    // mevcut yol parametreleri: { id: '7' }
+nav.route;     // mevcut rota
+nav.uri;       // mevcut URI
+nav.fullPath;  // tam yol
+nav.meta;      // rota meta verisi: { folder: 'notes' }
+nav.chain;     // zincirdeki her rotanın kendi yolu, parametreler doldurulmuş: ['/', '/notes', '/7']</code></pre>
+</div>
+<h3 id="live-route-state">Canlı rota durumu</h3>
+<p><code>app.router</code> uygulama boyunca tek nesnedir. Bir alana, <code>useApplication().router</code>'dan ya da <code>useNavigation()</code>'dan alınan router her okumada güncel rotayı verir. Rota alanları (<code>params</code>, <code>route</code>, <code>uri</code>, <code>ok</code>, <code>meta</code>, <code>extend</code>, <code>fullPath</code>, <code>aliasOf</code>, <code>chain</code>, <code>direction</code>, <code>state</code>, <code>stack</code>) reaktiftir: bir fonksiyon içinde okunduklarında gezinmede yeniden çalışırlar. Gezinme boyunca yerinde kalan bir layout, rota alanlarını getter içinde okuyarak her gezinmede güncellenir; yeniden kurulmaz. Örnekte iki öznitelik rotanın <code>meta</code> ve <code>params</code> değerlerinden hesaplanır:</p>
+<div class="doc-code" data-file="src/layouts/MainLayout.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/layouts/MainLayout.tsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  override view() {
+    return (
+      &lt;div
+        class=&quot;app&quot;
+        data-layout={() =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+        data-pane={() =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+      &gt;
+        &lt;RouterView /&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/layouts/MainLayout.tsx"><code>import { RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return (
+    &lt;div
+      class=&quot;app&quot;
+      data-layout={() =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+      data-pane={() =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+    &gt;
+      &lt;RouterView /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/layouts/MainLayout.tsx"><code>import { motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return &lt;RouterView /&gt;;
+  },
+});
+
+export default MainLayout;</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/layouts/MainLayout.ts"><code>import { Component, ComponentBase, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  override view() {
+    return motifComponent(&quot;div&quot;, (app: ComponentBase) =&gt; {
+      app.class.add(&quot;app&quot;);
+      app.attr.add({
+        &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+        &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+      });
+      app.controls.add(motifComponent(RouterView));
+    });
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/layouts/MainLayout.ts"><code>import { ComponentBase, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return motifComponent(&quot;div&quot;, (app: ComponentBase) =&gt; {
+    app.class.add(&quot;app&quot;);
+    app.attr.add({
+      &quot;data-layout&quot;: () =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+    app.controls.add(motifComponent(RouterView));
+  });
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/layouts/MainLayout.ts"><code>import { motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return motifComponent(RouterView);
+  },
+});
+
+export default MainLayout;</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/layouts/MainLayout.jsx"><code>import { Component, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  view() {
+    return (
+      &lt;div
+        class=&quot;app&quot;
+        data-layout={() =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+        data-pane={() =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+      &gt;
+        &lt;RouterView /&gt;
+      &lt;/div&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/layouts/MainLayout.jsx"><code>import { RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return (
+    &lt;div
+      class=&quot;app&quot;
+      data-layout={() =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;)}
+      data-pane={() =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;)}
+    &gt;
+      &lt;RouterView /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/layouts/MainLayout.jsx"><code>import { motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return &lt;RouterView /&gt;;
+  },
+});
+
+export default MainLayout;</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/layouts/MainLayout.js"><code>import { Component, motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default class MainLayout extends Component {
+  nav = useNavigation();
+
+  view() {
+    return motifComponent(&quot;div&quot;, (app) =&gt; {
+      app.class.add(&quot;app&quot;);
+      app.attr.add({
+        &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+        &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+      });
+      app.controls.add(motifComponent(RouterView));
+    });
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/layouts/MainLayout.js"><code>import { motifComponent, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+export default function MainLayout() {
+  const nav = useNavigation();
+  return motifComponent(&quot;div&quot;, (app) =&gt; {
+    app.class.add(&quot;app&quot;);
+    app.attr.add({
+      &quot;data-layout&quot;: () =&gt; (nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (nav.meta.folder &amp;&amp; !nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+    app.controls.add(motifComponent(RouterView));
+  });
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/layouts/MainLayout.js"><code>import { motifComponent, motifOptions, RouterView, useNavigation } from &quot;@motifx/core&quot;;
+
+const MainLayout = () =&gt; motifOptions({
+  el: &quot;div&quot;,
+  nav: useNavigation(),
+
+  onConfigured() {
+    this.class.add(&quot;app&quot;);
+    this.attr.add({
+      &quot;data-layout&quot;: () =&gt; (this.nav.meta.folder ? &quot;notes&quot; : &quot;page&quot;),
+      &quot;data-pane&quot;: () =&gt; (this.nav.meta.folder &amp;&amp; !this.nav.params.id ? &quot;list&quot; : &quot;detail&quot;),
+    });
+  },
+
+  view() {
+    return motifComponent(RouterView);
+  },
+});
+
+export default MainLayout;</code></pre>
+</div>
+<p>Öznitelikler <code>/notes</code>'ta <code>notes</code> / <code>list</code>, <code>/notes/3</code>'te <code>notes</code> / <code>detail</code>, <code>/settings</code>'te <code>page</code> / <code>detail</code> olur; layout yeniden kurulmaz, yalnız öznitelikler güncellenir.</p>
+<ul>
+<li><strong>Canlı okuma nesne üzerinden yapılır.</strong> <code>const { params } = useNavigation()</code> ya da <code>const id = nav.params.id</code> o anın değerini alır ve sonradan değişmez; güncel değer için her seferinde <code>nav.params.id</code> okuyun.</li>
+<li><strong>Rota, ayrılan sayfa ekrandan kaldırıldıktan sonra ve yeni sayfa bağlanmadan önce değişir</strong> (yığın gezinmesinde geçiş animasyonundan önce); <code>scoped</code> servisler de aynı anda yeni gezinmeye geçer. <code>keepAlive</code> önbelleğine alınan sayfa <code>onDeactivated</code> içinde kendi rotasını görür. Serbest bırakılan sayfanın <code>onDisposing</code> ve <code>onDisposed</code> kancaları yeni sayfa ekrana geldikten sonra çalışır ve gidilen rotayı görür (bkz. <a href="/tr/docs/router-view#leaving-page">Ayrılan sayfa</a>). Router'ın kurduğu yeni sayfa, yapıcısında ve alan başlangıç değerlerinde gidilen rotayı görür.</li>
+<li><strong>Guard ve rota kancaları</strong> (<code>useGuard</code>, <code>onEntering</code>, <code>onUpdate</code>) rota değişmeden önce çalışır; gidilen rota bağlam nesnesindedir (<code>to</code>, <code>params</code>). İptal edilen gezinmede rota değişmez.</li>
+<li><strong>Önbellekteki <code>keepAlive</code> sayfalar</strong> gizliyken de güncel rotayı okur: bağları başka bir rotaya geçildiğinde o rotanın değerleriyle yeniden çalışır. Rotaya bağlı işi (veri yükleme gibi) <code>onActivated</code> içinde yapın.</li>
+<li><code>useRouter()</code> çağrılmadan önce rota alanları boştur (<code>params</code> <code>{}</code>, <code>uri</code> <code>''</code>, <code>route</code> <code>null</code>, <code>chain</code> <code>[]</code>) ve <code>navigate</code> <code>MJX309</code> fırlatır.</li>
+</ul>
+<h3 id="listen">Rota değişimini dinlemek</h3>
+<p>Ekrana yansıyan değerler için reaktif alanları bir fonksiyon içinde okumak yeter; yukarıdaki <code>MainLayout</code> bunu yapar. Bir gezinmeden sonra yan bir iş yapılacaksa (sekme başlığı, odak, ölçüm) <code>onRouterChanged</code> dinlenir. <code>app.onRouterChanged(fn)</code> aboneliği kaldıran bir fonksiyon döndürür. Bileşen içinde <code>context.onRouterChanged(fn)</code> yazıldığında (sınıfta ve Options'ta <code>this.context</code>, fonksiyon bileşeninde <a href="/tr/docs/components#function-root">kök bileşenin</a> <code>context</code>'i) abonelik bileşenin ömrüne bağlanır: bileşen serbest bırakılınca kendiliğinden kalkar, ayrıca kaldırmak gerekmez. Yük <code>{ uri, params, meta, route, ok, initial, redirectedFrom?, direction?, state? }</code> biçimindedir; açılış gezinmesinde <code>initial</code> <code>true</code> olur (bkz. <a href="/tr/docs/route-guards#guards">Gezinme guard'ları</a>).</p>
+<h3 id="direction-state">Gezinme yönü ve kayıt durumu — <code>direction</code>, <code>state</code></h3>
+<p>Her gezinmenin yönü <code>direction</code> alanında gelir: <code>'initial'</code> (açılış), <code>'push'</code> (yeni geçmiş kaydı; adres çubuğuna elle yazılan adres ya da düz bir çapa bağlantısının açtığı kayıt da buna dahil), <code>'replace'</code>, <code>'back'</code>, <code>'forward'</code> ya da sırası bilinemeyen geçmiş hareketi için <code>'traverse'</code>. Yön guard'lara (<code>to.direction</code>), <code>onRouterChanged</code> yüküne ve <code>app.router.direction</code>'a yansır. Geçişleri yöne göre seçmek (ileride sola, geride sağa kaydırma) için kullanın.</p>
+<p><code>navigate(uri, { state })</code> ile verilen değer o geçmiş kaydına yazılır ve kayda <strong>geri/ileri ile dönüldüğünde de</strong> geri gelir; sayfa yenilense bile korunur. Adrese yazılmadan taşınması gereken veriler (listeden hangi filtreyle gelindi, açık sekme gibi) için uygundur:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>await app.navigate(&quot;/notes/7&quot;, { state: { from: &quot;archive&quot;, query: &quot;toplantı&quot; } });
+
+app.router.state;                // { from: 'archive', query: 'toplantı' } — geri/ileri ile dönüldüğünde de
+app.useGuard(({ to }, next) =&gt; { console.log(to.direction, to.state); next(); });
+app.onRouterChanged(({ direction, state }) =&gt; console.log(direction, state));</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>await app.navigate(&quot;/notes/7&quot;, { state: { from: &quot;archive&quot;, query: &quot;toplantı&quot; } });
+
+app.router.state;                // { from: 'archive', query: 'toplantı' } — geri/ileri ile dönüldüğünde de
+app.useGuard(({ to }, next) =&gt; { console.log(to.direction, to.state); next(); });
+app.onRouterChanged(({ direction, state }) =&gt; console.log(direction, state));</code></pre>
+</div>
+<p>Düz nesneler olduğu gibi saklanır (router yalnızca kendi damgasını ekler, <code>app.router.state</code> onu çıkarır); <code>Date</code>, <code>Map</code> gibi düz olmayan değerlere hiç dokunulmaz. <code>state</code> verilmemiş kayıtta <code>app.router.state</code> <code>undefined</code>'dır.</p>
+<h2 id="scroll-memory">Kaydırma hafızası — <code>scrollMemory</code></h2>
+<p>Tek sayfalık uygulamada gezinme belgeyi değiştirir ama kaydırma konumunu değiştirmez; tarayıcı da bunu SPA için kendiliğinden yönetmez. <code>scrollMemory</code> açıldığında router her yolun son kaydırma konumunu tutar ve o yola dönüldüğünde (geri/ileri, bağlantı, yenileme) konumu yerine koyar:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });</code></pre>
+</div>
+<p>Kurallar:</p>
+<ul>
+<li><strong>Hiç görülmemiş yol</strong> sayfa başından başlar (<code>top: false</code> ile kapatılır).</li>
+<li><strong>Adreste çıpa varsa</strong> (<code>/notes/5#history</code>) çıpa hafızayı ezer; ilgili <code>id</code>'ye kaydırılır. Sabit bir üst şerit varsa CSS'te <code>scroll-margin-top</code> verin.</li>
+<li><strong>Kaydırma anında yapılır</strong>, CSS'te <code>scroll-behavior: smooth</code> olsa da: kayıtlı konuma dönüş, yeni sayfanın başı, başka sayfadan gelinen çıpa ve geri/ileri, tarayıcının sayfa geçişlerindeki gibi beklemeden yerine oturur. Aynı sayfa içindeki çıpa bağlantısı (<code>/notes/5</code> → <code>/notes/5#history</code>, <code>history</code> modunda düz <code>&lt;a href=&quot;#history&quot;&gt;</code> dahil) CSS'teki <code>scroll-behavior</code> kuralına uyar; <code>smooth</code> verildiyse yumuşak kayar.</li>
+<li><strong>Gezinmeye özel <code>scroll</code> seçeneği</strong> hafızayı ezer: <code>app.router.navigate('/x', { scroll: 'top' })</code> her zaman başa alır; <code>container</code> ayarlıysa kabı, değilse pencereyi kaydırır. Gidilen sayfadan ayrılırken konum yine o sayfanın adına kaydedilir.</li>
+<li><strong>Konumlar bellekte tutulur:</strong> <code>restartRouter()</code> ile yeniden başlatmada korunur, sayfa yenilenince silinir. Yenilemeden sonra da hatırlanacaksa kaydı siz yaparsınız; nereye yazılacağı (tarayıcı deposu, sunucu) size kalmıştır.</li>
+</ul>
+<p>Kayıt için <code>app.router</code> üç metot verir: <code>saveScrollPositions(fn)</code> kayıt gereken her anda (sayfadan ayrılırken, <code>pagehide</code>, sayfa gizlenince ve <code>app.dispose()</code>) geri çağrıyı güncel konumlarla çağırır ve aboneliği kaldıran bir fonksiyon döndürür; abonelik yeniden başlatmada da sürer. <code>restoreScrollPositions(positions)</code> verilen konumları hafızaya ekler (<code>limit</code> uygulanır); açılışta, <code>run()</code>'dan önce de çağrılabilir. <code>scrollPositions()</code> o anki konumları, ekrandaki sayfanınki dahil, <code>{ &quot;/notes&quot;: 1200 }</code> biçiminde döndürür. <code>scrollMemory</code> kapalıyken <code>scrollPositions()</code> boş nesne döndürür, <code>restoreScrollPositions</code> etkisizdir ve geri çağrı hiç çağrılmaz.</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });
+app.router.restoreScrollPositions(JSON.parse(localStorage.getItem(&quot;scroll&quot;) ?? &quot;{}&quot;));
+app.router.saveScrollPositions((positions) =&gt; localStorage.setItem(&quot;scroll&quot;, JSON.stringify(positions)));</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({ routes, mode: &quot;history&quot;, scrollMemory: true });
+app.router.restoreScrollPositions(JSON.parse(localStorage.getItem(&quot;scroll&quot;) ?? &quot;{}&quot;));
+app.router.saveScrollPositions((positions) =&gt; localStorage.setItem(&quot;scroll&quot;, JSON.stringify(positions)));</code></pre>
+</div>
+<p>Ayar nesnesiyle ince ayar:</p>
+<div class="doc-code" data-file="src/app.ts">
+<pre data-lang="ts" data-variant="typescript" data-file="src/app.ts"><code>app.useRouter({
+  routes,
+  scrollMemory: {
+    top: true,          // görülmemiş yolda başa dön (varsayılan)
+    anchor: true,       // çıpa kayıtlı konumu ezsin (varsayılan)
+    settleMs: 1200,     // içeriğin oturmasını bekleme üst sınırı
+    limit: 60,          // kaç yol hatırlansın
+    // Aynı sayfaya iki adresten geliniyorsa tek anahtara indirin:
+    key: (path) =&gt; path.replace(/^\/notlar/, &quot;/notes&quot;),
+    // Pencere yerine bir kabın kaydırmasını hatırla (seçici, öğe ya da öğe döndüren fonksiyon):
+    container: &quot;main.detail&quot;,
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="javascript" data-file="src/app.js"><code>app.useRouter({
+  routes,
+  scrollMemory: {
+    top: true,          // görülmemiş yolda başa dön (varsayılan)
+    anchor: true,       // çıpa kayıtlı konumu ezsin (varsayılan)
+    settleMs: 1200,     // içeriğin oturmasını bekleme üst sınırı
+    limit: 60,          // kaç yol hatırlansın
+    // Aynı sayfaya iki adresten geliniyorsa tek anahtara indirin:
+    key: (path) =&gt; path.replace(/^\/notlar/, &quot;/notes&quot;),
+    // Pencere yerine bir kabın kaydırmasını hatırla (seçici, öğe ya da öğe döndüren fonksiyon):
+    container: &quot;main.detail&quot;,
+  },
+});</code></pre>
+</div>
+<p><strong>Kaydırma bir kabın içindeyse</strong> (sabit başlık ve sekme çubuğu olan mobil kabuklar gibi) <code>container</code> verin. Kap her gezinmede yeniden aranır, yani ilk açılışta henüz DOM'da olmaması sorun değildir; bulunamazsa pencere kaydırması kullanılır.</p>
+<p><strong>İçerik asenkron çiziliyorsa</strong> (uzak veri, markdown, sanal liste, <code>x-chunk</code> ile dilimlenen satırlar) endişelenmeyin: geri koyma tek seferlik değil, hedefe ulaşılana ya da <code>settleMs</code> dolana kadar her karede yeniden denenir. Kullanıcı bu sırada tekerlek/dokunuş/tuş/fare tıklamasıyla araya girerse deneme bırakılır.</p>
+<p><strong>Maliyeti:</strong> durağan hâlde sıfır. <code>scroll</code> olayı dinlenmez; konum her gezinmede bir kez okunur: guard'lar geçtikten sonra, adres uygulanmadan ve içerik değiştirilmeden hemen önce. O an ayrılan sayfa hâlâ ekrandadır ve konumu gerçektir; iptal edilen gezinmede konum okunmaz. Açıkken <code>history.scrollRestoration</code> <code>'manual'</code> yapılır; <code>pagehide</code> / sayfa gizlenince de ekrandaki sayfanın konumu hafızaya alınır ve kayıt geri çağrısı çağrılır. Kapalıyken (varsayılan) hiçbir dinleyici bağlanmaz ve <code>history.scrollRestoration</code>a dokunulmaz.</p>
+<p><strong>Çıpa kaynağı moda göre değişir.</strong> Adres çubuğundaki <code>#…</code> yalnızca <code>history</code> modunda çıpa olarak okunur. <code>hash</code> / <code>file</code> (ve <code>shell</code>) modunda yalnızca rotanın kendi çıpası (<code>/sayfa#bolum</code>) kullanılır; adresin <code>#</code> kısmı rota olduğu için çıpa sayılmaz. Hafıza bu modlarda varsayılan <code>anchor</code> ayarıyla çalışır.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Gezinmeyi denetlemek ve durdurmak için <a href="/tr/docs/route-guards">Rota Kancaları ve Guard'lar</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

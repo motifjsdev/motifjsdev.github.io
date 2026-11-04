@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="The Virtualization component; props, the dataRequest contract, automatic refresh, templates, filtering, variable height, the rendering model and methods.">
+    <title>Virtual Lists (Virtualization) — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/docs/virtualization">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/virtualization">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/virtualization">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/virtualization">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/docs/virtualization">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Virtual Lists (Virtualization)">
+    <meta property="og:description" content="The Virtualization component; props, the dataRequest contract, automatic refresh, templates, filtering, variable height, the rendering model and methods.">
+    <script type="application/json" id="doc-data">{"slug":"virtualization","locale":"en","title":"Virtual Lists (Virtualization)","description":"The Virtualization component; props, the dataRequest contract, automatic refresh, templates, filtering, variable height, the rendering model and methods.","category":{"id":"8","title":"Advanced"},"html":"\u003Cp\u003EIn lists of thousands of items, putting every item in the DOM hurts performance. MotifJS\u0027s \u003Ccode\u003EVirtualization\u003C/code\u003E component shows lists whose row height is fixed or can be calculated in advance efficiently, by keeping only the visible items (and a few buffer rows on either side) in the DOM. It asks for the data page by page itself.\u003C/p\u003E\n\u003Ch2 id=\u0022basic-usage\u0022\u003EBasic usage\u003C/h2\u003E\n\u003Cp\u003EIn the example, a folder\u0027s list of notes is drawn with a virtual list. The data is sliced page by page from the notes in the service, and each row is the \u003Ca href=\u0022/docs/component-creation\u0022\u003Enote row component\u003C/a\u003E:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003Eimport { Component, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component\u0026lt;any, { folder: Folder; state: { query: string } }\u0026gt; {\n  override view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = this.props;\n    return (\n      \u0026lt;Virtualization\u0026lt;Note\u0026gt;\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component\u0026lt;any, { folder: Folder; state: { query: string } }\u0026gt; {\n  override view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = this.props;\n    return new Virtualization\u0026lt;Note\u0026gt;({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; new NoteRow({ note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003Eimport { FromService, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props: { folder: Folder; state: { query: string } }) {\n  const notes = FromService(NotesService)!;\n  const { folder, state } = props;\n\n  return (\n    \u0026lt;Virtualization\u0026lt;Note\u0026gt;\n      itemHeight={64}\n      pageSize={50}\n      dataRequest={async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      }}\n      itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n      emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n    /\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, FromService, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props: { folder: Folder; state: { query: string } }) {\n  const notes = FromService(NotesService)!;\n  const { folder, state } = props;\n\n  return new Virtualization\u0026lt;Note\u0026gt;({\n    itemHeight: 64,\n    pageSize: 50,\n    dataRequest: async ({ page, pageSize }) =\u0026gt; {\n      const found = notes.list(folder, state.query);\n      const start = page * pageSize;\n      return {\n        items: found.slice(start, start \u002B pageSize),\n        totalCount: found.length,\n        hasMore: start \u002B pageSize \u0026lt; found.length,\n      };\n    },\n    itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n    emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n      p.class.add(\u0026quot;list__empty\u0026quot;);\n      p.setText(FOLDERS[folder].empty);\n    }),\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003Eimport { Virtualization, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props: { folder: Folder; state: { query: string } }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = props;\n    return (\n      \u0026lt;Virtualization\u0026lt;Note\u0026gt;\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Eimport { ComponentBase, Virtualization, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService, type Folder, type Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props: { folder: Folder; state: { query: string } }) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService)!;\n    const { folder, state } = props;\n    return new Virtualization\u0026lt;Note\u0026gt;({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p: ComponentBase) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003Eimport { Component, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component {\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = this.props;\n    return (\n      \u0026lt;Virtualization\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Eimport { Component, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteList extends Component {\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = this.props;\n    return new Virtualization({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; new NoteRow({ note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003Eimport { FromService, Virtualization } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props) {\n  const notes = FromService(NotesService);\n  const { folder, state } = props;\n\n  return (\n    \u0026lt;Virtualization\n      itemHeight={64}\n      pageSize={50}\n      dataRequest={async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      }}\n      itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n      emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n    /\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Eimport { FromService, Virtualization, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteList(props) {\n  const notes = FromService(NotesService);\n  const { folder, state } = props;\n\n  return new Virtualization({\n    itemHeight: 64,\n    pageSize: 50,\n    dataRequest: async ({ page, pageSize }) =\u0026gt; {\n      const found = notes.list(folder, state.query);\n      const start = page * pageSize;\n      return {\n        items: found.slice(start, start \u002B pageSize),\n        totalCount: found.length,\n        hasMore: start \u002B pageSize \u0026lt; found.length,\n      };\n    },\n    itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n    emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n      p.class.add(\u0026quot;list__empty\u0026quot;);\n      p.setText(FOLDERS[folder].empty);\n    }),\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003Eimport { Virtualization, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = props;\n    return (\n      \u0026lt;Virtualization\n        itemHeight={64}\n        pageSize={50}\n        dataRequest={async ({ page, pageSize }) =\u0026gt; {\n          const found = notes.list(folder, state.query);\n          const start = page * pageSize;\n          return {\n            items: found.slice(start, start \u002B pageSize),\n            totalCount: found.length,\n            hasMore: start \u002B pageSize \u0026lt; found.length,\n          };\n        }}\n        itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n        emptyTemplate={() =\u0026gt; \u0026lt;p class=\u0026quot;list__empty\u0026quot;\u0026gt;{FOLDERS[folder].empty}\u0026lt;/p\u0026gt;}\n      /\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Eimport { Virtualization, motifComponent, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport { NoteRow } from \u0026quot;./NoteRow\u0026quot;;\nimport { FOLDERS, NotesService } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteList = (props) =\u0026gt; motifOptions({\n  el: null,\n\n  view() {\n    const notes = this.getService(NotesService);\n    const { folder, state } = props;\n    return new Virtualization({\n      itemHeight: 64,\n      pageSize: 50,\n      dataRequest: async ({ page, pageSize }) =\u0026gt; {\n        const found = notes.list(folder, state.query);\n        const start = page * pageSize;\n        return {\n          items: found.slice(start, start \u002B pageSize),\n          totalCount: found.length,\n          hasMore: start \u002B pageSize \u0026lt; found.length,\n        };\n      },\n      itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n      emptyTemplate: () =\u0026gt; motifComponent(\u0026quot;p\u0026quot;, (p) =\u0026gt; {\n        p.class.add(\u0026quot;list__empty\u0026quot;);\n        p.setText(FOLDERS[folder].empty);\n      }),\n    });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe folder layout places the list together with the search state with \u003Ccode\u003E\u0026lt;NoteList folder={this.folder} state={this.state} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003EThe folder layout places the list together with the search state with \u003Ccode\u003Enew NoteList({ folder: this.folder, state: this.state })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003EThe folder layout places the list together with the search state with \u003Ccode\u003EmotifComponent(NoteList, { folder: this.folder, state: this.state })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EWhen \u003Ccode\u003EmainTemplate\u003C/code\u003E is not given, the list sets up its root \u003Ccode\u003Ediv\u003C/code\u003E with \u003Ccode\u003Eoverflow-y: auto; height: 100%; position: relative; overflow-anchor: none\u003C/code\u003E and scrolls inside itself, so the container that holds it must have a height, or the height is given to the list with \u003Ccode\u003Estyle\u003C/code\u003E. \u003Ccode\u003EdataRequest\u003C/code\u003E reads the search text and the notes, so the list refreshes on its own as you type into the search box (see \u003Ca href=\u0022#auto-refresh\u0022\u003EAutomatic refresh\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022props\u0022\u003EProps (\u003Ccode\u003EVirtualizationProps\u0026lt;T\u0026gt;\u003C/code\u003E)\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EProp\u003C/th\u003E\n\u003Cth\u003EType\u003C/th\u003E\n\u003Cth\u003EDescription\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(req) =\u0026gt; Promise\u0026lt;VirtualizationDataResponse\u0026lt;T\u0026gt;\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003ERequired.\u003C/strong\u003E The function that fetches a page of data; see \u003Ca href=\u0022#data-request\u0022\u003EThe \u003Ccode\u003EdataRequest\u003C/code\u003E contract\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EitemTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(item: T, index: number) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003ERequired.\u003C/strong\u003E Builds the row for each item. If it does not return a component, the returned value is wrapped in one. The item arrives exactly as it was given in the data (see \u003Ca href=\u0022#data-as-given\u0022\u003EData is used as given\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EitemHeight\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber \\| (item: T, index: number) =\u0026gt; number\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Cstrong\u003ERequired.\u003C/strong\u003E The pixel height of each item. A number: all rows are the same; a function: a known height per row (see \u003Ca href=\u0022#variable-height\u0022\u003EVariable height\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EpageSize\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHow many items to ask for in each request (50 by default).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(content, state) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe layout that wraps the list; see \u003Ca href=\u0022#main-template\u0022\u003EA custom container\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EloadingTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(state) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe view shown while the first load is in progress.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EemptyTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E() =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe view shown when there are no items left to show (the data is empty, or the filter removed all of them).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EerrorTemplate\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(error) =\u0026gt; any\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe view shown in place of the rows when the first load, \u003Ccode\u003Erefresh()\u003C/code\u003E or an automatic refresh request fails; if it is not given, the error is reported as \u003Ccode\u003EMJX207\u003C/code\u003E. An error in the next page request is always reported as \u003Ccode\u003EMJX207\u003C/code\u003E and written to \u003Ccode\u003EgetState().error\u003C/code\u003E; the loaded rows stay on screen, the error view is not shown, the request is made again on the next scroll, and \u003Ccode\u003Eerror\u003C/code\u003E is cleared on a successful load.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Efilter\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E(items: T[]) =\u0026gt; T[]\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EApplied to the loaded data; spacers and indices are calculated from the filtered length (see \u003Ca href=\u0022#filtering\u0022\u003EFiltering\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eoverscan\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe number of extra rows drawn \u003Cstrong\u003Eabove and below\u003C/strong\u003E the visible area (by default, the number of visible rows).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcacheSize\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe upper limit of row components kept in the cache, the drawn rows included (by default \u003Ccode\u003Emax(200, 3 × the number of drawn rows)\u003C/code\u003E). When it is exceeded, the off-screen rows not seen for the longest time are disposed.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EautoRefresh\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhen the reactive data read inside \u003Ccode\u003EdataRequest\u003C/code\u003E changes, it fetches the loaded range again in a single request (on by default); see \u003Ca href=\u0022#auto-refresh\u0022\u003EAutomatic refresh\u003C/a\u003E. With \u003Ccode\u003Efalse\u003C/code\u003E, the list refreshes only with \u003Ccode\u003Erefresh()\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Ewatch\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003E() =\u0026gt; unknown\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAn extra dependency for automatic refresh: reactive fields read here trigger a reload too.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EautoLoad\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EAsks for the next page when nearing the bottom (on by default). The next page is also asked for when the drawn window comes within \u003Ccode\u003Eoverscan\u003C/code\u003E of the end of the loaded data (e.g. when the first page does not fill the visible area).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EautoLoadThreshold\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EHow many pixels before the bottom edge of the \u003Cstrong\u003Eloaded\u003C/strong\u003E data the next page is asked for (100 by default). With a fixed height, the bottom edge is \u003Ccode\u003Edata.length × itemHeight\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EclassName\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Estring\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA class added to the root \u003Ccode\u003Ediv\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EPartial\u0026lt;CSSStyleDeclaration\u0026gt;\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EInline style for the root \u003Ccode\u003Ediv\u003C/code\u003E. It is applied after the list\u0027s own \u003Ccode\u003Eoverflow-y\u003C/code\u003E, \u003Ccode\u003Eheight\u003C/code\u003E and \u003Ccode\u003Eposition\u003C/code\u003E values; if you give the same property, yours wins.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EoverscanPages\u003C/code\u003E, \u003Ccode\u003ErenderMode\u003C/code\u003E, \u003Ccode\u003EpageBuffer\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003C/td\u003E\n\u003Ctd\u003EReserved; they are not read.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022data-request\u0022\u003EThe \u003Ccode\u003EdataRequest\u003C/code\u003E contract\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EdataRequest\u003C/code\u003E receives a request object (\u003Ccode\u003EVirtualizationDataRequest\u003C/code\u003E):\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EField\u003C/th\u003E\n\u003Cth\u003EType\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Epage\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe zero-based page number.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EpageSize\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe number of items asked for. In an automatic refresh the loaded range is asked for in a single request, so \u003Ccode\u003Epage\u003C/code\u003E is 0 and \u003Ccode\u003EpageSize\u003C/code\u003E is \u003Ccode\u003EpageSize × the number of loaded pages\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EscrollTop\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe scroll position at the time of the request (0 on the first load).\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003Eand gives a \u003Ccode\u003EPromise\u003C/code\u003E that returns a response object (\u003Ccode\u003EVirtualizationDataResponse\u0026lt;T\u0026gt;\u003C/code\u003E):\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EField\u003C/th\u003E\n\u003Cth\u003EType\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eitems\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ET[]\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe items on this page.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtotalCount\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe number of items in the whole data set. It is written to \u003Ccode\u003Estate.totalCount\u003C/code\u003E (e.g. for showing the total in a header) and decides the size of the scroll area while \u003Ccode\u003EhasMore\u003C/code\u003E holds.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EhasMore\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhether there is a next page. When it returns \u003Ccode\u003Efalse\u003C/code\u003E, automatic loading stops.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003EThe scroll area covers the whole \u003Ccode\u003EtotalCount\u003C/code\u003E: items that are not loaded yet take up space in the bottom spacer, at their full height with a fixed \u003Ccode\u003EitemHeight\u003C/code\u003E, and at the average of the loaded rows with a height given as a function. When you scroll into the unloaded region, pages are asked for in order until they reach it. When \u003Ccode\u003EhasMore\u003C/code\u003E becomes \u003Ccode\u003Efalse\u003C/code\u003E, or \u003Ccode\u003EtotalCount\u003C/code\u003E is less than the loaded items, the area is calculated from the loaded data only. \u003Ccode\u003Efilter\u003C/code\u003E is applied to the loaded items; the unloaded part is counted unfiltered, and the area shrinks as the items the filter drops are loaded.\u003C/p\u003E\n\u003Ch3 id=\u0022auto-refresh\u0022\u003EAutomatic refresh — \u003Ccode\u003EautoRefresh\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EautoRefresh\u003C/code\u003E (on by default) calls \u003Ccode\u003EdataRequest\u003C/code\u003E inside an effect on the first load and on \u003Ccode\u003Erefresh()\u003C/code\u003E. When one of the reactive fields read in this call changes, the loaded range (from page 0 to the current page) is fetched again in a single request; the rows of items still found in the response are kept, and those of the missing ones are disposed (see \u003Ca href=\u0022#rendering-and-methods\u0022\u003EThe rendering model\u003C/a\u003E). Next-page requests are not tracked; \u003Ccode\u003EsetData()\u003C/code\u003E stops the tracking. In the example, \u003Ccode\u003Enotes.list(folder, state.query)\u003C/code\u003E reads the notes array, the search text and the archive, pin and date fields of the notes (and the title and body too while the search is filled in); when one of them changes, the list refreshes.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe compiler wraps the \u003Ccode\u003Eawait\u003C/code\u003Es in an \u003Ccode\u003Easync\u003C/code\u003E \u003Ccode\u003EdataRequest\u003C/code\u003E function written on the tag: reactive fields read after an \u003Ccode\u003Eawait\u003C/code\u003E become dependencies too (elsewhere, reads after \u003Ccode\u003Eawait\u003C/code\u003E are not tracked; see \u003Ca href=\u0022/docs/reactivity#await-reads\u0022\u003EReads after \u003Ccode\u003Eawait\u003C/code\u003E\u003C/a\u003E). If \u003Ccode\u003EdataRequest\u003C/code\u003E is defined outside the tag, or a dependency comes from somewhere else, give an extra dependency with \u003Ccode\u003Ewatch={() =\u0026gt; state.query}\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003EThe compiler applies the \u003Ccode\u003Eawait\u003C/code\u003E wrapping only to a \u003Ccode\u003EdataRequest\u003C/code\u003E written on a \u003Ccode\u003E\u0026lt;Virtualization\u0026gt;\u003C/code\u003E tag; without JSX, only the reactive fields read before the first \u003Ccode\u003Eawait\u003C/code\u003E become dependencies (see \u003Ca href=\u0022/docs/reactivity#await-reads\u0022\u003EReads after \u003Ccode\u003Eawait\u003C/code\u003E\u003C/a\u003E). A dependency read after an \u003Ccode\u003Eawait\u003C/code\u003E or coming from somewhere else is given with \u003Ccode\u003Ewatch: () =\u0026gt; state.query\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Ewatch\u003C/code\u003E is called once while tracking is being set up, inside the same effect as \u003Ccode\u003EdataRequest\u003C/code\u003E; the fields it reads are added to the dependencies, and an error it throws is reported as \u003Ccode\u003EMJX205\u003C/code\u003E. The reload happens on the microtask after the change; the content stays in place until the response arrives. If more than 30 reloads are triggered within a second (loop protection), tracking is stopped and an \u003Ccode\u003EMJX206\u003C/code\u003E warning is written in development mode; \u003Ccode\u003Erefresh()\u003C/code\u003E sets the tracking up again.\u003C/p\u003E\n\u003Ch2 id=\u0022templates-and-state\u0022\u003ETemplates and the list state\u003C/h2\u003E\n\u003Cp\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E and \u003Ccode\u003EloadingTemplate\u003C/code\u003E receive the list\u0027s state (\u003Ccode\u003EVirtualizationState\u0026lt;T\u0026gt;\u003C/code\u003E). The state fields are reactive; a field read through a getter in a template stays up to date. The \u003Ccode\u003Edata\u003C/code\u003E field announces that the loaded array, or the array given with \u003Ccode\u003EsetData\u003C/code\u003E, has changed, but it does not wrap the items (see \u003Ca href=\u0022#data-as-given\u0022\u003EData is used as given\u003C/a\u003E).\u003C/p\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EField\u003C/th\u003E\n\u003Cth\u003EType\u003C/th\u003E\n\u003Cth\u003EMeaning\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisLoading\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe first load or a \u003Ccode\u003Erefresh()\u003C/code\u003E request is in progress.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EisInitialized\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe first response has arrived, or \u003Ccode\u003EsetData()\u003C/code\u003E was called.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EcurrentPage\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe last loaded page.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EtotalCount\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Enumber\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003EtotalCount\u003C/code\u003E from the last response.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EhasMore\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eboolean\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe \u003Ccode\u003EhasMore\u003C/code\u003E from the last response.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eerror\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EError \\| undefined\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe error of the last request; cleared on a successful load.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edata\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003ET[]\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EThe loaded items (with no filter applied), as they were given.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch3 id=\u0022data-as-given\u0022\u003EData is used as given\u003C/h3\u003E\n\u003Cp\u003EThe list does not turn the data into reactive objects. The items returned by \u003Ccode\u003EdataRequest\u003C/code\u003E or given to \u003Ccode\u003EsetData\u003C/code\u003E reach \u003Ccode\u003EitemTemplate\u003C/code\u003E, \u003Ccode\u003EitemHeight\u003C/code\u003E and \u003Ccode\u003Efilter\u003C/code\u003E as they are; the very array given to \u003Ccode\u003EsetData\u003C/code\u003E is read as \u003Ccode\u003Estate.data\u003C/code\u003E and \u003Ccode\u003EgetState().data\u003C/code\u003E. Reactive data stays reactive, and plain data stays plain.\u003C/p\u003E\n\u003Cp\u003EA row built with a plain object does not show a value written to the object later on its own. If the row needs to follow the change, give the data with \u003Ccode\u003Ereactive\u003C/code\u003E; with plain data, the change is brought to the screen by running the row\u0027s bindings again with \u003Ccode\u003EsetState()\u003C/code\u003E (see \u003Ca href=\u0022/docs/reactivity#bindings\u0022\u003EWhere reactivity meets the DOM\u003C/a\u003E). If a new array has arrived, call \u003Ccode\u003EsetData\u003C/code\u003E.\u003C/p\u003E\n\u003Cp\u003ELater pages are not appended to the first page\u0027s array: the list collects the loaded items in its own array, and the arrays returned by \u003Ccode\u003EdataRequest\u003C/code\u003E do not change.\u003C/p\u003E\n\u003Ch3 id=\u0022main-template\u0022\u003EA custom container — \u003Ccode\u003EmainTemplate\u003C/code\u003E\u003C/h3\u003E\n\u003Cp\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E builds the layout that wraps the list. Its first parameter (\u003Ccode\u003Econtent\u003C/code\u003E) is the component that carries the rows; wherever it is put in the layout, the rows are drawn there. The nearest element wrapping it becomes the scroll container: the list gives it \u003Ccode\u003Eoverflow-y: auto; position: relative; overflow-anchor: none\u003C/code\u003E and listens to its scrolling, while you give its height. In this case no style is written on the root \u003Ccode\u003Ediv\u003C/code\u003E. A list with a header that shows the folder name and the total number of notes:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/typescript\u0022 data-file=\u0022src/parts/NoteList.tsx\u0022\u003E\u003Ccode\u003E\u0026lt;Virtualization\u0026lt;Note\u0026gt;\n  itemHeight={64}\n  dataRequest={async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  }}\n  itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n  mainTemplate={(content, status) =\u0026gt; (\n    \u0026lt;div class=\u0026quot;list\u0026quot;\u0026gt;\n      \u0026lt;div class=\u0026quot;list__head\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{FOLDERS[folder].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; status.totalCount}\u0026lt;/span\u0026gt;\n      \u0026lt;/div\u0026gt;\n      \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n        \u0026lt;content\u0026gt;\u0026lt;/content\u0026gt;\n      \u0026lt;/div\u0026gt;\n    \u0026lt;/div\u0026gt;\n  )}\n/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/typescript\u0022 data-file=\u0022src/parts/NoteList.ts\u0022\u003E\u003Ccode\u003Econst list = new Virtualization\u0026lt;Note\u0026gt;({\n  itemHeight: 64,\n  dataRequest: async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  },\n  itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n  mainTemplate: (content, status) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, (box: ComponentBase) =\u0026gt; {\n    box.class.add(\u0026quot;list\u0026quot;);\n    const head = motifComponent(\u0026quot;div\u0026quot;, (head: ComponentBase) =\u0026gt; {\n      head.class.add(\u0026quot;list__head\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2: ComponentBase) =\u0026gt; h2.setText(FOLDERS[folder].title));\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span: ComponentBase) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; \u0060${status.totalCount}\u0060);\n      });\n      head.controls.add(title, badge);\n    });\n    const rows = motifComponent(\u0026quot;div\u0026quot;, (rows: ComponentBase) =\u0026gt; {\n      rows.class.add(\u0026quot;rows\u0026quot;);\n      rows.controls.add(content);\n    });\n    box.controls.add(head, rows);\n  }),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/javascript\u0022 data-file=\u0022src/parts/NoteList.jsx\u0022\u003E\u003Ccode\u003E\u0026lt;Virtualization\n  itemHeight={64}\n  dataRequest={async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  }}\n  itemTemplate={(note) =\u0026gt; \u0026lt;NoteRow note={note} folder={folder} /\u0026gt;}\n  mainTemplate={(content, status) =\u0026gt; (\n    \u0026lt;div class=\u0026quot;list\u0026quot;\u0026gt;\n      \u0026lt;div class=\u0026quot;list__head\u0026quot;\u0026gt;\n        \u0026lt;h2\u0026gt;{FOLDERS[folder].title}\u0026lt;/h2\u0026gt;\n        \u0026lt;span class=\u0026quot;badge\u0026quot;\u0026gt;{() =\u0026gt; status.totalCount}\u0026lt;/span\u0026gt;\n      \u0026lt;/div\u0026gt;\n      \u0026lt;div class=\u0026quot;rows\u0026quot;\u0026gt;\n        \u0026lt;content\u0026gt;\u0026lt;/content\u0026gt;\n      \u0026lt;/div\u0026gt;\n    \u0026lt;/div\u0026gt;\n  )}\n/\u0026gt;\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/javascript\u0022 data-file=\u0022src/parts/NoteList.js\u0022\u003E\u003Ccode\u003Econst list = new Virtualization({\n  itemHeight: 64,\n  dataRequest: async ({ page, pageSize }) =\u0026gt; {\n    const found = notes.list(folder, state.query);\n    const start = page * pageSize;\n    return { items: found.slice(start, start \u002B pageSize), totalCount: found.length, hasMore: start \u002B pageSize \u0026lt; found.length };\n  },\n  itemTemplate: (note) =\u0026gt; motifComponent(NoteRow, { note, folder }),\n  mainTemplate: (content, status) =\u0026gt; motifComponent(\u0026quot;div\u0026quot;, (box) =\u0026gt; {\n    box.class.add(\u0026quot;list\u0026quot;);\n    const head = motifComponent(\u0026quot;div\u0026quot;, (head) =\u0026gt; {\n      head.class.add(\u0026quot;list__head\u0026quot;);\n      const title = motifComponent(\u0026quot;h2\u0026quot;, (h2) =\u0026gt; h2.setText(FOLDERS[folder].title));\n      const badge = motifComponent(\u0026quot;span\u0026quot;, (span) =\u0026gt; {\n        span.class.add(\u0026quot;badge\u0026quot;);\n        span.bindings.text(() =\u0026gt; \u0060${status.totalCount}\u0060);\n      });\n      head.controls.add(title, badge);\n    });\n    const rows = motifComponent(\u0026quot;div\u0026quot;, (rows) =\u0026gt; {\n      rows.class.add(\u0026quot;rows\u0026quot;);\n      rows.controls.add(content);\n    });\n    box.controls.add(head, rows);\n  }),\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe \u003Ccode\u003E\u0026lt;content\u0026gt;\u0026lt;/content\u0026gt;\u003C/code\u003E tag places the \u003Ccode\u003Econtent\u003C/code\u003E parameter.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003E\u003Ccode\u003Econtent\u003C/code\u003E is a component, so it is added to the scroll container\u0027s \u003Ccode\u003Econtrols\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003EmainTemplate\u003C/code\u003E is called once, in the list\u0027s constructor; the first request is made when \u003Ccode\u003Econtent\u003C/code\u003E starts being built.\u003C/p\u003E\n\u003Ch2 id=\u0022filtering\u0022\u003EFiltering\u003C/h2\u003E\n\u003Cp\u003EThe list can be filtered in two places:\u003C/p\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Cstrong\u003EInside \u003Ccode\u003EdataRequest\u003C/code\u003E.\u003C/strong\u003E The search in the example works this way: \u003Ccode\u003Enotes.list(folder, state.query)\u003C/code\u003E returns only the matching notes, and \u003Ccode\u003EtotalCount\u003C/code\u003E and \u003Ccode\u003EhasMore\u003C/code\u003E are calculated from the filtered data. If the filter reads a reactive field, automatic refresh updates the list on its own.\u003C/li\u003E\n\u003Cli\u003E\u003Cstrong\u003EWith the \u003Ccode\u003Efilter\u003C/code\u003E prop.\u003C/strong\u003E The function is applied to all the loaded data on every load (first load, next page, refresh, \u003Ccode\u003EsetData\u003C/code\u003E); spacers, indices and \u003Ccode\u003EitemHeight\u003C/code\u003E totals are calculated from the filtered list, and \u003Ccode\u003Estate.data\u003C/code\u003E stays unfiltered. Since the filter runs only on loading, if a field it reads changes later, the list does not refresh on its own; call \u003Ccode\u003Erefresh()\u003C/code\u003E or move the condition into \u003Ccode\u003EdataRequest\u003C/code\u003E. If the filter removes all the loaded items, \u003Ccode\u003EemptyTemplate\u003C/code\u003E is shown, and if it is not given, the list area stays empty; the next page is not asked for, even if there are more pages on the server. If matching items can be on later pages, do the filtering in \u003Ccode\u003EdataRequest\u003C/code\u003E.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ch2 id=\u0022variable-height\u0022\u003EVariable height and size changes\u003C/h2\u003E\n\u003Cp\u003EIf the rows have different heights that can be calculated in advance, give \u003Ccode\u003EitemHeight\u003C/code\u003E a function; for example \u003Ccode\u003E(note) =\u0026gt; (note.body ? 72 : 48)\u003C/code\u003E if the row of a note with a body is taller. The heights are summed once every time the data changes (a load, \u003Ccode\u003EsetData\u003C/code\u003E, \u003Ccode\u003Efilter\u003C/code\u003E); the visible range is found with a binary search, and \u003Ccode\u003EscrollToIndex\u003C/code\u003E uses these totals as well. Invalid values (\u003Ccode\u003ENaN\u003C/code\u003E, negative) count as 0.\u003C/p\u003E\n\u003Cp\u003EThe list does not track heights: even if the value \u003Ccode\u003EitemHeight\u003C/code\u003E reads is reactive, it does not notice the change on its own. When the data stays the same but the height of one or more rows changes (a row expanded, the density setting changed, a fixed \u003Ccode\u003EitemHeight\u003C/code\u003E number was replaced with another number), call \u003Ccode\u003EupdateHeights()\u003C/code\u003E. The method reads the heights again from scratch and redraws the window; the rows stay as they are, \u003Ccode\u003Efilter\u003C/code\u003E does not run again, and no load is requested. The row at the top of the screen keeps its place on screen, \u003Ca href=\u0022#rendering-and-methods\u0022\u003Eas on a data change\u003C/a\u003E: if a row above it grows, the scroll position shifts by the same amount. If a height can only be known by measuring after drawing (a feed of free-form text), this method is not suitable.\u003C/p\u003E\n\u003Cp\u003EWhen the size of the list\u0027s container changes (a screen rotation, the mobile keyboard opening, the window size), the visible rows are recalculated without waiting for a scroll. A \u003Ccode\u003EResizeObserver\u003C/code\u003E is used for this; if the environment does not have one, this step is skipped, and the observer is released when the list is disposed.\u003C/p\u003E\n\u003Ch2 id=\u0022rendering-and-methods\u0022\u003EThe rendering model and methods\u003C/h2\u003E\n\u003Cul\u003E\n\u003Cli\u003EOnly a window of rows is in the DOM: \u003Ccode\u003E[anchor − overscan, anchor \u002B visible \u002B overscan)\u003C/code\u003E, \u003Ccode\u003Eanchor = floor(scrollTop / itemHeight)\u003C/code\u003E. The rows are plain siblings between two spacer \u003Ccode\u003Ediv\u003C/code\u003Es; the spacer heights are never negative, and \u003Ccode\u003Etop \u002B rows \u002B bottom = filtered length × itemHeight\u003C/code\u003E.\u003C/li\u003E\n\u003Cli\u003EA row that leaves the window is \u003Cstrong\u003Enot disposed but detached from the DOM\u003C/strong\u003E; when it comes back, the same component (its bindings, input state, item object) is put back at its ordered position. No placeholder comments pile up. A detached row gets \u003Ccode\u003EonDeactivated\u003C/code\u003E, and a row put back gets \u003Ccode\u003EonActivated\u003C/code\u003E. When \u003Ccode\u003EcacheSize\u003C/code\u003E is exceeded, the rows not seen for the longest time are disposed.\u003C/li\u003E\n\u003Cli\u003ERows are cached by the identity of the item object (by position for primitive items). The same object can appear in the data more than once; each occurrence gets its own row.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003EsetData\u003C/code\u003E, automatic refresh and the arrival of the next page match the rows by this identity: the row of an object still found in the new view is kept, whether it is on screen or in the cache, and moved to its new position; the row of an object not found in the new view (including those the \u003Ccode\u003Efilter\u003C/code\u003E drops along with the next page) is disposed. An object finds the same row whether it is given in raw form or as its reactive proxy. For a primitive item, the same value at the same position keeps its row. If new objects arrive on every load (e.g. a fresh list from the server), the rows are rebuilt even if they carry the same \u003Ccode\u003Eid\u003C/code\u003E. The \u003Ccode\u003Eindex\u003C/code\u003E a kept row received from \u003Ccode\u003EitemTemplate\u003C/code\u003E is its position at the moment it was built; it is not updated afterwards.\u003C/li\u003E\n\u003Cli\u003EWhen the data changes (\u003Ccode\u003EsetData\u003C/code\u003E, automatic refresh, the next page), the first of the rows visible on screen that stays in the new data keeps its place on screen: if items are added above it or deleted from above it (also when the next page\u0027s items move above it through a sorting \u003Ccode\u003Efilter\u003C/code\u003E), the scroll position shifts by that much, and when the order changes, the scroll follows that row to its new place. For a primitive item, the same value is looked for at the position closest to its old one. If none of the visible rows remains, the drawn row closest to the screen is used, first among those above the screen and then among those below it; if none of them remains either, the scroll position is kept as it is. If a row that overflows the top of the screen gets shorter, part of it stays visible. While the list is at the very top, it stays at the top, and an item added at the top is visible. To go back to the start of the list after a new sort, call \u003Ccode\u003EscrollToIndex(0)\u003C/code\u003E. The position is read from the rows drawn on screen, so it stays correct even if the array is changed in place (\u003Ccode\u003Esplice\u003C/code\u003E, \u003Ccode\u003Esort\u003C/code\u003E) and the same array is given again. The scroll container is given \u003Ccode\u003Eoverflow-anchor: none\u003C/code\u003E: the list keeps the position, not the browser; the browser\u0027s own scroll anchoring could change the scroll position while the list is drawing rows and leave a gap in the visible area.\u003C/li\u003E\n\u003Cli\u003EThe window is recalculated on every scroll event (also while \u003Ccode\u003EhasMore\u003C/code\u003E is \u003Ccode\u003Efalse\u003C/code\u003E); only the difference between the old and the new window is processed.\u003C/li\u003E\n\u003Cli\u003EThe first request is made while the list is being built; a list held with \u003Ccode\u003Ex-wait\u003C/code\u003E is not built, so its first request is also postponed until the wait ends.\u003C/li\u003E\n\u003Cli\u003EThe first draw waits for layout: if the scroll container is not in \u003Ccode\u003Edocument\u003C/code\u003E yet, drawing is postponed to \u003Ccode\u003EonMounted\u003C/code\u003E; for a container that is in the document but has a height of 0, drawing happens when the container\u0027s size changes.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EMethod\u003C/th\u003E\n\u003Cth\u003EEffect\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Erefresh()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EResets the data and asks for page 0 again with \u003Ccode\u003EdataRequest\u003C/code\u003E; all rows in the cache are disposed. Sets up automatic refresh tracking again. Returns a \u003Ccode\u003EPromise\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsetData(items)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EChanges the data without making a request; \u003Ccode\u003EhasMore\u003C/code\u003E becomes \u003Ccode\u003Efalse\u003C/code\u003E, the page becomes 0, and automatic refresh stops. The rows of items still found in the new data are kept, and those of the missing ones are disposed.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EupdateHeights()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EWhen the data stays the same but heights change, reads the heights again and draws the window; the rows are kept, and the row at the top of the screen stays in place (see \u003Ca href=\u0022#variable-height\u0022\u003EVariable height\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EscrollToIndex(i)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EScrolls to the position of row \u003Ccode\u003Ei\u003C/code\u003E (\u003Ccode\u003Ei × itemHeight\u003C/code\u003E with a fixed height) and draws right away; an index out of range is clamped to the edge.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EgetState()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EA shallow copy of the list state.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003EThe methods are on the list component itself; in JSX you reach it through \u003Ccode\u003Eref\u003C/code\u003E (see \u003Ca href=\u0022/docs/component-element#element-and-ref\u0022\u003EElement access inside a component\u003C/a\u003E).\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative\u0022\u003E\n\u003Cp\u003EThe methods are called on the component built with \u003Ccode\u003Enew Virtualization(...)\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ch2 id=\u0022when-to-use\u0022\u003EWhen to use it?\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003ESituation\u003C/th\u003E\n\u003Cth\u003ERecommendation\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EFew items (\u0026lt; ~100), variable height\u003C/td\u003E\n\u003Ctd\u003EThe normal list binding (\u003Ca href=\u0022/docs/conditionals-and-lists\u0022\u003EConditional Rendering and Lists\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EMany items, a \u003Cstrong\u003Efixed\u003C/strong\u003E or \u003Cstrong\u003Eprecomputable\u003C/strong\u003E row height\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EVirtualization\u003C/code\u003E (\u003Ccode\u003EitemHeight\u003C/code\u003E as a number or a function).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003EInfinite scrolling / a paged API\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003EVirtualization\u003C/code\u003E \u002B \u003Ccode\u003EautoLoad\u003C/code\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022next\u0022\u003ENext step\u003C/h2\u003E\n\u003Cp\u003ETo learn memory management and the disposal pattern, go on to \u003Ca href=\u0022/docs/memory-and-dispose\u0022\u003EMemory Management and Disposal\u003C/a\u003E.\u003C/p\u003E\n","headings":[{"id":"basic-usage","text":"Basic usage","level":2},{"id":"props","text":"Props (VirtualizationProps\u003CT\u003E)","level":2},{"id":"data-request","text":"The dataRequest contract","level":2},{"id":"auto-refresh","text":"Automatic refresh — autoRefresh","level":3},{"id":"templates-and-state","text":"Templates and the list state","level":2},{"id":"data-as-given","text":"Data is used as given","level":3},{"id":"main-template","text":"A custom container — mainTemplate","level":3},{"id":"filtering","text":"Filtering","level":2},{"id":"variable-height","text":"Variable height and size changes","level":2},{"id":"rendering-and-methods","text":"The rendering model and methods","level":2},{"id":"when-to-use","text":"When to use it?","level":2},{"id":"next","text":"Next step","level":2}],"previous":{"slug":"content-body","title":"ContentBody and ContentBlock"},"next":null,"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Advanced</p>
+        <h1>Virtual Lists (Virtualization)</h1>
+        <p>The Virtualization component; props, the dataRequest contract, automatic refresh, templates, filtering, variable height, the rendering model and methods.</p>
+<p>In lists of thousands of items, putting every item in the DOM hurts performance. MotifJS's <code>Virtualization</code> component shows lists whose row height is fixed or can be calculated in advance efficiently, by keeping only the visible items (and a few buffer rows on either side) in the DOM. It asks for the data page by page itself.</p>
+<h2 id="basic-usage">Basic usage</h2>
+<p>In the example, a folder's list of notes is drawn with a virtual list. The data is sliced page by page from the notes in the service, and each row is the <a href="/docs/component-creation">note row component</a>:</p>
+<div class="doc-code" data-file="src/parts/NoteList.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteList.tsx"><code>import { Component, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component&lt;any, { folder: Folder; state: { query: string } }&gt; {
+  override view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = this.props;
+    return (
+      &lt;Virtualization&lt;Note&gt;
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteList.ts"><code>import { Component, ComponentBase, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component&lt;any, { folder: Folder; state: { query: string } }&gt; {
+  override view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = this.props;
+    return new Virtualization&lt;Note&gt;({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; new NoteRow({ note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteList.tsx"><code>import { FromService, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export function NoteList(props: { folder: Folder; state: { query: string } }) {
+  const notes = FromService(NotesService)!;
+  const { folder, state } = props;
+
+  return (
+    &lt;Virtualization&lt;Note&gt;
+      itemHeight={64}
+      pageSize={50}
+      dataRequest={async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      }}
+      itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+      emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+    /&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteList.ts"><code>import { ComponentBase, FromService, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export function NoteList(props: { folder: Folder; state: { query: string } }) {
+  const notes = FromService(NotesService)!;
+  const { folder, state } = props;
+
+  return new Virtualization&lt;Note&gt;({
+    itemHeight: 64,
+    pageSize: 50,
+    dataRequest: async ({ page, pageSize }) =&gt; {
+      const found = notes.list(folder, state.query);
+      const start = page * pageSize;
+      return {
+        items: found.slice(start, start + pageSize),
+        totalCount: found.length,
+        hasMore: start + pageSize &lt; found.length,
+      };
+    },
+    itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+    emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+      p.class.add(&quot;list__empty&quot;);
+      p.setText(FOLDERS[folder].empty);
+    }),
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteList.tsx"><code>import { Virtualization, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export const NoteList = (props: { folder: Folder; state: { query: string } }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = props;
+    return (
+      &lt;Virtualization&lt;Note&gt;
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteList.ts"><code>import { ComponentBase, Virtualization, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService, type Folder, type Note } from &quot;../services/notes&quot;;
+
+export const NoteList = (props: { folder: Folder; state: { query: string } }) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService)!;
+    const { folder, state } = props;
+    return new Virtualization&lt;Note&gt;({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p: ComponentBase) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteList.jsx"><code>import { Component, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component {
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = this.props;
+    return (
+      &lt;Virtualization
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteList.js"><code>import { Component, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export class NoteList extends Component {
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = this.props;
+    return new Virtualization({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; new NoteRow({ note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteList.jsx"><code>import { FromService, Virtualization } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export function NoteList(props) {
+  const notes = FromService(NotesService);
+  const { folder, state } = props;
+
+  return (
+    &lt;Virtualization
+      itemHeight={64}
+      pageSize={50}
+      dataRequest={async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      }}
+      itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+      emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+    /&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteList.js"><code>import { FromService, Virtualization, motifComponent } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export function NoteList(props) {
+  const notes = FromService(NotesService);
+  const { folder, state } = props;
+
+  return new Virtualization({
+    itemHeight: 64,
+    pageSize: 50,
+    dataRequest: async ({ page, pageSize }) =&gt; {
+      const found = notes.list(folder, state.query);
+      const start = page * pageSize;
+      return {
+        items: found.slice(start, start + pageSize),
+        totalCount: found.length,
+        hasMore: start + pageSize &lt; found.length,
+      };
+    },
+    itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+    emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p) =&gt; {
+      p.class.add(&quot;list__empty&quot;);
+      p.setText(FOLDERS[folder].empty);
+    }),
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteList.jsx"><code>import { Virtualization, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export const NoteList = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = props;
+    return (
+      &lt;Virtualization
+        itemHeight={64}
+        pageSize={50}
+        dataRequest={async ({ page, pageSize }) =&gt; {
+          const found = notes.list(folder, state.query);
+          const start = page * pageSize;
+          return {
+            items: found.slice(start, start + pageSize),
+            totalCount: found.length,
+            hasMore: start + pageSize &lt; found.length,
+          };
+        }}
+        itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+        emptyTemplate={() =&gt; &lt;p class=&quot;list__empty&quot;&gt;{FOLDERS[folder].empty}&lt;/p&gt;}
+      /&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteList.js"><code>import { Virtualization, motifComponent, motifOptions } from &quot;@motifx/core&quot;;
+import { NoteRow } from &quot;./NoteRow&quot;;
+import { FOLDERS, NotesService } from &quot;../services/notes&quot;;
+
+export const NoteList = (props) =&gt; motifOptions({
+  el: null,
+
+  view() {
+    const notes = this.getService(NotesService);
+    const { folder, state } = props;
+    return new Virtualization({
+      itemHeight: 64,
+      pageSize: 50,
+      dataRequest: async ({ page, pageSize }) =&gt; {
+        const found = notes.list(folder, state.query);
+        const start = page * pageSize;
+        return {
+          items: found.slice(start, start + pageSize),
+          totalCount: found.length,
+          hasMore: start + pageSize &lt; found.length,
+        };
+      },
+      itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+      emptyTemplate: () =&gt; motifComponent(&quot;p&quot;, (p) =&gt; {
+        p.class.add(&quot;list__empty&quot;);
+        p.setText(FOLDERS[folder].empty);
+      }),
+    });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>The folder layout places the list together with the search state with <code>&lt;NoteList folder={this.folder} state={this.state} /&gt;</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>The folder layout places the list together with the search state with <code>new NoteList({ folder: this.folder, state: this.state })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>The folder layout places the list together with the search state with <code>motifComponent(NoteList, { folder: this.folder, state: this.state })</code>.</p>
+</div>
+<p>When <code>mainTemplate</code> is not given, the list sets up its root <code>div</code> with <code>overflow-y: auto; height: 100%; position: relative; overflow-anchor: none</code> and scrolls inside itself, so the container that holds it must have a height, or the height is given to the list with <code>style</code>. <code>dataRequest</code> reads the search text and the notes, so the list refreshes on its own as you type into the search box (see <a href="#auto-refresh">Automatic refresh</a>).</p>
+<h2 id="props">Props (<code>VirtualizationProps&lt;T&gt;</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Prop</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dataRequest</code></td>
+<td><code>(req) =&gt; Promise&lt;VirtualizationDataResponse&lt;T&gt;&gt;</code></td>
+<td><strong>Required.</strong> The function that fetches a page of data; see <a href="#data-request">The <code>dataRequest</code> contract</a>.</td>
+</tr>
+<tr>
+<td><code>itemTemplate</code></td>
+<td><code>(item: T, index: number) =&gt; any</code></td>
+<td><strong>Required.</strong> Builds the row for each item. If it does not return a component, the returned value is wrapped in one. The item arrives exactly as it was given in the data (see <a href="#data-as-given">Data is used as given</a>).</td>
+</tr>
+<tr>
+<td><code>itemHeight</code></td>
+<td><code>number \| (item: T, index: number) =&gt; number</code></td>
+<td><strong>Required.</strong> The pixel height of each item. A number: all rows are the same; a function: a known height per row (see <a href="#variable-height">Variable height</a>).</td>
+</tr>
+<tr>
+<td><code>pageSize</code></td>
+<td><code>number</code></td>
+<td>How many items to ask for in each request (50 by default).</td>
+</tr>
+<tr>
+<td><code>mainTemplate</code></td>
+<td><code>(content, state) =&gt; any</code></td>
+<td>The layout that wraps the list; see <a href="#main-template">A custom container</a>.</td>
+</tr>
+<tr>
+<td><code>loadingTemplate</code></td>
+<td><code>(state) =&gt; any</code></td>
+<td>The view shown while the first load is in progress.</td>
+</tr>
+<tr>
+<td><code>emptyTemplate</code></td>
+<td><code>() =&gt; any</code></td>
+<td>The view shown when there are no items left to show (the data is empty, or the filter removed all of them).</td>
+</tr>
+<tr>
+<td><code>errorTemplate</code></td>
+<td><code>(error) =&gt; any</code></td>
+<td>The view shown in place of the rows when the first load, <code>refresh()</code> or an automatic refresh request fails; if it is not given, the error is reported as <code>MJX207</code>. An error in the next page request is always reported as <code>MJX207</code> and written to <code>getState().error</code>; the loaded rows stay on screen, the error view is not shown, the request is made again on the next scroll, and <code>error</code> is cleared on a successful load.</td>
+</tr>
+<tr>
+<td><code>filter</code></td>
+<td><code>(items: T[]) =&gt; T[]</code></td>
+<td>Applied to the loaded data; spacers and indices are calculated from the filtered length (see <a href="#filtering">Filtering</a>).</td>
+</tr>
+<tr>
+<td><code>overscan</code></td>
+<td><code>number</code></td>
+<td>The number of extra rows drawn <strong>above and below</strong> the visible area (by default, the number of visible rows).</td>
+</tr>
+<tr>
+<td><code>cacheSize</code></td>
+<td><code>number</code></td>
+<td>The upper limit of row components kept in the cache, the drawn rows included (by default <code>max(200, 3 × the number of drawn rows)</code>). When it is exceeded, the off-screen rows not seen for the longest time are disposed.</td>
+</tr>
+<tr>
+<td><code>autoRefresh</code></td>
+<td><code>boolean</code></td>
+<td>When the reactive data read inside <code>dataRequest</code> changes, it fetches the loaded range again in a single request (on by default); see <a href="#auto-refresh">Automatic refresh</a>. With <code>false</code>, the list refreshes only with <code>refresh()</code>.</td>
+</tr>
+<tr>
+<td><code>watch</code></td>
+<td><code>() =&gt; unknown</code></td>
+<td>An extra dependency for automatic refresh: reactive fields read here trigger a reload too.</td>
+</tr>
+<tr>
+<td><code>autoLoad</code></td>
+<td><code>boolean</code></td>
+<td>Asks for the next page when nearing the bottom (on by default). The next page is also asked for when the drawn window comes within <code>overscan</code> of the end of the loaded data (e.g. when the first page does not fill the visible area).</td>
+</tr>
+<tr>
+<td><code>autoLoadThreshold</code></td>
+<td><code>number</code></td>
+<td>How many pixels before the bottom edge of the <strong>loaded</strong> data the next page is asked for (100 by default). With a fixed height, the bottom edge is <code>data.length × itemHeight</code>.</td>
+</tr>
+<tr>
+<td><code>className</code></td>
+<td><code>string</code></td>
+<td>A class added to the root <code>div</code>.</td>
+</tr>
+<tr>
+<td><code>style</code></td>
+<td><code>Partial&lt;CSSStyleDeclaration&gt;</code></td>
+<td>Inline style for the root <code>div</code>. It is applied after the list's own <code>overflow-y</code>, <code>height</code> and <code>position</code> values; if you give the same property, yours wins.</td>
+</tr>
+<tr>
+<td><code>overscanPages</code>, <code>renderMode</code>, <code>pageBuffer</code></td>
+<td></td>
+<td>Reserved; they are not read.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="data-request">The <code>dataRequest</code> contract</h2>
+<p><code>dataRequest</code> receives a request object (<code>VirtualizationDataRequest</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>page</code></td>
+<td><code>number</code></td>
+<td>The zero-based page number.</td>
+</tr>
+<tr>
+<td><code>pageSize</code></td>
+<td><code>number</code></td>
+<td>The number of items asked for. In an automatic refresh the loaded range is asked for in a single request, so <code>page</code> is 0 and <code>pageSize</code> is <code>pageSize × the number of loaded pages</code>.</td>
+</tr>
+<tr>
+<td><code>scrollTop</code></td>
+<td><code>number</code></td>
+<td>The scroll position at the time of the request (0 on the first load).</td>
+</tr>
+</tbody>
+</table>
+<p>and gives a <code>Promise</code> that returns a response object (<code>VirtualizationDataResponse&lt;T&gt;</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>items</code></td>
+<td><code>T[]</code></td>
+<td>The items on this page.</td>
+</tr>
+<tr>
+<td><code>totalCount</code></td>
+<td><code>number</code></td>
+<td>The number of items in the whole data set. It is written to <code>state.totalCount</code> (e.g. for showing the total in a header) and decides the size of the scroll area while <code>hasMore</code> holds.</td>
+</tr>
+<tr>
+<td><code>hasMore</code></td>
+<td><code>boolean</code></td>
+<td>Whether there is a next page. When it returns <code>false</code>, automatic loading stops.</td>
+</tr>
+</tbody>
+</table>
+<p>The scroll area covers the whole <code>totalCount</code>: items that are not loaded yet take up space in the bottom spacer, at their full height with a fixed <code>itemHeight</code>, and at the average of the loaded rows with a height given as a function. When you scroll into the unloaded region, pages are asked for in order until they reach it. When <code>hasMore</code> becomes <code>false</code>, or <code>totalCount</code> is less than the loaded items, the area is calculated from the loaded data only. <code>filter</code> is applied to the loaded items; the unloaded part is counted unfiltered, and the area shrinks as the items the filter drops are loaded.</p>
+<h3 id="auto-refresh">Automatic refresh — <code>autoRefresh</code></h3>
+<p><code>autoRefresh</code> (on by default) calls <code>dataRequest</code> inside an effect on the first load and on <code>refresh()</code>. When one of the reactive fields read in this call changes, the loaded range (from page 0 to the current page) is fetched again in a single request; the rows of items still found in the response are kept, and those of the missing ones are disposed (see <a href="#rendering-and-methods">The rendering model</a>). Next-page requests are not tracked; <code>setData()</code> stops the tracking. In the example, <code>notes.list(folder, state.query)</code> reads the notes array, the search text and the archive, pin and date fields of the notes (and the title and body too while the search is filled in); when one of them changes, the list refreshes.</p>
+<div class="doc-variant" data-variant="declarative">
+<p>The compiler wraps the <code>await</code>s in an <code>async</code> <code>dataRequest</code> function written on the tag: reactive fields read after an <code>await</code> become dependencies too (elsewhere, reads after <code>await</code> are not tracked; see <a href="/docs/reactivity#await-reads">Reads after <code>await</code></a>). If <code>dataRequest</code> is defined outside the tag, or a dependency comes from somewhere else, give an extra dependency with <code>watch={() =&gt; state.query}</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p>The compiler applies the <code>await</code> wrapping only to a <code>dataRequest</code> written on a <code>&lt;Virtualization&gt;</code> tag; without JSX, only the reactive fields read before the first <code>await</code> become dependencies (see <a href="/docs/reactivity#await-reads">Reads after <code>await</code></a>). A dependency read after an <code>await</code> or coming from somewhere else is given with <code>watch: () =&gt; state.query</code>.</p>
+</div>
+<p><code>watch</code> is called once while tracking is being set up, inside the same effect as <code>dataRequest</code>; the fields it reads are added to the dependencies, and an error it throws is reported as <code>MJX205</code>. The reload happens on the microtask after the change; the content stays in place until the response arrives. If more than 30 reloads are triggered within a second (loop protection), tracking is stopped and an <code>MJX206</code> warning is written in development mode; <code>refresh()</code> sets the tracking up again.</p>
+<h2 id="templates-and-state">Templates and the list state</h2>
+<p><code>mainTemplate</code> and <code>loadingTemplate</code> receive the list's state (<code>VirtualizationState&lt;T&gt;</code>). The state fields are reactive; a field read through a getter in a template stays up to date. The <code>data</code> field announces that the loaded array, or the array given with <code>setData</code>, has changed, but it does not wrap the items (see <a href="#data-as-given">Data is used as given</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isLoading</code></td>
+<td><code>boolean</code></td>
+<td>The first load or a <code>refresh()</code> request is in progress.</td>
+</tr>
+<tr>
+<td><code>isInitialized</code></td>
+<td><code>boolean</code></td>
+<td>The first response has arrived, or <code>setData()</code> was called.</td>
+</tr>
+<tr>
+<td><code>currentPage</code></td>
+<td><code>number</code></td>
+<td>The last loaded page.</td>
+</tr>
+<tr>
+<td><code>totalCount</code></td>
+<td><code>number</code></td>
+<td>The <code>totalCount</code> from the last response.</td>
+</tr>
+<tr>
+<td><code>hasMore</code></td>
+<td><code>boolean</code></td>
+<td>The <code>hasMore</code> from the last response.</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td><code>Error \| undefined</code></td>
+<td>The error of the last request; cleared on a successful load.</td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td><code>T[]</code></td>
+<td>The loaded items (with no filter applied), as they were given.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-as-given">Data is used as given</h3>
+<p>The list does not turn the data into reactive objects. The items returned by <code>dataRequest</code> or given to <code>setData</code> reach <code>itemTemplate</code>, <code>itemHeight</code> and <code>filter</code> as they are; the very array given to <code>setData</code> is read as <code>state.data</code> and <code>getState().data</code>. Reactive data stays reactive, and plain data stays plain.</p>
+<p>A row built with a plain object does not show a value written to the object later on its own. If the row needs to follow the change, give the data with <code>reactive</code>; with plain data, the change is brought to the screen by running the row's bindings again with <code>setState()</code> (see <a href="/docs/reactivity#bindings">Where reactivity meets the DOM</a>). If a new array has arrived, call <code>setData</code>.</p>
+<p>Later pages are not appended to the first page's array: the list collects the loaded items in its own array, and the arrays returned by <code>dataRequest</code> do not change.</p>
+<h3 id="main-template">A custom container — <code>mainTemplate</code></h3>
+<p><code>mainTemplate</code> builds the layout that wraps the list. Its first parameter (<code>content</code>) is the component that carries the rows; wherever it is put in the layout, the rows are drawn there. The nearest element wrapping it becomes the scroll container: the list gives it <code>overflow-y: auto; position: relative; overflow-anchor: none</code> and listens to its scrolling, while you give its height. In this case no style is written on the root <code>div</code>. A list with a header that shows the folder name and the total number of notes:</p>
+<div class="doc-code" data-file="src/parts/NoteList.tsx">
+<pre data-lang="tsx" data-variant="declarative/typescript" data-file="src/parts/NoteList.tsx"><code>&lt;Virtualization&lt;Note&gt;
+  itemHeight={64}
+  dataRequest={async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  }}
+  itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+  mainTemplate={(content, status) =&gt; (
+    &lt;div class=&quot;list&quot;&gt;
+      &lt;div class=&quot;list__head&quot;&gt;
+        &lt;h2&gt;{FOLDERS[folder].title}&lt;/h2&gt;
+        &lt;span class=&quot;badge&quot;&gt;{() =&gt; status.totalCount}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;rows&quot;&gt;
+        &lt;content&gt;&lt;/content&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )}
+/&gt;</code></pre>
+<pre data-lang="ts" data-variant="imperative/typescript" data-file="src/parts/NoteList.ts"><code>const list = new Virtualization&lt;Note&gt;({
+  itemHeight: 64,
+  dataRequest: async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  },
+  itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+  mainTemplate: (content, status) =&gt; motifComponent(&quot;div&quot;, (box: ComponentBase) =&gt; {
+    box.class.add(&quot;list&quot;);
+    const head = motifComponent(&quot;div&quot;, (head: ComponentBase) =&gt; {
+      head.class.add(&quot;list__head&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2: ComponentBase) =&gt; h2.setText(FOLDERS[folder].title));
+      const badge = motifComponent(&quot;span&quot;, (span: ComponentBase) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; `${status.totalCount}`);
+      });
+      head.controls.add(title, badge);
+    });
+    const rows = motifComponent(&quot;div&quot;, (rows: ComponentBase) =&gt; {
+      rows.class.add(&quot;rows&quot;);
+      rows.controls.add(content);
+    });
+    box.controls.add(head, rows);
+  }),
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/javascript" data-file="src/parts/NoteList.jsx"><code>&lt;Virtualization
+  itemHeight={64}
+  dataRequest={async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  }}
+  itemTemplate={(note) =&gt; &lt;NoteRow note={note} folder={folder} /&gt;}
+  mainTemplate={(content, status) =&gt; (
+    &lt;div class=&quot;list&quot;&gt;
+      &lt;div class=&quot;list__head&quot;&gt;
+        &lt;h2&gt;{FOLDERS[folder].title}&lt;/h2&gt;
+        &lt;span class=&quot;badge&quot;&gt;{() =&gt; status.totalCount}&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;rows&quot;&gt;
+        &lt;content&gt;&lt;/content&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )}
+/&gt;</code></pre>
+<pre data-lang="js" data-variant="imperative/javascript" data-file="src/parts/NoteList.js"><code>const list = new Virtualization({
+  itemHeight: 64,
+  dataRequest: async ({ page, pageSize }) =&gt; {
+    const found = notes.list(folder, state.query);
+    const start = page * pageSize;
+    return { items: found.slice(start, start + pageSize), totalCount: found.length, hasMore: start + pageSize &lt; found.length };
+  },
+  itemTemplate: (note) =&gt; motifComponent(NoteRow, { note, folder }),
+  mainTemplate: (content, status) =&gt; motifComponent(&quot;div&quot;, (box) =&gt; {
+    box.class.add(&quot;list&quot;);
+    const head = motifComponent(&quot;div&quot;, (head) =&gt; {
+      head.class.add(&quot;list__head&quot;);
+      const title = motifComponent(&quot;h2&quot;, (h2) =&gt; h2.setText(FOLDERS[folder].title));
+      const badge = motifComponent(&quot;span&quot;, (span) =&gt; {
+        span.class.add(&quot;badge&quot;);
+        span.bindings.text(() =&gt; `${status.totalCount}`);
+      });
+      head.controls.add(title, badge);
+    });
+    const rows = motifComponent(&quot;div&quot;, (rows) =&gt; {
+      rows.class.add(&quot;rows&quot;);
+      rows.controls.add(content);
+    });
+    box.controls.add(head, rows);
+  }),
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>The <code>&lt;content&gt;&lt;/content&gt;</code> tag places the <code>content</code> parameter.</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p><code>content</code> is a component, so it is added to the scroll container's <code>controls</code>.</p>
+</div>
+<p><code>mainTemplate</code> is called once, in the list's constructor; the first request is made when <code>content</code> starts being built.</p>
+<h2 id="filtering">Filtering</h2>
+<p>The list can be filtered in two places:</p>
+<ul>
+<li><strong>Inside <code>dataRequest</code>.</strong> The search in the example works this way: <code>notes.list(folder, state.query)</code> returns only the matching notes, and <code>totalCount</code> and <code>hasMore</code> are calculated from the filtered data. If the filter reads a reactive field, automatic refresh updates the list on its own.</li>
+<li><strong>With the <code>filter</code> prop.</strong> The function is applied to all the loaded data on every load (first load, next page, refresh, <code>setData</code>); spacers, indices and <code>itemHeight</code> totals are calculated from the filtered list, and <code>state.data</code> stays unfiltered. Since the filter runs only on loading, if a field it reads changes later, the list does not refresh on its own; call <code>refresh()</code> or move the condition into <code>dataRequest</code>. If the filter removes all the loaded items, <code>emptyTemplate</code> is shown, and if it is not given, the list area stays empty; the next page is not asked for, even if there are more pages on the server. If matching items can be on later pages, do the filtering in <code>dataRequest</code>.</li>
+</ul>
+<h2 id="variable-height">Variable height and size changes</h2>
+<p>If the rows have different heights that can be calculated in advance, give <code>itemHeight</code> a function; for example <code>(note) =&gt; (note.body ? 72 : 48)</code> if the row of a note with a body is taller. The heights are summed once every time the data changes (a load, <code>setData</code>, <code>filter</code>); the visible range is found with a binary search, and <code>scrollToIndex</code> uses these totals as well. Invalid values (<code>NaN</code>, negative) count as 0.</p>
+<p>The list does not track heights: even if the value <code>itemHeight</code> reads is reactive, it does not notice the change on its own. When the data stays the same but the height of one or more rows changes (a row expanded, the density setting changed, a fixed <code>itemHeight</code> number was replaced with another number), call <code>updateHeights()</code>. The method reads the heights again from scratch and redraws the window; the rows stay as they are, <code>filter</code> does not run again, and no load is requested. The row at the top of the screen keeps its place on screen, <a href="#rendering-and-methods">as on a data change</a>: if a row above it grows, the scroll position shifts by the same amount. If a height can only be known by measuring after drawing (a feed of free-form text), this method is not suitable.</p>
+<p>When the size of the list's container changes (a screen rotation, the mobile keyboard opening, the window size), the visible rows are recalculated without waiting for a scroll. A <code>ResizeObserver</code> is used for this; if the environment does not have one, this step is skipped, and the observer is released when the list is disposed.</p>
+<h2 id="rendering-and-methods">The rendering model and methods</h2>
+<ul>
+<li>Only a window of rows is in the DOM: <code>[anchor − overscan, anchor + visible + overscan)</code>, <code>anchor = floor(scrollTop / itemHeight)</code>. The rows are plain siblings between two spacer <code>div</code>s; the spacer heights are never negative, and <code>top + rows + bottom = filtered length × itemHeight</code>.</li>
+<li>A row that leaves the window is <strong>not disposed but detached from the DOM</strong>; when it comes back, the same component (its bindings, input state, item object) is put back at its ordered position. No placeholder comments pile up. A detached row gets <code>onDeactivated</code>, and a row put back gets <code>onActivated</code>. When <code>cacheSize</code> is exceeded, the rows not seen for the longest time are disposed.</li>
+<li>Rows are cached by the identity of the item object (by position for primitive items). The same object can appear in the data more than once; each occurrence gets its own row.</li>
+<li><code>setData</code>, automatic refresh and the arrival of the next page match the rows by this identity: the row of an object still found in the new view is kept, whether it is on screen or in the cache, and moved to its new position; the row of an object not found in the new view (including those the <code>filter</code> drops along with the next page) is disposed. An object finds the same row whether it is given in raw form or as its reactive proxy. For a primitive item, the same value at the same position keeps its row. If new objects arrive on every load (e.g. a fresh list from the server), the rows are rebuilt even if they carry the same <code>id</code>. The <code>index</code> a kept row received from <code>itemTemplate</code> is its position at the moment it was built; it is not updated afterwards.</li>
+<li>When the data changes (<code>setData</code>, automatic refresh, the next page), the first of the rows visible on screen that stays in the new data keeps its place on screen: if items are added above it or deleted from above it (also when the next page's items move above it through a sorting <code>filter</code>), the scroll position shifts by that much, and when the order changes, the scroll follows that row to its new place. For a primitive item, the same value is looked for at the position closest to its old one. If none of the visible rows remains, the drawn row closest to the screen is used, first among those above the screen and then among those below it; if none of them remains either, the scroll position is kept as it is. If a row that overflows the top of the screen gets shorter, part of it stays visible. While the list is at the very top, it stays at the top, and an item added at the top is visible. To go back to the start of the list after a new sort, call <code>scrollToIndex(0)</code>. The position is read from the rows drawn on screen, so it stays correct even if the array is changed in place (<code>splice</code>, <code>sort</code>) and the same array is given again. The scroll container is given <code>overflow-anchor: none</code>: the list keeps the position, not the browser; the browser's own scroll anchoring could change the scroll position while the list is drawing rows and leave a gap in the visible area.</li>
+<li>The window is recalculated on every scroll event (also while <code>hasMore</code> is <code>false</code>); only the difference between the old and the new window is processed.</li>
+<li>The first request is made while the list is being built; a list held with <code>x-wait</code> is not built, so its first request is also postponed until the wait ends.</li>
+<li>The first draw waits for layout: if the scroll container is not in <code>document</code> yet, drawing is postponed to <code>onMounted</code>; for a container that is in the document but has a height of 0, drawing happens when the container's size changes.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>refresh()</code></td>
+<td>Resets the data and asks for page 0 again with <code>dataRequest</code>; all rows in the cache are disposed. Sets up automatic refresh tracking again. Returns a <code>Promise</code>.</td>
+</tr>
+<tr>
+<td><code>setData(items)</code></td>
+<td>Changes the data without making a request; <code>hasMore</code> becomes <code>false</code>, the page becomes 0, and automatic refresh stops. The rows of items still found in the new data are kept, and those of the missing ones are disposed.</td>
+</tr>
+<tr>
+<td><code>updateHeights()</code></td>
+<td>When the data stays the same but heights change, reads the heights again and draws the window; the rows are kept, and the row at the top of the screen stays in place (see <a href="#variable-height">Variable height</a>).</td>
+</tr>
+<tr>
+<td><code>scrollToIndex(i)</code></td>
+<td>Scrolls to the position of row <code>i</code> (<code>i × itemHeight</code> with a fixed height) and draws right away; an index out of range is clamped to the edge.</td>
+</tr>
+<tr>
+<td><code>getState()</code></td>
+<td>A shallow copy of the list state.</td>
+</tr>
+</tbody>
+</table>
+<div class="doc-variant" data-variant="declarative">
+<p>The methods are on the list component itself; in JSX you reach it through <code>ref</code> (see <a href="/docs/component-element#element-and-ref">Element access inside a component</a>).</p>
+</div>
+<div class="doc-variant" data-variant="imperative">
+<p>The methods are called on the component built with <code>new Virtualization(...)</code>.</p>
+</div>
+<h2 id="when-to-use">When to use it?</h2>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Few items (&lt; ~100), variable height</td>
+<td>The normal list binding (<a href="/docs/conditionals-and-lists">Conditional Rendering and Lists</a>).</td>
+</tr>
+<tr>
+<td>Many items, a <strong>fixed</strong> or <strong>precomputable</strong> row height</td>
+<td><code>Virtualization</code> (<code>itemHeight</code> as a number or a function).</td>
+</tr>
+<tr>
+<td>Infinite scrolling / a paged API</td>
+<td><code>Virtualization</code> + <code>autoLoad</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next">Next step</h2>
+<p>To learn memory management and the disposal pattern, go on to <a href="/docs/memory-and-dispose">Memory Management and Disposal</a>.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

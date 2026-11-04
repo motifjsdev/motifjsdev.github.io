@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Bileşenin elemanına ve iç etiketlere erişim: `element`, `ref`, `onRefCreated`; `class`, `attr`, `style` ve `setText`.">
+    <title>Eleman ve Görünüş — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/component-element">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-element">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-element">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-element">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/component-element">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Eleman ve Görünüş">
+    <meta property="og:description" content="Bileşenin elemanına ve iç etiketlere erişim: `element`, `ref`, `onRefCreated`; `class`, `attr`, `style` ve `setText`.">
+    <script type="application/json" id="doc-data">{"slug":"component-element","locale":"tr","title":"Eleman ve Görünüş","description":"Bileşenin elemanına ve iç etiketlere erişim: \u0060element\u0060, \u0060ref\u0060, \u0060onRefCreated\u0060; \u0060class\u0060, \u0060attr\u0060, \u0060style\u0060 ve \u0060setText\u0060.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Ch2 id=\u0022element-and-ref\u0022\u003EBileşen içinde eleman erişimi (\u003Ccode\u003Eelement\u003C/code\u003E ve \u003Ccode\u003Eref\u003C/code\u003E)\u003C/h2\u003E\n\u003Cp\u003EHer bileşenin gerçek DOM düğümüne \u003Ccode\u003Eelement\u003C/code\u003E ile ulaşılır; eleman bileşen yaratılırken hazırdır. İç etiketlerden birinin bileşenini tutmak için o etikete \u003Ccode\u003Eref\u003C/code\u003E yazılır: JSX\u0027te \u003Ccode\u003Eref={this.title}\u003C/code\u003E (fonksiyon bileşeninde \u003Ccode\u003Eref={title}\u003C/code\u003E) ya da \u003Ccode\u003Eref={(c) =\u0026gt; …}\u003C/code\u003E, JSX\u0027siz yazımda props nesnesinin \u003Ccode\u003Eref\u003C/code\u003E anahtarı.\u003C/p\u003E\n\u003Cp\u003ENot sayfasının düzenleme alanı başlık ve metin alanlarını \u003Ccode\u003Eref\u003C/code\u003E ile tutar. Sayfa açılınca metin alanını içeriğinin yüksekliğine getirir, not yeniyse imleci başlığa koyar; yazdıkça metin alanı büyür. \u003Ccode\u003EonEdit\u003C/code\u003E her değişiklikte çağrılan bir geri çağrı prop\u0027udur:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteFields extends Component\u0026lt;HTMLDivElement, { note: Note; onEdit?: () =\u0026gt; void }\u0026gt; {\n  title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  override onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  override view() {\n    const { note, onEdit } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; aria-label=\u0026quot;Başlık\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Yazmaya başlayın…\u0026quot;\n          aria-label=\u0026quot;Metin\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteFields extends Component\u0026lt;HTMLDivElement, { note: Note; onEdit?: () =\u0026gt; void }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n  title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  override onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  override onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  override view() {\n    const { note, onEdit } = this.props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.title = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Adsız\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Başlık\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLTextAreaElement\u0026gt;) =\u0026gt; (this.body = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Yazmaya başlayın…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Metin\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value: string) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport type { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteFields(props: { note: Note; onEdit?: () =\u0026gt; void }) {\n  const { note, onEdit } = props;\n  let title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  let body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return (\n    \u0026lt;div\n      class=\u0026quot;editor\u0026quot;\n      onMounted={() =\u0026gt; {\n        fit();\n        if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n      }}\n    \u0026gt;\n      \u0026lt;input ref={title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; aria-label=\u0026quot;Başlık\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n      \u0026lt;textarea\n        ref={body}\n        class=\u0026quot;editor__body\u0026quot;\n        rows={1}\n        placeholder=\u0026quot;Yazmaya başlayın…\u0026quot;\n        aria-label=\u0026quot;Metin\u0026quot;\n        x-model={() =\u0026gt; note.body}\n        oninput={() =\u0026gt; {\n          fit();\n          onEdit?.();\n        }}\n      /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport function NoteFields(props: { note: Note; onEdit?: () =\u0026gt; void }) {\n  const { note, onEdit } = props;\n  let title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  let body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;editor\u0026quot;,\n    onMounted: () =\u0026gt; {\n      fit();\n      if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n    },\n    initializeComponent: (editor: ComponentBase) =\u0026gt; {\n      const titleField = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (title = field),\n        initializeComponent: (field: ComponentBase) =\u0026gt; {\n          field.class.add(\u0026quot;editor__title\u0026quot;);\n          field.attr.add({ placeholder: \u0026quot;Adsız\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Başlık\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n        },\n      });\n      const bodyField = motifComponent(\u0026quot;textarea\u0026quot;, {\n        ref: (field: Component\u0026lt;HTMLTextAreaElement\u0026gt;) =\u0026gt; (body = field),\n        initializeComponent: (field: ComponentBase) =\u0026gt; {\n          field.class.add(\u0026quot;editor__body\u0026quot;);\n          field.attr.add({ rows: 1, placeholder: \u0026quot;Yazmaya başlayın…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Metin\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.body, (value: string) =\u0026gt; (note.body = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n            fit();\n            onEdit?.();\n          });\n        },\n      });\n      editor.controls.add(titleField, bodyField);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, type Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteFields = (props: { note: Note; onEdit?: () =\u0026gt; void }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n  body: undefined as Component\u0026lt;HTMLTextAreaElement\u0026gt; | undefined,\n\n  fit() {\n    this.body!.style({ height: \u0026quot;auto\u0026quot; });\n    this.body!.style({ height: \u0060${this.body!.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title!.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; aria-label=\u0026quot;Başlık\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Yazmaya başlayın…\u0026quot;\n          aria-label=\u0026quot;Metin\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/NoteFields.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport const NoteFields = (props: { note: Note; onEdit?: () =\u0026gt; void }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n  body: undefined as Component\u0026lt;HTMLTextAreaElement\u0026gt; | undefined,\n\n  fit() {\n    this.body!.style({ height: \u0026quot;auto\u0026quot; });\n    this.body!.style({ height: \u0060${this.body!.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title!.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.title = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Adsız\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Başlık\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value: string) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLTextAreaElement\u0026gt;) =\u0026gt; (this.body = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Yazmaya başlayın…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Metin\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value: string) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteFields extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  title;\n  body;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  view() {\n    const { note, onEdit } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; aria-label=\u0026quot;Başlık\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Yazmaya başlayın…\u0026quot;\n          aria-label=\u0026quot;Metin\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteFields extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  title;\n  body;\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  }\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  }\n\n  onMounted() {\n    const { note } = this.props;\n    this.fit();\n    if (!note.title \u0026amp;\u0026amp; !note.body) this.title.element.focus();\n  }\n\n  view() {\n    const { note, onEdit } = this.props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field) =\u0026gt; (this.title = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Adsız\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Başlık\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field) =\u0026gt; (this.body = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Yazmaya başlayın…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Metin\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eexport function NoteFields(props) {\n  const { note, onEdit } = props;\n  let title;\n  let body;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return (\n    \u0026lt;div\n      class=\u0026quot;editor\u0026quot;\n      onMounted={() =\u0026gt; {\n        fit();\n        if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n      }}\n    \u0026gt;\n      \u0026lt;input ref={title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; aria-label=\u0026quot;Başlık\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n      \u0026lt;textarea\n        ref={body}\n        class=\u0026quot;editor__body\u0026quot;\n        rows={1}\n        placeholder=\u0026quot;Yazmaya başlayın…\u0026quot;\n        aria-label=\u0026quot;Metin\u0026quot;\n        x-model={() =\u0026gt; note.body}\n        oninput={() =\u0026gt; {\n          fit();\n          onEdit?.();\n        }}\n      /\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function NoteFields(props) {\n  const { note, onEdit } = props;\n  let title;\n  let body;\n\n  const fit = () =\u0026gt; {\n    body.style({ height: \u0026quot;auto\u0026quot; });\n    body.style({ height: \u0060${body.element.scrollHeight}px\u0060 });\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;editor\u0026quot;,\n    onMounted: () =\u0026gt; {\n      fit();\n      if (!note.title \u0026amp;\u0026amp; !note.body) title.element.focus();\n    },\n    initializeComponent: (editor) =\u0026gt; {\n      const titleField = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (field) =\u0026gt; (title = field),\n        initializeComponent: (field) =\u0026gt; {\n          field.class.add(\u0026quot;editor__title\u0026quot;);\n          field.attr.add({ placeholder: \u0026quot;Adsız\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Başlık\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n        },\n      });\n      const bodyField = motifComponent(\u0026quot;textarea\u0026quot;, {\n        ref: (field) =\u0026gt; (body = field),\n        initializeComponent: (field) =\u0026gt; {\n          field.class.add(\u0026quot;editor__body\u0026quot;);\n          field.attr.add({ rows: 1, placeholder: \u0026quot;Yazmaya başlayın…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Metin\u0026quot; });\n          field.bindings.model(() =\u0026gt; note.body, (value) =\u0026gt; (note.body = value));\n          field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n            fit();\n            onEdit?.();\n          });\n        },\n      });\n      editor.controls.add(titleField, bodyField);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFields = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined,\n  body: undefined,\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; aria-label=\u0026quot;Başlık\u0026quot; autocomplete=\u0026quot;off\u0026quot; x-model={() =\u0026gt; note.title} oninput={() =\u0026gt; onEdit?.()} /\u0026gt;\n        \u0026lt;textarea\n          ref={this.body}\n          class=\u0026quot;editor__body\u0026quot;\n          rows={1}\n          placeholder=\u0026quot;Yazmaya başlayın…\u0026quot;\n          aria-label=\u0026quot;Metin\u0026quot;\n          x-model={() =\u0026gt; note.body}\n          oninput={() =\u0026gt; {\n            this.fit();\n            onEdit?.();\n          }}\n        /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/NoteFields.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const NoteFields = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  title: undefined,\n  body: undefined,\n\n  fit() {\n    this.body.style({ height: \u0026quot;auto\u0026quot; });\n    this.body.style({ height: \u0060${this.body.element.scrollHeight}px\u0060 });\n  },\n\n  onConfigured() {\n    this.class.add(\u0026quot;editor\u0026quot;);\n  },\n\n  onMounted() {\n    this.fit();\n    if (!props.note.title \u0026amp;\u0026amp; !props.note.body) this.title.element.focus();\n  },\n\n  view() {\n    const { note, onEdit } = props;\n    const title = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field) =\u0026gt; (this.title = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__title\u0026quot;);\n        field.attr.add({ placeholder: \u0026quot;Adsız\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Başlık\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.title, (value) =\u0026gt; (note.title = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; onEdit?.());\n      },\n    });\n    const body = motifComponent(\u0026quot;textarea\u0026quot;, {\n      ref: (field) =\u0026gt; (this.body = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.class.add(\u0026quot;editor__body\u0026quot;);\n        field.attr.add({ rows: 1, placeholder: \u0026quot;Yazmaya başlayın…\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Metin\u0026quot; });\n        field.bindings.model(() =\u0026gt; note.body, (value) =\u0026gt; (note.body = value));\n        field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; {\n          this.fit();\n          onEdit?.();\n        });\n      },\n    });\n    return motifFragment({ childs: [title, body] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003ENot sayfası alanları \u003Ccode\u003E\u0026lt;NoteFields note={note} onEdit={() =\u0026gt; this.edited(note)} /\u0026gt;\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003ENot sayfası alanları \u003Ccode\u003Enew NoteFields({ note, onEdit: () =\u0026gt; this.edited(note) })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003ENot sayfası alanları \u003Ccode\u003EmotifComponent(NoteFields, { note, onEdit: () =\u0026gt; this.edited(note) })\u003C/code\u003E ile yerleştirir.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cul\u003E\n\u003Cli\u003E\u003Ccode\u003Eref={(s) =\u0026gt; ...}\u003C/code\u003E — geri çağırım biçimi; \u003Ccode\u003Es\u003C/code\u003E etiketin bileşenidir (düz DOM etiketinde elemanı saran \u003Ccode\u003EComponent\u003C/code\u003E, bileşen etiketinde bileşen örneği, fonksiyon bileşeninde döndürülen kök). JSX\u0027siz yazımda yalnız bu biçim vardır: \u003Ccode\u003EmotifComponent(\u0026quot;input\u0026quot;, { ref: (s) =\u0026gt; (this.title = s), … })\u003C/code\u003E (fonksiyon bileşeninde \u003Ccode\u003E(title = s)\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref={this.x}\u003C/code\u003E / \u003Ccode\u003Eref={ad}\u003C/code\u003E — derleyici hedefi çözer. Hedef bir metot, fonksiyon değerli alan ya da yerel fonksiyonsa etiketin bileşeniyle \u003Cstrong\u003Eçağrılır\u003C/strong\u003E. Bildirilmiş bir alan (değersiz ya da düz değerli) ya da başlangıç değeri olmayan bir değişkense bileşen ona \u003Cstrong\u003Eatanır\u003C/strong\u003E. Derleme anında belirlenemeyen hedeflerde (bildirilmemiş ya da üst sınıftan gelen üye, parametre, \u003Ccode\u003Eprops.x\u003C/code\u003E, fonksiyon tipli alan, getter) karar çalışma anında verilir: değer fonksiyonsa çağrılır, değilse atanır. İçe aktarılan bir fonksiyonu ref olarak vermek için geri çağırım biçimini yazın: \u003Ccode\u003Eref={(s) =\u0026gt; registerField(s)}\u003C/code\u003E. \u003Ccode\u003Eref={registerField}\u003C/code\u003E yazımında üretilen kod içe aktarılan ada bir atama dalı da içerir; geliştirme sunucusunda çalışır, ama \u003Ccode\u003Evite build\u003C/code\u003E (Rollup) \u0026quot;Illegal reassignment of import\u0026quot; hatasıyla durur.\u003C/li\u003E\n\u003Cli\u003Eİki biçim de düz DOM etiketinde ve bileşen etiketinde aynı anlamdadır; \u003Ccode\u003Ex-ref\u003C/code\u003E (ve \u003Ccode\u003Ex:ref\u003C/code\u003E) \u003Ccode\u003Eref\u003C/code\u003E ile aynıdır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref\u003C/code\u003E, etiketin bileşeni kurulurken (\u003Ccode\u003Ebuild()\u003C/code\u003E\u0027den önce) tam bir kez çağrılır ve DOM\u0027a öznitelik olarak yazılmaz. Sınıf ve Options bileşeni etiketinde ref çağrıldığında \u003Ccode\u003Eprops\u003C/code\u003E, etiketin ortak öznitelikleri (\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E …) ve \u003Ccode\u003Eoptions\u003C/code\u003E uygulanmıştır. Düz DOM etiketinde ref anında \u003Ccode\u003Eoptions\u003C/code\u003E ve yapıcıya giden öznitelikler (\u003Ccode\u003E{...p}\u003C/code\u003E ile yayılanlar, JSX\u0027siz yazımda nesneye doğrudan konanlar) uygulanmıştır; JSX\u0027te etikete doğrudan yazılan öznitelikler (\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eid\u003C/code\u003E, \u003Ccode\u003Eplaceholder\u003C/code\u003E …) ve JSX\u0027siz yazımda \u003Ccode\u003EinitializeComponent\u003C/code\u003E içinde eklenenler ise build sırasında, ref\u0027ten sonra yazılır. Fonksiyon bileşeni etiketinde ref, fonksiyon kökünü döndürür döndürmez çağrılır. Sınıf bileşeninde ref taban sınıfın yapıcısı içinde çalışır; alt sınıfın gövdesinde tanımlanan alanlar (\u003Ccode\u003Emarker = \u0027ready\u0027\u003C/code\u003E) JavaScript gereği yapıcı döndükten sonra kurulur, ref içinde henüz yoktur. Ref, sınıfın kendi alanlarına yazmak yerine bileşeni üst bileşendeki bir alana atamak için kullanılır (\u003Ccode\u003Eref={(b) =\u0026gt; (this.okButton = b)}\u003C/code\u003E).\u003C/li\u003E\n\u003Cli\u003EAynı etikette \u003Ccode\u003Eref\u003C/code\u003E ile \u003Ccode\u003Ex-ref\u003C/code\u003E birlikte yazılırsa ikisi de kaynaktaki sırayla birer kez çalışır.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eref\u003C/code\u003E bir prop değildir, yalnız verildiği bileşende çalışır: sınıf bileşeninde bileşenin kendisine, fonksiyon bileşeninde döndürülen köke uygulanır. Fonksiyona giden \u003Ccode\u003Eprops\u003C/code\u003E\u0027ta ve \u003Ccode\u003Ethis.props\u003C/code\u003E\u0027ta yer almaz; bu yüzden \u003Ccode\u003E{...props}\u003C/code\u003E / \u003Ccode\u003E{...this.props}\u003C/code\u003E ile yaymak onu içteki bir bileşene taşımaz.\u003C/li\u003E\n\u003Cli\u003EJSX\u0027siz kurarken de aynıdır: \u003Ccode\u003EmotifComponent(Setting, { ref: (c) =\u0026gt; ... })\u003C/code\u003E ref\u0027i bileşenin kendisine (fonksiyon bileşeninde döndürülen köke) uygular; ref fonksiyona giden \u003Ccode\u003Eprops\u003C/code\u003E\u0027ta ve \u003Ccode\u003Ethis.props\u003C/code\u003E\u0027ta kalmaz. Sınıf biçiminde \u003Ccode\u003Enew Setting({ ref: (c) =\u0026gt; ... })\u003C/code\u003E de aynıdır; fonksiyon ve Options biçiminde \u003Ccode\u003Enew\u003C/code\u003E kullanılmaz, \u003Ccode\u003EmotifComponent\u003C/code\u003E kullanılır.\u003C/li\u003E\n\u003Cli\u003EKural basittir: \u003Ccode\u003Eref\u003C/code\u003E bir fonksiyonsa bileşenle \u003Cstrong\u003Eçağrılır\u003C/strong\u003E ve prop\u0027tan çıkarılır. Sınıf, Options ve düz etikette bir nesneyse bileşen o alana \u003Cstrong\u003Eatanır\u003C/strong\u003E (\u003Ccode\u003Eprops.ref\u003C/code\u003E): sınıf biçimli \u003Ccode\u003ESetting\u003C/code\u003E için \u003Ccode\u003Econst p = { name: \u0026quot;Arşiv\u0026quot;, hint: \u0026quot;\u0026quot;, ref: {} }; const s = new Setting(p);\u003C/code\u003E sonrasında \u003Ccode\u003Ep.ref === s\u003C/code\u003E olur. Fonksiyon bileşeninde nesne biçimli ref\u0027e atama yapılmaz; geri çağırım biçimini kullanın.\u003C/li\u003E\n\u003Cli\u003E\u003Ccode\u003Eelement\u003C/code\u003E mount\u0027tan önce de vardır; içeriği ise bileşen kurulunca gelir. Belgeye bağlı olmayı gerektiren işler (odak, ölçü) \u003Ccode\u003EonMounted\u003C/code\u003E içinde yapılır.\u003C/li\u003E\n\u003C/ul\u003E\n\u003Cp\u003Eİçteki bir öğeyi dışarıya açmak için ayrı bir prop adı kullanılır (ör. \u003Ccode\u003EtitleRef\u003C/code\u003E) ve içteki etiketin \u003Ccode\u003Eref\u003C/code\u003E\u0027inden çağrılır: \u003Ccode\u003E\u0026lt;input ref={(c) =\u0026gt; props.titleRef?.(c)} … /\u0026gt;\u003C/code\u003E. Dışarıda \u003Ccode\u003E\u0026lt;NoteFields note={note} titleRef={(c) =\u0026gt; (this.title = c)} /\u0026gt;\u003C/code\u003E yazılır (fonksiyon bileşeninde \u003Ccode\u003Etitle = c\u003C/code\u003E). Bileşen etiketine yazılan \u003Ccode\u003Eref\u003C/code\u003E ise bileşenin kendisini verir; fonksiyon bileşeninde bu, döndürülen kök \u003Ccode\u003Ediv\u003C/code\u003E\u0027dir. \u003Ccode\u003Eref={props.titleRef}\u003C/code\u003E yazımı da çalışır: değer bir fonksiyonsa içteki bileşenle çağrılır.\u003C/p\u003E\n\u003Ch3 id=\u0022on-ref-created\u0022\u003E\u003Ccode\u003EonRefCreated\u003C/code\u003E — ref\u0027lerin ortak kancası\u003C/h3\u003E\n\u003Cp\u003ESınıf bileşeni \u003Ccode\u003EonRefCreated(sender)\u003C/code\u003E metodunu tanımlarsa, \u003Ccode\u003Eview()\u003C/code\u003E içindeki her \u003Ccode\u003Eref={this.x}\u003C/code\u003E / \u003Ccode\u003Eref={ad}\u003C/code\u003E hedefine uygulandıktan hemen sonra bu metot çağrılır. \u003Ccode\u003Esender\u003C/code\u003E ref verilen etiketin bileşenidir; hedef alan o anda atanmış, hedef metot çağrılmış olur. Geri çağırım biçimindeki \u003Ccode\u003Eref={(s) =\u0026gt; ...}\u003C/code\u003E için çağrılmaz. JSX\u0027siz yazımda \u003Ccode\u003Eref\u003C/code\u003E daima geri çağırım olduğundan bu kanca yalnız JSX\u0027te çalışır.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative/class\u0022\u003E\n\u003Cp\u003EDüzenleme alanı, her alana ayrı ayrı \u003Ccode\u003Eoninput\u003C/code\u003E yazmak yerine dinleyiciyi tek yerde bağlayabilir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022typescript\u0022 data-file=\u0022src/parts/NoteFields.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\nimport type { Note } from \u0026quot;../services/notes\u0026quot;;\n\nexport class NoteFields extends Component\u0026lt;HTMLDivElement, { note: Note; onEdit?: () =\u0026gt; void }\u0026gt; {\n  title!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  body!: Component\u0026lt;HTMLTextAreaElement\u0026gt;;\n\n  override view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;\n        \u0026lt;textarea ref={this.body} class=\u0026quot;editor__body\u0026quot; placeholder=\u0026quot;Yazmaya başlayın…\u0026quot; x-model={() =\u0026gt; note.body} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n\n  onRefCreated(field: Component) {\n    field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; this.props.onEdit?.());\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022javascript\u0022 data-file=\u0022src/parts/NoteFields.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class NoteFields extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  title;\n  body;\n\n  view() {\n    const { note } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input ref={this.title} class=\u0026quot;editor__title\u0026quot; placeholder=\u0026quot;Adsız\u0026quot; x-model={() =\u0026gt; note.title} /\u0026gt;\n        \u0026lt;textarea ref={this.body} class=\u0026quot;editor__body\u0026quot; placeholder=\u0026quot;Yazmaya başlayın…\u0026quot; x-model={() =\u0026gt; note.body} /\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n\n  onRefCreated(field) {\n    field.motif.on(\u0026quot;input\u0026quot;, () =\u0026gt; this.props.onEdit?.());\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative,function,options\u0022\u003E\n\u003Cp\u003ESeçtiğiniz yazımda bu kanca çalışmaz; her ref geri çağırım biçimiyle verilir ve ortak iş o geri çağırımın içinde yapılır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003EHer ref, etiketin bileşeni oluşturulduğu anda uygulanır; \u003Ccode\u003EonRefCreated\u003C/code\u003E her birinden sonra bir kez çalışır. Düz bir etiketin içindeki etiketler o etiket kurulurken, yani kardeşleri oluşturulduktan sonra oluşturulur; bu yüzden iç içe yazımda sıra kaynaktaki sıradan farklı olabilir: \u003Ccode\u003E\u0026lt;form\u0026gt;\u0026lt;label\u0026gt;\u0026lt;input ref={this.title} /\u0026gt;\u0026lt;/label\u0026gt;\u0026lt;textarea ref={this.body} /\u0026gt;\u0026lt;/form\u0026gt;\u003C/code\u003E yazımında önce \u003Ccode\u003Ebody\u003C/code\u003E, sonra \u003Ccode\u003Etitle\u003C/code\u003E uygulanır. Kanca, JSX\u0027i yazan sınıfın (\u003Ccode\u003Eview()\u003C/code\u003E\u0027ın \u003Ccode\u003Ethis\u003C/code\u003E\u0027i) üyesidir; ref verilen bileşenin değil. Sınıfın metotlarında ve alanlarındaki (ok fonksiyonları dahil) JSX için çağrılır; fonksiyon bileşenlerinde, modül düzeyindeki JSX\u0027te, sınıf metodunun içindeki \u003Ccode\u003Efunction\u003C/code\u003E ifadelerinde ve nesne metotlarında çağrılmaz. Options bileşeninin \u003Ccode\u003Eview()\u003C/code\u003E\u0027ı da bir nesne metodudur: oradaki \u003Ccode\u003Eref={this.x}\u003C/code\u003E atanır, ama nesneye yazılan \u003Ccode\u003EonRefCreated\u003C/code\u003E üyesi çağrılmaz.\u003C/p\u003E\n\u003Ch2 id=\u0022appearance\u0022\u003EGörünüş: \u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E, \u003Ccode\u003Estyle\u003C/code\u003E, \u003Ccode\u003EsetText\u003C/code\u003E\u003C/h2\u003E\n\u003Cp\u003EBileşenin elemanının sınıfı, öznitelikleri, satır içi stili ve metni bileşenin üzerinden yönetilir.\u003C/p\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022class,options\u0022\u003E\n\u003Cp\u003EYukarıdaki örnekte \u003Ccode\u003Ethis.class.add(\u0026quot;editor\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Efield.attr.add({ … })\u003C/code\u003E ve \u003Ccode\u003Ethis.body.style({ height: … })\u003C/code\u003E bunlardır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022function\u0022\u003E\n\u003Cp\u003EYukarıdaki örnekte kök elemana verilen \u003Ccode\u003Eclass=\u0026quot;editor\u0026quot;\u003C/code\u003E (JSX\u0027siz yazımda \u003Ccode\u003Eclass: \u0026quot;editor\u0026quot;\u003C/code\u003E anahtarı), \u003Ccode\u003Efield.attr.add({ … })\u003C/code\u003E ve \u003Ccode\u003Ebody.style({ height: … })\u003C/code\u003E bunlardır.\u003C/p\u003E\n\u003C/div\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EÇağrı\u003C/th\u003E\n\u003Cth\u003ENe yapar\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass.add(\u0026quot;a\u0026quot;, \u0026quot;b\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESınıf ekler. Fonksiyon (\u003Ccode\u003E() =\u0026gt; (note.pinned ? \u0026quot;pinned\u0026quot; : \u0026quot;\u0026quot;)\u003C/code\u003E) ve \u003Ccode\u003E{ active: () =\u0026gt; open() }\u003C/code\u003E nesnesi canlıdır; dizi de verilir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass.remove(\u0026quot;a\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Eclass.remove(\u0026quot;**\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESınıfı kaldırır; \u003Ccode\u003E\u0026quot;**\u0026quot;\u003C/code\u003E bütün sınıfları ve canlı kaynakları kaldırır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclass.has(\u0026quot;a\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EElemanda sınıf var mı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eattr.add({ type: \u0026quot;button\u0026quot;, disabled: () =\u0026gt; busy })\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÖznitelik yazar. Fonksiyon değer canlıdır; \u003Ccode\u003Efalse\u003C/code\u003E, \u003Ccode\u003Enull\u003C/code\u003E ve \u003Ccode\u003Eundefined\u003C/code\u003E özniteliği kaldırır, \u003Ccode\u003Etrue\u003C/code\u003E boş değerle yazar.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eattr.remove(\u0026quot;disabled\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Eattr.has(\u0026quot;disabled\u0026quot;)\u003C/code\u003E, \u003Ccode\u003Eattr.get(\u0026quot;href\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EÖzniteliği kaldırır, varlığını sorar, değerini okur.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle({ height: \u0026quot;120px\u0026quot; })\u003C/code\u003E, \u003Ccode\u003Estyle(\u0026quot;color: red\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESatır içi stili yazar; nesne yalnız verdiği özellikleri değiştirir, metin bütün stili değiştirir.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Estyle(() =\u0026gt; ({ opacity: … }))\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ECanlı stil; fonksiyonun okuduğu değer değişince yeniden yazılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsetText(\u0026quot;Kaydedildi\u0026quot;)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EElemanın metnini değiştirir (\u003Ccode\u003EtextContent\u003C/code\u003E); içindeki çocuk düğümler gider. Canlı metin için \u003Ccode\u003Ebindings.text(() =\u0026gt; …)\u003C/code\u003E kullanılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003Eclass\u003C/code\u003E, \u003Ccode\u003Eattr\u003C/code\u003E ve \u003Ccode\u003Estyle\u003C/code\u003E elemanı olmayan bileşende bir şey yapmaz: kök bir yorum düğümüdür (bkz. \u003Ca href=\u0022/docs/components#root-element\u0022\u003EKök eleman\u003C/a\u003E). \u003Ccode\u003Eclass.add\u003C/code\u003E aynı sınıfı birden çok kaynaktan sayarak tutar; ayrıntılar ve JSX\u0027teki karşılıkları \u003Ca href=\u0022/docs/styling-and-transitions#imperative-class-style\u0022\u003EStil ve Animasyon\u003C/a\u003E sayfasındadır.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBileşeni göstermek, gizlemek, olay dinlemek ve kaynaklarını bırakmak için \u003Ca href=\u0022/docs/component-motif\u0022\u003Emotif Ad Alanı\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"element-and-ref","text":"Bileşen içinde eleman erişimi (element ve ref)","level":2},{"id":"on-ref-created","text":"onRefCreated — ref\u0027lerin ortak kancası","level":3},{"id":"appearance","text":"Görünüş: class, attr, style, setText","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"component-tree","title":"controls ve Bileşen Ağacı"},"next":{"slug":"component-motif","title":"motif Ad Alanı"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>Eleman ve Görünüş</h1>
+        <p>Bileşenin elemanına ve iç etiketlere erişim: `element`, `ref`, `onRefCreated`; `class`, `attr`, `style` ve `setText`.</p>
+<h2 id="element-and-ref">Bileşen içinde eleman erişimi (<code>element</code> ve <code>ref</code>)</h2>
+<p>Her bileşenin gerçek DOM düğümüne <code>element</code> ile ulaşılır; eleman bileşen yaratılırken hazırdır. İç etiketlerden birinin bileşenini tutmak için o etikete <code>ref</code> yazılır: JSX'te <code>ref={this.title}</code> (fonksiyon bileşeninde <code>ref={title}</code>) ya da <code>ref={(c) =&gt; …}</code>, JSX'siz yazımda props nesnesinin <code>ref</code> anahtarı.</p>
+<p>Not sayfasının düzenleme alanı başlık ve metin alanlarını <code>ref</code> ile tutar. Sayfa açılınca metin alanını içeriğinin yüksekliğine getirir, not yeniyse imleci başlığa koyar; yazdıkça metin alanı büyür. <code>onEdit</code> her değişiklikte çağrılan bir geri çağrı prop'udur:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/NoteFields.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteFields extends Component&lt;HTMLDivElement, { note: Note; onEdit?: () =&gt; void }&gt; {
+  title!: Component&lt;HTMLInputElement&gt;;
+  body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  override onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  override view() {
+    const { note, onEdit } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; aria-label=&quot;Başlık&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Yazmaya başlayın…&quot;
+          aria-label=&quot;Metin&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/NoteFields.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteFields extends Component&lt;HTMLDivElement, { note: Note; onEdit?: () =&gt; void }&gt; {
+  static override elementTag = &quot;div&quot;;
+  title!: Component&lt;HTMLInputElement&gt;;
+  body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  override onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  override onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  override view() {
+    const { note, onEdit } = this.props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.title = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Adsız&quot;, &quot;aria-label&quot;: &quot;Başlık&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field: Component&lt;HTMLTextAreaElement&gt;) =&gt; (this.body = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Yazmaya başlayın…&quot;, &quot;aria-label&quot;: &quot;Metin&quot; });
+        field.bindings.model(() =&gt; note.body, (value: string) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/NoteFields.tsx"><code>import type { Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteFields(props: { note: Note; onEdit?: () =&gt; void }) {
+  const { note, onEdit } = props;
+  let title!: Component&lt;HTMLInputElement&gt;;
+  let body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return (
+    &lt;div
+      class=&quot;editor&quot;
+      onMounted={() =&gt; {
+        fit();
+        if (!note.title &amp;&amp; !note.body) title.element.focus();
+      }}
+    &gt;
+      &lt;input ref={title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; aria-label=&quot;Başlık&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+      &lt;textarea
+        ref={body}
+        class=&quot;editor__body&quot;
+        rows={1}
+        placeholder=&quot;Yazmaya başlayın…&quot;
+        aria-label=&quot;Metin&quot;
+        x-model={() =&gt; note.body}
+        oninput={() =&gt; {
+          fit();
+          onEdit?.();
+        }}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/NoteFields.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export function NoteFields(props: { note: Note; onEdit?: () =&gt; void }) {
+  const { note, onEdit } = props;
+  let title!: Component&lt;HTMLInputElement&gt;;
+  let body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;editor&quot;,
+    onMounted: () =&gt; {
+      fit();
+      if (!note.title &amp;&amp; !note.body) title.element.focus();
+    },
+    initializeComponent: (editor: ComponentBase) =&gt; {
+      const titleField = motifComponent(&quot;input&quot;, {
+        ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (title = field),
+        initializeComponent: (field: ComponentBase) =&gt; {
+          field.class.add(&quot;editor__title&quot;);
+          field.attr.add({ placeholder: &quot;Adsız&quot;, &quot;aria-label&quot;: &quot;Başlık&quot;, autocomplete: &quot;off&quot; });
+          field.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+          field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+        },
+      });
+      const bodyField = motifComponent(&quot;textarea&quot;, {
+        ref: (field: Component&lt;HTMLTextAreaElement&gt;) =&gt; (body = field),
+        initializeComponent: (field: ComponentBase) =&gt; {
+          field.class.add(&quot;editor__body&quot;);
+          field.attr.add({ rows: 1, placeholder: &quot;Yazmaya başlayın…&quot;, &quot;aria-label&quot;: &quot;Metin&quot; });
+          field.bindings.model(() =&gt; note.body, (value: string) =&gt; (note.body = value));
+          field.motif.on(&quot;input&quot;, () =&gt; {
+            fit();
+            onEdit?.();
+          });
+        },
+      });
+      editor.controls.add(titleField, bodyField);
+    },
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/NoteFields.tsx"><code>import { motifOptions, type Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteFields = (props: { note: Note; onEdit?: () =&gt; void }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+  body: undefined as Component&lt;HTMLTextAreaElement&gt; | undefined,
+
+  fit() {
+    this.body!.style({ height: &quot;auto&quot; });
+    this.body!.style({ height: `${this.body!.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title!.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; aria-label=&quot;Başlık&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Yazmaya başlayın…&quot;
+          aria-label=&quot;Metin&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/NoteFields.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export const NoteFields = (props: { note: Note; onEdit?: () =&gt; void }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+  body: undefined as Component&lt;HTMLTextAreaElement&gt; | undefined,
+
+  fit() {
+    this.body!.style({ height: &quot;auto&quot; });
+    this.body!.style({ height: `${this.body!.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title!.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.title = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Adsız&quot;, &quot;aria-label&quot;: &quot;Başlık&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value: string) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field: Component&lt;HTMLTextAreaElement&gt;) =&gt; (this.body = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Yazmaya başlayın…&quot;, &quot;aria-label&quot;: &quot;Metin&quot; });
+        field.bindings.model(() =&gt; note.body, (value: string) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/NoteFields.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class NoteFields extends Component {
+  static elementTag = &quot;div&quot;;
+  title;
+  body;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  view() {
+    const { note, onEdit } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; aria-label=&quot;Başlık&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Yazmaya başlayın…&quot;
+          aria-label=&quot;Metin&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/NoteFields.js"><code>import { Component, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+
+export class NoteFields extends Component {
+  static elementTag = &quot;div&quot;;
+  title;
+  body;
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  }
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  }
+
+  onMounted() {
+    const { note } = this.props;
+    this.fit();
+    if (!note.title &amp;&amp; !note.body) this.title.element.focus();
+  }
+
+  view() {
+    const { note, onEdit } = this.props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field) =&gt; (this.title = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Adsız&quot;, &quot;aria-label&quot;: &quot;Başlık&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field) =&gt; (this.body = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Yazmaya başlayın…&quot;, &quot;aria-label&quot;: &quot;Metin&quot; });
+        field.bindings.model(() =&gt; note.body, (value) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/NoteFields.jsx"><code>export function NoteFields(props) {
+  const { note, onEdit } = props;
+  let title;
+  let body;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return (
+    &lt;div
+      class=&quot;editor&quot;
+      onMounted={() =&gt; {
+        fit();
+        if (!note.title &amp;&amp; !note.body) title.element.focus();
+      }}
+    &gt;
+      &lt;input ref={title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; aria-label=&quot;Başlık&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+      &lt;textarea
+        ref={body}
+        class=&quot;editor__body&quot;
+        rows={1}
+        placeholder=&quot;Yazmaya başlayın…&quot;
+        aria-label=&quot;Metin&quot;
+        x-model={() =&gt; note.body}
+        oninput={() =&gt; {
+          fit();
+          onEdit?.();
+        }}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/NoteFields.js"><code>import { motifComponent } from &quot;@motifx/core&quot;;
+
+export function NoteFields(props) {
+  const { note, onEdit } = props;
+  let title;
+  let body;
+
+  const fit = () =&gt; {
+    body.style({ height: &quot;auto&quot; });
+    body.style({ height: `${body.element.scrollHeight}px` });
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;editor&quot;,
+    onMounted: () =&gt; {
+      fit();
+      if (!note.title &amp;&amp; !note.body) title.element.focus();
+    },
+    initializeComponent: (editor) =&gt; {
+      const titleField = motifComponent(&quot;input&quot;, {
+        ref: (field) =&gt; (title = field),
+        initializeComponent: (field) =&gt; {
+          field.class.add(&quot;editor__title&quot;);
+          field.attr.add({ placeholder: &quot;Adsız&quot;, &quot;aria-label&quot;: &quot;Başlık&quot;, autocomplete: &quot;off&quot; });
+          field.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+          field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+        },
+      });
+      const bodyField = motifComponent(&quot;textarea&quot;, {
+        ref: (field) =&gt; (body = field),
+        initializeComponent: (field) =&gt; {
+          field.class.add(&quot;editor__body&quot;);
+          field.attr.add({ rows: 1, placeholder: &quot;Yazmaya başlayın…&quot;, &quot;aria-label&quot;: &quot;Metin&quot; });
+          field.bindings.model(() =&gt; note.body, (value) =&gt; (note.body = value));
+          field.motif.on(&quot;input&quot;, () =&gt; {
+            fit();
+            onEdit?.();
+          });
+        },
+      });
+      editor.controls.add(titleField, bodyField);
+    },
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/NoteFields.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+
+export const NoteFields = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined,
+  body: undefined,
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; aria-label=&quot;Başlık&quot; autocomplete=&quot;off&quot; x-model={() =&gt; note.title} oninput={() =&gt; onEdit?.()} /&gt;
+        &lt;textarea
+          ref={this.body}
+          class=&quot;editor__body&quot;
+          rows={1}
+          placeholder=&quot;Yazmaya başlayın…&quot;
+          aria-label=&quot;Metin&quot;
+          x-model={() =&gt; note.body}
+          oninput={() =&gt; {
+            this.fit();
+            onEdit?.();
+          }}
+        /&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/NoteFields.js"><code>import { motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+
+export const NoteFields = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  title: undefined,
+  body: undefined,
+
+  fit() {
+    this.body.style({ height: &quot;auto&quot; });
+    this.body.style({ height: `${this.body.element.scrollHeight}px` });
+  },
+
+  onConfigured() {
+    this.class.add(&quot;editor&quot;);
+  },
+
+  onMounted() {
+    this.fit();
+    if (!props.note.title &amp;&amp; !props.note.body) this.title.element.focus();
+  },
+
+  view() {
+    const { note, onEdit } = props;
+    const title = motifComponent(&quot;input&quot;, {
+      ref: (field) =&gt; (this.title = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__title&quot;);
+        field.attr.add({ placeholder: &quot;Adsız&quot;, &quot;aria-label&quot;: &quot;Başlık&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; note.title, (value) =&gt; (note.title = value));
+        field.motif.on(&quot;input&quot;, () =&gt; onEdit?.());
+      },
+    });
+    const body = motifComponent(&quot;textarea&quot;, {
+      ref: (field) =&gt; (this.body = field),
+      initializeComponent: (field) =&gt; {
+        field.class.add(&quot;editor__body&quot;);
+        field.attr.add({ rows: 1, placeholder: &quot;Yazmaya başlayın…&quot;, &quot;aria-label&quot;: &quot;Metin&quot; });
+        field.bindings.model(() =&gt; note.body, (value) =&gt; (note.body = value));
+        field.motif.on(&quot;input&quot;, () =&gt; {
+          this.fit();
+          onEdit?.();
+        });
+      },
+    });
+    return motifFragment({ childs: [title, body] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Not sayfası alanları <code>&lt;NoteFields note={note} onEdit={() =&gt; this.edited(note)} /&gt;</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Not sayfası alanları <code>new NoteFields({ note, onEdit: () =&gt; this.edited(note) })</code> ile yerleştirir.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Not sayfası alanları <code>motifComponent(NoteFields, { note, onEdit: () =&gt; this.edited(note) })</code> ile yerleştirir.</p>
+</div>
+<ul>
+<li><code>ref={(s) =&gt; ...}</code> — geri çağırım biçimi; <code>s</code> etiketin bileşenidir (düz DOM etiketinde elemanı saran <code>Component</code>, bileşen etiketinde bileşen örneği, fonksiyon bileşeninde döndürülen kök). JSX'siz yazımda yalnız bu biçim vardır: <code>motifComponent(&quot;input&quot;, { ref: (s) =&gt; (this.title = s), … })</code> (fonksiyon bileşeninde <code>(title = s)</code>).</li>
+<li><code>ref={this.x}</code> / <code>ref={ad}</code> — derleyici hedefi çözer. Hedef bir metot, fonksiyon değerli alan ya da yerel fonksiyonsa etiketin bileşeniyle <strong>çağrılır</strong>. Bildirilmiş bir alan (değersiz ya da düz değerli) ya da başlangıç değeri olmayan bir değişkense bileşen ona <strong>atanır</strong>. Derleme anında belirlenemeyen hedeflerde (bildirilmemiş ya da üst sınıftan gelen üye, parametre, <code>props.x</code>, fonksiyon tipli alan, getter) karar çalışma anında verilir: değer fonksiyonsa çağrılır, değilse atanır. İçe aktarılan bir fonksiyonu ref olarak vermek için geri çağırım biçimini yazın: <code>ref={(s) =&gt; registerField(s)}</code>. <code>ref={registerField}</code> yazımında üretilen kod içe aktarılan ada bir atama dalı da içerir; geliştirme sunucusunda çalışır, ama <code>vite build</code> (Rollup) &quot;Illegal reassignment of import&quot; hatasıyla durur.</li>
+<li>İki biçim de düz DOM etiketinde ve bileşen etiketinde aynı anlamdadır; <code>x-ref</code> (ve <code>x:ref</code>) <code>ref</code> ile aynıdır.</li>
+<li><code>ref</code>, etiketin bileşeni kurulurken (<code>build()</code>'den önce) tam bir kez çağrılır ve DOM'a öznitelik olarak yazılmaz. Sınıf ve Options bileşeni etiketinde ref çağrıldığında <code>props</code>, etiketin ortak öznitelikleri (<code>class</code>, <code>id</code> …) ve <code>options</code> uygulanmıştır. Düz DOM etiketinde ref anında <code>options</code> ve yapıcıya giden öznitelikler (<code>{...p}</code> ile yayılanlar, JSX'siz yazımda nesneye doğrudan konanlar) uygulanmıştır; JSX'te etikete doğrudan yazılan öznitelikler (<code>class</code>, <code>id</code>, <code>placeholder</code> …) ve JSX'siz yazımda <code>initializeComponent</code> içinde eklenenler ise build sırasında, ref'ten sonra yazılır. Fonksiyon bileşeni etiketinde ref, fonksiyon kökünü döndürür döndürmez çağrılır. Sınıf bileşeninde ref taban sınıfın yapıcısı içinde çalışır; alt sınıfın gövdesinde tanımlanan alanlar (<code>marker = 'ready'</code>) JavaScript gereği yapıcı döndükten sonra kurulur, ref içinde henüz yoktur. Ref, sınıfın kendi alanlarına yazmak yerine bileşeni üst bileşendeki bir alana atamak için kullanılır (<code>ref={(b) =&gt; (this.okButton = b)}</code>).</li>
+<li>Aynı etikette <code>ref</code> ile <code>x-ref</code> birlikte yazılırsa ikisi de kaynaktaki sırayla birer kez çalışır.</li>
+<li><code>ref</code> bir prop değildir, yalnız verildiği bileşende çalışır: sınıf bileşeninde bileşenin kendisine, fonksiyon bileşeninde döndürülen köke uygulanır. Fonksiyona giden <code>props</code>'ta ve <code>this.props</code>'ta yer almaz; bu yüzden <code>{...props}</code> / <code>{...this.props}</code> ile yaymak onu içteki bir bileşene taşımaz.</li>
+<li>JSX'siz kurarken de aynıdır: <code>motifComponent(Setting, { ref: (c) =&gt; ... })</code> ref'i bileşenin kendisine (fonksiyon bileşeninde döndürülen köke) uygular; ref fonksiyona giden <code>props</code>'ta ve <code>this.props</code>'ta kalmaz. Sınıf biçiminde <code>new Setting({ ref: (c) =&gt; ... })</code> de aynıdır; fonksiyon ve Options biçiminde <code>new</code> kullanılmaz, <code>motifComponent</code> kullanılır.</li>
+<li>Kural basittir: <code>ref</code> bir fonksiyonsa bileşenle <strong>çağrılır</strong> ve prop'tan çıkarılır. Sınıf, Options ve düz etikette bir nesneyse bileşen o alana <strong>atanır</strong> (<code>props.ref</code>): sınıf biçimli <code>Setting</code> için <code>const p = { name: &quot;Arşiv&quot;, hint: &quot;&quot;, ref: {} }; const s = new Setting(p);</code> sonrasında <code>p.ref === s</code> olur. Fonksiyon bileşeninde nesne biçimli ref'e atama yapılmaz; geri çağırım biçimini kullanın.</li>
+<li><code>element</code> mount'tan önce de vardır; içeriği ise bileşen kurulunca gelir. Belgeye bağlı olmayı gerektiren işler (odak, ölçü) <code>onMounted</code> içinde yapılır.</li>
+</ul>
+<p>İçteki bir öğeyi dışarıya açmak için ayrı bir prop adı kullanılır (ör. <code>titleRef</code>) ve içteki etiketin <code>ref</code>'inden çağrılır: <code>&lt;input ref={(c) =&gt; props.titleRef?.(c)} … /&gt;</code>. Dışarıda <code>&lt;NoteFields note={note} titleRef={(c) =&gt; (this.title = c)} /&gt;</code> yazılır (fonksiyon bileşeninde <code>title = c</code>). Bileşen etiketine yazılan <code>ref</code> ise bileşenin kendisini verir; fonksiyon bileşeninde bu, döndürülen kök <code>div</code>'dir. <code>ref={props.titleRef}</code> yazımı da çalışır: değer bir fonksiyonsa içteki bileşenle çağrılır.</p>
+<h3 id="on-ref-created"><code>onRefCreated</code> — ref'lerin ortak kancası</h3>
+<p>Sınıf bileşeni <code>onRefCreated(sender)</code> metodunu tanımlarsa, <code>view()</code> içindeki her <code>ref={this.x}</code> / <code>ref={ad}</code> hedefine uygulandıktan hemen sonra bu metot çağrılır. <code>sender</code> ref verilen etiketin bileşenidir; hedef alan o anda atanmış, hedef metot çağrılmış olur. Geri çağırım biçimindeki <code>ref={(s) =&gt; ...}</code> için çağrılmaz. JSX'siz yazımda <code>ref</code> daima geri çağırım olduğundan bu kanca yalnız JSX'te çalışır.</p>
+<div class="doc-variant" data-variant="declarative/class">
+<p>Düzenleme alanı, her alana ayrı ayrı <code>oninput</code> yazmak yerine dinleyiciyi tek yerde bağlayabilir:</p>
+<div class="doc-code" data-file="src/parts/NoteFields.tsx">
+<pre data-lang="tsx" data-variant="typescript" data-file="src/parts/NoteFields.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+import type { Note } from &quot;../services/notes&quot;;
+
+export class NoteFields extends Component&lt;HTMLDivElement, { note: Note; onEdit?: () =&gt; void }&gt; {
+  title!: Component&lt;HTMLInputElement&gt;;
+  body!: Component&lt;HTMLTextAreaElement&gt;;
+
+  override view() {
+    const { note } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; x-model={() =&gt; note.title} /&gt;
+        &lt;textarea ref={this.body} class=&quot;editor__body&quot; placeholder=&quot;Yazmaya başlayın…&quot; x-model={() =&gt; note.body} /&gt;
+      &lt;/&gt;
+    );
+  }
+
+  onRefCreated(field: Component) {
+    field.motif.on(&quot;input&quot;, () =&gt; this.props.onEdit?.());
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="javascript" data-file="src/parts/NoteFields.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class NoteFields extends Component {
+  static elementTag = &quot;div&quot;;
+  title;
+  body;
+
+  view() {
+    const { note } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input ref={this.title} class=&quot;editor__title&quot; placeholder=&quot;Adsız&quot; x-model={() =&gt; note.title} /&gt;
+        &lt;textarea ref={this.body} class=&quot;editor__body&quot; placeholder=&quot;Yazmaya başlayın…&quot; x-model={() =&gt; note.body} /&gt;
+      &lt;/&gt;
+    );
+  }
+
+  onRefCreated(field) {
+    field.motif.on(&quot;input&quot;, () =&gt; this.props.onEdit?.());
+  }
+}</code></pre>
+</div>
+</div>
+<div class="doc-variant" data-variant="imperative,function,options">
+<p>Seçtiğiniz yazımda bu kanca çalışmaz; her ref geri çağırım biçimiyle verilir ve ortak iş o geri çağırımın içinde yapılır.</p>
+</div>
+<p>Her ref, etiketin bileşeni oluşturulduğu anda uygulanır; <code>onRefCreated</code> her birinden sonra bir kez çalışır. Düz bir etiketin içindeki etiketler o etiket kurulurken, yani kardeşleri oluşturulduktan sonra oluşturulur; bu yüzden iç içe yazımda sıra kaynaktaki sıradan farklı olabilir: <code>&lt;form&gt;&lt;label&gt;&lt;input ref={this.title} /&gt;&lt;/label&gt;&lt;textarea ref={this.body} /&gt;&lt;/form&gt;</code> yazımında önce <code>body</code>, sonra <code>title</code> uygulanır. Kanca, JSX'i yazan sınıfın (<code>view()</code>'ın <code>this</code>'i) üyesidir; ref verilen bileşenin değil. Sınıfın metotlarında ve alanlarındaki (ok fonksiyonları dahil) JSX için çağrılır; fonksiyon bileşenlerinde, modül düzeyindeki JSX'te, sınıf metodunun içindeki <code>function</code> ifadelerinde ve nesne metotlarında çağrılmaz. Options bileşeninin <code>view()</code>'ı da bir nesne metodudur: oradaki <code>ref={this.x}</code> atanır, ama nesneye yazılan <code>onRefCreated</code> üyesi çağrılmaz.</p>
+<h2 id="appearance">Görünüş: <code>class</code>, <code>attr</code>, <code>style</code>, <code>setText</code></h2>
+<p>Bileşenin elemanının sınıfı, öznitelikleri, satır içi stili ve metni bileşenin üzerinden yönetilir.</p>
+<div class="doc-variant" data-variant="class,options">
+<p>Yukarıdaki örnekte <code>this.class.add(&quot;editor&quot;)</code>, <code>field.attr.add({ … })</code> ve <code>this.body.style({ height: … })</code> bunlardır.</p>
+</div>
+<div class="doc-variant" data-variant="function">
+<p>Yukarıdaki örnekte kök elemana verilen <code>class=&quot;editor&quot;</code> (JSX'siz yazımda <code>class: &quot;editor&quot;</code> anahtarı), <code>field.attr.add({ … })</code> ve <code>body.style({ height: … })</code> bunlardır.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Çağrı</th>
+<th>Ne yapar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class.add(&quot;a&quot;, &quot;b&quot;)</code></td>
+<td>Sınıf ekler. Fonksiyon (<code>() =&gt; (note.pinned ? &quot;pinned&quot; : &quot;&quot;)</code>) ve <code>{ active: () =&gt; open() }</code> nesnesi canlıdır; dizi de verilir.</td>
+</tr>
+<tr>
+<td><code>class.remove(&quot;a&quot;)</code>, <code>class.remove(&quot;**&quot;)</code></td>
+<td>Sınıfı kaldırır; <code>&quot;**&quot;</code> bütün sınıfları ve canlı kaynakları kaldırır.</td>
+</tr>
+<tr>
+<td><code>class.has(&quot;a&quot;)</code></td>
+<td>Elemanda sınıf var mı.</td>
+</tr>
+<tr>
+<td><code>attr.add({ type: &quot;button&quot;, disabled: () =&gt; busy })</code></td>
+<td>Öznitelik yazar. Fonksiyon değer canlıdır; <code>false</code>, <code>null</code> ve <code>undefined</code> özniteliği kaldırır, <code>true</code> boş değerle yazar.</td>
+</tr>
+<tr>
+<td><code>attr.remove(&quot;disabled&quot;)</code>, <code>attr.has(&quot;disabled&quot;)</code>, <code>attr.get(&quot;href&quot;)</code></td>
+<td>Özniteliği kaldırır, varlığını sorar, değerini okur.</td>
+</tr>
+<tr>
+<td><code>style({ height: &quot;120px&quot; })</code>, <code>style(&quot;color: red&quot;)</code></td>
+<td>Satır içi stili yazar; nesne yalnız verdiği özellikleri değiştirir, metin bütün stili değiştirir.</td>
+</tr>
+<tr>
+<td><code>style(() =&gt; ({ opacity: … }))</code></td>
+<td>Canlı stil; fonksiyonun okuduğu değer değişince yeniden yazılır.</td>
+</tr>
+<tr>
+<td><code>setText(&quot;Kaydedildi&quot;)</code></td>
+<td>Elemanın metnini değiştirir (<code>textContent</code>); içindeki çocuk düğümler gider. Canlı metin için <code>bindings.text(() =&gt; …)</code> kullanılır.</td>
+</tr>
+</tbody>
+</table>
+<p><code>class</code>, <code>attr</code> ve <code>style</code> elemanı olmayan bileşende bir şey yapmaz: kök bir yorum düğümüdür (bkz. <a href="/tr/docs/components#root-element">Kök eleman</a>). <code>class.add</code> aynı sınıfı birden çok kaynaktan sayarak tutar; ayrıntılar ve JSX'teki karşılıkları <a href="/tr/docs/styling-and-transitions#imperative-class-style">Stil ve Animasyon</a> sayfasındadır.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Bileşeni göstermek, gizlemek, olay dinlemek ve kaynaklarını bırakmak için <a href="/tr/docs/component-motif">motif Ad Alanı</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>

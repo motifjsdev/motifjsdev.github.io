@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1d1c1a">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="description" content="Bileşen üzerindeki çerçeve işlemleri: `show`/`hide`/`toggle`, `on`/`off`/`trigger`, `setDisposable`/`register`, `clear`, `stopAnimations` ve `motif.options`.">
+    <title>motif Ad Alanı — MotifJS</title>
+  <script type="module" crossorigin src="/assets/index-Z_1BjqF2.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DOhsg4N7.css">
+    <script>document.documentElement.classList.add('js')</script>
+    <style>html.js #prerender{display:none}</style>
+    <link rel="canonical" href="https://motifjs.com/tr/docs/component-motif">
+    <link rel="alternate" hreflang="en" href="https://motifjs.com/docs/component-motif">
+    <link rel="alternate" hreflang="tr" href="https://motifjs.com/tr/docs/component-motif">
+    <link rel="alternate" hreflang="x-default" href="https://motifjs.com/docs/component-motif">
+    <meta property="og:site_name" content="MotifJS">
+    <meta property="og:url" content="https://motifjs.com/tr/docs/component-motif">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="motif Ad Alanı">
+    <meta property="og:description" content="Bileşen üzerindeki çerçeve işlemleri: `show`/`hide`/`toggle`, `on`/`off`/`trigger`, `setDisposable`/`register`, `clear`, `stopAnimations` ve `motif.options`.">
+    <script type="application/json" id="doc-data">{"slug":"component-motif","locale":"tr","title":"motif Ad Alanı","description":"Bileşen üzerindeki çerçeve işlemleri: \u0060show\u0060/\u0060hide\u0060/\u0060toggle\u0060, \u0060on\u0060/\u0060off\u0060/\u0060trigger\u0060, \u0060setDisposable\u0060/\u0060register\u0060, \u0060clear\u0060, \u0060stopAnimations\u0060 ve \u0060motif.options\u0060.","category":{"id":"2","title":"Temel kavramlar"},"html":"\u003Cp\u003EMotifJS\u0027in bir bileşen üzerinde yaptığı işlemler \u003Ccode\u003Emotif\u003C/code\u003E ad alanında toplanır: sınıfta ve Options\u0027ta \u003Ccode\u003Ethis.motif\u003C/code\u003E, fonksiyon bileşeninde kökün ya da \u003Ccode\u003Eref\u003C/code\u003E ile tutulan bir bileşenin \u003Ccode\u003Emotif\u003C/code\u003E\u0027i. Bu işlemler sınıfın kendi üyeleriyle karışmaz; sınıfta \u003Ccode\u003Eshow\u003C/code\u003E, \u003Ccode\u003Eon\u003C/code\u003E ya da \u003Ccode\u003Eclear\u003C/code\u003E adında kendi metodunuzu yazabilirsiniz (bkz. \u003Ca href=\u0022/docs/components#member-names\u0022\u003ESınıf üyelerinin adları\u003C/a\u003E).\u003C/p\u003E\n\u003Ch2 id=\u0022members\u0022\u003EÜyeler\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EÜye\u003C/th\u003E\n\u003Cth\u003ENe yapar\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eshow()\u003C/code\u003E, \u003Ccode\u003Ehide()\u003C/code\u003E, \u003Ccode\u003Etoggle()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşeni serbest bırakmadan gösterir ve gizler. Gizlenen elemanın yerinde \u003Ccode\u003E\u0026lt;!--h--\u0026gt;\u003C/code\u003E izi kalır, gösterilince eleman izin yerine döner. \u003Ccode\u003Eshow\u003C/code\u003E ve \u003Ccode\u003Ehide\u003C/code\u003E geçiş bitince çözülen bir söz döndürür (bkz. \u003Ca href=\u0022/docs/lifecycle#visibility\u0022\u003EGörünürlük\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eon(ad, fn)\u003C/code\u003E, \u003Ccode\u003Eoff(ad, fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBir DOM olayını ya da bileşen olayını dinler ve bırakır. \u003Ccode\u003E\u0026quot;keydown:prevent\u0026quot;\u003C/code\u003E, \u003Ccode\u003E\u0026quot;click:once\u0026quot;\u003C/code\u003E gibi değiştiriciler yazılır. Dinleyiciler bileşen serbest bırakılınca kalkar (bkz. \u003Ca href=\u0022/docs/events#component-events\u0022\u003EBileşen olay API\u0027si\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etrigger(ad, veri)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EO adla kaydedilmiş işleyicileri \u003Ccode\u003Everi\u003C/code\u003E ile çağırır; DOM\u0027a olay göndermez.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EaddHandler(ad, fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Eon(ad, fn)\u003C/code\u003E ile aynıdır, değer döndürmez.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EsetDisposable(fn)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Efn\u003C/code\u003E bileşen serbest bırakılırken çalışır: belgeye eklenen dinleyiciyi, zamanlayıcıyı ya da dış bir kütüphanenin kurulumunu bırakmak için (bkz. \u003Ca href=\u0022/docs/memory-and-dispose#register\u0022\u003EBellek Yönetimi ve Serbest Bırakma\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eregister(nesne)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Edispose()\u003C/code\u003E metodu olan bir nesneyi bileşenin ömrüne bağlar; bileşenle birlikte serbest bırakılır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eclear()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBütün çocukları serbest bırakır (\u003Ccode\u003Econtrols.clearAsync()\u003C/code\u003E). \u003Ccode\u003Eoptions.disableDisposal\u003C/code\u003E açıksa hiçbir şey yapmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EstopAnimations()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003ESüren CSS sınıf geçişini bitirir, WAAPI animasyonlarını iptal eder (bkz. \u003Ca href=\u0022/docs/styling-and-transitions#stop-animations\u0022\u003EStil ve Animasyon\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Eoptions\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşenin ayarları; \u003Ca href=\u0022#options\u0022\u003Eaşağıda\u003C/a\u003E.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Ch2 id=\u0022example\u0022\u003EBir örnek\u003C/h2\u003E\n\u003Cp\u003ENot listesinin arama kutusu üç işi \u003Ccode\u003Emotif\u003C/code\u003E ile yapar. \u003Ccode\u003E/\u003C/code\u003E tuşu sayfanın her yerinden aramaya odak verir; bu dinleyici belgeye eklendiği için bileşen kaldırılınca \u003Ccode\u003EsetDisposable\u003C/code\u003E ile bırakılır. Escape aramayı temizler: kutunun \u003Ccode\u003Emotif.on(\u0026quot;keydown\u0026quot;, …)\u003C/code\u003E dinleyicisi alandan kabaran olayı yakalar. Alan odaktayken \u003Ccode\u003E/\u003C/code\u003E ipucu \u003Ccode\u003Emotif.hide()\u003C/code\u003E ile gizlenir, odak gidince \u003Ccode\u003Emotif.show()\u003C/code\u003E ile geri gelir. Aramanın kendisi ebeveynin reaktif \u003Ccode\u003Estate\u003C/code\u003E nesnesindedir:\u003C/p\u003E\n\u003Cdiv class=\u0022doc-code\u0022 data-file=\u0022src/parts/SearchBox.tsx\u0022\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/class/typescript\u0022 data-file=\u0022src/parts/SearchBox.tsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class SearchBox extends Component\u0026lt;HTMLDivElement, { state: { query: string } }\u0026gt; {\n  input!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  hint!: Component\u0026lt;HTMLElement\u0026gt;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n  }\n\n  override onConfig() {\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e: KeyboardEvent) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) this.props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e: KeyboardEvent) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  }\n\n  override view() {\n    const { state } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input\n          ref={this.input}\n          type=\u0026quot;search\u0026quot;\n          placeholder=\u0026quot;Notlarda ara\u0026quot;\n          aria-label=\u0026quot;Notlarda ara\u0026quot;\n          autocomplete=\u0026quot;off\u0026quot;\n          x-model={() =\u0026gt; state.query}\n          onfocus={() =\u0026gt; this.hint.motif.hide()}\n          onblur={() =\u0026gt; this.hint.motif.show()}\n        /\u0026gt;\n        \u0026lt;kbd ref={this.hint}\u0026gt;/\u0026lt;/kbd\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/class/typescript\u0022 data-file=\u0022src/parts/SearchBox.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class SearchBox extends Component\u0026lt;HTMLDivElement, { state: { query: string } }\u0026gt; {\n  static override elementTag = \u0026quot;div\u0026quot;;\n  input!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  hint!: Component\u0026lt;HTMLElement\u0026gt;;\n\n  override onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n  }\n\n  override onConfig() {\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e: KeyboardEvent) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) this.props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e: KeyboardEvent) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  }\n\n  override view() {\n    const { state } = this.props;\n    const input = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.input = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Notlarda ara\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.query, (value: string) =\u0026gt; (state.query = value));\n        field.motif.on(\u0026quot;focus\u0026quot;, () =\u0026gt; this.hint.motif.hide());\n        field.motif.on(\u0026quot;blur\u0026quot;, () =\u0026gt; this.hint.motif.show());\n      },\n    });\n    const hint = motifComponent(\u0026quot;kbd\u0026quot;, {\n      ref: (kbd: Component\u0026lt;HTMLElement\u0026gt;) =\u0026gt; (this.hint = kbd),\n      initializeComponent: (kbd: ComponentBase) =\u0026gt; kbd.setText(\u0026quot;/\u0026quot;),\n    });\n    return motifFragment({ childs: [input, hint] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/function/typescript\u0022 data-file=\u0022src/parts/SearchBox.tsx\u0022\u003E\u003Ccode\u003Eimport type { Component, ComponentBase } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function SearchBox(props: { state: { query: string } }) {\n  const { state } = props;\n  let input!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  let hint!: Component\u0026lt;HTMLElement\u0026gt;;\n\n  const configured = (box: ComponentBase) =\u0026gt; {\n    box.motif.on(\u0026quot;keydown\u0026quot;, (_box, e: KeyboardEvent) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e: KeyboardEvent) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    box.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;search\u0026quot; onConfig={configured}\u0026gt;\n      \u0026lt;input\n        ref={input}\n        type=\u0026quot;search\u0026quot;\n        placeholder=\u0026quot;Notlarda ara\u0026quot;\n        aria-label=\u0026quot;Notlarda ara\u0026quot;\n        autocomplete=\u0026quot;off\u0026quot;\n        x-model={() =\u0026gt; state.query}\n        onfocus={() =\u0026gt; hint.motif.hide()}\n        onblur={() =\u0026gt; hint.motif.show()}\n      /\u0026gt;\n      \u0026lt;kbd ref={hint}\u0026gt;/\u0026lt;/kbd\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/function/typescript\u0022 data-file=\u0022src/parts/SearchBox.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function SearchBox(props: { state: { query: string } }) {\n  const { state } = props;\n  let input!: Component\u0026lt;HTMLInputElement\u0026gt;;\n  let hint!: Component\u0026lt;HTMLElement\u0026gt;;\n\n  const configured = (box: ComponentBase) =\u0026gt; {\n    box.motif.on(\u0026quot;keydown\u0026quot;, (_box, e: KeyboardEvent) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e: KeyboardEvent) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    box.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;search\u0026quot;,\n    onConfig: configured,\n    initializeComponent: (box: ComponentBase) =\u0026gt; {\n      const field = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (c: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (input = c),\n        initializeComponent: (c: ComponentBase) =\u0026gt; {\n          c.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Notlarda ara\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n          c.bindings.model(() =\u0026gt; state.query, (value: string) =\u0026gt; (state.query = value));\n          c.motif.on(\u0026quot;focus\u0026quot;, () =\u0026gt; hint.motif.hide());\n          c.motif.on(\u0026quot;blur\u0026quot;, () =\u0026gt; hint.motif.show());\n        },\n      });\n      const kbd = motifComponent(\u0026quot;kbd\u0026quot;, {\n        ref: (c: Component\u0026lt;HTMLElement\u0026gt;) =\u0026gt; (hint = c),\n        initializeComponent: (c: ComponentBase) =\u0026gt; c.setText(\u0026quot;/\u0026quot;),\n      });\n      box.controls.add(field, kbd);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022tsx\u0022 data-variant=\u0022declarative/options/typescript\u0022 data-file=\u0022src/parts/SearchBox.tsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions, type Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const SearchBox = (props: { state: { query: string } }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  input: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n  hint: undefined as Component\u0026lt;HTMLElement\u0026gt; | undefined,\n\n  onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e: KeyboardEvent) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e: KeyboardEvent) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input!.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  },\n\n  view() {\n    const { state } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input\n          ref={this.input}\n          type=\u0026quot;search\u0026quot;\n          placeholder=\u0026quot;Notlarda ara\u0026quot;\n          aria-label=\u0026quot;Notlarda ara\u0026quot;\n          autocomplete=\u0026quot;off\u0026quot;\n          x-model={() =\u0026gt; state.query}\n          onfocus={() =\u0026gt; this.hint!.motif.hide()}\n          onblur={() =\u0026gt; this.hint!.motif.show()}\n        /\u0026gt;\n        \u0026lt;kbd ref={this.hint}\u0026gt;/\u0026lt;/kbd\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022ts\u0022 data-variant=\u0022imperative/options/typescript\u0022 data-file=\u0022src/parts/SearchBox.ts\u0022\u003E\u003Ccode\u003Eimport { Component, ComponentBase, motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const SearchBox = (props: { state: { query: string } }) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  input: undefined as Component\u0026lt;HTMLInputElement\u0026gt; | undefined,\n  hint: undefined as Component\u0026lt;HTMLElement\u0026gt; | undefined,\n\n  onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e: KeyboardEvent) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e: KeyboardEvent) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input!.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  },\n\n  view() {\n    const { state } = props;\n    const input = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field: Component\u0026lt;HTMLInputElement\u0026gt;) =\u0026gt; (this.input = field),\n      initializeComponent: (field: ComponentBase) =\u0026gt; {\n        field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Notlarda ara\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.query, (value: string) =\u0026gt; (state.query = value));\n        field.motif.on(\u0026quot;focus\u0026quot;, () =\u0026gt; this.hint!.motif.hide());\n        field.motif.on(\u0026quot;blur\u0026quot;, () =\u0026gt; this.hint!.motif.show());\n      },\n    });\n    const hint = motifComponent(\u0026quot;kbd\u0026quot;, {\n      ref: (kbd: Component\u0026lt;HTMLElement\u0026gt;) =\u0026gt; (this.hint = kbd),\n      initializeComponent: (kbd: ComponentBase) =\u0026gt; kbd.setText(\u0026quot;/\u0026quot;),\n    });\n    return motifFragment({ childs: [input, hint] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/class/javascript\u0022 data-file=\u0022src/parts/SearchBox.jsx\u0022\u003E\u003Ccode\u003Eimport { Component } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class SearchBox extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  input;\n  hint;\n\n  onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n  }\n\n  onConfig() {\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) this.props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  }\n\n  view() {\n    const { state } = this.props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input\n          ref={this.input}\n          type=\u0026quot;search\u0026quot;\n          placeholder=\u0026quot;Notlarda ara\u0026quot;\n          aria-label=\u0026quot;Notlarda ara\u0026quot;\n          autocomplete=\u0026quot;off\u0026quot;\n          x-model={() =\u0026gt; state.query}\n          onfocus={() =\u0026gt; this.hint.motif.hide()}\n          onblur={() =\u0026gt; this.hint.motif.show()}\n        /\u0026gt;\n        \u0026lt;kbd ref={this.hint}\u0026gt;/\u0026lt;/kbd\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/class/javascript\u0022 data-file=\u0022src/parts/SearchBox.js\u0022\u003E\u003Ccode\u003Eimport { Component, motifComponent, motifFragment } from \u0026quot;@motifx/core\u0026quot;;\n\nexport class SearchBox extends Component {\n  static elementTag = \u0026quot;div\u0026quot;;\n  input;\n  hint;\n\n  onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n  }\n\n  onConfig() {\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) this.props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  }\n\n  view() {\n    const { state } = this.props;\n    const input = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field) =\u0026gt; (this.input = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Notlarda ara\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.query, (value) =\u0026gt; (state.query = value));\n        field.motif.on(\u0026quot;focus\u0026quot;, () =\u0026gt; this.hint.motif.hide());\n        field.motif.on(\u0026quot;blur\u0026quot;, () =\u0026gt; this.hint.motif.show());\n      },\n    });\n    const hint = motifComponent(\u0026quot;kbd\u0026quot;, {\n      ref: (kbd) =\u0026gt; (this.hint = kbd),\n      initializeComponent: (kbd) =\u0026gt; kbd.setText(\u0026quot;/\u0026quot;),\n    });\n    return motifFragment({ childs: [input, hint] });\n  }\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/function/javascript\u0022 data-file=\u0022src/parts/SearchBox.jsx\u0022\u003E\u003Ccode\u003Eexport function SearchBox(props) {\n  const { state } = props;\n  let input;\n  let hint;\n\n  const configured = (box) =\u0026gt; {\n    box.motif.on(\u0026quot;keydown\u0026quot;, (_box, e) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    box.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  };\n\n  return (\n    \u0026lt;div class=\u0026quot;search\u0026quot; onConfig={configured}\u0026gt;\n      \u0026lt;input\n        ref={input}\n        type=\u0026quot;search\u0026quot;\n        placeholder=\u0026quot;Notlarda ara\u0026quot;\n        aria-label=\u0026quot;Notlarda ara\u0026quot;\n        autocomplete=\u0026quot;off\u0026quot;\n        x-model={() =\u0026gt; state.query}\n        onfocus={() =\u0026gt; hint.motif.hide()}\n        onblur={() =\u0026gt; hint.motif.show()}\n      /\u0026gt;\n      \u0026lt;kbd ref={hint}\u0026gt;/\u0026lt;/kbd\u0026gt;\n    \u0026lt;/div\u0026gt;\n  );\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/function/javascript\u0022 data-file=\u0022src/parts/SearchBox.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent } from \u0026quot;@motifx/core\u0026quot;;\n\nexport function SearchBox(props) {\n  const { state } = props;\n  let input;\n  let hint;\n\n  const configured = (box) =\u0026gt; {\n    box.motif.on(\u0026quot;keydown\u0026quot;, (_box, e) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    box.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  };\n\n  return motifComponent(\u0026quot;div\u0026quot;, {\n    class: \u0026quot;search\u0026quot;,\n    onConfig: configured,\n    initializeComponent: (box) =\u0026gt; {\n      const field = motifComponent(\u0026quot;input\u0026quot;, {\n        ref: (c) =\u0026gt; (input = c),\n        initializeComponent: (c) =\u0026gt; {\n          c.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Notlarda ara\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n          c.bindings.model(() =\u0026gt; state.query, (value) =\u0026gt; (state.query = value));\n          c.motif.on(\u0026quot;focus\u0026quot;, () =\u0026gt; hint.motif.hide());\n          c.motif.on(\u0026quot;blur\u0026quot;, () =\u0026gt; hint.motif.show());\n        },\n      });\n      const kbd = motifComponent(\u0026quot;kbd\u0026quot;, {\n        ref: (c) =\u0026gt; (hint = c),\n        initializeComponent: (c) =\u0026gt; c.setText(\u0026quot;/\u0026quot;),\n      });\n      box.controls.add(field, kbd);\n    },\n  });\n}\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022jsx\u0022 data-variant=\u0022declarative/options/javascript\u0022 data-file=\u0022src/parts/SearchBox.jsx\u0022\u003E\u003Ccode\u003Eimport { motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const SearchBox = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  input: undefined,\n  hint: undefined,\n\n  onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  },\n\n  view() {\n    const { state } = props;\n    return (\n      \u0026lt;\u0026gt;\n        \u0026lt;input\n          ref={this.input}\n          type=\u0026quot;search\u0026quot;\n          placeholder=\u0026quot;Notlarda ara\u0026quot;\n          aria-label=\u0026quot;Notlarda ara\u0026quot;\n          autocomplete=\u0026quot;off\u0026quot;\n          x-model={() =\u0026gt; state.query}\n          onfocus={() =\u0026gt; this.hint.motif.hide()}\n          onblur={() =\u0026gt; this.hint.motif.show()}\n        /\u0026gt;\n        \u0026lt;kbd ref={this.hint}\u0026gt;/\u0026lt;/kbd\u0026gt;\n      \u0026lt;/\u0026gt;\n    );\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003Cpre data-lang=\u0022js\u0022 data-variant=\u0022imperative/options/javascript\u0022 data-file=\u0022src/parts/SearchBox.js\u0022\u003E\u003Ccode\u003Eimport { motifComponent, motifFragment, motifOptions } from \u0026quot;@motifx/core\u0026quot;;\n\nexport const SearchBox = (props) =\u0026gt; motifOptions({\n  el: \u0026quot;div\u0026quot;,\n  input: undefined,\n  hint: undefined,\n\n  onConfigured() {\n    this.class.add(\u0026quot;search\u0026quot;);\n    this.motif.on(\u0026quot;keydown\u0026quot;, (_box, e) =\u0026gt; {\n      if (e.key === \u0026quot;Escape\u0026quot;) props.state.query = \u0026quot;\u0026quot;;\n    });\n\n    const focusSearch = (e) =\u0026gt; {\n      if (e.key !== \u0026quot;/\u0026quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? \u0026quot;\u0026quot;)) return;\n      e.preventDefault();\n      this.input.element.focus();\n    };\n    document.addEventListener(\u0026quot;keydown\u0026quot;, focusSearch);\n    this.motif.setDisposable(() =\u0026gt; document.removeEventListener(\u0026quot;keydown\u0026quot;, focusSearch));\n  },\n\n  view() {\n    const { state } = props;\n    const input = motifComponent(\u0026quot;input\u0026quot;, {\n      ref: (field) =\u0026gt; (this.input = field),\n      initializeComponent: (field) =\u0026gt; {\n        field.attr.add({ type: \u0026quot;search\u0026quot;, placeholder: \u0026quot;Notlarda ara\u0026quot;, \u0026quot;aria-label\u0026quot;: \u0026quot;Notlarda ara\u0026quot;, autocomplete: \u0026quot;off\u0026quot; });\n        field.bindings.model(() =\u0026gt; state.query, (value) =\u0026gt; (state.query = value));\n        field.motif.on(\u0026quot;focus\u0026quot;, () =\u0026gt; this.hint.motif.hide());\n        field.motif.on(\u0026quot;blur\u0026quot;, () =\u0026gt; this.hint.motif.show());\n      },\n    });\n    const hint = motifComponent(\u0026quot;kbd\u0026quot;, {\n      ref: (kbd) =\u0026gt; (this.hint = kbd),\n      initializeComponent: (kbd) =\u0026gt; kbd.setText(\u0026quot;/\u0026quot;),\n    });\n    return motifFragment({ childs: [input, hint] });\n  },\n});\u003C/code\u003E\u003C/pre\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022declarative\u0022\u003E\n\u003Cp\u003ENot listesi kutuyu kendi arama durumuyla yerleştirir: \u003Ccode\u003E\u0026lt;SearchBox state={this.state} /\u0026gt;\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/class\u0022\u003E\n\u003Cp\u003ENot listesi kutuyu kendi arama durumuyla yerleştirir: \u003Ccode\u003Enew SearchBox({ state: this.state })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cdiv class=\u0022doc-variant\u0022 data-variant=\u0022imperative/function,imperative/options\u0022\u003E\n\u003Cp\u003ENot listesi kutuyu kendi arama durumuyla yerleştirir: \u003Ccode\u003EmotifComponent(SearchBox, { state: this.state })\u003C/code\u003E.\u003C/p\u003E\n\u003C/div\u003E\n\u003Cp\u003E\u003Ccode\u003Emotif.on\u003C/code\u003E ile eklenen dinleyiciyi bileşen kendisi bırakır; belgeye ya da \u003Ccode\u003Ewindow\u003C/code\u003E\u0027a doğrudan eklenen dinleyiciyi ise bileşen tanımaz, onu \u003Ccode\u003EsetDisposable\u003C/code\u003E bırakır. Aynı kural zamanlayıcılar, gözlemciler (\u003Ccode\u003EResizeObserver\u003C/code\u003E, \u003Ccode\u003EIntersectionObserver\u003C/code\u003E) ve dış kütüphanelerin kurulumları için de geçerlidir.\u003C/p\u003E\n\u003Ch2 id=\u0022options\u0022\u003E\u003Ccode\u003Emotif.options\u003C/code\u003E\u003C/h2\u003E\n\u003Ctable\u003E\n\u003Cthead\u003E\n\u003Ctr\u003E\n\u003Cth\u003EAlan\u003C/th\u003E\n\u003Cth\u003EAnlamı\u003C/th\u003E\n\u003C/tr\u003E\n\u003C/thead\u003E\n\u003Ctbody\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EhideStrategy\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGizlenen elemanın DOM\u0027da nasıl duracağı: \u003Ccode\u003E\u0026quot;auto\u0026quot;\u003C/code\u003E (varsayılan), \u003Ccode\u003E\u0026quot;placeholder\u0026quot;\u003C/code\u003E ya da \u003Ccode\u003E\u0026quot;detach\u0026quot;\u003C/code\u003E (bkz. \u003Ca href=\u0022/docs/lifecycle#hide-strategy\u0022\u003EGizleme stratejisi\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EdisableDisposal\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003E\u003Ccode\u003Etrue\u003C/code\u003E ise \u003Ccode\u003Emotif.clear()\u003C/code\u003E çocukları serbest bırakmaz.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Etransition\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EGeçiş ayarı ve WAAPI ile \u003Ccode\u003Ein\u003C/code\u003E/\u003Ccode\u003Eout\u003C/code\u003E animasyonları (bkz. \u003Ca href=\u0022/docs/styling-and-transitions#waapi\u0022\u003EStil ve Animasyon\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EenableRouterClassing\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EYalnız yazılır: elemana geçerli adrese göre sınıf verir (bkz. \u003Ca href=\u0022/docs/router-links#router-classing\u0022\u003ERota sınıfları\u003C/a\u003E).\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003Edisplay\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EOkununca \u003Ccode\u003EisVisible\u003C/code\u003E\u0027ı verir; \u003Ccode\u003Etrue\u003C/code\u003E yazmak \u003Ccode\u003Eshow()\u003C/code\u003E, \u003Ccode\u003Efalse\u003C/code\u003E yazmak \u003Ccode\u003Ehide()\u003C/code\u003E çağırır.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EhasEvent(ad)\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EO adla kaydedilmiş bir işleyici var mı.\u003C/td\u003E\n\u003C/tr\u003E\n\u003Ctr\u003E\n\u003Ctd\u003E\u003Ccode\u003EgetInstance()\u003C/code\u003E\u003C/td\u003E\n\u003Ctd\u003EBileşenin kendisi.\u003C/td\u003E\n\u003C/tr\u003E\n\u003C/tbody\u003E\n\u003C/table\u003E\n\u003Cp\u003E\u003Ccode\u003EhideStrategy\u003C/code\u003E ve \u003Ccode\u003EdisableDisposal\u003C/code\u003E bileşen yaratılırken \u003Ccode\u003Eoptions\u003C/code\u003E prop\u0027uyla da verilir: JSX\u0027te \u003Ccode\u003Eoptions={{ hideStrategy: \u0026quot;detach\u0026quot; }}\u003C/code\u003E, JSX\u0027siz yazımda props nesnesinin \u003Ccode\u003Eoptions\u003C/code\u003E anahtarı.\u003C/p\u003E\n\u003Ch2 id=\u0022next\u0022\u003ESonraki adım\u003C/h2\u003E\n\u003Cp\u003EBileşenin bağlarını tanımak için \u003Ca href=\u0022/docs/component-bindings\u0022\u003Ebindings\u003C/a\u003E bölümüne geçin.\u003C/p\u003E\n","headings":[{"id":"members","text":"Üyeler","level":2},{"id":"example","text":"Bir örnek","level":2},{"id":"options","text":"motif.options","level":2},{"id":"next","text":"Sonraki adım","level":2}],"previous":{"slug":"component-element","title":"Eleman ve Görünüş"},"next":{"slug":"component-bindings","title":"bindings"},"updatedAt":"2026-11-04T16:24:30.6777852+00:00"}</script>
+</head>
+
+<body>
+    <div id="prerender">
+    <article class="docs-article">
+        <p>Temel kavramlar</p>
+        <h1>motif Ad Alanı</h1>
+        <p>Bileşen üzerindeki çerçeve işlemleri: `show`/`hide`/`toggle`, `on`/`off`/`trigger`, `setDisposable`/`register`, `clear`, `stopAnimations` ve `motif.options`.</p>
+<p>MotifJS'in bir bileşen üzerinde yaptığı işlemler <code>motif</code> ad alanında toplanır: sınıfta ve Options'ta <code>this.motif</code>, fonksiyon bileşeninde kökün ya da <code>ref</code> ile tutulan bir bileşenin <code>motif</code>'i. Bu işlemler sınıfın kendi üyeleriyle karışmaz; sınıfta <code>show</code>, <code>on</code> ya da <code>clear</code> adında kendi metodunuzu yazabilirsiniz (bkz. <a href="/tr/docs/components#member-names">Sınıf üyelerinin adları</a>).</p>
+<h2 id="members">Üyeler</h2>
+<table>
+<thead>
+<tr>
+<th>Üye</th>
+<th>Ne yapar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>show()</code>, <code>hide()</code>, <code>toggle()</code></td>
+<td>Bileşeni serbest bırakmadan gösterir ve gizler. Gizlenen elemanın yerinde <code>&lt;!--h--&gt;</code> izi kalır, gösterilince eleman izin yerine döner. <code>show</code> ve <code>hide</code> geçiş bitince çözülen bir söz döndürür (bkz. <a href="/tr/docs/lifecycle#visibility">Görünürlük</a>).</td>
+</tr>
+<tr>
+<td><code>on(ad, fn)</code>, <code>off(ad, fn)</code></td>
+<td>Bir DOM olayını ya da bileşen olayını dinler ve bırakır. <code>&quot;keydown:prevent&quot;</code>, <code>&quot;click:once&quot;</code> gibi değiştiriciler yazılır. Dinleyiciler bileşen serbest bırakılınca kalkar (bkz. <a href="/tr/docs/events#component-events">Bileşen olay API'si</a>).</td>
+</tr>
+<tr>
+<td><code>trigger(ad, veri)</code></td>
+<td>O adla kaydedilmiş işleyicileri <code>veri</code> ile çağırır; DOM'a olay göndermez.</td>
+</tr>
+<tr>
+<td><code>addHandler(ad, fn)</code></td>
+<td><code>on(ad, fn)</code> ile aynıdır, değer döndürmez.</td>
+</tr>
+<tr>
+<td><code>setDisposable(fn)</code></td>
+<td><code>fn</code> bileşen serbest bırakılırken çalışır: belgeye eklenen dinleyiciyi, zamanlayıcıyı ya da dış bir kütüphanenin kurulumunu bırakmak için (bkz. <a href="/tr/docs/memory-and-dispose#register">Bellek Yönetimi ve Serbest Bırakma</a>).</td>
+</tr>
+<tr>
+<td><code>register(nesne)</code></td>
+<td><code>dispose()</code> metodu olan bir nesneyi bileşenin ömrüne bağlar; bileşenle birlikte serbest bırakılır.</td>
+</tr>
+<tr>
+<td><code>clear()</code></td>
+<td>Bütün çocukları serbest bırakır (<code>controls.clearAsync()</code>). <code>options.disableDisposal</code> açıksa hiçbir şey yapmaz.</td>
+</tr>
+<tr>
+<td><code>stopAnimations()</code></td>
+<td>Süren CSS sınıf geçişini bitirir, WAAPI animasyonlarını iptal eder (bkz. <a href="/tr/docs/styling-and-transitions#stop-animations">Stil ve Animasyon</a>).</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td>Bileşenin ayarları; <a href="#options">aşağıda</a>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example">Bir örnek</h2>
+<p>Not listesinin arama kutusu üç işi <code>motif</code> ile yapar. <code>/</code> tuşu sayfanın her yerinden aramaya odak verir; bu dinleyici belgeye eklendiği için bileşen kaldırılınca <code>setDisposable</code> ile bırakılır. Escape aramayı temizler: kutunun <code>motif.on(&quot;keydown&quot;, …)</code> dinleyicisi alandan kabaran olayı yakalar. Alan odaktayken <code>/</code> ipucu <code>motif.hide()</code> ile gizlenir, odak gidince <code>motif.show()</code> ile geri gelir. Aramanın kendisi ebeveynin reaktif <code>state</code> nesnesindedir:</p>
+<div class="doc-code" data-file="src/parts/SearchBox.tsx">
+<pre data-lang="tsx" data-variant="declarative/class/typescript" data-file="src/parts/SearchBox.tsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class SearchBox extends Component&lt;HTMLDivElement, { state: { query: string } }&gt; {
+  input!: Component&lt;HTMLInputElement&gt;;
+  hint!: Component&lt;HTMLElement&gt;;
+
+  override onConfigured() {
+    this.class.add(&quot;search&quot;);
+  }
+
+  override onConfig() {
+    this.motif.on(&quot;keydown&quot;, (_box, e: KeyboardEvent) =&gt; {
+      if (e.key === &quot;Escape&quot;) this.props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e: KeyboardEvent) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  }
+
+  override view() {
+    const { state } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input
+          ref={this.input}
+          type=&quot;search&quot;
+          placeholder=&quot;Notlarda ara&quot;
+          aria-label=&quot;Notlarda ara&quot;
+          autocomplete=&quot;off&quot;
+          x-model={() =&gt; state.query}
+          onfocus={() =&gt; this.hint.motif.hide()}
+          onblur={() =&gt; this.hint.motif.show()}
+        /&gt;
+        &lt;kbd ref={this.hint}&gt;/&lt;/kbd&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/class/typescript" data-file="src/parts/SearchBox.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+
+export class SearchBox extends Component&lt;HTMLDivElement, { state: { query: string } }&gt; {
+  static override elementTag = &quot;div&quot;;
+  input!: Component&lt;HTMLInputElement&gt;;
+  hint!: Component&lt;HTMLElement&gt;;
+
+  override onConfigured() {
+    this.class.add(&quot;search&quot;);
+  }
+
+  override onConfig() {
+    this.motif.on(&quot;keydown&quot;, (_box, e: KeyboardEvent) =&gt; {
+      if (e.key === &quot;Escape&quot;) this.props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e: KeyboardEvent) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  }
+
+  override view() {
+    const { state } = this.props;
+    const input = motifComponent(&quot;input&quot;, {
+      ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.input = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot;, &quot;aria-label&quot;: &quot;Notlarda ara&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; state.query, (value: string) =&gt; (state.query = value));
+        field.motif.on(&quot;focus&quot;, () =&gt; this.hint.motif.hide());
+        field.motif.on(&quot;blur&quot;, () =&gt; this.hint.motif.show());
+      },
+    });
+    const hint = motifComponent(&quot;kbd&quot;, {
+      ref: (kbd: Component&lt;HTMLElement&gt;) =&gt; (this.hint = kbd),
+      initializeComponent: (kbd: ComponentBase) =&gt; kbd.setText(&quot;/&quot;),
+    });
+    return motifFragment({ childs: [input, hint] });
+  }
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/function/typescript" data-file="src/parts/SearchBox.tsx"><code>import type { Component, ComponentBase } from &quot;@motifx/core&quot;;
+
+export function SearchBox(props: { state: { query: string } }) {
+  const { state } = props;
+  let input!: Component&lt;HTMLInputElement&gt;;
+  let hint!: Component&lt;HTMLElement&gt;;
+
+  const configured = (box: ComponentBase) =&gt; {
+    box.motif.on(&quot;keydown&quot;, (_box, e: KeyboardEvent) =&gt; {
+      if (e.key === &quot;Escape&quot;) state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e: KeyboardEvent) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    box.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  };
+
+  return (
+    &lt;div class=&quot;search&quot; onConfig={configured}&gt;
+      &lt;input
+        ref={input}
+        type=&quot;search&quot;
+        placeholder=&quot;Notlarda ara&quot;
+        aria-label=&quot;Notlarda ara&quot;
+        autocomplete=&quot;off&quot;
+        x-model={() =&gt; state.query}
+        onfocus={() =&gt; hint.motif.hide()}
+        onblur={() =&gt; hint.motif.show()}
+      /&gt;
+      &lt;kbd ref={hint}&gt;/&lt;/kbd&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="ts" data-variant="imperative/function/typescript" data-file="src/parts/SearchBox.ts"><code>import { Component, ComponentBase, motifComponent } from &quot;@motifx/core&quot;;
+
+export function SearchBox(props: { state: { query: string } }) {
+  const { state } = props;
+  let input!: Component&lt;HTMLInputElement&gt;;
+  let hint!: Component&lt;HTMLElement&gt;;
+
+  const configured = (box: ComponentBase) =&gt; {
+    box.motif.on(&quot;keydown&quot;, (_box, e: KeyboardEvent) =&gt; {
+      if (e.key === &quot;Escape&quot;) state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e: KeyboardEvent) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    box.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;search&quot;,
+    onConfig: configured,
+    initializeComponent: (box: ComponentBase) =&gt; {
+      const field = motifComponent(&quot;input&quot;, {
+        ref: (c: Component&lt;HTMLInputElement&gt;) =&gt; (input = c),
+        initializeComponent: (c: ComponentBase) =&gt; {
+          c.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot;, &quot;aria-label&quot;: &quot;Notlarda ara&quot;, autocomplete: &quot;off&quot; });
+          c.bindings.model(() =&gt; state.query, (value: string) =&gt; (state.query = value));
+          c.motif.on(&quot;focus&quot;, () =&gt; hint.motif.hide());
+          c.motif.on(&quot;blur&quot;, () =&gt; hint.motif.show());
+        },
+      });
+      const kbd = motifComponent(&quot;kbd&quot;, {
+        ref: (c: Component&lt;HTMLElement&gt;) =&gt; (hint = c),
+        initializeComponent: (c: ComponentBase) =&gt; c.setText(&quot;/&quot;),
+      });
+      box.controls.add(field, kbd);
+    },
+  });
+}</code></pre>
+<pre data-lang="tsx" data-variant="declarative/options/typescript" data-file="src/parts/SearchBox.tsx"><code>import { motifOptions, type Component } from &quot;@motifx/core&quot;;
+
+export const SearchBox = (props: { state: { query: string } }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  input: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+  hint: undefined as Component&lt;HTMLElement&gt; | undefined,
+
+  onConfigured() {
+    this.class.add(&quot;search&quot;);
+    this.motif.on(&quot;keydown&quot;, (_box, e: KeyboardEvent) =&gt; {
+      if (e.key === &quot;Escape&quot;) props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e: KeyboardEvent) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input!.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  },
+
+  view() {
+    const { state } = props;
+    return (
+      &lt;&gt;
+        &lt;input
+          ref={this.input}
+          type=&quot;search&quot;
+          placeholder=&quot;Notlarda ara&quot;
+          aria-label=&quot;Notlarda ara&quot;
+          autocomplete=&quot;off&quot;
+          x-model={() =&gt; state.query}
+          onfocus={() =&gt; this.hint!.motif.hide()}
+          onblur={() =&gt; this.hint!.motif.show()}
+        /&gt;
+        &lt;kbd ref={this.hint}&gt;/&lt;/kbd&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="ts" data-variant="imperative/options/typescript" data-file="src/parts/SearchBox.ts"><code>import { Component, ComponentBase, motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+
+export const SearchBox = (props: { state: { query: string } }) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  input: undefined as Component&lt;HTMLInputElement&gt; | undefined,
+  hint: undefined as Component&lt;HTMLElement&gt; | undefined,
+
+  onConfigured() {
+    this.class.add(&quot;search&quot;);
+    this.motif.on(&quot;keydown&quot;, (_box, e: KeyboardEvent) =&gt; {
+      if (e.key === &quot;Escape&quot;) props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e: KeyboardEvent) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement as HTMLElement | null)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input!.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  },
+
+  view() {
+    const { state } = props;
+    const input = motifComponent(&quot;input&quot;, {
+      ref: (field: Component&lt;HTMLInputElement&gt;) =&gt; (this.input = field),
+      initializeComponent: (field: ComponentBase) =&gt; {
+        field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot;, &quot;aria-label&quot;: &quot;Notlarda ara&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; state.query, (value: string) =&gt; (state.query = value));
+        field.motif.on(&quot;focus&quot;, () =&gt; this.hint!.motif.hide());
+        field.motif.on(&quot;blur&quot;, () =&gt; this.hint!.motif.show());
+      },
+    });
+    const hint = motifComponent(&quot;kbd&quot;, {
+      ref: (kbd: Component&lt;HTMLElement&gt;) =&gt; (this.hint = kbd),
+      initializeComponent: (kbd: ComponentBase) =&gt; kbd.setText(&quot;/&quot;),
+    });
+    return motifFragment({ childs: [input, hint] });
+  },
+});</code></pre>
+<pre data-lang="jsx" data-variant="declarative/class/javascript" data-file="src/parts/SearchBox.jsx"><code>import { Component } from &quot;@motifx/core&quot;;
+
+export class SearchBox extends Component {
+  static elementTag = &quot;div&quot;;
+  input;
+  hint;
+
+  onConfigured() {
+    this.class.add(&quot;search&quot;);
+  }
+
+  onConfig() {
+    this.motif.on(&quot;keydown&quot;, (_box, e) =&gt; {
+      if (e.key === &quot;Escape&quot;) this.props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  }
+
+  view() {
+    const { state } = this.props;
+    return (
+      &lt;&gt;
+        &lt;input
+          ref={this.input}
+          type=&quot;search&quot;
+          placeholder=&quot;Notlarda ara&quot;
+          aria-label=&quot;Notlarda ara&quot;
+          autocomplete=&quot;off&quot;
+          x-model={() =&gt; state.query}
+          onfocus={() =&gt; this.hint.motif.hide()}
+          onblur={() =&gt; this.hint.motif.show()}
+        /&gt;
+        &lt;kbd ref={this.hint}&gt;/&lt;/kbd&gt;
+      &lt;/&gt;
+    );
+  }
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/class/javascript" data-file="src/parts/SearchBox.js"><code>import { Component, motifComponent, motifFragment } from &quot;@motifx/core&quot;;
+
+export class SearchBox extends Component {
+  static elementTag = &quot;div&quot;;
+  input;
+  hint;
+
+  onConfigured() {
+    this.class.add(&quot;search&quot;);
+  }
+
+  onConfig() {
+    this.motif.on(&quot;keydown&quot;, (_box, e) =&gt; {
+      if (e.key === &quot;Escape&quot;) this.props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  }
+
+  view() {
+    const { state } = this.props;
+    const input = motifComponent(&quot;input&quot;, {
+      ref: (field) =&gt; (this.input = field),
+      initializeComponent: (field) =&gt; {
+        field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot;, &quot;aria-label&quot;: &quot;Notlarda ara&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; state.query, (value) =&gt; (state.query = value));
+        field.motif.on(&quot;focus&quot;, () =&gt; this.hint.motif.hide());
+        field.motif.on(&quot;blur&quot;, () =&gt; this.hint.motif.show());
+      },
+    });
+    const hint = motifComponent(&quot;kbd&quot;, {
+      ref: (kbd) =&gt; (this.hint = kbd),
+      initializeComponent: (kbd) =&gt; kbd.setText(&quot;/&quot;),
+    });
+    return motifFragment({ childs: [input, hint] });
+  }
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/function/javascript" data-file="src/parts/SearchBox.jsx"><code>export function SearchBox(props) {
+  const { state } = props;
+  let input;
+  let hint;
+
+  const configured = (box) =&gt; {
+    box.motif.on(&quot;keydown&quot;, (_box, e) =&gt; {
+      if (e.key === &quot;Escape&quot;) state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    box.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  };
+
+  return (
+    &lt;div class=&quot;search&quot; onConfig={configured}&gt;
+      &lt;input
+        ref={input}
+        type=&quot;search&quot;
+        placeholder=&quot;Notlarda ara&quot;
+        aria-label=&quot;Notlarda ara&quot;
+        autocomplete=&quot;off&quot;
+        x-model={() =&gt; state.query}
+        onfocus={() =&gt; hint.motif.hide()}
+        onblur={() =&gt; hint.motif.show()}
+      /&gt;
+      &lt;kbd ref={hint}&gt;/&lt;/kbd&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+<pre data-lang="js" data-variant="imperative/function/javascript" data-file="src/parts/SearchBox.js"><code>import { motifComponent } from &quot;@motifx/core&quot;;
+
+export function SearchBox(props) {
+  const { state } = props;
+  let input;
+  let hint;
+
+  const configured = (box) =&gt; {
+    box.motif.on(&quot;keydown&quot;, (_box, e) =&gt; {
+      if (e.key === &quot;Escape&quot;) state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    box.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  };
+
+  return motifComponent(&quot;div&quot;, {
+    class: &quot;search&quot;,
+    onConfig: configured,
+    initializeComponent: (box) =&gt; {
+      const field = motifComponent(&quot;input&quot;, {
+        ref: (c) =&gt; (input = c),
+        initializeComponent: (c) =&gt; {
+          c.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot;, &quot;aria-label&quot;: &quot;Notlarda ara&quot;, autocomplete: &quot;off&quot; });
+          c.bindings.model(() =&gt; state.query, (value) =&gt; (state.query = value));
+          c.motif.on(&quot;focus&quot;, () =&gt; hint.motif.hide());
+          c.motif.on(&quot;blur&quot;, () =&gt; hint.motif.show());
+        },
+      });
+      const kbd = motifComponent(&quot;kbd&quot;, {
+        ref: (c) =&gt; (hint = c),
+        initializeComponent: (c) =&gt; c.setText(&quot;/&quot;),
+      });
+      box.controls.add(field, kbd);
+    },
+  });
+}</code></pre>
+<pre data-lang="jsx" data-variant="declarative/options/javascript" data-file="src/parts/SearchBox.jsx"><code>import { motifOptions } from &quot;@motifx/core&quot;;
+
+export const SearchBox = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  input: undefined,
+  hint: undefined,
+
+  onConfigured() {
+    this.class.add(&quot;search&quot;);
+    this.motif.on(&quot;keydown&quot;, (_box, e) =&gt; {
+      if (e.key === &quot;Escape&quot;) props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  },
+
+  view() {
+    const { state } = props;
+    return (
+      &lt;&gt;
+        &lt;input
+          ref={this.input}
+          type=&quot;search&quot;
+          placeholder=&quot;Notlarda ara&quot;
+          aria-label=&quot;Notlarda ara&quot;
+          autocomplete=&quot;off&quot;
+          x-model={() =&gt; state.query}
+          onfocus={() =&gt; this.hint.motif.hide()}
+          onblur={() =&gt; this.hint.motif.show()}
+        /&gt;
+        &lt;kbd ref={this.hint}&gt;/&lt;/kbd&gt;
+      &lt;/&gt;
+    );
+  },
+});</code></pre>
+<pre data-lang="js" data-variant="imperative/options/javascript" data-file="src/parts/SearchBox.js"><code>import { motifComponent, motifFragment, motifOptions } from &quot;@motifx/core&quot;;
+
+export const SearchBox = (props) =&gt; motifOptions({
+  el: &quot;div&quot;,
+  input: undefined,
+  hint: undefined,
+
+  onConfigured() {
+    this.class.add(&quot;search&quot;);
+    this.motif.on(&quot;keydown&quot;, (_box, e) =&gt; {
+      if (e.key === &quot;Escape&quot;) props.state.query = &quot;&quot;;
+    });
+
+    const focusSearch = (e) =&gt; {
+      if (e.key !== &quot;/&quot; || /^(INPUT|TEXTAREA)$/.test((document.activeElement)?.tagName ?? &quot;&quot;)) return;
+      e.preventDefault();
+      this.input.element.focus();
+    };
+    document.addEventListener(&quot;keydown&quot;, focusSearch);
+    this.motif.setDisposable(() =&gt; document.removeEventListener(&quot;keydown&quot;, focusSearch));
+  },
+
+  view() {
+    const { state } = props;
+    const input = motifComponent(&quot;input&quot;, {
+      ref: (field) =&gt; (this.input = field),
+      initializeComponent: (field) =&gt; {
+        field.attr.add({ type: &quot;search&quot;, placeholder: &quot;Notlarda ara&quot;, &quot;aria-label&quot;: &quot;Notlarda ara&quot;, autocomplete: &quot;off&quot; });
+        field.bindings.model(() =&gt; state.query, (value) =&gt; (state.query = value));
+        field.motif.on(&quot;focus&quot;, () =&gt; this.hint.motif.hide());
+        field.motif.on(&quot;blur&quot;, () =&gt; this.hint.motif.show());
+      },
+    });
+    const hint = motifComponent(&quot;kbd&quot;, {
+      ref: (kbd) =&gt; (this.hint = kbd),
+      initializeComponent: (kbd) =&gt; kbd.setText(&quot;/&quot;),
+    });
+    return motifFragment({ childs: [input, hint] });
+  },
+});</code></pre>
+</div>
+<div class="doc-variant" data-variant="declarative">
+<p>Not listesi kutuyu kendi arama durumuyla yerleştirir: <code>&lt;SearchBox state={this.state} /&gt;</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/class">
+<p>Not listesi kutuyu kendi arama durumuyla yerleştirir: <code>new SearchBox({ state: this.state })</code>.</p>
+</div>
+<div class="doc-variant" data-variant="imperative/function,imperative/options">
+<p>Not listesi kutuyu kendi arama durumuyla yerleştirir: <code>motifComponent(SearchBox, { state: this.state })</code>.</p>
+</div>
+<p><code>motif.on</code> ile eklenen dinleyiciyi bileşen kendisi bırakır; belgeye ya da <code>window</code>'a doğrudan eklenen dinleyiciyi ise bileşen tanımaz, onu <code>setDisposable</code> bırakır. Aynı kural zamanlayıcılar, gözlemciler (<code>ResizeObserver</code>, <code>IntersectionObserver</code>) ve dış kütüphanelerin kurulumları için de geçerlidir.</p>
+<h2 id="options"><code>motif.options</code></h2>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hideStrategy</code></td>
+<td>Gizlenen elemanın DOM'da nasıl duracağı: <code>&quot;auto&quot;</code> (varsayılan), <code>&quot;placeholder&quot;</code> ya da <code>&quot;detach&quot;</code> (bkz. <a href="/tr/docs/lifecycle#hide-strategy">Gizleme stratejisi</a>).</td>
+</tr>
+<tr>
+<td><code>disableDisposal</code></td>
+<td><code>true</code> ise <code>motif.clear()</code> çocukları serbest bırakmaz.</td>
+</tr>
+<tr>
+<td><code>transition</code></td>
+<td>Geçiş ayarı ve WAAPI ile <code>in</code>/<code>out</code> animasyonları (bkz. <a href="/tr/docs/styling-and-transitions#waapi">Stil ve Animasyon</a>).</td>
+</tr>
+<tr>
+<td><code>enableRouterClassing</code></td>
+<td>Yalnız yazılır: elemana geçerli adrese göre sınıf verir (bkz. <a href="/tr/docs/router-links#router-classing">Rota sınıfları</a>).</td>
+</tr>
+<tr>
+<td><code>display</code></td>
+<td>Okununca <code>isVisible</code>'ı verir; <code>true</code> yazmak <code>show()</code>, <code>false</code> yazmak <code>hide()</code> çağırır.</td>
+</tr>
+<tr>
+<td><code>hasEvent(ad)</code></td>
+<td>O adla kaydedilmiş bir işleyici var mı.</td>
+</tr>
+<tr>
+<td><code>getInstance()</code></td>
+<td>Bileşenin kendisi.</td>
+</tr>
+</tbody>
+</table>
+<p><code>hideStrategy</code> ve <code>disableDisposal</code> bileşen yaratılırken <code>options</code> prop'uyla da verilir: JSX'te <code>options={{ hideStrategy: &quot;detach&quot; }}</code>, JSX'siz yazımda props nesnesinin <code>options</code> anahtarı.</p>
+<h2 id="next">Sonraki adım</h2>
+<p>Bileşenin bağlarını tanımak için <a href="/tr/docs/component-bindings">bindings</a> bölümüne geçin.</p>
+    </article>
+    </div>
+    <div id="app"></div>
+</body>
+
+</html>
