@@ -1,4 +1,4 @@
-import{D as e,E as t,L as n,M as r,O as i,a,b as o,c as s,f as c,i as l,k as u,l as d,m as f,r as p,s as m,u as h,v as g,y as _}from"./index-CSH3ANou.js";import{r as v,t as y}from"./Brand-D_rzWbgj.js";import{a as b,o as x,r as S}from"./SearchDialog-BbWr4WyH.js";var C,w,T,E=n((()=>{C={declarative:{class:`import { Component, reactive } from '@motifx/core';
+import{D as e,E as t,L as n,M as r,O as i,a,b as o,c as s,f as c,i as l,k as u,l as d,m as f,r as p,s as m,u as h,v as g,y as _}from"./index-D96wZZvL.js";import{r as v,t as y}from"./Brand-BbVbmXg0.js";import{a as b,o as x,r as S}from"./SearchDialog-TCSr7FWG.js";var C,w,T,E=n((()=>{C={declarative:{class:`import { Component, reactive } from '@motifx/core';
 
 export class Counter extends Component<HTMLDivElement> {
   state = reactive({ count: 0 });

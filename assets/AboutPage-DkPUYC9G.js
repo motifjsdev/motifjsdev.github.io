@@ -1,1 +1,0 @@
-import{E as e,L as t,M as n,k as r,v as i}from"./index-CSH3ANou.js";function a(){return n(`div`,{initializeComponent:t=>{let r=n(`h1`,{initializeComponent:t=>{t.bindings.method(()=>e(`about.title`))}},1);t.controls.add(r);let i=n(`p`,{initializeComponent:t=>{t.bindings.method(()=>e(`about.description`))}},1);t.controls.add(i)}},1)}t((()=>{r(),i()}))();export{a as default};
